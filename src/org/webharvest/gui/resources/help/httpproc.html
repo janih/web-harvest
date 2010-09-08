@@ -1,7 +1,7 @@
 <div>
     Sends HTTP request to the specified URL and gets HTTP response as a result.
     First the body of the processor is executed in order to define optional
-    HTTP parameters and/or headers and then sends HTTP request.  
+    HTTP parameters and/or headers and then sends HTTP request.
 </div>
 
 <h3>Syntax</h3>
@@ -12,6 +12,7 @@
       cookie-policy="cookie_policy"
       username="username"
       password="password"
+      follow-redirects="follow-redirects"
       multipart="multipart"&gt;
     body that might contain http-param and/or http-header elements
 &lt;/http&gt;</pre>
@@ -85,9 +86,17 @@
                 Tells if form is multipart encoded (enabling data upload).
             </td>
         </tr>
+        <tr>
+            <td>follow-redirects</td>
+            <td>no</td>
+            <td>[Varies depending on the method]</td>
+            <td>
+                Sets whether or not the HTTP method should automatically follow HTTP redirects (status code 302, etc.)
+            </td>
+        </tr>
     </table>
 </div>
-        
+
 <h3>Example</h3>
 <div>
 <pre>&lt;xpath expression="data(//script)"&gt;

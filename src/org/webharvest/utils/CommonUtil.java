@@ -64,6 +64,7 @@ public class CommonUtil {
      * Contains pair of intger values
      */
     public static class IntPair {
+
         public int x;
         public int y;
 
@@ -89,8 +90,8 @@ public class CommonUtil {
                     x = 1;
                     String s2 = s.substring(1);
                     y = "".equals(s2) ? maxValue : Integer.parseInt(s2);
-                } else if (columnIndex == s.length()-1) {
-                    x = Integer.parseInt( s.substring(0, s.length()-1) );
+                } else if (columnIndex == s.length() - 1) {
+                    x = Integer.parseInt(s.substring(0, s.length() - 1));
                     y = maxValue;
                 } else {
                     String s1 = s.substring(0, columnIndex);
@@ -121,15 +122,16 @@ public class CommonUtil {
     /**
      * Checks if given string is valid XML identifier, i.e. it can be valid XML tag
      * or attribute name.
+     *
      * @param name String to be checked
      * @return True if string is valid XML identifier, false otherwise.
      */
     public static boolean isValidXmlIdentifier(String name) {
-        if ( !isEmpty(name) ) {
-            if ( Character.isJavaIdentifierStart(name.charAt(0)) ) {
-                for (int i = 1; i < name.length(); i++ )  {
+        if (!isEmpty(name)) {
+            if (Character.isJavaIdentifierStart(name.charAt(0))) {
+                for (int i = 1; i < name.length(); i++) {
                     char ch = name.charAt(i);
-                    if ( !Character.isJavaIdentifierPart(ch) && ch != '-' ) {
+                    if (!Character.isJavaIdentifierPart(ch) && ch != '-') {
                         return false;
                     }
                 }
@@ -142,6 +144,7 @@ public class CommonUtil {
     /**
      * Checks if specified file path is absolute. Criteria for recogning absolute file paths is
      * that i starts with /, \, or X: where X is some letter.
+     *
      * @param path
      * @return True, if specified filepath is absolute, false otherwise.
      */
@@ -153,18 +156,19 @@ public class CommonUtil {
         path = adaptFilename(path);
         int len = path.length();
 
-        return ( len >= 1 && path.startsWith("/") ) ||
-               ( len >= 2 && Character.isLetter(path.charAt(0)) && path.charAt(1) == ':' ); 
+        return (len >= 1 && path.startsWith("/")) ||
+                (len >= 2 && Character.isLetter(path.charAt(0)) && path.charAt(1) == ':');
     }
 
     /**
      * For the goven working path and file path returns absolute file path.
+     *
      * @param workingPath
      * @param filePath
      * @return Absolute path of the second parameter according to absolute working path.
      */
     public static String getAbsoluteFilename(String workingPath, String filePath) {
-    	filePath = adaptFilename(filePath);
+        filePath = adaptFilename(filePath);
 
         // if file path is absolute, then return only filePath parameter
         if (isPathAbsolute(filePath)) {
@@ -172,33 +176,33 @@ public class CommonUtil {
         } else {
             workingPath = adaptFilename(workingPath);
             if (workingPath.endsWith("/")) {
-                workingPath = workingPath.substring( 0, workingPath.length() - 1 );
+                workingPath = workingPath.substring(0, workingPath.length() - 1);
             }
             return workingPath + "/" + filePath;
         }
     }
-    
-	/**
-	 * Extracts a filename and directory from an absolute path.
-	 */
-	public static String getDirectoryFromPath(String path) {
-		path = adaptFilename(path);
-		int index = path.lastIndexOf("/");
 
-		return path.substring(0, index);
-	}
+    /**
+     * Extracts a filename and directory from an absolute path.
+     */
+    public static String getDirectoryFromPath(String path) {
+        path = adaptFilename(path);
+        int index = path.lastIndexOf("/");
 
-	/**
-	 * Extracts a filename from an absolute path.
-	 */
-	public static String getFileFromPath(String path) {
-		int i1 = path.lastIndexOf("/");
-		int i2 = path.lastIndexOf("\\");
-		if (i1 > i2) {
-			return path.substring(i1+1);
-		}
-		return path.substring(i2+1);
-	}
+        return path.substring(0, index);
+    }
+
+    /**
+     * Extracts a filename from an absolute path.
+     */
+    public static String getFileFromPath(String path) {
+        int i1 = path.lastIndexOf("/");
+        int i2 = path.lastIndexOf("\\");
+        if (i1 > i2) {
+            return path.substring(i1 + 1);
+        }
+        return path.substring(i2 + 1);
+    }
 
     /**
      * Returns class name without packages for the specified object
@@ -208,7 +212,7 @@ public class CommonUtil {
             String processorClassName = o.getClass().getName();
             int dotIndex = processorClassName.lastIndexOf('.');
             if (dotIndex >= 0) {
-                processorClassName = processorClassName.substring(dotIndex+1);
+                processorClassName = processorClassName.substring(dotIndex + 1);
             }
 
             return processorClassName;
@@ -225,37 +229,37 @@ public class CommonUtil {
 
         return result;
     }
-    
+
     private static String encodeUrlParam(String value, String charset) throws UnsupportedEncodingException {
         if (value == null) {
             return "";
         }
 
         try {
-    		String decoded = URLDecoder.decode(value, charset);
-    		
-    		String result = "";
-    		for (int i = 0; i < decoded.length(); i++) {
-    			char ch = decoded.charAt(i);
-    			result += (ch == '#') ? "#" : URLEncoder.encode(String.valueOf(ch), charset);
-    		}
+            String decoded = URLDecoder.decode(value, charset);
 
-    		return result;
-    	} catch (IllegalArgumentException e) {
-    		return value;
-    	}
+            String result = "";
+            for (int i = 0; i < decoded.length(); i++) {
+                char ch = decoded.charAt(i);
+                result += (ch == '#') ? "#" : URLEncoder.encode(String.valueOf(ch), charset);
+            }
+
+            return result;
+        } catch (IllegalArgumentException e) {
+            return value;
+        }
     }
 
     public static String encodeUrl(String url, String charset) {
         if (url == null) {
             return "";
         }
-        
+
         int index = url.indexOf("?");
         if (index >= 0) {
             try {
-                String result = url.substring(0, index+1);
-                String paramsPart = url.substring(index+1);
+                String result = url.substring(0, index + 1);
+                String paramsPart = url.substring(index + 1);
                 StringTokenizer tokenizer = new StringTokenizer(paramsPart, "&");
                 while (tokenizer.hasMoreTokens()) {
                     String definition = tokenizer.nextToken();
@@ -269,7 +273,7 @@ public class CommonUtil {
                     }
                 }
 
-                if( result.endsWith("&") ) {
+                if (result.endsWith("&")) {
                     result = result.substring(0, result.length() - 1);
                 }
 
@@ -281,29 +285,28 @@ public class CommonUtil {
 
         return url;
     }
-    
+
     /**
      * Checks if specified string value represents boolean true value.
+     *
      * @return If specified string equals (ignoring case) to 1, true or yes then
-     *         true, otherwise false. 
+     *         true, otherwise false.
      */
     public static boolean isBooleanTrue(String value) {
-    	if (value != null) {
-    		return "1".equals(value) || "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value);
-    	}
-    	
-    	return false;
+        return value != null && ("1".equals(value) || "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value));
+
     }
 
     /**
      * Reads boolean value from string
+     *
      * @param value
-     * @param defaultValue value to be returned if string value is not recognized      
+     * @param defaultValue value to be returned if string value is not recognized
      */
-    public static boolean getBooleanValue(String value, boolean defaultValue) {
-        if ( "1".equals(value) || "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) ) {
+    public static Boolean getBooleanValue(String value, Boolean defaultValue) {
+        if ("1".equals(value) || "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value)) {
             return true;
-        } else if ( "0".equals(value) || "false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value) ) {
+        } else if ("0".equals(value) || "false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value)) {
             return false;
         }
 
@@ -312,6 +315,7 @@ public class CommonUtil {
 
     /**
      * Reads integer value from string
+     *
      * @param value
      * @param defaultValue value to be returned if string value is not valid integer
      */
@@ -325,6 +329,7 @@ public class CommonUtil {
 
     /**
      * Reads double value from string
+     *
      * @param value
      * @param defaultValue value to be returned if string value is not valid double
      */
@@ -348,27 +353,27 @@ public class CommonUtil {
                 char ch = s.charAt(i);
                 if (ch == '&') {
                     String sub = s.substring(i);
-                    if ( !sub.startsWith("&amp;") &&
-                         !sub.startsWith("&apos;") &&
-                         !sub.startsWith("&gt;") &&
-                         !sub.startsWith("&lt;") &&
-                         !sub.startsWith("&quot;") ) {
-                        result.replace(index, index+1, "&amp;");
+                    if (!sub.startsWith("&amp;") &&
+                            !sub.startsWith("&apos;") &&
+                            !sub.startsWith("&gt;") &&
+                            !sub.startsWith("&lt;") &&
+                            !sub.startsWith("&quot;")) {
+                        result.replace(index, index + 1, "&amp;");
                         index += 5;
                     } else {
                         index++;
                     }
                 } else if (ch == '\'') {
-                    result.replace(index, index+1, "&apos;");
+                    result.replace(index, index + 1, "&apos;");
                     index += 6;
                 } else if (ch == '>') {
-                    result.replace(index, index+1, "&gt;");
+                    result.replace(index, index + 1, "&gt;");
                     index += 4;
                 } else if (ch == '<') {
-                    result.replace(index, index+1, "&lt;");
+                    result.replace(index, index + 1, "&lt;");
                     index += 4;
                 } else if (ch == '\"') {
-                    result.replace(index, index+1, "&quot;");
+                    result.replace(index, index + 1, "&quot;");
                     index += 6;
                 } else {
                     index++;
@@ -385,79 +390,79 @@ public class CommonUtil {
      * Serializes item after XPath or XQuery processor execution using Saxon.
      */
     public static String serializeItem(Item item) throws XPathException {
-    	if (item instanceof NodeInfo) {
-    		int type = ((NodeInfo)item).getNodeKind();
+        if (item instanceof NodeInfo) {
+            int type = ((NodeInfo) item).getNodeKind();
             if (type == Type.DOCUMENT || type == Type.ELEMENT) {
-	            Properties props = new Properties();
-	            props.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-	            props.setProperty(OutputKeys.INDENT, "yes");
+                Properties props = new Properties();
+                props.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                props.setProperty(OutputKeys.INDENT, "yes");
 
                 StringWriter stringWriter = new java.io.StringWriter();
-                QueryResult.serialize((NodeInfo)item, new StreamResult(stringWriter), props);
+                QueryResult.serialize((NodeInfo) item, new StreamResult(stringWriter), props);
                 stringWriter.flush();
                 return stringWriter.toString().replaceAll(" xmlns=\"http\\://www.w3.org/1999/xhtml\"", "");
             }
-    	}
-    	
-    	return item.getStringValue();
+        }
+
+        return item.getStringValue();
     }
-    
+
     public static String readStringFromFile(File file, String encoding) throws IOException {
-    	if (!file.exists()) {
-    		throw new IOException("File doesn't exist!");
-		}
-    	
-		long fileLen = file.length();
-		if (fileLen <= 0L) {
-			if (file.exists()) {
-				return ""; // empty file
-			}
-			return null; // all other file len problems
-		}
-		if (fileLen > Integer.MAX_VALUE) { // max String size
-			throw new IOException("File too big for loading into a String!");
-		}
+        if (!file.exists()) {
+            throw new IOException("File doesn't exist!");
+        }
 
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
-		BufferedReader brin = null;
+        long fileLen = file.length();
+        if (fileLen <= 0L) {
+            if (file.exists()) {
+                return ""; // empty file
+            }
+            return null; // all other file len problems
+        }
+        if (fileLen > Integer.MAX_VALUE) { // max String size
+            throw new IOException("File too big for loading into a String!");
+        }
 
-		int length = (int) fileLen;
-		char[] buf = null;
-		int realSize = 0;
-		try {
-			fis = new FileInputStream(file);
-			isr = new InputStreamReader(fis, encoding);
-			brin = new BufferedReader(isr, 64 * 1024);
-			buf = new char[length];
-			int c;
-			while ((c = brin.read()) != -1) {
-				buf[realSize] = (char) c;
-				realSize++;
-			}
-		} finally {
-			if (brin != null) {
-				brin.close();
-				isr = null;
-				fis = null;
-			}
-			if (isr != null) {
-				isr.close();
-				fis = null;
-			}
-			if (fis != null) {
-				fis.close();
-			}
-		}
-		return new String(buf, 0, realSize);
-	}
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader brin = null;
+
+        int length = (int) fileLen;
+        char[] buf = null;
+        int realSize = 0;
+        try {
+            fis = new FileInputStream(file);
+            isr = new InputStreamReader(fis, encoding);
+            brin = new BufferedReader(isr, 64 * 1024);
+            buf = new char[length];
+            int c;
+            while ((c = brin.read()) != -1) {
+                buf[realSize] = (char) c;
+                realSize++;
+            }
+        } finally {
+            if (brin != null) {
+                brin.close();
+                isr = null;
+                fis = null;
+            }
+            if (isr != null) {
+                isr.close();
+                fis = null;
+            }
+            if (fis != null) {
+                fis.close();
+            }
+        }
+        return new String(buf, 0, realSize);
+    }
 
     /**
      * Saves specified content to the file with specified charset.
+     *
      * @param file
      * @param content
      * @param charset
-     * 
      * @throws IOException
      * @throws UnsupportedEncodingException
      */
@@ -472,28 +477,31 @@ public class CommonUtil {
     }
 
     public static byte[] readBytesFromFile(File file) throws IOException {
-		FileInputStream fileinputstream = new FileInputStream(file);
-		long l = file.length();
+        FileInputStream fileinputstream = new FileInputStream(file);
+        long l = file.length();
 
         if (l > Integer.MAX_VALUE) {
-			throw new IOException("File too big for loading into a byte array!");
-		}
-        
+            throw new IOException("File too big for loading into a byte array!");
+        }
+
         byte byteArray[] = new byte[(int) l];
 
-		int i = 0;
+        int i = 0;
 
-		for (int j = 0; (i < byteArray.length) && (j = fileinputstream.read(byteArray, i, byteArray.length - i)) >= 0; i += j);
+        for (int j = 0; (i < byteArray.length) && (j = fileinputstream.read(byteArray, i, byteArray.length - i)) >= 0; i += j) {
+            ;
+        }
 
-		if (i < byteArray.length) {
-			throw new IOException("Could not completely read the file " + file.getName());
-		}
-		fileinputstream.close();
-		return byteArray;
-	}
+        if (i < byteArray.length) {
+            throw new IOException("Could not completely read the file " + file.getName());
+        }
+        fileinputstream.close();
+        return byteArray;
+    }
 
     /**
      * Checks if specified link is full URL.
+     *
      * @param link
      * @return True, if full URl, false otherwise.
      */
@@ -504,16 +512,16 @@ public class CommonUtil {
         link = link.trim().toLowerCase();
         return link.startsWith("http://") || link.startsWith("https://") || link.startsWith("file://");
     }
-    
+
     /**
      * Calculates full URL for specified page URL and link
-     * which could be full, absolute or relative like there can 
-     * be found in A or IMG tags. 
+     * which could be full, absolute or relative like there can
+     * be found in A or IMG tags.
      */
     public static String fullUrl(String pageUrl, String link) {
-    	if ( isFullUrl(link) ) {
-    		return link;
-    	} else if ( link != null && link.startsWith("?") ) {
+        if (isFullUrl(link)) {
+            return link;
+        } else if (link != null && link.startsWith("?")) {
             int qindex = pageUrl.indexOf('?');
             int len = pageUrl.length();
             if (qindex < 0) {
@@ -524,28 +532,29 @@ public class CommonUtil {
                 return pageUrl + "&" + link.substring(1);
             }
         }
-    	
-    	boolean isLinkAbsolute = link.startsWith("/");
-    	
-    	if ( !isFullUrl(pageUrl) ) {
-    		pageUrl = "http://" + pageUrl;
-    	}
-    	
-    	int slashIndex = isLinkAbsolute ? pageUrl.indexOf("/", 8) : pageUrl.lastIndexOf("/");
-    	if (slashIndex <= 8) {
-    		pageUrl += "/";
-    	} else {
-    		pageUrl = pageUrl.substring(0, slashIndex+1);
-    	}
-    	
-    	return isLinkAbsolute ? pageUrl + link.substring(1) : pageUrl + link; 
+
+        boolean isLinkAbsolute = link.startsWith("/");
+
+        if (!isFullUrl(pageUrl)) {
+            pageUrl = "http://" + pageUrl;
+        }
+
+        int slashIndex = isLinkAbsolute ? pageUrl.indexOf("/", 8) : pageUrl.lastIndexOf("/");
+        if (slashIndex <= 8) {
+            pageUrl += "/";
+        } else {
+            pageUrl = pageUrl.substring(0, slashIndex + 1);
+        }
+
+        return isLinkAbsolute ? pageUrl + link.substring(1) : pageUrl + link;
     }
 
     /**
      * Creates appropriate AbstractVariable instance for the specified object.
      * For colleactions and arrays ListVariable instance is returned,
      * for null it is an EmptyVariable, and for others it is NodeVariable
-     * that wraps specified object. 
+     * that wraps specified object.
+     *
      * @param value
      */
     public static Variable createVariable(Object value) {
@@ -557,7 +566,7 @@ public class CommonUtil {
             Collection collection = (Collection) value;
             return new ListVariable(new ArrayList(collection));
         } else if (value instanceof Object[]) {
-            List list = Arrays.asList( (Object[]) value );
+            List list = Arrays.asList((Object[]) value);
             return new ListVariable(list);
         } else {
             return new NodeVariable(value);
@@ -566,16 +575,17 @@ public class CommonUtil {
 
     /**
      * Reads content from specified URL
+     *
      * @param url
-     * @throws IOException
      * @return Read content as string.
+     * @throws IOException
      */
     public static String readStringFromUrl(URL url) throws IOException {
         StringBuffer buffer = new StringBuffer();
-    	BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-    	int ch;
-        while ( (ch = in.read()) != -1 ) {
-            buffer.append( (char)ch );
+        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+        int ch;
+        while ((ch = in.read()) != -1) {
+            buffer.append((char) ch);
         }
         in.close();
 
@@ -584,10 +594,11 @@ public class CommonUtil {
 
     /**
      * Counts number of specified characters in give text.
+     *
      * @param text Text to be parsed
-     * @param ch Character to be counted
+     * @param ch   Character to be counted
      * @param from Text offset
-     * @param to Text end
+     * @param to   Text end
      * @return Number of character occurences in given text.
      */
     public static int countChars(String text, char ch, int from, int to) {
@@ -611,15 +622,16 @@ public class CommonUtil {
 
     /**
      * Checks if specified string exists in given array
-     * @param array  Array of strings
-     * @param s String to be looked for in array
+     *
+     * @param array         Array of strings
+     * @param s             String to be looked for in array
      * @param caseSensitive Tells whether search is case sensitive
      * @return True if string is found in array, false otherwise
      */
     public static boolean existsInStringArray(String[] array, String s, boolean caseSensitive) {
         if (s != null && array != null) {
             for (int i = 0; i < array.length; i++) {
-                if ( (caseSensitive && s.equals(array[i])) || s.equalsIgnoreCase(array[i]) ) {
+                if ((caseSensitive && s.equals(array[i])) || s.equalsIgnoreCase(array[i])) {
                     return true;
                 }
 
@@ -630,13 +642,14 @@ public class CommonUtil {
 
     /**
      * Tokenize given string for specified delimiter(s).
-     * @param s String to be tokenized
+     *
+     * @param s          String to be tokenized
      * @param delimiters Delimiter character(s)
-     * @return Array of token strings      
+     * @return Array of token strings
      */
     public static String[] tokenize(String s, String delimiters) {
         if (s == null) {
-            return new String[] {};
+            return new String[]{};
         }
 
         StringTokenizer tokenizer = new StringTokenizer(s, delimiters);
@@ -651,7 +664,7 @@ public class CommonUtil {
 
     public static String[] tokenize(String s, String delimiters, boolean trimTokens, boolean allowEmptyTokens) {
         if (s == null) {
-            return new String[] {};
+            return new String[]{};
         }
 
         StringTokenizer tokenizer = new StringTokenizer(s, delimiters, true);
@@ -682,6 +695,7 @@ public class CommonUtil {
     /**
      * For the given string creates valid identifier name. All invalid characters
      * are transformed to underscores, and valid characters are preserved.
+     *
      * @param value String to be transformed to valid identifier
      * @return Valid identifier name made of specified string.
      */
@@ -692,7 +706,7 @@ public class CommonUtil {
         StringBuffer validIdentifier = new StringBuffer();
         for (int i = 0; i < value.length(); i++) {
             char ch = value.charAt(i);
-            if ( (i == 0 && !Character.isJavaIdentifierStart(ch)) || !Character.isJavaIdentifierPart(ch) ) {
+            if ((i == 0 && !Character.isJavaIdentifierStart(ch)) || !Character.isJavaIdentifierPart(ch)) {
                 ch = '_';
             }
             validIdentifier.append(ch);
@@ -702,7 +716,8 @@ public class CommonUtil {
 
     /**
      * Searches specified value in given collection
-     * @param c Collection to be searched
+     *
+     * @param c     Collection to be searched
      * @param value Object searched for
      * @return First index in collection of object found, or -1 if collection doesn't contain it
      */
@@ -711,7 +726,7 @@ public class CommonUtil {
         int index = 0;
         while (iterator.hasNext()) {
             Object curr = iterator.next();
-            if ( value == curr || (value != null && curr != null && value.equals(curr)) ) {
+            if (value == curr || (value != null && curr != null && value.equals(curr))) {
                 return index;
             }
             index++;

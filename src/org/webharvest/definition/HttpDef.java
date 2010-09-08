@@ -38,13 +38,15 @@ package org.webharvest.definition;
 
 import org.webharvest.utils.CommonUtil;
 
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
+
 /**
  * Definition of HTTP processor.
  */
 public class HttpDef extends BaseElementDef {
 
-    public static final String METHOD_GET = "get";
-    public static final String METHOD_POST = "post";
+    public static final String DEFAULT_METHOD = "get";
+    public static final String DEFAULT_MULTIPART = "false";
 
     private String method;
     private String multipart;
@@ -53,21 +55,27 @@ public class HttpDef extends BaseElementDef {
     private String username;
     private String password;
     private String cookiePolicy;
+    private String followRedirects;
 
     public HttpDef(XmlNode xmlNode) {
         super(xmlNode);
 
-        this.method = CommonUtil.nvl( xmlNode.getAttribute("method"), METHOD_GET );
-        this.multipart = CommonUtil.nvl( xmlNode.getAttribute("multipart"), "false" );
+        this.method = CommonUtil.nvl(xmlNode.getAttribute("method"), DEFAULT_METHOD);
+        this.multipart = CommonUtil.nvl(xmlNode.getAttribute("multipart"), DEFAULT_MULTIPART);
         this.url = xmlNode.getAttribute("url");
         this.charset = xmlNode.getAttribute("charset");
         this.username = xmlNode.getAttribute("username");
         this.password = xmlNode.getAttribute("password");
         this.cookiePolicy = xmlNode.getAttribute("cookie-policy");
+        this.followRedirects = xmlNode.getAttribute("follow-redirects");
     }
 
     public String getMethod() {
         return method;
+    }
+
+    public String getFollowRedirects() {
+        return followRedirects;
     }
 
     public String getMultipart() {
@@ -82,13 +90,13 @@ public class HttpDef extends BaseElementDef {
         return charset;
     }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
     public String getCookiePolicy() {
         return cookiePolicy;
@@ -97,5 +105,5 @@ public class HttpDef extends BaseElementDef {
     public String getShortElementName() {
         return "http";
     }
-    
+
 }

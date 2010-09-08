@@ -37,19 +37,24 @@
 package org.webharvest.runtime.web;
 
 import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.auth.*;
-import org.apache.commons.httpclient.contrib.ssl.*;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.*;
-import org.apache.commons.httpclient.params.*;
-import org.apache.commons.httpclient.protocol.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * HTTP client functionality.
@@ -73,20 +78,20 @@ public class HttpClientManager {
     public HttpClientManager() {
         client = new HttpClient();
         httpInfo = new HttpInfo(client);
-        
+
         HttpClientParams clientParams = new HttpClientParams();
         clientParams.setBooleanParameter("http.protocol.allow-circular-redirects", true);
         client.setParams(clientParams);
     }
 
     public void setCookiePolicy(String cookiePolicy) {
-        if ( "browser".equalsIgnoreCase(cookiePolicy) ) {
+        if ("browser".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-        } else if ( "ignore".equalsIgnoreCase(cookiePolicy) ) {
+        } else if ("ignore".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
-        } else if ( "netscape".equalsIgnoreCase(cookiePolicy) ) {
+        } else if ("netscape".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.NETSCAPE);
-        } else if ( "rfc_2109".equalsIgnoreCase(cookiePolicy) ) {
+        } else if ("rfc_2109".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         } else {
             client.getParams().setCookiePolicy(CookiePolicy.DEFAULT);
@@ -95,6 +100,7 @@ public class HttpClientManager {
 
     /**
      * Defines HTTP proxy for the client with specified host and port
+     *
      * @param hostName
      * @param hostPort
      */
@@ -104,68 +110,70 @@ public class HttpClientManager {
 
     /**
      * Defines HTTP proxy for the client with specified host
+     *
      * @param hostName
      */
     public void setHttpProxy(String hostName) {
-    	client.getHostConfiguration().setProxyHost(new ProxyHost(hostName));
+        client.getHostConfiguration().setProxyHost(new ProxyHost(hostName));
     }
 
 
     /**
      * Defines user credintials for the HTTP proxy server
+     *
      * @param username
      * @param password
      */
     public void setHttpProxyCredentials(String username, String password, String host, String domain) {
         Credentials credentials =
-                ( host == null || domain == null || "".equals(host.trim()) || "".equals(domain.trim()) ) ?
-                    new UsernamePasswordCredentials(username, password) :
-                    new NTCredentials(username, password, host, domain);
-        client.getState().setProxyCredentials( AuthScope.ANY, credentials);
+                (host == null || domain == null || "".equals(host.trim()) || "".equals(domain.trim())) ?
+                        new UsernamePasswordCredentials(username, password) :
+                        new NTCredentials(username, password, host, domain);
+        client.getState().setProxyCredentials(AuthScope.ANY, credentials);
     }
-    
+
     public HttpResponseWrapper execute(
             String methodType,
-            boolean multipart,
+            Boolean followRedirects,
+            Boolean multipart,
             String url,
             String charset,
             String username,
             String password,
             Map<String, HttpParamInfo> params,
             Map headers) {
-        if ( !url.startsWith("http://") && !url.startsWith("https://") ) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
 
         url = CommonUtil.encodeUrl(url, charset);
-        
+
         // if username and password are specified, define new credentials for authenticaton
-        if ( username != null && password != null ) {
-        	try {
-				URL urlObj = new URL(url);
-	            client.getState().setCredentials(
-                    new AuthScope(urlObj.getHost(), urlObj.getPort()),
-                    new UsernamePasswordCredentials(username, password)
+        if (username != null && password != null) {
+            try {
+                URL urlObj = new URL(url);
+                client.getState().setCredentials(
+                        new AuthScope(urlObj.getHost(), urlObj.getPort()),
+                        new UsernamePasswordCredentials(username, password)
                 );
-        	} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
-        
+
         HttpMethodBase method;
-        if ( "post".equalsIgnoreCase(methodType) ) {
+        if ("post".equalsIgnoreCase(methodType)) {
             method = createPostMethod(url, params, multipart, charset);
         } else {
-            method = createGetMethod(url, params, charset);
+            method = createGetMethod(url, params, charset, followRedirects);
         }
 
         boolean isUserAgentSpecified = false;
 
         // define request headers, if any exist
         if (headers != null) {
-            Iterator it = headers.keySet().iterator();
-            while (it.hasNext()) {
-                String headerName =  (String) it.next();
+            for (Object o : headers.keySet()) {
+                String headerName = (String) o;
                 if ("User-Agent".equalsIgnoreCase(headerName)) {
                     isUserAgentSpecified = true;
                 }
@@ -179,26 +187,9 @@ public class HttpClientManager {
         }
 
         try {
-            int statusCode = client.executeMethod(method);
-            
-            // if there is redirection, try to download redirection page
-            if ((statusCode == HttpStatus.SC_MOVED_TEMPORARILY) ||
-                (statusCode == HttpStatus.SC_MOVED_PERMANENTLY) ||
-                (statusCode == HttpStatus.SC_SEE_OTHER) ||
-                (statusCode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
-                Header header = method.getResponseHeader("location");
-                if (header != null) {
-                    String newURI = header.getValue();
-                    if ( !CommonUtil.isEmptyString(newURI) ) {
-                        method.releaseConnection();
-                        method = new GetMethod( CommonUtil.fullUrl(url, newURI) );
-                        identifyAsDefaultBrowser(method);
-                        client.executeMethod(method);
-                    }
-                }
-            }
+            client.executeMethod(method);
 
-            HttpResponseWrapper httpResponseWrapper = new HttpResponseWrapper(method);
+            final HttpResponseWrapper httpResponseWrapper = new HttpResponseWrapper(method);
 
             // updates HTTP info with response's details
             this.httpInfo.setResponse(httpResponseWrapper);
@@ -213,6 +204,7 @@ public class HttpClientManager {
 
     /**
      * Defines "User-Agent" HTTP header.
+     *
      * @param method
      */
     private void identifyAsDefaultBrowser(HttpMethodBase method) {
@@ -227,7 +219,7 @@ public class HttpClientManager {
             if (multipart) {
                 Part[] parts = new Part[params.size()];
                 int index = 0;
-                for (Map.Entry<String, HttpParamInfo> entry: params.entrySet()) {
+                for (Map.Entry<String, HttpParamInfo> entry : params.entrySet()) {
                     String name = entry.getKey();
                     HttpParamInfo httpParamInfo = entry.getValue();
                     Variable value = httpParamInfo.getValue();
@@ -244,17 +236,17 @@ public class HttpClientManager {
                         }
 
                         byte[] bytes = value.toBinary(charset);
-                        parts[index] = new FilePart( httpParamInfo.getName(), new ByteArrayPartSource(filename, bytes), contentType, charset );
+                        parts[index] = new FilePart(httpParamInfo.getName(), new ByteArrayPartSource(filename, bytes), contentType, charset);
                     } else {
                         parts[index] = new StringPart(name, CommonUtil.nvl(value, ""), charset);
                     }
                     index++;
                 }
-                method.setRequestEntity( new MultipartRequestEntity(parts, method.getParams()) );
+                method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
             } else {
                 NameValuePair[] paramArray = new NameValuePair[params.size()];
                 int index = 0;
-                for (Map.Entry<String, HttpParamInfo> entry: params.entrySet()) {
+                for (Map.Entry<String, HttpParamInfo> entry : params.entrySet()) {
                     String name = entry.getKey();
                     String value = entry.getValue().getValue().toString();
                     paramArray[index++] = new NameValuePair(name, value);
@@ -266,10 +258,10 @@ public class HttpClientManager {
         return method;
     }
 
-    private GetMethod createGetMethod(String url, Map<String, HttpParamInfo> params, String charset) {
+    private GetMethod createGetMethod(String url, Map<String, HttpParamInfo> params, String charset, Boolean followRedirects) {
         if (params != null) {
             String urlParams = "";
-            for (Map.Entry<String, HttpParamInfo> entry: params.entrySet()) {
+            for (Map.Entry<String, HttpParamInfo> entry : params.entrySet()) {
                 String value = entry.getValue().toString();
                 NameValuePair pair = new NameValuePair(entry.getKey(), value);
                 try {
@@ -290,7 +282,11 @@ public class HttpClientManager {
             }
         }
 
-        return new GetMethod(url);
+        final GetMethod method = new GetMethod(url);
+        if (followRedirects != null) {
+            method.setFollowRedirects(followRedirects);
+        }
+        return method;
     }
 
     public HttpClient getHttpClient() {
@@ -300,5 +296,5 @@ public class HttpClientManager {
     public HttpInfo getHttpInfo() {
         return httpInfo;
     }
-    
+
 }

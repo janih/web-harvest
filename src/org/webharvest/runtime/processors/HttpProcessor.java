@@ -81,15 +81,15 @@ public class HttpProcessor extends BaseProcessor {
     public Variable execute(Scraper scraper, ScraperContext context) {
         scraper.setRunningHttpProcessor(this);
 
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String url = BaseTemplater.execute(httpDef.getUrl(), scriptEngine);
-        String method = BaseTemplater.execute(httpDef.getMethod(), scriptEngine);
-        String multipart = BaseTemplater.execute(httpDef.getMultipart(), scriptEngine);
-        boolean isMultipart = CommonUtil.getBooleanValue(multipart, false);
+        final ScriptEngine scriptEngine = scraper.getScriptEngine();
+        final String url = BaseTemplater.execute(httpDef.getUrl(), scriptEngine);
+        final String method = BaseTemplater.execute(httpDef.getMethod(), scriptEngine);
+        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.execute(httpDef.getFollowRedirects(), scriptEngine), null);
+        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.execute(httpDef.getMultipart(), scriptEngine), false);
         final String specifiedCharset = BaseTemplater.execute(httpDef.getCharset(), scriptEngine);
-        String username = BaseTemplater.execute(httpDef.getUsername(), scriptEngine);
-        String password = BaseTemplater.execute(httpDef.getPassword(), scriptEngine);
-        String cookiePolicy = BaseTemplater.execute(httpDef.getCookiePolicy(), scriptEngine);
+        final String username = BaseTemplater.execute(httpDef.getUsername(), scriptEngine);
+        final String password = BaseTemplater.execute(httpDef.getPassword(), scriptEngine);
+        final String cookiePolicy = BaseTemplater.execute(httpDef.getCookiePolicy(), scriptEngine);
 
         String charset = specifiedCharset;
 
@@ -103,7 +103,7 @@ public class HttpProcessor extends BaseProcessor {
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);
 
-        final HttpResponseWrapper res = manager.execute(method, isMultipart, url, charset, username, password, httpParams, httpHeaderMap);
+        final HttpResponseWrapper res = manager.execute(method, followRedirects, isMultipart, url, charset, username, password, httpParams, httpHeaderMap);
 
         scraper.removeRunningHttpProcessor();
 
@@ -157,6 +157,7 @@ public class HttpProcessor extends BaseProcessor {
 
         this.setProperty("URL", url);
         this.setProperty("Method", method);
+        this.setProperty("Follow-Redirects", followRedirects);
         this.setProperty("Multipart", String.valueOf(isMultipart));
         this.setProperty("Charset", charset);
         this.setProperty("Content length", String.valueOf(contentLength));
