@@ -36,24 +36,29 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.definition.HttpDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.runtime.web.*;
-import org.webharvest.utils.*;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.web.HttpClientManager;
+import org.webharvest.runtime.web.HttpParamInfo;
+import org.webharvest.runtime.web.HttpResponseWrapper;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.KeyValuePair;
 
 import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Http processor.
@@ -61,12 +66,12 @@ import java.nio.charset.IllegalCharsetNameException;
 public class HttpProcessor extends BaseProcessor {
 
     private static final String HTML_META_CHARSET_REGEX =
-        "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')/?>)";
+            "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')/?>)";
 
     private HttpDef httpDef;
-    
+
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
-    private Map httpHeaderMap = new HashMap();
+    private Map<String, String> httpHeaderMap = new HashMap<String, String>();
 
     public HttpProcessor(HttpDef httpDef) {
         super(httpDef);
@@ -74,48 +79,48 @@ public class HttpProcessor extends BaseProcessor {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-    	scraper.setRunningHttpProcessor(this);
+        scraper.setRunningHttpProcessor(this);
 
         ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String url = BaseTemplater.execute( httpDef.getUrl(), scriptEngine);
-        String method = BaseTemplater.execute( httpDef.getMethod(), scriptEngine);
-        String multipart = BaseTemplater.execute( httpDef.getMultipart(), scriptEngine);
+        String url = BaseTemplater.execute(httpDef.getUrl(), scriptEngine);
+        String method = BaseTemplater.execute(httpDef.getMethod(), scriptEngine);
+        String multipart = BaseTemplater.execute(httpDef.getMultipart(), scriptEngine);
         boolean isMultipart = CommonUtil.getBooleanValue(multipart, false);
-        String specifiedCharset = BaseTemplater.execute( httpDef.getCharset(), scriptEngine);
-        String username = BaseTemplater.execute( httpDef.getUsername(), scriptEngine);
-        String password = BaseTemplater.execute( httpDef.getPassword(), scriptEngine);
-        String cookiePolicy = BaseTemplater.execute( httpDef.getCookiePolicy(), scriptEngine);
+        final String specifiedCharset = BaseTemplater.execute(httpDef.getCharset(), scriptEngine);
+        String username = BaseTemplater.execute(httpDef.getUsername(), scriptEngine);
+        String password = BaseTemplater.execute(httpDef.getPassword(), scriptEngine);
+        String cookiePolicy = BaseTemplater.execute(httpDef.getCookiePolicy(), scriptEngine);
 
         String charset = specifiedCharset;
 
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
-        
+
         // executes body of HTTP processor
         new BodyProcessor(httpDef).execute(scraper, context);
 
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);
 
-        HttpResponseWrapper res = manager.execute(method, isMultipart, url, charset, username, password, httpParams, httpHeaderMap);
+        final HttpResponseWrapper res = manager.execute(method, isMultipart, url, charset, username, password, httpParams, httpHeaderMap);
 
         scraper.removeRunningHttpProcessor();
 
-        String mimeType = res.getMimeType();
+        final String mimeType = StringUtils.lowerCase(res.getMimeType());
 
         long contentLength = res.getContentLength();
-        if ( scraper.getLogger().isInfoEnabled() ) {
+        if (scraper.getLogger().isInfoEnabled()) {
             scraper.getLogger().info("Downloaded: " + url + ", mime type = " + mimeType + ", length = " + contentLength + "B.");
         }
 
         Variable result;
 
-        String responseCharset = res.getCharset();
         byte[] responseBody = res.getBody();
 
-        if ( mimeType == null || mimeType.indexOf("text") >= 0 || mimeType.indexOf("xml") >= 0 || mimeType.indexOf("javascript") >= 0 ) {
-            String text = "";
+        if (mimeType != null && !isTextMimeType(mimeType)) {
+            result = new NodeVariable(responseBody);
+        } else {
             try {
                 // resolvs charset in the following way:
                 //    1. if explicitely defined as charset attribute in http processor, then use it
@@ -124,10 +129,11 @@ public class HttpProcessor extends BaseProcessor {
                 //    3. use charset from response's header
                 //    4. uses default charset for the configuration
                 if (specifiedCharset == null) {
+                    final String responseCharset = res.getCharset();
                     if (responseCharset != null && Charset.isSupported(responseCharset)) {
                         charset = responseCharset;
                     }
-                    if ( "text/html".equalsIgnoreCase(res.getMimeType()) ) {
+                    if ("text/html".equals(mimeType)) {
                         String firstBodyKb = new String(responseBody, 0, Math.min(responseBody.length, 1024), "ASCII");
                         Matcher matcher = Pattern.compile(HTML_META_CHARSET_REGEX, Pattern.CASE_INSENSITIVE).matcher(firstBodyKb);
                         if (matcher.find()) {
@@ -136,20 +142,17 @@ public class HttpProcessor extends BaseProcessor {
                                 if (Charset.isSupported(foundCharset)) {
                                     charset = foundCharset;
                                 }
-                            } catch(IllegalCharsetNameException e) {
+                            } catch (IllegalCharsetNameException e) {
                                 // do nothing - charset will not be set here
                             }
                         }
                     }
                 }
-                text = new String(responseBody, charset);
+                result = new NodeVariable(new String(responseBody, charset));
+
             } catch (UnsupportedEncodingException e) {
                 throw new HttpException("Charset " + charset + " is not supported!", e);
             }
-            
-            result =  new NodeVariable(text);
-        } else {
-            result = new NodeVariable(responseBody);
         }
 
         this.setProperty("URL", url);
@@ -163,7 +166,7 @@ public class HttpProcessor extends BaseProcessor {
         KeyValuePair<String>[] headerPairs = res.getHeaders();
         if (headerPairs != null) {
             int index = 1;
-            for (KeyValuePair<String> pair: headerPairs) {
+            for (KeyValuePair<String> pair : headerPairs) {
                 this.setProperty("HTTP header [" + index + "]: " + pair.getKey(), pair.getValue());
                 index++;
             }
@@ -171,14 +174,20 @@ public class HttpProcessor extends BaseProcessor {
 
         return result;
     }
-    
-    protected void addHttpParam(String name, boolean isFile, String fileName, String contentType, Variable value) {
-        HttpParamInfo httpParamInfo = new HttpParamInfo(name, isFile, fileName, contentType, value);
-    	httpParams.put(name, httpParamInfo);
+
+    private boolean isTextMimeType(String mimeType) {
+        // todo: it's a temporary fix. Think better about handling mime-types.
+        return mimeType.startsWith("text/")
+                || mimeType.endsWith("/xml")
+                || mimeType.contains("javascript");
     }
-    
+
+    protected void addHttpParam(String name, boolean isFile, String fileName, String contentType, Variable value) {
+        httpParams.put(name, new HttpParamInfo(name, isFile, fileName, contentType, value));
+    }
+
     protected void addHttpHeader(String name, String value) {
-    	httpHeaderMap.put(name, value);
+        httpHeaderMap.put(name, value);
     }
 
 }
