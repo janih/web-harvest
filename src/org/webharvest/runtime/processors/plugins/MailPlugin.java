@@ -89,7 +89,7 @@ public class MailPlugin extends WebHarvestPlugin {
         }
 
         String security = evaluateAttribute("security", scraper);
-        if ("tsl".equals(security)) {
+        if ("tls".equals(security)) {
             email.setTLS(true);
         } else if ("ssl".equals(security)) {
             email.setSSL(true);
@@ -175,7 +175,7 @@ public class MailPlugin extends WebHarvestPlugin {
             Set<String> charsetKeys = Charset.availableCharsets().keySet();
             return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
         } else if ("security".equalsIgnoreCase(attributeName)) {
-            return new String[] {"ssl", "tsl", "none"};
+            return new String[] {"ssl", "tls", "none"};
         }
         return null;
     }

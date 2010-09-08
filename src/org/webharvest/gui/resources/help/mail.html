@@ -122,7 +122,7 @@
         <td>no</td>
         <td><code>none</code></td>
         <td>
-            SMTP server security type: <code>none</code>, <code>ssl</code> or <code>tsl</code>
+            SMTP server security type: <code>none</code>, <code>ssl</code> or <code>tls</code>
         </td>
     </tr>
 </table>
@@ -130,7 +130,7 @@
 <h3>Example</h3>
 <div>
 <pre>&lt;mail from="reminder@my.com" smtp-host="smtp.gmail.com" to="myaccount@gmail.com"
-      username="myusername" password="mypassword" security="tsl"
+      username="myusername" password="mypassword" security="tls"
       subject='Reminder for ${sys.datetime("dd.MM.yyyy.")}'&gt;
       Here is what you need today:
       &lt;file path="today.txt"&gt;
