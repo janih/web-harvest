@@ -41,6 +41,8 @@ import org.webharvest.utils.Catalog;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.SystemUtilities;
 
+import java.util.Map;
+
 /**
  * Context of scraper execution. All the variables created during
  * scraper execution are stored in this context.
@@ -53,7 +55,7 @@ public class ScraperContext extends Catalog {
     private SystemUtilities systemUtilities;
 
     public ScraperContext(Scraper scraper, ScraperContext callerContext) {
-		super();
+        super();
         this.callerContext = callerContext;
         this.systemUtilities = new SystemUtilities(scraper);
         this.put("sys", this.systemUtilities);
@@ -61,12 +63,12 @@ public class ScraperContext extends Catalog {
     }
 
     public ScraperContext(Scraper scraper) {
-		this(scraper, null);
+        this(scraper, null);
     }
 
-	public Variable getVar(String name) {
+    public Variable getVar(String name) {
         Variable value = (Variable) this.get(name);
-        if ( value == null && callerContext != null && name.startsWith("caller.") ) {
+        if (value == null && callerContext != null && name.startsWith("caller.")) {
             return callerContext.getVar(name.substring(7));
         }
         return value;
@@ -84,5 +86,9 @@ public class ScraperContext extends Catalog {
     public void dispose() {
         this.systemUtilities.setScraper(null);
     }
-   
+
+    @Override
+    public void putAll(Map m) {
+        super.putAll(m);
+    }
 }

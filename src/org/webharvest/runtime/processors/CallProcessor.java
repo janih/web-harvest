@@ -47,30 +47,35 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Function call processor.
  */
 public class CallProcessor extends BaseProcessor {
 
     private CallDef callDef;
-    
+
     ScraperContext functionContext;
     ScriptEngine scriptEngine;
+    Map<String, ScriptEngine> cachedScriptEngines = new HashMap<String, ScriptEngine>();
 
     private Variable functionResult = new NodeVariable("");
+    private ScraperConfiguration configuration;
 
     public CallProcessor(CallDef callDef, ScraperConfiguration configuration, Scraper scraper) {
         super(callDef);
+        this.configuration = configuration;
         CallProcessor runningFunction = scraper.getRunningFunction();
         ScraperContext callerContext =
                 runningFunction == null ? scraper.getContext() : runningFunction.getFunctionContext();
         this.functionContext = new ScraperContext(scraper, callerContext);
-        this.scriptEngine = configuration.createScriptEngine(functionContext);
         this.callDef = callDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String functionName = BaseTemplater.execute( callDef.getName(), scraper.getScriptEngine() );
+        String functionName = BaseTemplater.execute(callDef.getName(), scraper.getScriptEngine());
         FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);
@@ -84,11 +89,11 @@ public class CallProcessor extends BaseProcessor {
         // executes body of call processor
         new BodyProcessor(callDef).execute(scraper, context);
 
-        functionContext.putAll( scraper.getFunctionParams() );
+        functionContext.putAll(scraper.getFunctionParams());
 
         // adds this runtime info to the running functions stack
         scraper.addRunningFunction(this);
-        
+
         // executes body of function using new context
         new BodyProcessor(functionDef).execute(scraper, functionContext);
 
@@ -101,13 +106,25 @@ public class CallProcessor extends BaseProcessor {
     public void setFunctionResult(Variable result) {
         this.functionResult = result;
     }
-    
+
     public ScriptEngine getScriptEngine() {
+        if (scriptEngine == null) {
+            scriptEngine = configuration.createScriptEngine(functionContext);
+        }
         return scriptEngine;
+    }
+
+    public ScriptEngine getScriptEngine(String engineType) {
+        ScriptEngine engine = cachedScriptEngines.get(engineType);
+        if (engine == null) {
+            engine = configuration.createScriptEngine(functionContext, engineType);
+            cachedScriptEngines.put(engineType, engine);
+        }
+        return engine;
     }
 
     public ScraperContext getFunctionContext() {
         return functionContext;
     }
-    
+
 }

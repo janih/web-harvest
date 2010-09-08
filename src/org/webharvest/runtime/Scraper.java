@@ -111,6 +111,7 @@ public class Scraper {
 
     /**
      * Constructor.
+     *
      * @param configuration
      * @param workingDir
      */
@@ -130,6 +131,7 @@ public class Scraper {
      * Adds parameter with specified name and value to the context.
      * This way some predefined variables can be put in runtime context
      * before execution starts.
+     *
      * @param name
      * @param value
      */
@@ -139,6 +141,7 @@ public class Scraper {
 
     /**
      * Add all map values to the context.
+     *
      * @param map
      */
     public void addVariablesToContext(Map map) {
@@ -146,7 +149,7 @@ public class Scraper {
             Iterator iterator = map.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry entry = (Map.Entry) iterator.next();
-                this.context.put( entry.getKey(), new NodeVariable(entry.getValue()) );
+                this.context.put(entry.getKey(), new NodeVariable(entry.getValue()));
             }
         }
     }
@@ -155,12 +158,12 @@ public class Scraper {
         this.setStatus(STATUS_RUNNING);
 
         // inform al listeners that execution is just about to start
-        for (ScraperRuntimeListener listener: scraperRuntimeListeners) {
+        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionStart(this);
         }
 
         try {
-            for (IElementDef elementDef: ops) {
+            for (IElementDef elementDef : ops) {
                 BaseProcessor processor = ProcessorResolver.createProcessor(elementDef, this.configuration, this);
                 if (processor != null) {
                     processor.run(this, context);
@@ -174,11 +177,11 @@ public class Scraper {
     }
 
     public void execute() {
-    	long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-        execute( configuration.getOperations() );
+        execute(configuration.getOperations());
 
-        if ( this.status == STATUS_RUNNING ) {
+        if (this.status == STATUS_RUNNING) {
             this.setStatus(STATUS_FINISHED);
         }
 
@@ -189,7 +192,7 @@ public class Scraper {
             listener.onExecutionEnd(this);
         }
 
-        if ( logger.isInfoEnabled() ) {
+        if (logger.isInfoEnabled()) {
             if (this.status == STATUS_FINISHED) {
                 logger.info("Configuration executed in " + (System.currentTimeMillis() - startTime) + "ms.");
             } else if (this.status == STATUS_STOPPED) {
@@ -197,12 +200,12 @@ public class Scraper {
             }
         }
     }
-    
-    public ScraperContext getContext() {
-		return context;
-	}
 
-	public ScraperConfiguration getConfiguration() {
+    public ScraperContext getContext() {
+        return context;
+    }
+
+    public ScraperConfiguration getConfiguration() {
         return configuration;
     }
 
@@ -239,13 +242,13 @@ public class Scraper {
             runningFunctions.pop();
         }
     }
-    
+
     public HttpProcessor getRunningHttpProcessor() {
-    	return (HttpProcessor) runningHttpProcessors.peek();
+        return (HttpProcessor) runningHttpProcessors.peek();
     }
-    
+
     public void setRunningHttpProcessor(HttpProcessor httpProcessor) {
-    	runningHttpProcessors.push(httpProcessor);
+        runningHttpProcessors.push(httpProcessor);
     }
 
     public void removeRunningHttpProcessor() {
@@ -267,10 +270,15 @@ public class Scraper {
     }
 
     public ScriptEngine getScriptEngine() {
-        return runningFunctions.size() > 0 ? getRunningFunction().getScriptEngine() : this.scriptEngine;
+        return runningFunctions.isEmpty()
+                ? this.scriptEngine
+                : getRunningFunction().getScriptEngine();
     }
 
     public synchronized ScriptEngine getScriptEngine(String engineType) {
+        if (!runningFunctions.isEmpty()) {
+            return getRunningFunction().getScriptEngine(engineType);
+        }
         ScriptEngine engine = (ScriptEngine) this.usedScriptEngines.get(engineType);
         if (engine == null) {
             engine = configuration.createScriptEngine(this.context, engineType);
@@ -291,7 +299,7 @@ public class Scraper {
     /**
      * @param processor Processor whose parent is needed.
      * @return Parent running processor of the specified running processor, or null if processor is
-     * not currently running or if it is top running processor.
+     *         not currently running or if it is top running processor.
      */
     public BaseProcessor getParentRunningProcessor(BaseProcessor processor) {
         List runningProcessorList = runningProcessors.getList();
@@ -320,11 +328,12 @@ public class Scraper {
     }
 
     /**
-     * Get connection from the connection pool, and first create one if necessery 
-     * @param jdbc Name of JDBC class
+     * Get connection from the connection pool, and first create one if necessery
+     *
+     * @param jdbc       Name of JDBC class
      * @param connection JDBC connection string
-     * @param username Username
-     * @param password Password
+     * @param username   Username
+     * @param password   Password
      * @return JDBC connection used to access database
      */
     public Connection getConnection(String jdbc, String connection, String username, String password) {
@@ -471,7 +480,7 @@ public class Scraper {
         }
 
         this.logger.removeAllAppenders();
-        
+
         Iterator iterator = usedScriptEngines.values().iterator();
         while (iterator.hasNext()) {
             ScriptEngine engine = (ScriptEngine) iterator.next();
