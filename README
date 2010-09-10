@@ -1,0 +1,7 @@
+To build Web-Harvest using Maven:
+
+- To build JAR without dependencies:
+  $ mvn clean install
+
+- To build JAR with all dependencies embedded:
+  $ mvn clean install -Pwith-dependencies
