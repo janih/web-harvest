@@ -11,12 +11,12 @@
 			</xs:sequence>
 			<xs:attribute name="charset">
 				<xs:annotation>
-					<xs:documentation>Default charset used wherever not explicitely specified in processors</xs:documentation>
+					<xs:documentation>Default charset used wherever not explicitly specified in processors</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="scriptlang">
 				<xs:annotation>
-					<xs:documentation>Scripting langiage used for the configuration. Should be one of: BeanShell (default), Javascript and Groovy</xs:documentation>
+					<xs:documentation>Scripting language used for the configuration. Should be one of: BeanShell (default), Javascript and Groovy</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="id"/>
@@ -65,6 +65,7 @@
 					<xs:group ref="groupProcessors" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:attribute name="url" use="required"/>
 					<xs:attribute name="method"/>
+					<xs:attribute name="follow-redirects"/>
 					<xs:attribute name="charset"/>
 					<xs:attribute name="username"/>
 					<xs:attribute name="password"/>
