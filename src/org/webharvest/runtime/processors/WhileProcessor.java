@@ -62,9 +62,9 @@ public class WhileProcessor extends BaseProcessor {
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String index = BaseTemplater.execute( whileDef.getIndex(), scriptEngine);
-        String maxLoopsString = BaseTemplater.execute( whileDef.getMaxLoops(), scriptEngine);
-        boolean isEmpty = CommonUtil.getBooleanValue( BaseTemplater.execute(whileDef.getEmpty(), scriptEngine), false );
+        String index = BaseTemplater.execute(whileDef.getIndex(), scriptEngine);
+        String maxLoopsString = BaseTemplater.execute(whileDef.getMaxLoops(), scriptEngine);
+        boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(whileDef.getEmpty(), scriptEngine), false);
 
         double maxLoops = Constants.DEFAULT_MAX_LOOPS;
         if (maxLoopsString != null && !"".equals(maxLoopsString.trim())) {
@@ -78,11 +78,11 @@ public class WhileProcessor extends BaseProcessor {
         int i = 1;
 
         // define first value of index variable
-        if ( index != null && !"".equals(index) ) {
-            context.put( index, new NodeVariable(String.valueOf(i)) );
+        if (index != null && !"".equals(index)) {
+            context.setVar(index, new NodeVariable(String.valueOf(i)));
         }
 
-        String condition = BaseTemplater.execute( whileDef.getCondition(), scriptEngine);
+        String condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
 
         this.setProperty("Condition", condition);
         this.setProperty("Index", index);
@@ -90,16 +90,16 @@ public class WhileProcessor extends BaseProcessor {
         this.setProperty("Empty", String.valueOf(isEmpty));
 
         // iterates while testing variable represents boolean true or loop limit is exceeded
-        while ( CommonUtil.isBooleanTrue(condition) && (i <= maxLoops) ) {
+        while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
             Variable loopResult = new BodyProcessor(whileDef).execute(scraper, context);
             if (!isEmpty) {
-                resultList.addAll( loopResult.toList() );
+                resultList.addAll(loopResult.toList());
             }
 
             i++;
             // define current value of index variable
-            if ( index != null && !"".equals(index) ) {
-                context.put( index, new NodeVariable(String.valueOf(i)) );
+            if (index != null && !"".equals(index)) {
+                context.setVar(index, new NodeVariable(String.valueOf(i)));
             }
 
             condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
@@ -107,7 +107,7 @@ public class WhileProcessor extends BaseProcessor {
 
         // restores previous value of index variable
         if (index != null && indexBeforeLoop != null) {
-            context.put(index, indexBeforeLoop);
+            context.setVar(index, indexBeforeLoop);
         }
 
         return isEmpty ? new EmptyVariable() : new ListVariable(resultList);

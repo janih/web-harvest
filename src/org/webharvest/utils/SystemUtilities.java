@@ -51,7 +51,7 @@ import net.sf.saxon.trans.XPathException;
 
 /**
  * Collection of useful constants and functions that are available in each
- * scraper context. 
+ * scraper context.
  */
 public class SystemUtilities {
 
@@ -62,7 +62,7 @@ public class SystemUtilities {
     public static final Variable quot = new NodeVariable("\"");
     public static final Variable apos = new NodeVariable("\'");
     public static final Variable backspace = new NodeVariable("\b");
-    
+
     private Scraper scraper;
 
     public SystemUtilities(Scraper scraper) {
@@ -78,23 +78,27 @@ public class SystemUtilities {
      * @return True if scraper's context contain not-null variable with specified name.
      */
     public boolean isVariableDefined(String varName) {
-        return scraper.getContext().get(varName) != null;
+        return getCurrentContext().get(varName) != null;
     }
 
     /**
-     * Returns variable from scraper context 
+     * Returns variable from scraper context
+     *
      * @param varName Name of the variable
      */
     public Variable getVar(String varName) {
-        CallProcessor runningFunction = scraper.getRunningFunction();
-        ScraperContext activeContext =
-                runningFunction == null ? scraper.getContext() : runningFunction.getFunctionContext();
-        return activeContext.getVar(varName);
+        return getCurrentContext().getVar(varName);
+    }
+
+    private ScraperContext getCurrentContext() {
+        final CallProcessor runningFunction = scraper.getRunningFunction();
+        return (runningFunction != null) ? runningFunction.getFunctionContext() : scraper.getContext();
     }
 
     /**
      * Adds or/replaces variable in scraper's context. If overwrite is false
      * and variable with specified name already exists, it won't be updated.
+     *
      * @param varName
      * @param varValue
      * @param overwrite
@@ -102,13 +106,13 @@ public class SystemUtilities {
     public void defineVariable(String varName, Object varValue, boolean overwrite) {
         ScraperContext context = scraper.getContext();
         if (overwrite || context.get(varName) == null) {
-            Variable var = CommonUtil.createVariable(varValue);
-            context.put(varName, var);
+            context.setVar(varName, CommonUtil.createVariable(varValue));
         }
     }
 
     /**
      * Adds or/replaces variable in scraper's context.
+     *
      * @param varName
      * @param varValue
      */
@@ -117,14 +121,14 @@ public class SystemUtilities {
     }
 
     /**
-	 * Returns formatted date/time for specified format string.
-	 *   
-	 * @param format
-	 */
-	public String datetime(Object format) {
+     * Returns formatted date/time for specified format string.
+     *
+     * @param format
+     */
+    public String datetime(Object format) {
         if (format != null) {
             SimpleDateFormat formatter = new SimpleDateFormat(format.toString());
-            return formatter.format( new Date() );
+            return formatter.format(new Date());
         }
 
         throw new BaseException("Cannot return datetime for null format!");
@@ -134,16 +138,16 @@ public class SystemUtilities {
      * Returns current date formated as "yyyyMMdd".
      */
     public String date() {
-		return datetime("yyyyMMdd");
-	}
+        return datetime("yyyyMMdd");
+    }
 
     /**
      *
      */
     public String time() {
-		return datetime("HHmmss");
-	}
-	
+        return datetime("HHmmss");
+    }
+
     /**
      * Escapes XML string - special characters: &'"<> are
      * replaced with XML escape sequences: &amp; &apos; &quot; &lt; &gt;
@@ -155,11 +159,11 @@ public class SystemUtilities {
 
         throw new BaseException("Cannot escape XML for null argumant!");
     }
-    
+
     /**
      * Calculates full URL for specified page URL and link
-     * which could be full, absolute or relative like there can 
-     * be found in A or IMG tags. 
+     * which could be full, absolute or relative like there can
+     * be found in A or IMG tags.
      */
     public String fullUrl(Object pageUrl, Object link) {
         if (pageUrl != null && link != null) {
@@ -171,6 +175,7 @@ public class SystemUtilities {
 
     /**
      * Evaluates XPath expression on specified XML
+     *
      * @param expression
      * @param xml
      */
@@ -195,7 +200,7 @@ public class SystemUtilities {
      * @return Filename for the full path
      */
     public String getFilename(String path) {
-        int index = Math.max( path.lastIndexOf("\\"), path.lastIndexOf("/") );
+        int index = Math.max(path.lastIndexOf("\\"), path.lastIndexOf("/"));
         return index >= 0 && index < path.length() - 1 ? path.substring(index + 1) : path;
     }
 

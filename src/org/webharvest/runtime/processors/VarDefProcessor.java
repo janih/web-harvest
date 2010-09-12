@@ -62,7 +62,7 @@ public class VarDefProcessor extends BaseProcessor {
         String overwrite = BaseTemplater.execute( varDef.getOverwrite(), scraper.getScriptEngine() );
         boolean toOverwrite = overwrite == null || CommonUtil.isBooleanTrue(overwrite);
         if (toOverwrite || context.get(name) == null) {
-            context.put(name, var);
+            context.setVar(name, var);
         }
 
         this.setProperty("Name", name);

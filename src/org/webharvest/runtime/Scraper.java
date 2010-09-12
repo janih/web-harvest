@@ -136,7 +136,7 @@ public class Scraper {
      * @param value
      */
     public void addVariableToContext(String name, Object value) {
-        this.context.put(name, new NodeVariable(value));
+        this.context.setVar(name, CommonUtil.createVariable(value));
     }
 
     /**
@@ -144,12 +144,10 @@ public class Scraper {
      *
      * @param map
      */
-    public void addVariablesToContext(Map map) {
+    public void addVariablesToContext(Map<String, Object> map) {
         if (map != null) {
-            Iterator iterator = map.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                this.context.put(entry.getKey(), new NodeVariable(entry.getValue()));
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                this.context.setVar(entry.getKey(), CommonUtil.createVariable(entry.getValue()));
             }
         }
     }

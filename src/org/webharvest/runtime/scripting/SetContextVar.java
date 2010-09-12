@@ -41,6 +41,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Implementation of set command for saving variables back to web-harvest
@@ -52,7 +53,7 @@ public class SetContextVar {
         try {
             ScraperContext context = (ScraperContext) interpreter.get(ScriptEngine.CONTEXT_VARIABLE_NAME);
             if (context != null) {
-                context.setVar(name, value);
+                context.setVar(name, CommonUtil.createVariable(value));
             }
         } catch (EvalError e) {
             throw new ScriptException("Cannot get web-Harvest context from interpreter: " + e.getMessage(), e);

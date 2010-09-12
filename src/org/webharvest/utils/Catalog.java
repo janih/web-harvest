@@ -41,24 +41,23 @@ import java.util.HashMap;
 /**
  * Specialization of HashMap
  */
-public class Catalog extends HashMap {
-
-    public Catalog() {
-        super();
-    }
+public class Catalog extends HashMap<String, Object> {
 
     private String getStringKey(Object key) {
         return (key == null) ? null : key.toString().trim();
     }
 
-    public Object put(Object key, Object value) {
+    @Override
+    public Object put(String key, Object value) {
         return super.put(getStringKey(key), value);
     }
 
+    @Override
     public Object get(Object key) {
         return super.get(getStringKey(key));
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return super.containsKey(getStringKey(key));
     }

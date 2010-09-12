@@ -38,10 +38,7 @@ package org.webharvest.runtime;
 
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.Catalog;
-import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.SystemUtilities;
-
-import java.util.Map;
 
 /**
  * Context of scraper execution. All the variables created during
@@ -74,9 +71,8 @@ public class ScraperContext extends Catalog {
         return value;
     }
 
-    public Object setVar(Object key, Object value) {
-        Variable var = CommonUtil.createVariable(value);
-        return super.put(key, var);
+    public Object setVar(String key, Variable value) {
+        return super.put(key, value);
     }
 
     public ScraperContext getCallerContext() {
@@ -85,10 +81,5 @@ public class ScraperContext extends Catalog {
 
     public void dispose() {
         this.systemUtilities.setScraper(null);
-    }
-
-    @Override
-    public void putAll(Map m) {
-        super.putAll(m);
     }
 }

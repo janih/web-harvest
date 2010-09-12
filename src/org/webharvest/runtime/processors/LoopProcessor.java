@@ -67,11 +67,11 @@ public class LoopProcessor extends BaseProcessor {
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String item = BaseTemplater.execute( loopDef.getItem(), scriptEngine);
-        String index = BaseTemplater.execute( loopDef.getIndex(), scriptEngine);
-        String maxLoopsString = BaseTemplater.execute( loopDef.getMaxloops(), scriptEngine);
-        String filter = BaseTemplater.execute( loopDef.getFilter(), scriptEngine);
-        boolean isEmpty = CommonUtil.getBooleanValue( BaseTemplater.execute(loopDef.getEmpty(), scriptEngine), false );
+        String item = BaseTemplater.execute(loopDef.getItem(), scriptEngine);
+        String index = BaseTemplater.execute(loopDef.getIndex(), scriptEngine);
+        String maxLoopsString = BaseTemplater.execute(loopDef.getMaxloops(), scriptEngine);
+        String filter = BaseTemplater.execute(loopDef.getFilter(), scriptEngine);
+        boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(loopDef.getEmpty(), scriptEngine), false);
 
         this.setProperty("Item", item);
         this.setProperty("Index", index);
@@ -102,13 +102,13 @@ public class LoopProcessor extends BaseProcessor {
                 Variable currElement = (Variable) it.next();
 
                 // define current value of item variable
-                if ( item != null && !"".equals(item) ) {
-                    context.put(item, currElement);
+                if (item != null && !"".equals(item)) {
+                    context.setVar(item, currElement);
                 }
 
                 // define current value of index variable
-                if ( index != null && !"".equals(index) ) {
-                    context.put( index, new NodeVariable(String.valueOf(i)) );
+                if (index != null && !"".equals(index)) {
+                    context.setVar(index, new NodeVariable(String.valueOf(i)));
                 }
 
                 // execute the loop body
@@ -116,18 +116,18 @@ public class LoopProcessor extends BaseProcessor {
                 Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : new EmptyVariable();
                 debug(bodyDef, scraper, loopResult);
                 if (!isEmpty) {
-                    resultList.addAll( loopResult.toList() );
+                    resultList.addAll(loopResult.toList());
                 }
             }
 
             // restores previous value of item variable
             if (item != null && itemBeforeLoop != null) {
-                context.put(item, itemBeforeLoop);
+                context.setVar(item, itemBeforeLoop);
             }
 
             // restores previous value of index variable
             if (index != null && indexBeforeLoop != null) {
-                context.put(index, indexBeforeLoop);
+                context.setVar(index, indexBeforeLoop);
             }
         }
 
@@ -136,6 +136,7 @@ public class LoopProcessor extends BaseProcessor {
 
     /**
      * Create filtered list based on specified list and filterStr
+     *
      * @param list
      * @param filterStr
      * @return Filtered list
@@ -176,6 +177,7 @@ public class LoopProcessor extends BaseProcessor {
     private static class IntRange extends CommonUtil.IntPair {
 
         // checks if strins is in form [n][-][m]
+
         static boolean isValid(String s) {
             Pattern pattern = Pattern.compile("(\\d*)(-?)(\\d*?)");
             Matcher matcher = pattern.matcher(s);
@@ -203,6 +205,7 @@ public class LoopProcessor extends BaseProcessor {
     private static class IntSublist extends CommonUtil.IntPair {
 
         // checks if strins is in form [n][:][m]
+
         static boolean isValid(String s) {
             Pattern pattern = Pattern.compile("(\\d*)(:?)(\\d*?)");
             Matcher matcher = pattern.matcher(s);
@@ -224,17 +227,17 @@ public class LoopProcessor extends BaseProcessor {
 
     }
 
-   /**
+    /**
      * Class that represents filter for list filtering. It is created based on filter string.
      * Filter string is comma separated list of filter tokens. Valid filter tokens are:
-     *      m - specific integer m
-     *      m-n - integers in specified range, if m is ommited it's vaue is 1, if n is
-     *            ommited it's value is specified size of list to be filtered
-     *      m:n - all integerers starting from m and all subsequent with step n,
-     *            m, m+1*n , m+2*n, ...
-     *      odd - the same as 1:2
-     *      even - the same as 2:2
-     *      unique - tells that list must contain unique values (no duplicates)
+     * m - specific integer m
+     * m-n - integers in specified range, if m is ommited it's vaue is 1, if n is
+     * ommited it's value is specified size of list to be filtered
+     * m:n - all integerers starting from m and all subsequent with step n,
+     * m, m+1*n , m+2*n, ...
+     * odd - the same as 1:2
+     * even - the same as 2:2
+     * unique - tells that list must contain unique values (no duplicates)
      */
     private static class Filter {
 
@@ -244,20 +247,20 @@ public class LoopProcessor extends BaseProcessor {
         private Filter(String filterStr, int size) {
             StringTokenizer tokenizer = new StringTokenizer(filterStr, ",");
             filterList = new ArrayList();
-            
+
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken().trim();
 
                 if ("unique".equals(token)) {
                     isUnique = true;
                 } else if ("odd".equals(token)) {
-                	filterList.add(new IntSublist(1, 2));
+                    filterList.add(new IntSublist(1, 2));
                 } else if ("even".equals(token)) {
-                	filterList.add( new IntSublist(2, 2));
+                    filterList.add(new IntSublist(2, 2));
                 } else if (IntRange.isValid(token)) {
-                	filterList.add(new IntRange(token, size));
+                    filterList.add(new IntRange(token, size));
                 } else if (IntSublist.isValid(token)) {
-                	filterList.add(new IntSublist(token, size));
+                    filterList.add(new IntSublist(token, size));
                 }
             }
         }
@@ -266,17 +269,17 @@ public class LoopProcessor extends BaseProcessor {
          * Checks if specified integer passes the filter
          */
         private boolean isInFilter(int num) {
-        	int listSize = filterList.size();
-        	
-        	if (listSize == 0) {
-        		return true;
-        	}
-        	
+            int listSize = filterList.size();
+
+            if (listSize == 0) {
+                return true;
+            }
+
             for (int i = 0; i < listSize; i++) {
-            	CommonUtil.IntPair curr = (CommonUtil.IntPair) filterList.get(i);
-                if ( curr instanceof IntRange && ((IntRange)curr).isInRange(num) ) {
+                CommonUtil.IntPair curr = (CommonUtil.IntPair) filterList.get(i);
+                if (curr instanceof IntRange && ((IntRange) curr).isInRange(num)) {
                     return true;
-                } else if ( curr instanceof IntSublist && ((IntSublist)curr).isInSublist(num) ) {
+                } else if (curr instanceof IntSublist && ((IntSublist) curr).isInSublist(num)) {
                     return true;
                 }
             }

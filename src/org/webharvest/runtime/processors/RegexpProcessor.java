@@ -76,15 +76,15 @@ public class RegexpProcessor extends BaseProcessor {
         BaseElementDef sourceDef = regexpDef.getRegexpSourceDef();
         Variable source = new BodyProcessor(sourceDef).run(scraper, context);
         debug(sourceDef, scraper, source);
-        
-        String replace = BaseTemplater.execute( regexpDef.getReplace(), scriptEngine);
+
+        String replace = BaseTemplater.execute(regexpDef.getReplace(), scriptEngine);
         boolean isReplace = CommonUtil.isBooleanTrue(replace);
 
-        boolean flagCaseInsensitive = CommonUtil.getBooleanValue( BaseTemplater.execute(regexpDef.getFlagCaseInsensitive(), scriptEngine), false );
-        boolean flagMultiline = CommonUtil.getBooleanValue( BaseTemplater.execute(regexpDef.getFlagMultiline(), scriptEngine), false );
-        boolean flagDotall = CommonUtil.getBooleanValue( BaseTemplater.execute(regexpDef.getFlagDotall(), scriptEngine), true );
-        boolean flagUnicodecase = CommonUtil.getBooleanValue( BaseTemplater.execute(regexpDef.getFlagUnicodecase(), scriptEngine), true );
-        boolean flagCanoneq = CommonUtil.getBooleanValue( BaseTemplater.execute(regexpDef.getFlagCanoneq(), scriptEngine), false );
+        boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagCaseInsensitive(), scriptEngine), false);
+        boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagMultiline(), scriptEngine), false);
+        boolean flagDotall = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagDotall(), scriptEngine), true);
+        boolean flagUnicodecase = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagUnicodecase(), scriptEngine), true);
+        boolean flagCanoneq = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagCanoneq(), scriptEngine), false);
 
         this.setProperty("Is replacing", String.valueOf(isReplace));
         this.setProperty("Flag CaseInsensitive", String.valueOf(flagCaseInsensitive));
@@ -93,7 +93,7 @@ public class RegexpProcessor extends BaseProcessor {
         this.setProperty("Flag UnicodeCase", String.valueOf(flagUnicodecase));
         this.setProperty("Flag CanonEq", String.valueOf(flagCanoneq));
 
-        String maxLoopsString = BaseTemplater.execute( regexpDef.getMax(), scriptEngine);
+        String maxLoopsString = BaseTemplater.execute(regexpDef.getMax(), scriptEngine);
         double maxLoops = Constants.DEFAULT_MAX_LOOPS;
         if (maxLoopsString != null && !"".equals(maxLoopsString.trim())) {
             maxLoops = Double.parseDouble(maxLoopsString);
@@ -119,55 +119,55 @@ public class RegexpProcessor extends BaseProcessor {
         }
 
         Pattern pattern = Pattern.compile(patternVar.toString(), flags);
-        
+
         List resultList = new ArrayList();
-        
+
         List bodyList = source.toList();
         Iterator it = bodyList.iterator();
         while (it.hasNext()) {
-        	Variable currVar = (Variable) it.next();
-        	String text = currVar.toString();
-            
+            Variable currVar = (Variable) it.next();
+            String text = currVar.toString();
+
             Matcher matcher = pattern.matcher(text);
             int groupCount = matcher.groupCount();
-            
-            StringBuffer buffer = new StringBuffer();
-            
-            int index = 0; 
-            while ( matcher.find() ) {
-            	index++;
 
-            	// if index exceeds maximum number of matching sequences exists the loop
+            StringBuffer buffer = new StringBuffer();
+
+            int index = 0;
+            while (matcher.find()) {
+                index++;
+
+                // if index exceeds maximum number of matching sequences exists the loop
                 if (maxLoops < index) {
                     break;
                 }
 
-            	for (int i = 0; i <= groupCount; i++) {
-            		context.put("_"+i, new NodeVariable(matcher.group(i)));
-            	}
+                for (int i = 0; i <= groupCount; i++) {
+                    context.setVar("_" + i, new NodeVariable(matcher.group(i)));
+                }
 
                 BaseElementDef resultDef = regexpDef.getRegexpResultDef();
                 Variable result = getBodyTextContent(resultDef, scraper, context, true);
                 debug(resultDef, scraper, result);
-                
+
                 String currResult = (result == null) ? matcher.group(0) : result.toString();
-            	if (isReplace) {
-            		matcher.appendReplacement(buffer, currResult);
-            	} else {
-            		resultList.add(new NodeVariable(currResult));
-            	}
-            	
-            	for (int i = 0; i <= groupCount; i++) {
-            		context.remove("_"+i);
-            	}
+                if (isReplace) {
+                    matcher.appendReplacement(buffer, currResult);
+                } else {
+                    resultList.add(new NodeVariable(currResult));
+                }
+
+                for (int i = 0; i <= groupCount; i++) {
+                    context.remove("_" + i);
+                }
             }
-            
+
             if (isReplace) {
-        		matcher.appendTail(buffer);
-        		resultList.add(new NodeVariable(buffer.toString()));
-        	}
+                matcher.appendTail(buffer);
+                resultList.add(new NodeVariable(buffer.toString()));
+            }
         }
-        
+
 
         return new ListVariable(resultList);
     }
