@@ -2,11 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.sourceforge.web-harvest</groupId>
-    <artifactId>web-harvest</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
-    <description>Open Source Web Data Extraction tool written in Java. It offers a way to collect desired Web pages and
-        extract useful data from them.
+    <groupId>net.sourceforge.webharvest</groupId>
+    <artifactId>webharvest</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <description>
+        Open Source Web Data Extraction tool written in Java.
+        It offers a way to collect desired Web pages and extract useful data from them.
     </description>
     <url>http://web-harvest.sourceforge.net/</url>
     <inceptionYear>2006</inceptionYear>
@@ -19,13 +21,21 @@
                 <role>Developer</role>
             </roles>
         </developer>
+        <developer>
+            <id>awajda</id>
+            <name>Alexander Wajda</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
     </developers>
     <licenses>
         <license>
             <name>BSD License</name>
             <url>http://www.opensource.org/licenses/bsd-license.php</url>
             <distribution>repo</distribution>
-            <comments>OWNER = Vladimir Nikic
+            <comments>
+                OWNER = Vladimir Nikic
                 YEAR = 2006-2007
             </comments>
         </license>
@@ -34,8 +44,7 @@
         <url>http://web-harvest.svn.sourceforge.net/</url>
     </scm>
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <resources>
+        <!--<resources>
             <resource>
                 <directory>src</directory>
                 <includes>
@@ -49,7 +58,7 @@
                     <include>**/*</include>
                 </includes>
             </resource>
-        </resources>
+        </resources>-->
         <plugins>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -200,6 +209,11 @@
             <version>9.1.0.8</version>
         </dependency>
     </dependencies>
+
+    <modules>
+        <module>core</module>
+        <module>ide</module>
+    </modules>
 
     <repositories>
         <repository>

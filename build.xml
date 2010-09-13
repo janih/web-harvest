@@ -44,7 +44,7 @@
 			<classpath refid="classpath.compile"/>
 		</javac>
         <copy todir="${dir.dist}/org/webharvest/gui/resources">
-            <fileset dir="${dir.src}/org/webharvest/gui/resources"/>
+            <fileset dir="ide/src/main/java/org/webharvest/gui/resources"/>
         </copy>
     </target>
 
