@@ -36,55 +36,51 @@
 */
 
 import org.apache.log4j.PropertyConfigurator;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.gui.Ide;
-import org.webharvest.utils.CommonUtil;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.PluginException;
+import org.webharvest.gui.Ide;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.FileInputStream;
 import java.io.File;
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Startup class  for Web-Harvest.
  */
 public class CommandLine {
-	
-	private static Map getArgValue(String[] args, boolean caseSensitive) {
-        Map params = new HashMap();
-        for (int i = 0; i < args.length; i++) {
-			String curr = args[i];
+
+    private static Map<String, String> getArgValue(String[] args, boolean caseSensitive) {
+        Map<String, String> params = new HashMap<String, String>();
+        for (String curr : args) {
             String argName = caseSensitive ? curr : curr.toLowerCase();
             String argValue = "";
 
-			int eqIndex = curr.indexOf('=');
-			if (eqIndex >= 0) {
-				argName = curr.substring(0, eqIndex).trim();
-				argValue = curr.substring(eqIndex+1).trim();
+            int eqIndex = curr.indexOf('=');
+            if (eqIndex >= 0) {
+                argName = curr.substring(0, eqIndex).trim();
+                argValue = curr.substring(eqIndex + 1).trim();
             }
 
             params.put(caseSensitive ? argName : argName.toLowerCase(), argValue);
         }
-		
-		return params; 
-	}
 
-    private static Map getArgValue(String[] args) {
+        return params;
+    }
+
+    private static Map<String, String> getArgValue(String[] args) {
         return getArgValue(args, false);
     }
-	
+
     public static void main(String[] args) throws IOException {
-        Map params = getArgValue(args);
+        Map<String, String> params = getArgValue(args);
 
         if (params.size() == 0) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -92,31 +88,31 @@ public class CommandLine {
                     new Ide().createAndShowGUI();
                 }
             });
-        } else if ( params.containsKey("-h") || params.containsKey("/h")) {
+        } else if (params.containsKey("-h") || params.containsKey("/h")) {
             printHelp();
             System.exit(0);
         } else {
-            String configFilePath = (String) params.get("config");
-            if ( configFilePath == null || "".equals(configFilePath) ) {
+            String configFilePath = params.get("config");
+            if (configFilePath == null || "".equals(configFilePath)) {
                 System.err.println("You must specify configuration file path using config=<path> argument!");
                 printHelp();
                 System.exit(1);
             }
 
-            String workingDir = (String) params.get("workdir");
-            if ( workingDir == null || "".equals(workingDir) ) {
+            String workingDir = params.get("workdir");
+            if (workingDir == null || "".equals(workingDir)) {
                 workingDir = ".";
             }
 
-            String logLevel = (String) params.get("loglevel");
-            if ( logLevel == null || "".equals(logLevel) ) {
+            String logLevel = params.get("loglevel");
+            if (logLevel == null || "".equals(logLevel)) {
                 logLevel = "INFO";
             }
 
             Properties props = new Properties();
 
-            String logPropsFile = (String) params.get("logpropsfile");
-            if ( logPropsFile != null && !"".equals(logPropsFile) ) {
+            String logPropsFile = params.get("logpropsfile");
+            if (logPropsFile != null && !"".equals(logPropsFile)) {
                 FileInputStream fis = new FileInputStream(new File(logPropsFile));
                 props.load(fis);
                 fis.close();
@@ -136,37 +132,33 @@ public class CommandLine {
             PropertyConfigurator.configure(props);
 
             // register plugins if specified
-            String pluginsString = (String) params.get("plugins");
-            if ( !CommonUtil.isEmpty(pluginsString) ) {
-                String plugins[] = CommonUtil.tokenize(pluginsString, ",");
-                for (int i = 0; i < plugins.length; i++) {
+            String pluginsString = params.get("plugins");
+            if (!CommonUtil.isEmpty(pluginsString)) {
+                for (String plugin : CommonUtil.tokenize(pluginsString, ",")) {
                     try {
-                        DefinitionResolver.registerPlugin(plugins[i]);
+                        DefinitionResolver.registerPlugin(plugin);
                     } catch (PluginException e) {
                         System.out.println(e.getMessage());
                     }
                 }
             }
 
-            ScraperConfiguration config = null;
-            String configLowercase = configFilePath.toLowerCase();
-            if ( configLowercase.startsWith("http://") || configLowercase.startsWith("https://") ) {
-                config = new ScraperConfiguration( new URL(configFilePath) );
-            } else {
-                config = new ScraperConfiguration(configFilePath);
-            }
+            final String configLowercase = configFilePath.toLowerCase();
 
-            Scraper scraper = new Scraper(config, workingDir);
+            final Scraper scraper = new Scraper(configLowercase.startsWith("http://") || configLowercase.startsWith("https://")
+                    ? new ScraperConfiguration(new URL(configFilePath))
+                    : new ScraperConfiguration(configFilePath),
+                    workingDir);
 
-            String isDebug = (String) params.get("debug");
-            if ( CommonUtil.isBooleanTrue(isDebug) ) {
+            String isDebug = params.get("debug");
+            if (CommonUtil.isBooleanTrue(isDebug)) {
                 scraper.setDebug(true);
             }
 
-            String proxyHost = (String) params.get("proxyhost");
-            if ( proxyHost != null && !"".equals(proxyHost)) {
-                String proxyPort = (String) params.get("proxyport");
-                if ( proxyPort != null && !"".equals(proxyPort) ) {
+            String proxyHost = params.get("proxyhost");
+            if (proxyHost != null && !"".equals(proxyHost)) {
+                String proxyPort = params.get("proxyport");
+                if (proxyPort != null && !"".equals(proxyPort)) {
                     int port = Integer.parseInt(proxyPort);
                     scraper.getHttpClientManager().setHttpProxy(proxyHost, port);
                 } else {
@@ -174,20 +166,18 @@ public class CommandLine {
                 }
             }
 
-            String proxyUser = (String) params.get("proxyuser");
-            if ( proxyUser != null && !"".equals(proxyUser) ) {
-                String proxyPassword = (String) params.get("proxypassword");
-                String proxyNTHost = (String) params.get("proxynthost");
-                String proxyNTDomain = (String) params.get("proxyntdomain");
+            String proxyUser = params.get("proxyuser");
+            if (proxyUser != null && !"".equals(proxyUser)) {
+                String proxyPassword = params.get("proxypassword");
+                String proxyNTHost = params.get("proxynthost");
+                String proxyNTDomain = params.get("proxyntdomain");
                 scraper.getHttpClientManager().setHttpProxyCredentials(proxyUser, proxyPassword, proxyNTHost, proxyNTDomain);
             }
 
             // adds initial variables to the scraper's content, if any
-            Map caseSensitiveParams = getArgValue(args, true);
-            Iterator iterator = caseSensitiveParams.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                String key = (String) entry.getKey();
+            Map<String, String> caseSensitiveParams = getArgValue(args, true);
+            for (Map.Entry<String, String> entry : caseSensitiveParams.entrySet()) {
+                final String key = entry.getKey();
                 if (key.startsWith("#")) {
                     String varName = key.substring(1);
                     if (varName.length() > 0) {
