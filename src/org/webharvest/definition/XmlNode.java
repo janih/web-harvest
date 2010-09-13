@@ -39,211 +39,219 @@ package org.webharvest.definition;
 import org.apache.log4j.Logger;
 import org.xml.sax.InputSource;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class XmlNode extends HashMap {
+public class XmlNode extends HashMap<String, Object> {
 
     protected static final Logger log = Logger.getLogger(XmlNode.class);
 
     private static final boolean IGNORE_NAMESPACE = true;
-	private static final boolean IGNORE_CASE = true;
+    private static final boolean IGNORE_CASE = true;
 
-	// node name - correspondes to xml tag name
-	private String name;
+    // node name - corresponds to xml tag name
+    private String name;
 
-	// parent element
-	private XmlNode parent;
+    // parent element
+    private XmlNode parent;
 
-	// map of attributes
-	private Map attributes = new HashMap();
+    // map of attributes
+    private Map<String, String> attributes = new HashMap<String, String>();
 
-	// all subelements in the form of linear list
-	private List elementList = new ArrayList();
+    // all subelements in the form of linear list
+    private List<Serializable> elementList = new ArrayList<Serializable>();
 
-	// textBuff value
-	private StringBuffer textBuff = new StringBuffer();
+    // textBuff value
+    private StringBuffer textBuff = new StringBuffer();
 
-	// text buffer containing continuous text 
-	private transient StringBuffer tmpBuf = new StringBuffer();
+    // text buffer containing continuous text
+    private transient StringBuffer tmpBuf = new StringBuffer();
 
     // location of element in the XML
-    private int lineNumbwe;
+    private int lineNumber;
     private int columnNumber;
 
     /**
-	 * Static method that creates node for specified input source which
-	 * contains XML data
-	 * @param in
-	 * @return XmlNode instance
-	 */
-	public static XmlNode getInstance(InputSource in) {
+     * Static method that creates node for specified input source which
+     * contains XML data
+     *
+     * @param in
+     * @return XmlNode instance
+     */
+    public static XmlNode getInstance(InputSource in) {
         return XmlParser.parse(in);
-	}
-
-	/**
-	 * Constructor that defines name and connects to specified
-	 * parent element.
-	 * @param name
-	 * @param parent
-	 */
-	protected XmlNode(String name, XmlNode parent) {
-		super();
-
-		this.name = adaptName(name);
-		this.parent = parent;
-
-		if (parent != null) {
-			parent.addElement(this);
-		}
-	}
-
-	/**
-	 * According to settings of this object changes element/attribute
-	 * names to be namespace/case insensitive.
-	 * @param s
-	 * @return String
-	 */
-	private String adaptName(String s) {
-		if (IGNORE_NAMESPACE) {
-			int index = s.indexOf(':');
-			if (index >= 0) {
-				s = s.substring(index + 1);
-			}
-		}
-
-		if (IGNORE_CASE) {
-			s = s.toLowerCase();
-		}
-
-		return s;
-	}
-
-	/**
-	 * @return Node name.
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return Node textBuff.
-	 */
-	public String getText() {
-		return textBuff == null ? null : textBuff.toString();
-	}
-
-	/**
-	 * @return Parent node or null if instance is root node.
-	 */
-	public XmlNode getParent() {
-		return parent;
-	}
-
-	/**
-	 * For specified serach path returns element/attribute if found,
-	 * or null otherwise. Path is sequence of elements separated with
-	 * some of characters: ./\[]
-	 * For example: msg[0].response[0].id is trying to find in node
-	 * first msg subelement and than first response subelement and then
-	 * attribute id.
-	 * @param key
-	 * @return Resulting value which should be eather XmlNode instance or string.
-	 */
-	private Object getSeq(String key) {
-		StringTokenizer strTkzr = new StringTokenizer(key, "./\\[]");
-		Object currValue = this;
-		while (strTkzr.hasMoreTokens()) {
-			String currKey = strTkzr.nextToken();
-			if (currValue instanceof Map) {
-				currValue = ((Map)currValue).get(currKey);
-			} else if (currValue instanceof List) {
-				try {
-					List list = (List) currValue;
-					int index = Integer.parseInt(currKey);
-
-					if (index >= 0 && index < list.size()) {
-						currValue = list.get(index);
-					}
-				} catch (NumberFormatException e) {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-
-		return currValue;
-	}
-
-	/**
-	 * Overriden get method - search both subelements and attributes
-	 */
-	public Object get(Object key) {
-		if (key == null) {
-			return null;
-		}
-
-		if (IGNORE_CASE) {
-			key = ((String)key).toLowerCase();
-		}
-
-		String sKey = (String) key;
-
-		if ( sKey.indexOf('/') >= 0 || sKey.indexOf('.') >= 0 || sKey.indexOf('\\') >= 0 || sKey.indexOf('[') >= 0 ) {
-			return getSeq(sKey);
-		}
-
-		if (sKey.equalsIgnoreCase("_value")) {
-			return getText();
-		} else if (this.containsKey(key)) {
-			return super.get(key);
-		} else {
-			return attributes.get(key);
-		}
-	}
-	
-	public String getString(Object key) {
-		return (String) get(key);
-	}
-
-	/**
-	 * Adds new attribute with specified name and value.
-	 * @param name
-	 * @param value
-	 */
-	public void addAttribute(String name, String value) {
-		attributes.put(adaptName(name), value);
-	}
-
-    public Map getAttributes() {
-        return this.attributes;
-    }
-    
-    public String getAttribute(String attName) {
-    	return (String) this.attributes.get(attName);
     }
 
     /**
-	 * Adds new subelement.
-	 * @param elementNode
-	 */
-	public void addElement(XmlNode elementNode) {
+     * Constructor that defines name and connects to specified
+     * parent element.
+     *
+     * @param name
+     * @param parent
+     */
+    protected XmlNode(String name, XmlNode parent) {
+        super();
+
+        this.name = adaptName(name);
+        this.parent = parent;
+
+        if (parent != null) {
+            parent.addElement(this);
+        }
+    }
+
+    /**
+     * According to settings of this object changes element/attribute
+     * names to be namespace/case insensitive.
+     *
+     * @param s
+     * @return String
+     */
+    private String adaptName(String s) {
+        if (IGNORE_NAMESPACE) {
+            int index = s.indexOf(':');
+            if (index >= 0) {
+                s = s.substring(index + 1);
+            }
+        }
+
+        if (IGNORE_CASE) {
+            s = s.toLowerCase();
+        }
+
+        return s;
+    }
+
+    /**
+     * @return Node name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return Node textBuff.
+     */
+    public String getText() {
+        return textBuff == null ? null : textBuff.toString();
+    }
+
+    /**
+     * @return Parent node or null if instance is root node.
+     */
+    public XmlNode getParent() {
+        return parent;
+    }
+
+    /**
+     * For specified serach path returns element/attribute if found,
+     * or null otherwise. Path is sequence of elements separated with
+     * some of characters: ./\[]
+     * For example: msg[0].response[0].id is trying to find in node
+     * first msg subelement and than first response subelement and then
+     * attribute id.
+     *
+     * @param key
+     * @return Resulting value which should be either XmlNode instance or string.
+     */
+    private Object getSeq(String key) {
+        StringTokenizer strTkzr = new StringTokenizer(key, "./\\[]");
+        Object currValue = this;
+        while (strTkzr.hasMoreTokens()) {
+            String currKey = strTkzr.nextToken();
+            if (currValue instanceof Map) {
+                currValue = ((Map) currValue).get(currKey);
+            } else if (currValue instanceof List) {
+                try {
+                    List list = (List) currValue;
+                    int index = Integer.parseInt(currKey);
+
+                    if (index >= 0 && index < list.size()) {
+                        currValue = list.get(index);
+                    }
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+
+        return currValue;
+    }
+
+    /**
+     * Overridden get method - search both subelements and attributes
+     */
+    @Override
+    public Object get(Object key) {
+        if (key == null) {
+            return null;
+        }
+
+        if (IGNORE_CASE) {
+            key = ((String) key).toLowerCase();
+        }
+
+        String sKey = (String) key;
+
+        if (sKey.indexOf('/') >= 0 || sKey.indexOf('.') >= 0 || sKey.indexOf('\\') >= 0 || sKey.indexOf('[') >= 0) {
+            return getSeq(sKey);
+        }
+
+        if (sKey.equalsIgnoreCase("_value")) {
+            return getText();
+        } else if (this.containsKey(key)) {
+            return super.get(key);
+        } else {
+            return attributes.get(key);
+        }
+    }
+
+    public String getString(Object key) {
+        return (String) get(key);
+    }
+
+    /**
+     * Adds new attribute with specified name and value.
+     *
+     * @param name
+     * @param value
+     */
+    public void addAttribute(String name, String value) {
+        attributes.put(adaptName(name), value);
+    }
+
+    public Map<String, String> getAttributes() {
+        return this.attributes;
+    }
+
+    public String getAttribute(String attName) {
+        return this.attributes.get(attName);
+    }
+
+    /**
+     * Adds new subelement.
+     *
+     * @param elementNode
+     */
+    public void addElement(XmlNode elementNode) {
         flushText();
-        
+
         String elementName = elementNode.getName();
 
-		if (!this.containsKey(elementName)) {
-			this.put(elementName, new ArrayList());
-		}
+        if (!this.containsKey(elementName)) {
+            this.put(elementName, new ArrayList());
+        }
 
-		ArrayList elementsForName = (ArrayList) this.get(elementName);
-		elementsForName.add(elementNode);
+        ((List) this.get(elementName)).add(elementNode);
 
-		elementList.add(elementNode);
-	}
+        elementList.add(elementNode);
+    }
 
     /**
      * Adds new textBuff to element list
+     *
      * @param value
      */
     public void addElement(String value) {
@@ -264,7 +272,7 @@ public class XmlNode extends HashMap {
                     textBuff.append(token);
                 }
             }
-            tmpBuf.delete( 0, tmpBuf.length() );
+            tmpBuf.delete(0, tmpBuf.length());
         }
     }
 
@@ -273,27 +281,25 @@ public class XmlNode extends HashMap {
         return super.get(name);
     }
 
-    public List getElementList() {
+    public List<Serializable> getElementList() {
         return elementList;
     }
 
     /**
-	 * Prints instance in treelike form to the default output.
-	 * Useful for testing.
-	 */
-	public void print() {
-		print(0);
-	}
+     * Prints instance in treelike form to the default output.
+     * Useful for testing.
+     */
+    public void print() {
+        print(0);
+    }
 
-	private void print(int level) {
-		for (int i = 0; i < level; i++) {
-			System.out.print("     ");
-		}
-		System.out.print(name + ": " + attributes + ": TEXT = [" + textBuff + "]\n");
+    private void print(int level) {
+        for (int i = 0; i < level; i++) {
+            System.out.print("     ");
+        }
+        System.out.print(name + ": " + attributes + ": TEXT = [" + textBuff + "]\n");
 
-		Iterator it = elementList.iterator();
-		while (it.hasNext()) {
-            Object element = it.next();
+        for (Serializable element : elementList) {
             if (element instanceof XmlNode) {
                 XmlNode childNode = (XmlNode) element;
                 childNode.print(level + 1);
@@ -301,22 +307,22 @@ public class XmlNode extends HashMap {
                 for (int i = 0; i <= level; i++) {
                     System.out.print("     ");
                 }
-                System.out.println((String)element);
+                System.out.println((String) element);
             }
-		}
-	}
+        }
+    }
 
     public void setLocation(int lineNumber, int columnNumber) {
-        this.lineNumbwe = lineNumber;
+        this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
 
     public int getLineNumber() {
-        return lineNumbwe;
+        return lineNumber;
     }
 
     public int getColumnNumber() {
         return columnNumber;
     }
-    
+
 }

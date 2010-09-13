@@ -36,17 +36,16 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.utils.Catalog;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.BeanShellScriptEngine;
-import org.webharvest.runtime.scripting.JavascriptScriptEngine;
 import org.webharvest.runtime.scripting.GroovyScriptEngine;
+import org.webharvest.runtime.scripting.JavascriptScriptEngine;
+import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.utils.Catalog;
 import org.xml.sax.InputSource;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -65,8 +64,8 @@ public class ScraperConfiguration {
     private Map functionDefs = new Catalog();
 
     // sequence of operationDefs
-    private List operations = new ArrayList();
-    
+    private List<IElementDef> operations = new ArrayList<IElementDef>();
+
     private String charset = DEFAULT_CHARSET;
     private String defaultScriptEngine = BEANSHELL_SCRIPT_ENGINE;
 
@@ -75,7 +74,7 @@ public class ScraperConfiguration {
 
     /**
      * Creates configuration instance loaded from the specified input stream.
-     * 
+     *
      * @param in
      */
     public ScraperConfiguration(InputSource in) {
@@ -91,65 +90,59 @@ public class ScraperConfiguration {
         this.charset = charsetString != null ? charsetString : DEFAULT_CHARSET;
 
         String scriptEngineDesc = node.getString("scriptlang");
-        if ( "javascript".equalsIgnoreCase(scriptEngineDesc) ) {
+        if ("javascript".equalsIgnoreCase(scriptEngineDesc)) {
             this.defaultScriptEngine = JAVASCRIPT_SCRIPT_ENGINE;
-        } else if ( "groovy".equalsIgnoreCase(scriptEngineDesc) ) {
+        } else if ("groovy".equalsIgnoreCase(scriptEngineDesc)) {
             this.defaultScriptEngine = GROOVY_SCRIPT_ENGINE;
         } else {
             this.defaultScriptEngine = BEANSHELL_SCRIPT_ENGINE;
         }
 
-        List elementList = node.getElementList();
-        Iterator it = elementList.iterator();
-        while (it.hasNext()) {
-            Object element = it.next();
-            if (element instanceof XmlNode) {
-                XmlNode currElementNode = (XmlNode) element;
-                operations.add( DefinitionResolver.createElementDefinition(currElementNode) );
-            } else {
-                operations.add( new ConstantDef(element.toString()) );
-            }
+        for (Object element : node.getElementList()) {
+            operations.add((element instanceof XmlNode)
+                    ? DefinitionResolver.createElementDefinition((XmlNode) element)
+                    : new ConstantDef(element.toString()));
         }
     }
 
     /**
      * Creates configuration instance loaded from the specified File.
-     * 
+     *
      * @param sourceFile
      * @throws FileNotFoundException
      */
     public ScraperConfiguration(File sourceFile) throws FileNotFoundException {
         this.sourceFile = sourceFile;
-        createFromInputStream( new InputSource(new FileReader(sourceFile)) );
+        createFromInputStream(new InputSource(new FileReader(sourceFile)));
     }
 
     /**
      * Creates configuration instance loaded from the file specified by filename.
-     * 
+     *
      * @param sourceFilePath
      */
     public ScraperConfiguration(String sourceFilePath) throws FileNotFoundException {
-        this( new File(sourceFilePath) );
+        this(new File(sourceFilePath));
     }
 
     /**
      * Creates configuration instance loaded from specified URL.
-     *  
+     *
      * @param sourceUrl
      * @throws IOException
      */
     public ScraperConfiguration(URL sourceUrl) throws IOException {
         this.url = sourceUrl.toString();
-        createFromInputStream( new InputSource(new InputStreamReader(sourceUrl.openStream())) );
+        createFromInputStream(new InputSource(new InputStreamReader(sourceUrl.openStream())));
     }
 
-    public List getOperations() {
+    public List<IElementDef> getOperations() {
         return operations;
     }
 
-	public String getCharset() {
-		return charset;
-	}
+    public String getCharset() {
+        return charset;
+    }
 
     public String getDefaultScriptEngine() {
         return defaultScriptEngine;
@@ -179,17 +172,17 @@ public class ScraperConfiguration {
         this.url = url;
     }
 
-    public ScriptEngine createScriptEngine(Map context, String engineType) {
-        if ( JAVASCRIPT_SCRIPT_ENGINE.equalsIgnoreCase(engineType) ) {
+    public ScriptEngine createScriptEngine(Map<String, Object> context, String engineType) {
+        if (JAVASCRIPT_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
             return new JavascriptScriptEngine(context);
-        } else if ( GROOVY_SCRIPT_ENGINE.equalsIgnoreCase(engineType) ) {
+        } else if (GROOVY_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
             return new GroovyScriptEngine(context);
         } else {
             return new BeanShellScriptEngine(context);
         }
     }
 
-    public ScriptEngine createScriptEngine(Map context) {
+    public ScriptEngine createScriptEngine(Map<String, Object> context) {
         return createScriptEngine(context, this.defaultScriptEngine);
     }
 

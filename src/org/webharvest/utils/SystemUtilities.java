@@ -52,6 +52,7 @@ import java.util.Date;
  * Collection of useful constants and functions that are available in each
  * scraper context.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class SystemUtilities {
 
     public static final Variable lf = new NodeVariable("\n");
@@ -134,7 +135,7 @@ public class SystemUtilities {
     }
 
     /**
-     * Returns current date formated as "yyyyMMdd".
+     * Returns current date formatted as "yyyyMMdd".
      */
     public String date() {
         return datetime("yyyyMMdd");
