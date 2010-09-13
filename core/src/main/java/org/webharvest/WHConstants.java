@@ -45,7 +45,7 @@ package org.webharvest;
 public class WHConstants {
 
     public static final String MIME_TYPES[] = {
-            "applicaiton/x-bytecode.python",
+            "application/x-bytecode.python",
             "application/acad",
             "application/arj",
             "application/base64",
