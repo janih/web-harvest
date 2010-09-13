@@ -1,4 +1,4 @@
-package org.webharvest;/*  Copyright (c) 2006-2007, Vladimir Nikic
+/*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
 
     Redistribution and use of this software in source and binary forms,
@@ -34,6 +34,7 @@ package org.webharvest;/*  Copyright (c) 2006-2007, Vladimir Nikic
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
+package org.webharvest;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;

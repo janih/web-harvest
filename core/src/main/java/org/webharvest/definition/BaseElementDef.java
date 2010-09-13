@@ -36,10 +36,9 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.utils.*;
-import org.webharvest.gui.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class BaseElementDef implements IElementDef {
 
@@ -61,13 +60,13 @@ public class BaseElementDef implements IElementDef {
 
     protected BaseElementDef() {
     }
-    
+
     protected BaseElementDef(XmlNode node) {
-    	this(node, true);
+        this(node, true);
     }
 
     protected BaseElementDef(XmlNode node, String descName) {
-    	this(node);
+        this(node);
         this.descName = descName;
     }
 
@@ -81,23 +80,23 @@ public class BaseElementDef implements IElementDef {
             List elementList = node.getElementList();
 
             if (createBodyDefs) {
-	            if (elementList != null && elementList.size() > 0) {
-	                Iterator it = elementList.iterator();
-	                while (it.hasNext()) {
-	                    Object element = it.next();
-	                    if (element instanceof XmlNode) {
-	                        XmlNode currElementNode = (XmlNode) element;
-	                        IElementDef def = DefinitionResolver.createElementDefinition(currElementNode);
-	                        if (def != null) {
-	                            operationDefs.add(def);
-	                        }
-	                    } else {
-	                        operationDefs.add( new ConstantDef(element.toString()) );
-	                    }
-	                }
-	            } else {
-	                body = node.getText();
-	            }
+                if (elementList != null && elementList.size() > 0) {
+                    Iterator it = elementList.iterator();
+                    while (it.hasNext()) {
+                        Object element = it.next();
+                        if (element instanceof XmlNode) {
+                            XmlNode currElementNode = (XmlNode) element;
+                            IElementDef def = DefinitionResolver.createElementDefinition(currElementNode);
+                            if (def != null) {
+                                operationDefs.add(def);
+                            }
+                        } else {
+                            operationDefs.add(new ConstantDef(element.toString()));
+                        }
+                    }
+                } else {
+                    body = node.getText();
+                }
             }
         }
     }

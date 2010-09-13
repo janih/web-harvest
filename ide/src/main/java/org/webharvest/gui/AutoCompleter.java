@@ -1,9 +1,10 @@
 package org.webharvest.gui;
 
+import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.ElementInfo;
-import org.webharvest.gui.component.*;
-import org.webharvest.utils.*;
+import org.webharvest.gui.component.WHScrollPane;
+import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,14 +12,21 @@ import javax.swing.event.MenuKeyEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Instance of the class is responsible for auto completion of defined tags and
  * attributes in the Web-Harvest XML configuration. It wraps instance of XML editor
  * pane and popup menu that offers context specific set of tags/attributes in the
- * editor. 
+ * editor.
  *
  * @author: Vladimir Nikic
  * Date: May 24, 2007
@@ -40,20 +48,23 @@ public class AutoCompleter {
     // popup font
     private static final Font POPUP_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
+    private static final Properties attrValuesProperties = org.webharvest.gui.ResourceManager.getAttrValuesProperties();
+
     /**
      * Class that provides listener for key events inside completer popup menu.
      */
     private class CompleterKeyListener extends KeyAdapter {
+
         public void keyPressed(KeyEvent e) {
             char ch = e.getKeyChar();
             int code = e.getKeyCode();
-            if ( (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '-' || code == KeyEvent.VK_BACK_SPACE ) {
+            if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '-' || code == KeyEvent.VK_BACK_SPACE) {
                 Document document = xmlPane.getDocument();
                 int pos = xmlPane.getCaretPosition();
                 try {
                     // deleting or inserting new character
                     if (code == MenuKeyEvent.VK_BACK_SPACE) {
-                        if ( pos > 0 && document.getLength() > 0 ) {
+                        if (pos > 0 && document.getLength() > 0) {
                             document.remove(pos - 1, 1);
                         }
                     } else {
@@ -98,6 +109,7 @@ public class AutoCompleter {
 
     /**
      * Constructor.
+     *
      * @param xmlPane
      */
     public AutoCompleter(final XmlTextPane xmlPane) {
@@ -105,18 +117,18 @@ public class AutoCompleter {
 
         this.list.setBackground(BG_COLOR);
         this.list.setFont(POPUP_FONT);
-        this.list.setSelectionMode(ListSelectionModel .SINGLE_SELECTION);
+        this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.list.addKeyListener(new CompleterKeyListener());
         this.list.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                if ( e.getClickCount() > 1) {
+                if (e.getClickCount() > 1) {
                     popupMenu.setVisible(false);
                     doComplete();
                 }
             }
         });
 
-        this.popupMenu.setBorder( new EmptyBorder(1, 1, 1, 1) );
+        this.popupMenu.setBorder(new EmptyBorder(1, 1, 1, 1));
         this.elementInfos = DefinitionResolver.getElementInfos();
     }
 
@@ -127,11 +139,9 @@ public class AutoCompleter {
 
         this.model.clear();
 
-        Iterator iterator = this.elementInfos.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            String key = (String) entry.getKey();
-            if ( prefix == null || key.toLowerCase().startsWith(prefix) ) {
+        for (Object o : this.elementInfos.entrySet()) {
+            final Map.Entry entry = (Map.Entry) o;
+            if (prefix == null || ((String) entry.getKey()).toLowerCase().startsWith(prefix)) {
                 ElementInfo elementInfo = (ElementInfo) entry.getValue();
                 model.addElement(elementInfo.getName());
             }
@@ -158,10 +168,10 @@ public class AutoCompleter {
 
         ElementInfo elementInfo = DefinitionResolver.getElementInfo(elementName);
         if (elementInfo != null) {
-            for (Object attObj: elementInfo.getAttsSet()) {
+            for (Object attObj : elementInfo.getAttsSet()) {
                 if (attObj != null) {
-                    String att = ((String)attObj).toLowerCase();
-                    if ( att.startsWith(prefix) && !"id".equals(att) ) {
+                    String att = ((String) attObj).toLowerCase();
+                    if (att.startsWith(prefix) && !"id".equals(att)) {
                         model.addElement(att);
                     }
                 }
@@ -174,15 +184,38 @@ public class AutoCompleter {
 
         ElementInfo elementInfo = DefinitionResolver.getElementInfo(tagName);
         if (elementInfo != null) {
-            String[] suggs = elementInfo.getAttributeValueSuggestions(attributeName);
+            String[] suggs = getAttributeValueSuggestions(elementInfo, attributeName);
             if (suggs != null) {
-                for (String s: suggs) {
+                for (String s : suggs) {
                     if (s.toLowerCase().startsWith(attValuePrefix)) {
                         model.addElement(s);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @return Array of suggested values for specified attribute - used for auto-completion in IDE.
+     */
+    private static String[] getAttributeValueSuggestions(ElementInfo elementInfo, String attributeName) {
+        if (elementInfo.getPlugin() != null) {
+            return elementInfo.getPlugin().getAttributeValueSuggestions(attributeName);
+        } else {
+            if (attrValuesProperties != null && attributeName != null) {
+                String key = elementInfo.getName().toLowerCase() + "." + attributeName.toLowerCase();
+                String values = attrValuesProperties.getProperty(key);
+                if ("*charset".equalsIgnoreCase(values)) {
+                    Set<String> charsetKeys = Charset.availableCharsets().keySet();
+                    return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
+                } else if ("*mime".equalsIgnoreCase(values)) {
+                    return WHConstants.MIME_TYPES;
+                } else {
+                    return CommonUtil.tokenize(values, ",");
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -206,10 +239,10 @@ public class AutoCompleter {
                 this.context = TAG_CONTEXT;
 
                 if (tagName != null && tagName.length() > 0) {
-                    int quoteIndex = Math.max( trimmedText.lastIndexOf("\""), trimmedText.lastIndexOf("\'") );
+                    int quoteIndex = Math.max(trimmedText.lastIndexOf("\""), trimmedText.lastIndexOf("\'"));
                     if (quoteIndex > 0) {
                         int eqIndex = trimmedText.lastIndexOf("=");
-                        if ( eqIndex >= 0 && eqIndex < quoteIndex && "".equals(trimmedText.substring(eqIndex + 1, quoteIndex).trim()) ) {
+                        if (eqIndex >= 0 && eqIndex < quoteIndex && "".equals(trimmedText.substring(eqIndex + 1, quoteIndex).trim())) {
                             int firstQuoteIndex = trimmedText.indexOf("\"", eqIndex);
                             if (firstQuoteIndex < 0) {
                                 firstQuoteIndex = trimmedText.indexOf("\'", eqIndex);
@@ -220,7 +253,7 @@ public class AutoCompleter {
                                 String attName = getIdentifierFromEnd(trimmedText);
                                 if (attName != null && attName.length() > 0) {
                                     this.context = ATTRIBUTE_VALUE_CONTEXT;
-                                    defineAttributeValuesMenu( tagName.toLowerCase().trim(), attName.toLowerCase().trim(), attValuePrefix.toLowerCase().trim() );
+                                    defineAttributeValuesMenu(tagName.toLowerCase().trim(), attName.toLowerCase().trim(), attValuePrefix.toLowerCase().trim());
                                 }
                             }
                         }
@@ -229,7 +262,7 @@ public class AutoCompleter {
 
                 if (this.context != ATTRIBUTE_VALUE_CONTEXT) {
                     String identifier = getIdentifierFromEnd(text);
-                    if ( containWhitespaces(text) ) {           // attributes context
+                    if (containWhitespaces(text)) {           // attributes context
                         this.context = ATTRIBUTE_CONTEXT;
                         String elementName = getIdentifierFromStart(text);
                         defineAttributesMenu(elementName, identifier);
@@ -254,7 +287,7 @@ public class AutoCompleter {
                 JScrollPane scrollPane = new WHScrollPane(list);
 
                 this.popupMenu.add(scrollPane);
-                this.popupMenu.show( this.xmlPane, (int)position.getX(), (int)(position.getY() + position.getHeight()) );
+                this.popupMenu.show(this.xmlPane, (int) position.getX(), (int) (position.getY() + position.getHeight()));
                 this.list.grabFocus();
                 this.list.setSelectedIndex(0);
             }
@@ -270,7 +303,7 @@ public class AutoCompleter {
     private boolean containWhitespaces(String text) {
         int len = text.length();
         for (int i = 0; i < len; i++) {
-            if ( Character.isWhitespace(text.charAt(i)) ) {
+            if (Character.isWhitespace(text.charAt(i))) {
                 return true;
             }
         }
@@ -280,25 +313,25 @@ public class AutoCompleter {
 
     /**
      * @param text
-     * @return Maximal peace at the start of specified string which is valid tag or attribute name. 
+     * @return Maximal peace at the start of specified string which is valid tag or attribute name.
      */
     private String getIdentifierFromStart(String text) {
-        if ( text.startsWith("<") ) {
+        if (text.startsWith("<")) {
             text = text.substring(1);
         }
-        
+
         StringBuffer result = new StringBuffer();
         int len = text.length();
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
-            if ( Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!' ) {
+            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!') {
                 result.append(ch);
             } else {
                 break;
             }
         }
 
-        return result.toString(); 
+        return result.toString();
     }
 
     /**
@@ -309,7 +342,7 @@ public class AutoCompleter {
         StringBuffer result = new StringBuffer();
         for (int i = text.length() - 1; i >= 0; i--) {
             char ch = text.charAt(i);
-            if ( Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!' ) {
+            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!') {
                 result.insert(0, ch);
             } else {
                 break;
@@ -327,7 +360,7 @@ public class AutoCompleter {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if ( Character.isLetter(ch) || (i != 0 && (ch == '-' || ch == '_' || ch == '!'))  ) {
+            if (Character.isLetter(ch) || (i != 0 && (ch == '-' || ch == '_' || ch == '!'))) {
                 result.append(ch);
             } else {
                 break;
@@ -351,7 +384,7 @@ public class AutoCompleter {
                 } else {
                     completeAttribute(selectedValue);
                 }
-            } catch(BadLocationException e1) {
+            } catch (BadLocationException e1) {
                 e1.printStackTrace();
             }
         }
@@ -365,7 +398,7 @@ public class AutoCompleter {
         String template = (name + "=\"\"" + (toAppendSpace ? " " : "")).substring(this.prefixLength);
 
         document.insertString(pos, template, null);
-        xmlPane.setCaretPosition( xmlPane.getCaretPosition() - 1 );
+        xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 1);
     }
 
     private void completeAttributeValue(String value) throws BadLocationException {
@@ -374,7 +407,7 @@ public class AutoCompleter {
         String text = document.getText(0, pos);
         int startTagIndex = text.lastIndexOf("<");
         if (startTagIndex >= 0) {
-            int quoteIndex = Math.max( text.lastIndexOf("\""), text.lastIndexOf("\'") );
+            int quoteIndex = Math.max(text.lastIndexOf("\""), text.lastIndexOf("\'"));
             if (quoteIndex > 0 && quoteIndex > startTagIndex) {
                 document.remove(quoteIndex + 1, pos - quoteIndex - 1);
                 document.insertString(quoteIndex + 1, value, null);
@@ -386,12 +419,12 @@ public class AutoCompleter {
         Document document = xmlPane.getDocument();
         int pos = xmlPane.getCaretPosition();
 
-        if ( CDATA_NAME.equals(name) ) {
+        if (CDATA_NAME.equals(name)) {
             document.insertString(pos, "<![CDATA[  ]]>".substring(this.prefixLength), null);
-            xmlPane.setCaretPosition( xmlPane.getCaretPosition() - 4 );
-        } else if ( XML_COMMENT_NAME.equals(name) ) {
+            xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
+        } else if (XML_COMMENT_NAME.equals(name)) {
             document.insertString(pos, "<!--  -->".substring(this.prefixLength), null);
-            xmlPane.setCaretPosition( xmlPane.getCaretPosition() - 4 );
+            xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
         } else {
             ElementInfo info = DefinitionResolver.getElementInfo(name);
             if (info != null) {
@@ -399,7 +432,7 @@ public class AutoCompleter {
                 document.insertString(pos, template, null);
                 int closingIndex = template.lastIndexOf("</");
                 if (closingIndex >= 0) {
-                    xmlPane.setCaretPosition( xmlPane.getCaretPosition() - template.length() + closingIndex );
+                    xmlPane.setCaretPosition(xmlPane.getCaretPosition() - template.length() + closingIndex);
                 }
             }
         }

@@ -1,14 +1,20 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.apache.commons.mail.*;
-import org.webharvest.gui.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+import org.webharvest.WHConstants;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import javax.activation.*;
-import java.io.*;
+import javax.activation.DataSource;
+import java.io.IOException;
 
 /**
  * Mail attachment plugin - can be used only inside mail plugin.
@@ -54,14 +60,14 @@ public class MailAttachPlugin extends WebHarvestPlugin {
     }
 
     public String[] getValidAttributes() {
-        return new String[] {"name", "mimetype", "inline"};
+        return new String[]{"name", "mimetype", "inline"};
     }
 
     public String[] getAttributeValueSuggestions(String attributeName) {
         if ("mimetype".equalsIgnoreCase(attributeName)) {
-            return ResourceManager.MIME_TYPES;
+            return WHConstants.MIME_TYPES;
         } else if ("inline".equalsIgnoreCase(attributeName)) {
-            return new String[] {"true", "false"};
+            return new String[]{"true", "false"};
         }
         return null;
     }
