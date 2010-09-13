@@ -36,18 +36,17 @@
 */
 package org.webharvest.utils;
 
+import net.sf.saxon.trans.XPathException;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.ScraperXPathException;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.CallProcessor;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import net.sf.saxon.trans.XPathException;
 
 /**
  * Collection of useful constants and functions that are available in each
@@ -78,7 +77,7 @@ public class SystemUtilities {
      * @return True if scraper's context contain not-null variable with specified name.
      */
     public boolean isVariableDefined(String varName) {
-        return getCurrentContext().get(varName) != null;
+        return getCurrentContext().getVar(varName) != null;
     }
 
     /**
