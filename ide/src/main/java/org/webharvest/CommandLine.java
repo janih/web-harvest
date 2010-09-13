@@ -1,4 +1,4 @@
-/*  Copyright (c) 2006-2007, Vladimir Nikic
+package org.webharvest;/*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
 
     Redistribution and use of this software in source and binary forms,
