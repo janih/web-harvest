@@ -36,51 +36,37 @@
 */
 package org.webharvest.utils;
 
-import org.webharvest.exception.BaseException;
-
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 import java.util.List;
 
 /**
- * Simple Stack (FIFO list).
+ * Simple Stack (LIFO queue).
  */
-public class Stack {
+public class Stack<T> {
 
-	private LinkedList list = new LinkedList();
+    private LinkedList<T> list = new LinkedList<T>();
 
-	public void push(Object o) {
-		list.addLast(o);
-	}
+    public void push(T o) {
+        list.addLast(o);
+    }
 
-	public Object pop() {
-		try {
-			return list.removeLast();
-		} catch (NoSuchElementException e) {
-            throw new BaseException("Cannot pop element from the empty stack!", e);
-        }
-	}
+    public T pop() {
+        return list.removeLast();
+    }
 
-	public Object[] popAll() {
-		Object[] res = list.toArray();
-		list.clear();
-		
-		return res;
-	}
-	
-	public Object peek() {
-		return list.getLast();
-	}
+    public T peek() {
+        return list.getLast();
+    }
 
-	public boolean isEmpty() {
-		return list.isEmpty();
-	}
-	
-	public int size() {
-		return list.size();
-	}
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 
-    public List getList() {
+    public int size() {
+        return list.size();
+    }
+
+    public List<T> getList() {
         return list;
     }
 

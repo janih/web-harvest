@@ -39,28 +39,28 @@ package org.webharvest.runtime;
 import org.apache.log4j.Logger;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.exception.DatabaseException;
 import org.webharvest.runtime.processors.BaseProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngine;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
+import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
-import org.webharvest.utils.ClassLoaderUtil;
-import org.webharvest.exception.DatabaseException;
 
-import java.util.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Basic runtime class.
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class Scraper {
 
     public static final int STATUS_READY = 0;
@@ -83,25 +83,25 @@ public class Scraper {
     private HttpClientManager httpClientManager;
 
     // stack of running processors
-    private transient Stack runningProcessors = new Stack();
+    private transient Stack<BaseProcessor> runningProcessors = new Stack<BaseProcessor>();
 
     // stack of running functions
-    private transient Stack runningFunctions = new Stack();
+    private transient Stack<CallProcessor> runningFunctions = new Stack<CallProcessor>();
 
     // params that are proceeded to calling function
-    private transient Map functionParams = new HashMap();
+    private transient Map<String, Variable> functionParams = new HashMap<String, Variable>();
 
     // stack of running http processors
-    private transient Stack runningHttpProcessors = new Stack();
+    private transient Stack<HttpProcessor> runningHttpProcessors = new Stack<HttpProcessor>();
 
     // default script engine used throughout the configuration execution
     private ScriptEngine scriptEngine = null;
 
     // all used script engines in this scraper
-    private Map usedScriptEngines = new HashMap();
+    private Map<String, ScriptEngine> usedScriptEngines = new HashMap<String, ScriptEngine>();
 
     // pool of used database connections
-    Map dbPool = new HashMap();
+    Map<String, Connection> dbPool = new HashMap<String, Connection>();
 
     private List<ScraperRuntimeListener> scraperRuntimeListeners = new LinkedList<ScraperRuntimeListener>();
 
@@ -184,9 +184,7 @@ public class Scraper {
         }
 
         // inform al listeners that execution is finished
-        Iterator listenersIterator = this.scraperRuntimeListeners.iterator();
-        while (listenersIterator.hasNext()) {
-            ScraperRuntimeListener listener = (ScraperRuntimeListener) listenersIterator.next();
+        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionEnd(this);
         }
 
@@ -220,29 +218,27 @@ public class Scraper {
     }
 
     public CallProcessor getRunningFunction() {
-        return runningFunctions.isEmpty() ? null : (CallProcessor) runningFunctions.peek();
+        return runningFunctions.isEmpty() ? null : runningFunctions.peek();
     }
 
-    public void clearFunctionParams() {
-        this.functionParams.clear();
+    public void removeRunningFunction() {
+        runningFunctions.pop();
     }
 
     public void addFunctionParam(String name, Variable value) {
         this.functionParams.put(name, value);
     }
 
-    public Map getFunctionParams() {
+    public Map<String, Variable> getFunctionParams() {
         return functionParams;
     }
 
-    public void removeRunningFunction() {
-        if (runningFunctions.size() > 0) {
-            runningFunctions.pop();
-        }
+    public void clearFunctionParams() {
+        this.functionParams.clear();
     }
 
     public HttpProcessor getRunningHttpProcessor() {
-        return (HttpProcessor) runningHttpProcessors.peek();
+        return runningHttpProcessors.peek();
     }
 
     public void setRunningHttpProcessor(HttpProcessor httpProcessor) {
@@ -250,9 +246,7 @@ public class Scraper {
     }
 
     public void removeRunningHttpProcessor() {
-        if (runningHttpProcessors.size() > 0) {
-            runningHttpProcessors.pop();
-        }
+        runningHttpProcessors.pop();
     }
 
     public int getRunningLevel() {
@@ -277,7 +271,7 @@ public class Scraper {
         if (!runningFunctions.isEmpty()) {
             return getRunningFunction().getScriptEngine(engineType);
         }
-        ScriptEngine engine = (ScriptEngine) this.usedScriptEngines.get(engineType);
+        ScriptEngine engine = this.usedScriptEngines.get(engineType);
         if (engine == null) {
             engine = configuration.createScriptEngine(this.context, engineType);
             this.usedScriptEngines.put(engineType, engine);
@@ -291,7 +285,7 @@ public class Scraper {
     }
 
     public BaseProcessor getRunningProcessor() {
-        return (BaseProcessor) runningProcessors.peek();
+        return runningProcessors.peek();
     }
 
     /**
@@ -300,9 +294,9 @@ public class Scraper {
      *         not currently running or if it is top running processor.
      */
     public BaseProcessor getParentRunningProcessor(BaseProcessor processor) {
-        List runningProcessorList = runningProcessors.getList();
+        List<BaseProcessor> runningProcessorList = runningProcessors.getList();
         int index = CommonUtil.findValueInCollection(runningProcessorList, processor);
-        return index > 0 ? (BaseProcessor) runningProcessorList.get(index - 1) : null;
+        return index > 0 ? runningProcessorList.get(index - 1) : null;
     }
 
     /**
@@ -310,10 +304,10 @@ public class Scraper {
      * @return Parent running processor in the tree of specified class, or null if it doesn't exist.
      */
     public BaseProcessor getRunningProcessorOfType(Class processorClazz) {
-        List runningProcessorList = runningProcessors.getList();
-        ListIterator listIterator = runningProcessorList.listIterator(runningProcessors.size());
+        List<BaseProcessor> runningProcessorList = runningProcessors.getList();
+        ListIterator<BaseProcessor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
         while (listIterator.hasPrevious()) {
-            BaseProcessor curr = (BaseProcessor) listIterator.previous();
+            BaseProcessor curr = listIterator.previous();
             if (processorClazz.equals(curr.getClass())) {
                 return curr;
             }
@@ -337,7 +331,7 @@ public class Scraper {
     public Connection getConnection(String jdbc, String connection, String username, String password) {
         try {
             String poolKey = jdbc + "-" + connection + "-" + username + "-" + password;
-            Connection conn = (Connection) dbPool.get(poolKey);
+            Connection conn = dbPool.get(poolKey);
             if (conn == null) {
                 ClassLoaderUtil.registerJDBCDriver(jdbc);
                 conn = DriverManager.getConnection(connection, username, password);
@@ -351,24 +345,18 @@ public class Scraper {
     }
 
     public void setExecutingProcessor(BaseProcessor processor) {
-        this.runningProcessors.push(processor);
-        Iterator iterator = this.scraperRuntimeListeners.iterator();
-        while (iterator.hasNext()) {
-            ScraperRuntimeListener listener = (ScraperRuntimeListener) iterator.next();
+        runningProcessors.push(processor);
+        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onNewProcessorExecution(this, processor);
         }
     }
 
     public void finishExecutingProcessor() {
-        if (this.runningProcessors.size() > 0) {
-            this.runningProcessors.pop();
-        }
+        this.runningProcessors.pop();
     }
 
     public void processorFinishedExecution(BaseProcessor processor, Map properties) {
-        Iterator iterator = this.scraperRuntimeListeners.iterator();
-        while (iterator.hasNext()) {
-            ScraperRuntimeListener listener = (ScraperRuntimeListener) iterator.next();
+        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onProcessorExecutionFinished(this, processor, properties);
         }
     }
@@ -407,9 +395,7 @@ public class Scraper {
             setStatus(STATUS_PAUSED);
 
             // inform al listeners that execution is paused
-            Iterator listenersIterator = this.scraperRuntimeListeners.iterator();
-            while (listenersIterator.hasNext()) {
-                ScraperRuntimeListener listener = (ScraperRuntimeListener) listenersIterator.next();
+            for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
                 listener.onExecutionPaused(this);
             }
         }
@@ -420,9 +406,7 @@ public class Scraper {
             setStatus(STATUS_RUNNING);
 
             // inform al listeners that execution is continued
-            Iterator listenersIterator = this.scraperRuntimeListeners.iterator();
-            while (listenersIterator.hasNext()) {
-                ScraperRuntimeListener listener = (ScraperRuntimeListener) listenersIterator.next();
+            for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
                 listener.onExecutionContinued(this);
             }
         }
@@ -435,9 +419,7 @@ public class Scraper {
         setStatus(STATUS_ERROR);
 
         // inform al listeners that execution is continued
-        Iterator listenersIterator = this.scraperRuntimeListeners.iterator();
-        while (listenersIterator.hasNext()) {
-            ScraperRuntimeListener listener = (ScraperRuntimeListener) listenersIterator.next();
+        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionError(this, e);
         }
     }
@@ -446,12 +428,10 @@ public class Scraper {
      * Releases all DB connections from the pool.
      */
     public void releaseDBConnections() {
-        Iterator iterator = dbPool.values().iterator();
-        while (iterator.hasNext()) {
-            Connection conn = (Connection) iterator.next();
-            if (conn != null) {
+        for (Connection connection : dbPool.values()) {
+            if (connection != null) {
                 try {
-                    conn.close();
+                    connection.close();
                 } catch (SQLException e) {
                     throw new DatabaseException(e);
                 }
@@ -468,9 +448,7 @@ public class Scraper {
 
         // releases script engines
         if (this.usedScriptEngines != null) {
-            Iterator iterator = this.usedScriptEngines.values().iterator();
-            while (iterator.hasNext()) {
-                ScriptEngine engine = (ScriptEngine) iterator.next();
+            for (ScriptEngine engine : this.usedScriptEngines.values()) {
                 if (engine != null) {
                     engine.dispose();
                 }
@@ -479,9 +457,7 @@ public class Scraper {
 
         this.logger.removeAllAppenders();
 
-        Iterator iterator = usedScriptEngines.values().iterator();
-        while (iterator.hasNext()) {
-            ScriptEngine engine = (ScriptEngine) iterator.next();
+        for (ScriptEngine engine : usedScriptEngines.values()) {
             engine.dispose();
         }
     }

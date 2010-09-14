@@ -122,8 +122,8 @@ public class HttpProcessor extends BaseProcessor {
             result = new NodeVariable(responseBody);
         } else {
             try {
-                // resolvs charset in the following way:
-                //    1. if explicitely defined as charset attribute in http processor, then use it
+                // resolves charset in the following way:
+                //    1. if explicitly defined as charset attribute in http processor, then use it
                 //    2. if it is HTML document, reads first KB from response's body as ASCII stream
                 //       and tries to find meta tag with specified charset
                 //    3. use charset from response's header

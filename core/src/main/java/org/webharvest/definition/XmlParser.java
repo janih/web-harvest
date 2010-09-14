@@ -48,7 +48,6 @@ import org.xml.sax.helpers.LocatorImpl;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.StringTokenizer;
 
 
 public class XmlParser extends DefaultHandler {
@@ -58,7 +57,7 @@ public class XmlParser extends DefaultHandler {
     XmlNode root;
 
     // working stack of elements
-    private transient Stack elementStack = new Stack();
+    private transient Stack<XmlNode> elementStack = new Stack<XmlNode>();
     private Locator locator;
 
     public static XmlNode parse(InputSource in) {
@@ -93,20 +92,20 @@ public class XmlParser extends DefaultHandler {
     }
 
     private XmlNode getCurrentNode() {
-        return elementStack.size() > 0 ? (XmlNode) elementStack.peek() : null;
+        return elementStack.isEmpty() ? null : elementStack.peek();
     }
 
     public void characters(char[] ch, int start, int length) throws SAXException {
         XmlNode currNode = getCurrentNode();
         if (currNode != null) {
-            currNode.addElement( new String(ch, start, length) );
+            currNode.addElement(new String(ch, start, length));
         }
     }
-    
+
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         XmlNode currNode = getCurrentNode();
         XmlNode newNode = new XmlNode(qName, currNode);
-        newNode.setLocation( this.locator.getLineNumber(), this.locator.getColumnNumber() );
+        newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());
         elementStack.push(newNode);
 
         if (currNode == null) {
@@ -115,12 +114,12 @@ public class XmlParser extends DefaultHandler {
 
         int attsCount = attributes.getLength();
         for (int i = 0; i < attsCount; i++) {
-            newNode.addAttribute( attributes.getQName(i), attributes.getValue(i) );
+            newNode.addAttribute(attributes.getQName(i), attributes.getValue(i));
         }
     }
 
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (elementStack.size() > 0) {
+        if (!elementStack.isEmpty()) {
             getCurrentNode().flushText();
             elementStack.pop();
         }
