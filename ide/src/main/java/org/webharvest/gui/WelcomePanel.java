@@ -36,30 +36,22 @@
 */
 package org.webharvest.gui;
 
-import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
-import org.webharvest.definition.XmlParser;
+import org.webharvest.ApplicationInfo;
 import org.webharvest.definition.XmlNode;
-import org.webharvest.gui.component.*;
+import org.webharvest.definition.XmlParser;
+import org.webharvest.gui.component.WHScrollPane;
+import org.webharvest.utils.CommonUtil;
 import org.xml.sax.InputSource;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import java.net.URL;
-import java.net.MalformedURLException;
-import java.util.Iterator;
 
 /**
  * @author: Vladimir Nikic
@@ -73,6 +65,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
 
     /**
      * Constructor.
+     *
      * @param ide
      */
     public WelcomePanel(final Ide ide) {
@@ -81,21 +74,21 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
         setLayout(new BorderLayout(0, 0));
         htmlPane = new JEditorPane() {
             public void paint(Graphics g) {
-                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 super.paint(g);
             }
         };
         htmlPane.setEditable(false);
         htmlPane.setContentType("text/html");
-        htmlPane.setEditorKit( new HTMLEditorKit() );
+        htmlPane.setEditorKit(new HTMLEditorKit());
         htmlPane.setBorder(null);
         htmlPane.addHyperlinkListener(this);
 
         try {
             URL welcomeUrl = ResourceManager.getWelcomeUrl();
             String content = CommonUtil.readStringFromUrl(welcomeUrl);
-            content = content.replaceAll("#program.version#", Constants.WEB_HARVEST_VERSION);
-            ((HTMLDocument)htmlPane.getDocument()).setBase(ResourceManager.getWelcomeUrl());
+            content = content.replaceAll("#program.version#", ApplicationInfo.WEB_HARVEST_VERSION);
+            ((HTMLDocument) htmlPane.getDocument()).setBase(ResourceManager.getWelcomeUrl());
             htmlPane.setText(content);
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,7 +106,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
 
     private synchronized void downloadAddition() {
         try {
-            String content = CommonUtil.readStringFromUrl( new URL(Constants.WELCOME_ADDITION_URL) );
+            String content = CommonUtil.readStringFromUrl(new URL(ApplicationInfo.WELCOME_ADDITION_URL));
             XmlNode node = XmlParser.parse(new InputSource(new StringReader(content)));
             String versionValue = (String) node.get("version[0].number");
             String versionMessage = (String) node.get("version[0]._value");
@@ -127,10 +120,10 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
             boolean isThereNewVersion = false;
             if (hasVersion && hasVersionMessage) {
                 try {
-                    double currVersion = Double.parseDouble(Constants.WEB_HARVEST_VERSION);
+                    double currVersion = Double.parseDouble(ApplicationInfo.WEB_HARVEST_VERSION);
                     double serverVersion = Double.parseDouble(versionValue);
                     isThereNewVersion = serverVersion > currVersion;
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     isThereNewVersion = false;
                 }
             }
@@ -138,7 +131,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
             if (hasStart || hasEnd || isThereNewVersion) {
                 URL welcomeUrl = ResourceManager.getWelcomeUrl();
                 String htmlPaneContent = CommonUtil.readStringFromUrl(welcomeUrl);
-                htmlPaneContent = htmlPaneContent.replaceAll("#program.version#", Constants.WEB_HARVEST_VERSION);
+                htmlPaneContent = htmlPaneContent.replaceAll("#program.version#", ApplicationInfo.WEB_HARVEST_VERSION);
                 if (isThereNewVersion) {
                     htmlPaneContent = htmlPaneContent.replaceAll("<!--version-->", versionMessage);
                 }
@@ -148,7 +141,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
                 if (hasEnd) {
                     htmlPaneContent = htmlPaneContent.replaceAll("<!--end-->", endValue);
                 }
-                ((HTMLDocument)htmlPane.getDocument()).setBase(ResourceManager.getWelcomeUrl());
+                ((HTMLDocument) htmlPane.getDocument()).setBase(ResourceManager.getWelcomeUrl());
                 htmlPane.setText(htmlPaneContent);
             }
         } catch (Exception e) {
@@ -160,7 +153,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            String url = e.getDescription().toString();
+            String url = e.getDescription();
 
             if ("#new".equalsIgnoreCase(url)) {
                 ide.addTab();

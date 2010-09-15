@@ -1,14 +1,14 @@
 package org.webharvest.gui;
 
+import org.webharvest.ApplicationInfo;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -16,7 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Calendar;
 
 public class AboutWindow extends JWindow implements HyperlinkListener {
 
@@ -34,12 +34,12 @@ public class AboutWindow extends JWindow implements HyperlinkListener {
 
     private void createGUI() {
         Container contentPane = this.getContentPane();
-        contentPane.setLayout( new BorderLayout() );
+        contentPane.setLayout(new BorderLayout());
 
         JEditorPane htmlPane = new JEditorPane();
         htmlPane.setEditable(false);
         htmlPane.setContentType("text/html");
-        htmlPane.setEditorKit( new HTMLEditorKit() );
+        htmlPane.setEditorKit(new HTMLEditorKit());
         htmlPane.setBorder(new LineBorder(Color.black));
         htmlPane.addHyperlinkListener(this);
         htmlPane.addMouseListener(new MouseAdapter() {
@@ -56,12 +56,12 @@ public class AboutWindow extends JWindow implements HyperlinkListener {
         try {
             URL aboutUrl = ResourceManager.getAboutUrl();
             String content = CommonUtil.readStringFromUrl(aboutUrl);
-            content = content.replaceAll("#program.version#", Constants.WEB_HARVEST_VERSION);
-            content = content.replaceAll("#program.date#", Constants.WEB_HARVEST_DATE);
+            content = content.replaceAll("#program.version#", ApplicationInfo.WEB_HARVEST_VERSION);
+            content = content.replaceAll("#program.date#", ApplicationInfo.WEB_HARVEST_DATE);
             content = content.replaceAll("#java.version#", System.getProperty("java.version"));
             content = content.replaceAll("#java.vendor#", System.getProperty("java.vendor"));
-            content = content.replaceAll("#year#",  String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
-            ((HTMLDocument)htmlPane.getDocument()).setBase(ResourceManager.getAboutUrl());
+            content = content.replaceAll("#year#", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+            ((HTMLDocument) htmlPane.getDocument()).setBase(ResourceManager.getAboutUrl());
             htmlPane.setText(content);
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +78,7 @@ public class AboutWindow extends JWindow implements HyperlinkListener {
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            String url = e.getDescription().toString();
+            String url = e.getDescription();
             ide.openURLInBrowser(url);
         }
     }

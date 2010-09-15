@@ -38,11 +38,6 @@ package org.webharvest.utils;
 
 public class Constants {
 
-    public static final String WEB_HARVEST_VERSION = "2.001";
-    public static final String WEB_HARVEST_DATE = "17th February, 2010";
-
-    public static final String WELCOME_ADDITION_URL = "http://web-harvest.sourceforge.net/welcome_add.xml";
-
     public static final int DEFAULT_MAX_LOOPS = 1000000000;
 
     public static final String VALUE_PROPERTY_NAME = "[Value]";
