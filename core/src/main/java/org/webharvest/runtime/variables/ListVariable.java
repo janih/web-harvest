@@ -36,9 +36,11 @@
 */
 package org.webharvest.runtime.variables;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -56,27 +58,22 @@ public class ListVariable extends Variable {
 
     public ListVariable(List list) {
         this.list = new ArrayList<Variable>();
-        
+
         if (list != null) {
-    		Iterator it = list.iterator();
-    		while (it.hasNext()) {
-                Object object = it.next();
-                Variable var = object instanceof Variable ? (Variable) object : new NodeVariable(object);
-    			if ( !var.isEmpty() ) {
-    				this.list.add(var);
-    			}
-    		}
-    	}
+            for (Object object : list) {
+                final Variable var = (object instanceof Variable) ? (Variable) object : new NodeVariable(object);
+                if (!var.isEmpty()) {
+                    this.list.add(var);
+                }
+            }
+        }
     }
 
     public String toString() {
         if (cachedStringRepresentation == null) {
             StringBuffer buffer = new StringBuffer();
-
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                Variable var = (Variable) it.next();
-                String value = var.toString();
+            for (Variable var : list) {
+                final String value = var.toString();
                 if (value.length() != 0) {
                     if (buffer.length() != 0) {
                         buffer.append('\n');
@@ -84,17 +81,15 @@ public class ListVariable extends Variable {
                     buffer.append(value);
                 }
             }
-
             cachedStringRepresentation = buffer.toString();
         }
-
         return cachedStringRepresentation;
     }
 
     public String toString(String charset, String delimiter) {
         StringBuffer buffer = new StringBuffer();
 
-        for (Variable var: list) {
+        for (Variable var : list) {
             String value = var.toString(charset);
             if (value.length() != 0) {
                 if (buffer.length() != 0) {
@@ -112,25 +107,20 @@ public class ListVariable extends Variable {
     }
 
     public byte[] toBinary(String charset) {
-        byte[] result = null;
-        
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-        	Variable currVar = (Variable) it.next();
-        	byte[] curr = charset == null ? currVar.toBinary() : currVar.toBinary(charset);
-        	if (curr != null) {
-        		if (result == null) {
-        			result = curr;
-        		} else {
-        			byte[] newResult = new byte[result.length + curr.length];
-        			System.arraycopy(result, 0, newResult, 0, result.length);
-        			System.arraycopy(curr, 0, newResult, result.length, curr.length);
-        			result = newResult;
-        		}
-        	}
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            for (Variable currVar : list) {
+                byte[] curr = (charset == null ? currVar.toBinary() : currVar.toBinary(charset));
+                if (curr == null) {
+                    continue;
+                }
+                baos.write(curr);
+            }
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new AssertionError("This should never happen");
         }
 
-        return result;
     }
 
     public byte[] toBinary() {
@@ -142,14 +132,11 @@ public class ListVariable extends Variable {
     }
 
     public boolean isEmpty() {
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            Variable var =  (Variable) it.next();
+        for (Variable var : list) {
             if (!var.isEmpty()) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -158,32 +145,31 @@ public class ListVariable extends Variable {
         cachedStringRepresentation = null;
 
         if (variable instanceof ListVariable) {
-            list.addAll( ((ListVariable)variable).getList() );
+            list.addAll(((ListVariable) variable).getList());
         } else {
             list.add(variable == null ? EmptyVariable.INSTANCE : variable);
         }
     }
 
-    private Collection getList() {
+    private Collection<Variable> getList() {
         return this.list;
     }
-    
+
     /**
      * Checks if list contains specified object's string representation
+     *
      * @param item
      */
     public boolean contains(Object item) {
-    	Iterator it = list.iterator();
-    	while (it.hasNext()) {
-    		Variable currVariable = (Variable) it.next();
-    		if ( currVariable != null && currVariable.toString().equals(item.toString()) ) {
-    			return true;
-    		}
-    	}
-    	
-    	return false;
+        final String itemAsString = item.toString();
+        for (Variable currVar : list) {
+            if (currVar != null && currVar.toString().equals(itemAsString)) {
+                return true;
+            }
+        }
+        return false;
     }
-    
+
     public Object getWrappedObject() {
         return this.list;
     }
