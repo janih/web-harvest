@@ -36,15 +36,26 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.templaters.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.IElementDef;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.Constants;
+import org.webharvest.utils.KeyValuePair;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Base processor that contains common processor logic.
@@ -62,6 +73,7 @@ abstract public class BaseProcessor {
 
     /**
      * Base constructor - assigns element definition to the processor.
+     *
      * @param elementDef
      */
     protected BaseProcessor(BaseElementDef elementDef) {
@@ -81,8 +93,8 @@ abstract public class BaseProcessor {
         if (scraperStatus == Scraper.STATUS_PAUSED) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
             try {
-                synchronized(scraper) {
-                    if ( scraper.getLogger().isInfoEnabled() ) {
+                synchronized (scraper) {
+                    if (scraper.getLogger().isInfoEnabled()) {
                         scraper.getLogger().info("Execution paused [" + dateFormatter.format(new Date()) + "].");
                     }
                     scraper.wait();
@@ -92,7 +104,7 @@ abstract public class BaseProcessor {
             }
 
             scraper.continueExecution();
-            if ( scraper.getLogger().isInfoEnabled() ) {
+            if (scraper.getLogger().isInfoEnabled()) {
                 scraper.getLogger().info("Execution continued [" + dateFormatter.format(new Date()) + "].");
             }
         }
@@ -101,13 +113,13 @@ abstract public class BaseProcessor {
 
         int runningLevel = scraper.getRunningLevel();
 
-        String id = (this.elementDef != null) ? BaseTemplater.execute( this.elementDef.getId(), scraper.getScriptEngine() ) : null;
+        String id = (this.elementDef != null) ? BaseTemplater.execute(this.elementDef.getId(), scraper.getScriptEngine()) : null;
         String idDesc = id != null ? "[ID=" + id + "] " : "";
-        String indent = CommonUtil.replicate("    ", runningLevel-1);
+        String indent = CommonUtil.replicate("    ", runningLevel - 1);
 
         setProperty("ID", id);
 
-        if ( scraper.getLogger().isInfoEnabled() ) {
+        if (scraper.getLogger().isInfoEnabled()) {
             scraper.getLogger().info(indent + CommonUtil.getClassName(this) + " starts processing..." + idDesc);
         }
 
@@ -115,7 +127,7 @@ abstract public class BaseProcessor {
         Variable result = execute(scraper, context);
         long executionTime = System.currentTimeMillis() - startTime;
 
-        setProperty(Constants.EXECUTION_TIME_PROPERTY_NAME, new Long(executionTime));
+        setProperty(Constants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
         setProperty(Constants.VALUE_PROPERTY_NAME, result);
 
         scraper.processorFinishedExecution(this, this.properties);
@@ -126,7 +138,7 @@ abstract public class BaseProcessor {
             writeDebugFile(result, id, scraper);
         }
 
-        if ( scraper.getLogger().isInfoEnabled() ) {
+        if (scraper.getLogger().isInfoEnabled()) {
             scraper.getLogger().info(indent + CommonUtil.getClassName(this) + " processor executed in " + executionTime + "ms." + idDesc);
         }
 
@@ -135,17 +147,18 @@ abstract public class BaseProcessor {
 
     /**
      * Defines processor runtime property with specified name and value.
+     *
      * @param name
      * @param value
      */
     protected void setProperty(String name, Object value) {
-        if ( name != null && !"".equals(name) && value != null ) {
+        if (name != null && !"".equals(name) && value != null) {
             this.properties.put(name, value);
         }
     }
 
     protected void debug(BaseElementDef elementDef, Scraper scraper, Variable variable) {
-        String id = (elementDef != null) ? BaseTemplater.execute( elementDef.getId(), scraper.getScriptEngine() ) : null;
+        String id = (elementDef != null) ? BaseTemplater.execute(elementDef.getId(), scraper.getScriptEngine()) : null;
 
         if (scraper.isDebugMode() && id != null) {
             if (variable != null) {
@@ -155,18 +168,18 @@ abstract public class BaseProcessor {
     }
 
     protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context,
-                                           boolean registerExecution, KeyValuePair properties[]) {
+                                          boolean registerExecution, KeyValuePair properties[]) {
         if (elementDef == null) {
             return null;
         } else if (elementDef.hasOperations()) {
             BodyProcessor bodyProcessor = new BodyProcessor(elementDef);
             if (properties != null) {
-                for (int i = 0; i < properties.length; i++) {
-                    bodyProcessor.setProperty(properties[i].getKey(), properties[i].getValue());
+                for (KeyValuePair property : properties) {
+                    bodyProcessor.setProperty(property.getKey(), property.getValue());
                 }
             }
-            Variable body = registerExecution ?  bodyProcessor.run(scraper, context) :  bodyProcessor.execute(scraper, context);
-            return new NodeVariable( body == null ? "" : body.toString() );
+            Variable body = registerExecution ? bodyProcessor.run(scraper, context) : bodyProcessor.execute(scraper, context);
+            return new NodeVariable(body == null ? "" : body.toString());
         } else {
             return new NodeVariable(elementDef.getBodyText());
         }
@@ -185,7 +198,7 @@ abstract public class BaseProcessor {
         BaseProcessor result[] = new BaseProcessor[defs.length];
 
         for (int i = 0; i < defs.length; i++) {
-            result[i] = ProcessorResolver.createProcessor( defs[i], scraper.getConfiguration(), scraper );
+            result[i] = ProcessorResolver.createProcessor(defs[i], scraper.getConfiguration(), scraper);
         }
 
         return result;
@@ -196,14 +209,14 @@ abstract public class BaseProcessor {
     }
 
     private void writeDebugFile(Variable var, String processorId, Scraper scraper) {
-        byte[] data = var == null ? new byte[] {} : var.toString().getBytes();
+        byte[] data = var == null ? new byte[]{} : var.toString().getBytes();
 
         String workingDir = scraper.getWorkingDir();
         String dir = CommonUtil.getAbsoluteFilename(workingDir, "_debug");
 
         int index = 1;
         String fullPath = dir + "/" + processorId + "_" + index + ".debug";
-        while ( new File(fullPath).exists() ) {
+        while (new File(fullPath).exists()) {
             index++;
             fullPath = dir + "/" + processorId + "_" + index + ".debug";
         }

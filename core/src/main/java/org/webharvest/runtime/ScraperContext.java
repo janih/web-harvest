@@ -64,8 +64,12 @@ public class ScraperContext extends Catalog {
     }
 
     public Variable getVar(String name) {
+        return getVar(name, true);
+    }
+
+    public Variable getVar(String name, boolean lookInStack) {
         final Variable value = (Variable) this.get(name);
-        return (value == null && callerContext != null) ? callerContext.getVar(name) : value;
+        return (value == null && lookInStack && callerContext != null) ? callerContext.getVar(name) : value;
     }
 
     public Object setVar(String key, Variable value) {

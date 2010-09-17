@@ -4,7 +4,9 @@ import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 /**
  * Processor which executes only body and returns variables list.
@@ -20,14 +22,15 @@ public class BodyProcessor extends BaseProcessor {
         ListVariable result = new ListVariable();
 
         if (defs.length > 0) {
-            for (int i = 0; i < defs.length; i++) {
-                BaseProcessor processor = ProcessorResolver.createProcessor( defs[i], scraper.getConfiguration(), scraper );
-                result.addVariable( processor.run(scraper, context) );
+            for (IElementDef def : defs) {
+                BaseProcessor processor = ProcessorResolver.createProcessor(def, scraper.getConfiguration(), scraper);
+                result.addVariable(processor.run(scraper, context));
             }
         } else {
-            result.addVariable( new NodeVariable(elementDef.getBodyText()) );
+            result.addVariable(new NodeVariable(elementDef.getBodyText()));
         }
 
+        // todo: why always list ???
         return result;
     }
 

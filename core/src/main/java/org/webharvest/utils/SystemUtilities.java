@@ -105,7 +105,7 @@ public class SystemUtilities {
      */
     public void defineVariable(String varName, Object varValue, boolean overwrite) {
         ScraperContext context = scraper.getContext();
-        if (overwrite || context.get(varName) == null) {
+        if (overwrite || context.getVar(varName) == null) {
             context.setVar(varName, CommonUtil.createVariable(varValue));
         }
     }

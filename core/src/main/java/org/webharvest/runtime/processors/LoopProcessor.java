@@ -43,9 +43,9 @@ import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
@@ -92,8 +92,8 @@ public class LoopProcessor extends BaseProcessor {
 
         List list = loopValue != null ? loopValue.toList() : null;
         if (list != null) {
-            Variable itemBeforeLoop = (Variable) context.get(item);
-            Variable indexBeforeLoop = (Variable) context.get(index);
+            Variable itemBeforeLoop = context.getVar(item, false); // todo: introduce loop context instead
+            Variable indexBeforeLoop = context.getVar(index, false); // todo: introduce loop context instead
 
             List filteredList = filter != null ? createFilteredList(list, filter) : list;
             Iterator it = filteredList.iterator();

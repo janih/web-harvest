@@ -57,16 +57,21 @@ public class VarDefProcessor extends BaseProcessor {
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         Variable var = new BodyProcessor(varDef).execute(scraper, context);
-        
-        String name = BaseTemplater.execute( varDef.getName(), scraper.getScriptEngine() );
-        String overwrite = BaseTemplater.execute( varDef.getOverwrite(), scraper.getScriptEngine() );
+
+        String name = BaseTemplater.execute(varDef.getName(), scraper.getScriptEngine());
+        String overwrite = BaseTemplater.execute(varDef.getOverwrite(), scraper.getScriptEngine());
         boolean toOverwrite = overwrite == null || CommonUtil.isBooleanTrue(overwrite);
-        if (toOverwrite || context.get(name) == null) {
+
+        final Variable existingVar = context.getVar(name);
+        if (existingVar == null || toOverwrite) {
             context.setVar(name, var);
+        } else {
+            var = existingVar;
         }
 
         this.setProperty("Name", name);
 
+        // todo: is returning result actually needed? Why not <empty>?
         return var;
     }
 

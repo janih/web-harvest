@@ -41,7 +41,10 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
@@ -73,7 +76,7 @@ public class WhileProcessor extends BaseProcessor {
 
         List resultList = new ArrayList();
 
-        Variable indexBeforeLoop = (Variable) context.get(index);
+        Variable indexBeforeLoop = context.getVar(index, false); // todo: introduce loop context instead
 
         int i = 1;
 
