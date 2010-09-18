@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public abstract class Test {
 
+    // todo: Use unit tests or acceptance tests instead of this!
     public static void main(String[] args) throws IOException {
 //    	Properties props = new Properties();
 //    	props.setProperty("log4j.rootLogger", "INFO, stdout");
