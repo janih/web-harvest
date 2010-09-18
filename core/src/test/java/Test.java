@@ -1,11 +1,9 @@
-import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.Scraper;
 
 import java.io.IOException;
-import java.util.Properties;
 
-public class Test {
+public abstract class Test {
 
     public static void main(String[] args) throws IOException {
 //    	Properties props = new Properties();
