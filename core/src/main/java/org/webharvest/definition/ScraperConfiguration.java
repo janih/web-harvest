@@ -40,12 +40,12 @@ import org.webharvest.runtime.scripting.BeanShellScriptEngine;
 import org.webharvest.runtime.scripting.GroovyScriptEngine;
 import org.webharvest.runtime.scripting.JavascriptScriptEngine;
 import org.webharvest.runtime.scripting.ScriptEngine;
-import org.webharvest.utils.Catalog;
 import org.xml.sax.InputSource;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +61,7 @@ public class ScraperConfiguration {
     public static final String DEFAULT_CHARSET = "UTF-8";
 
     // map of function definitions
-    private Map functionDefs = new Catalog();
+    private Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
     // sequence of operationDefs
     private List<IElementDef> operations = new ArrayList<IElementDef>();
@@ -149,7 +149,7 @@ public class ScraperConfiguration {
     }
 
     public FunctionDef getFunctionDef(String name) {
-        return (FunctionDef) functionDefs.get(name);
+        return functionDefs.get(name);
     }
 
     public void addFunctionDef(FunctionDef funcDef) {

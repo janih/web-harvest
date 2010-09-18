@@ -36,15 +36,17 @@
 */
 package org.webharvest.runtime;
 
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.Catalog;
 import org.webharvest.utils.SystemUtilities;
+
+import java.util.HashMap;
 
 /**
  * Context of scraper execution. All the variables created during
  * scraper execution are stored in this context.
  */
-public class ScraperContext extends Catalog {
+public class ScraperContext extends HashMap<String, Object> {
 
     // context of the caller if context is crated in a function 
     private ScraperContext callerContext = null;
@@ -68,7 +70,7 @@ public class ScraperContext extends Catalog {
     }
 
     public Variable getVar(String name, boolean lookInStack) {
-        final Variable value = (Variable) this.get(name);
+        final Variable value = (Variable) this.get(StringUtils.trimToNull(name));
         return (value == null && lookInStack && callerContext != null) ? callerContext.getVar(name) : value;
     }
 
