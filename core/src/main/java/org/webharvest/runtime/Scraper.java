@@ -36,7 +36,8 @@
 */
 package org.webharvest.runtime;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.DatabaseException;
@@ -63,6 +64,8 @@ import java.util.*;
 @SuppressWarnings({"UnusedDeclaration"})
 public class Scraper {
 
+    private static Logger logger = LoggerFactory.getLogger(Scraper.class);
+
     public static final int STATUS_READY = 0;
     public static final int STATUS_RUNNING = 1;
     public static final int STATUS_PAUSED = 2;
@@ -71,7 +74,6 @@ public class Scraper {
     public static final int STATUS_ERROR = 5;
     public static final int STATUS_EXIT = 6;
 
-    private Logger logger = Logger.getLogger("" + System.currentTimeMillis());
     private ScraperConfiguration configuration;
     private String workingDir;
     private ScraperContext context;
@@ -453,12 +455,6 @@ public class Scraper {
                     engine.dispose();
                 }
             }
-        }
-
-        this.logger.removeAllAppenders();
-
-        for (ScriptEngine engine : usedScriptEngines.values()) {
-            engine.dispose();
         }
     }
 

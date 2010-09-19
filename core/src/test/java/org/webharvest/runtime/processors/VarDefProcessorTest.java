@@ -38,10 +38,10 @@
 
 package org.webharvest.runtime.processors;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;

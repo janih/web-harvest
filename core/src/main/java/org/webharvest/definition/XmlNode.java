@@ -36,7 +36,8 @@
 */
 package org.webharvest.definition;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import java.io.Serializable;
@@ -44,7 +45,7 @@ import java.util.*;
 
 public class XmlNode extends HashMap<String, Object> {
 
-    protected static final Logger log = Logger.getLogger(XmlNode.class);
+    protected static final Logger log = LoggerFactory.getLogger(XmlNode.class);
 
     private static final boolean IGNORE_NAMESPACE = true;
     private static final boolean IGNORE_CASE = true;

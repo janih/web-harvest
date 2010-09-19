@@ -36,7 +36,8 @@
 */
 package org.webharvest.definition;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.exception.ParserException;
 import org.webharvest.utils.Stack;
 import org.xml.sax.Attributes;
@@ -52,7 +53,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class XmlParser extends DefaultHandler {
 
-    protected static Logger log = Logger.getLogger(XmlParser.class);
+    protected static Logger log = LoggerFactory.getLogger(XmlParser.class);
 
     XmlNode root;
 
@@ -112,8 +113,8 @@ public class XmlParser extends DefaultHandler {
             root = newNode;
         }
 
-        int attsCount = attributes.getLength();
-        for (int i = 0; i < attsCount; i++) {
+        int attrsCount = attributes.getLength();
+        for (int i = 0; i < attrsCount; i++) {
             newNode.addAttribute(attributes.getQName(i), attributes.getValue(i));
         }
     }

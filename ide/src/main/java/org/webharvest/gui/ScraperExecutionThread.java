@@ -46,18 +46,21 @@ import javax.swing.*;
 public class ScraperExecutionThread extends Thread {
 
     private Scraper scraper;
+    private JTextArea logTextArea;
 
-    public ScraperExecutionThread(Scraper scraper) {
+    public ScraperExecutionThread(Scraper scraper, JTextArea logTextArea) {
         this.scraper = scraper;
+        this.logTextArea = logTextArea;
     }
 
     public void run() {
         try {
+            TextAreaAppender.setCurrentLogArea(logTextArea);
             scraper.execute();
         } catch (Exception e) {
             scraper.informListenersAboutError(e);
             e.printStackTrace();
         }
     }
-    
+
 }

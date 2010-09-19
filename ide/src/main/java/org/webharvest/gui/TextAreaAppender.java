@@ -36,9 +36,9 @@
 */
 package org.webharvest.gui;
 
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.WriterAppender;
 import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.WriterAppender;
+import org.apache.log4j.spi.LoggingEvent;
 
 import javax.swing.*;
 
@@ -51,34 +51,54 @@ import javax.swing.*;
  */
 public class TextAreaAppender extends WriterAppender {
 
-	private JTextArea textArea = null;
-    private int textSize = 0;
+    private static ThreadLocal<CurrentThreadTextAreaAppenderAdapter>
+            threadAppenderAdapter = new ThreadLocal<CurrentThreadTextAreaAppenderAdapter>();
 
-    public TextAreaAppender(JTextArea textArea) {
-        this.textArea = textArea;
-        this.layout = new SimpleLayout();
+    public static final TextAreaAppender INSTANCE = new TextAreaAppender();
+
+    private TextAreaAppender() {
+        layout = new SimpleLayout();
         setImmediateFlush(true);
     }
 
-    /** Set the target JTextArea for the logging information to appear. */
-	public void setTextArea(JTextArea jTextArea) {
-		this.textArea = jTextArea;
+    /**
+     * Set the current thread target JTextArea for the logging information to appear.
+     */
+    public static void setCurrentLogArea(JTextArea logTextArea) {
+        threadAppenderAdapter.set(INSTANCE.new CurrentThreadTextAreaAppenderAdapter(logTextArea));
     }
 
     /**
-	 * Format and then append the loggingEvent to the stored
-	 * JTextArea.
-	 */
-	public void append(LoggingEvent loggingEvent) {
-		final String message = this.layout.format(loggingEvent);
-        final boolean atTheEnd = textArea.getCaretPosition() == this.textSize;
+     * Format and then append the loggingEvent to the stored
+     * JTextArea.
+     */
+    public void append(LoggingEvent loggingEvent) {
+        threadAppenderAdapter.get().append(loggingEvent);
+    }
 
-        this.textSize += message.length();
-        this.textArea.append(message);
+    private class CurrentThreadTextAreaAppenderAdapter {
 
-        if (atTheEnd) {
-            textArea.setCaretPosition(this.textSize);
+        private int textSize = 0;
+        private JTextArea textArea;
+
+        private CurrentThreadTextAreaAppenderAdapter(JTextArea textArea) {
+            this.textArea = textArea;
         }
-	}
-    
+
+        /**
+         * Format and then append the loggingEvent to the stored
+         * JTextArea.
+         */
+        public void append(LoggingEvent loggingEvent) {
+            final String message = TextAreaAppender.this.layout.format(loggingEvent);
+            final boolean atTheEnd = (textArea.getCaretPosition() == textSize);
+
+            textSize += message.length();
+            textArea.append(message);
+
+            if (atTheEnd) {
+                textArea.setCaretPosition(textSize);
+            }
+        }
+    }
 }

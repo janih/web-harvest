@@ -40,6 +40,7 @@ import org.webharvest.definition.*;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ import java.util.Map;
 public class TreeNodeInfo {
 
     private static Icon DEFAULT_ICON = ResourceManager.getIcon("resources/icons/default.gif");
-    private static Map icons = new HashMap();
+    private static Map<Serializable, Icon> icons = new HashMap<Serializable, Icon>();
 
     static {
         icons.put(LoopDef.class, ResourceManager.getIcon("resources/icons/loop.gif"));
@@ -98,7 +99,7 @@ public class TreeNodeInfo {
     private Map properties;
 
     // list of synchronizes views
-    private List synchronizedViews = new ArrayList();
+    private List<ViewerFrame> synchronizedViews = new ArrayList<ViewerFrame>();
 
     public TreeNodeInfo(IElementDef elementDef) {
         this.elementDef = elementDef;
@@ -118,9 +119,9 @@ public class TreeNodeInfo {
         if (this.elementDef == null) {
             result = DEFAULT_ICON;
         } else {
-            result = (Icon) icons.get(this.elementDef.getClass());
+            result = icons.get(this.elementDef.getClass());
             if (result == null && elementDef instanceof WebHarvestPluginDef) {
-                result = (Icon) icons.get( ((WebHarvestPluginDef)elementDef).getShortElementName() );
+                result = icons.get( ((WebHarvestPluginDef)elementDef).getShortElementName() );
                 if (result == null) {
                     result = ResourceManager.getIcon("resources/icons/plugin.gif");
                 }
@@ -173,7 +174,7 @@ public class TreeNodeInfo {
         return properties;
     }
 
-    public List getSynchronizedViews() {
+    public List<ViewerFrame> getSynchronizedViews() {
         return synchronizedViews;
     }
 
