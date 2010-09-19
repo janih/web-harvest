@@ -7,12 +7,6 @@ public abstract class Test {
 
     // todo: Use unit tests or acceptance tests instead of this!
     public static void main(String[] args) throws IOException {
-//    	Properties props = new Properties();
-//    	props.setProperty("log4j.rootLogger", "INFO, stdout");
-//    	props.setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-//    	props.setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-//    	props.setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p (%20F:%-3L) - %m\n");
-//        PropertyConfigurator.configure(props);
 
 //        ScraperConfiguration config = new ScraperConfiguration("c:/temp/scrapertest/configs/test2.xml");
         ScraperConfiguration config = new ScraperConfiguration("c:/temp/scrapertest/dddd.xml");
