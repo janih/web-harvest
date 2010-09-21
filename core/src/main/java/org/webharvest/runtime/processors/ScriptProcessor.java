@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.ScriptDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -49,8 +49,6 @@ import org.webharvest.utils.CommonUtil;
  * Script processor - executes script defined in the body and optionally returns result.
  */
 public class ScriptProcessor extends BaseProcessor {
-
-    public static final String CONTEXT_VARIABLE_NAME = "context";
 
     private ScriptDef scriptDef;
 
@@ -70,11 +68,11 @@ public class ScriptProcessor extends BaseProcessor {
         String returnExpression = scriptDef.getReturnExpression();
 
         ScriptEngine scriptEngine = language == null ? scraper.getScriptEngine() : scraper.getScriptEngine(language);
-        scriptEngine.eval( scriptText.toString() );
+        scriptEngine.evaluate( scriptText.toString() );
 
         if (returnExpression != null) {
             String returnExpressionEvaluated = BaseTemplater.execute( scriptDef.getReturnExpression(), scraper.getScriptEngine());
-            Object returnValue = scriptEngine.eval(returnExpressionEvaluated);
+            Object returnValue = scriptEngine.evaluate(returnExpressionEvaluated);
             return CommonUtil.createVariable(returnValue);
         } else {
             return new EmptyVariable();

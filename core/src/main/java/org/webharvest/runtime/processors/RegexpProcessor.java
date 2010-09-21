@@ -36,20 +36,20 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +66,7 @@ public class RegexpProcessor extends BaseProcessor {
         this.regexpDef = regexpDef;
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) {
         ScriptEngine scriptEngine = scraper.getScriptEngine();
 
         BaseElementDef patternDef = regexpDef.getRegexpPatternDef();
@@ -78,7 +78,7 @@ public class RegexpProcessor extends BaseProcessor {
         debug(sourceDef, scraper, source);
 
         String replace = BaseTemplater.execute(regexpDef.getReplace(), scriptEngine);
-        boolean isReplace = CommonUtil.isBooleanTrue(replace);
+        final boolean isReplace = CommonUtil.isBooleanTrue(replace);
 
         boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagCaseInsensitive(), scriptEngine), false);
         boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagMultiline(), scriptEngine), false);
@@ -93,11 +93,7 @@ public class RegexpProcessor extends BaseProcessor {
         this.setProperty("Flag UnicodeCase", String.valueOf(flagUnicodecase));
         this.setProperty("Flag CanonEq", String.valueOf(flagCanoneq));
 
-        String maxLoopsString = BaseTemplater.execute(regexpDef.getMax(), scriptEngine);
-        double maxLoops = Constants.DEFAULT_MAX_LOOPS;
-        if (maxLoopsString != null && !"".equals(maxLoopsString.trim())) {
-            maxLoops = Double.parseDouble(maxLoopsString);
-        }
+        final double maxLoops = NumberUtils.toDouble(BaseTemplater.execute(regexpDef.getMax(), scriptEngine), Constants.DEFAULT_MAX_LOOPS);
 
         this.setProperty("Max loops", String.valueOf(maxLoops));
 
@@ -118,54 +114,52 @@ public class RegexpProcessor extends BaseProcessor {
             flags |= Pattern.CANON_EQ;
         }
 
-        Pattern pattern = Pattern.compile(patternVar.toString(), flags);
+        final Pattern pattern = Pattern.compile(patternVar.toString(), flags);
 
-        List resultList = new ArrayList();
+        final List resultList = new ArrayList();
 
         List bodyList = source.toList();
-        Iterator it = bodyList.iterator();
-        while (it.hasNext()) {
-            Variable currVar = (Variable) it.next();
-            String text = currVar.toString();
+        for (final Object currVar : bodyList) {
+            context.executeWithinNewContext(new Runnable() {
+                public void run() {
+                    String text = currVar.toString();
 
-            Matcher matcher = pattern.matcher(text);
-            int groupCount = matcher.groupCount();
+                    Matcher matcher = pattern.matcher(text);
+                    int groupCount = matcher.groupCount();
 
-            StringBuffer buffer = new StringBuffer();
+                    StringBuffer buffer = new StringBuffer();
 
-            int index = 0;
-            while (matcher.find()) {
-                index++;
+                    int index = 0;
+                    while (matcher.find()) {
+                        index++;
 
-                // if index exceeds maximum number of matching sequences exists the loop
-                if (maxLoops < index) {
-                    break;
+                        // if index exceeds maximum number of matching sequences exists the loop
+                        if (maxLoops < index) {
+                            break;
+                        }
+
+                        for (int i = 0; i <= groupCount; i++) {
+                            context.setVar("_" + i, new NodeVariable(matcher.group(i)));
+                        }
+
+                        BaseElementDef resultDef = regexpDef.getRegexpResultDef();
+                        Variable result = getBodyTextContent(resultDef, scraper, context, true);
+                        debug(resultDef, scraper, result);
+
+                        String currResult = (result == null) ? matcher.group(0) : result.toString();
+                        if (isReplace) {
+                            matcher.appendReplacement(buffer, currResult);
+                        } else {
+                            resultList.add(new NodeVariable(currResult));
+                        }
+                    }
+
+                    if (isReplace) {
+                        matcher.appendTail(buffer);
+                        resultList.add(new NodeVariable(buffer.toString()));
+                    }
                 }
-
-                for (int i = 0; i <= groupCount; i++) {
-                    context.setVar("_" + i, new NodeVariable(matcher.group(i)));
-                }
-
-                BaseElementDef resultDef = regexpDef.getRegexpResultDef();
-                Variable result = getBodyTextContent(resultDef, scraper, context, true);
-                debug(resultDef, scraper, result);
-
-                String currResult = (result == null) ? matcher.group(0) : result.toString();
-                if (isReplace) {
-                    matcher.appendReplacement(buffer, currResult);
-                } else {
-                    resultList.add(new NodeVariable(currResult));
-                }
-
-                for (int i = 0; i <= groupCount; i++) {
-                    context.remove("_" + i);
-                }
-            }
-
-            if (isReplace) {
-                matcher.appendTail(buffer);
-                resultList.add(new NodeVariable(buffer.toString()));
-            }
+            });
         }
 
 

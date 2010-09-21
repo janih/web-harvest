@@ -43,33 +43,33 @@ import org.webharvest.runtime.scripting.ScriptEngine;
  * Specified script engine is used for evaluation.
  */
 public class BaseTemplater {
-	
-	public static String VAR_START = "${";
-	public static String VAR_END = "}";
+
+    public static String VAR_START = "${";
+    public static String VAR_END = "}";
 
     public static String execute(String source, ScriptEngine scriptEngine) {
         if (source == null) {
             return source;
         }
-        
+
         String result = "";
-        
+
         int startIndex = source.indexOf(VAR_START);
         int endIndex = -1;
-        
+
         while (startIndex >= 0 && startIndex < source.length()) {
-        	result += source.substring(endIndex + 1, startIndex);
-        	endIndex = source.indexOf(VAR_END, startIndex);
-        	
-        	if (endIndex > startIndex) {
-        		String expression = source.substring(startIndex + VAR_START.length(), endIndex);
-                Object resultObj = scriptEngine.eval(expression);
+            result += source.substring(endIndex + 1, startIndex);
+            endIndex = source.indexOf(VAR_END, startIndex);
+
+            if (endIndex > startIndex) {
+                String expression = source.substring(startIndex + VAR_START.length(), endIndex);
+                Object resultObj = scriptEngine.evaluate(expression);
                 result += resultObj == null ? "" : resultObj.toString();
-        	}
-        	
-        	startIndex = source.indexOf( VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1) );
+            }
+
+            startIndex = source.indexOf(VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1));
         }
-        
+
         result += source.substring(endIndex + 1);
 
         return result;

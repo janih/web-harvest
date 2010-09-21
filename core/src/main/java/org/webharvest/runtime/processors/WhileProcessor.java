@@ -36,6 +36,7 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.WhileDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -63,55 +64,48 @@ public class WhileProcessor extends BaseProcessor {
         this.whileDef = whileDef;
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String index = BaseTemplater.execute(whileDef.getIndex(), scriptEngine);
-        String maxLoopsString = BaseTemplater.execute(whileDef.getMaxLoops(), scriptEngine);
-        boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(whileDef.getEmpty(), scriptEngine), false);
+    public Variable execute(final Scraper scraper, final ScraperContext context) {
+        final ScriptEngine scriptEngine = scraper.getScriptEngine();
+        final String index = BaseTemplater.execute(whileDef.getIndex(), scriptEngine);
+        final String maxLoopsString = BaseTemplater.execute(whileDef.getMaxLoops(), scriptEngine);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(whileDef.getEmpty(), scriptEngine), false);
 
-        double maxLoops = Constants.DEFAULT_MAX_LOOPS;
-        if (maxLoopsString != null && !"".equals(maxLoopsString.trim())) {
-            maxLoops = Double.parseDouble(maxLoopsString);
-        }
+        final List resultList = new ArrayList();
 
-        List resultList = new ArrayList();
+        context.executeWithinNewContext(new Runnable() {
+            public void run() {
+                int i = 1;
 
-        Variable indexBeforeLoop = context.getVar(index, false); // todo: introduce loop context instead
+                // define first value of index variable
+                if (index != null && !"".equals(index)) {
+                    context.setVar(index, new NodeVariable(String.valueOf(i)));
+                }
 
-        int i = 1;
+                String condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
 
-        // define first value of index variable
-        if (index != null && !"".equals(index)) {
-            context.setVar(index, new NodeVariable(String.valueOf(i)));
-        }
+                setProperty("Condition", condition);
+                setProperty("Index", index);
+                setProperty("Max Loops", maxLoopsString);
+                setProperty("Empty", String.valueOf(isEmpty));
 
-        String condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
+                // iterates while testing variable represents boolean true or loop limit is exceeded
+                final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+                while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
+                    Variable loopResult = new BodyProcessor(whileDef).execute(scraper, context);
+                    if (!isEmpty) {
+                        resultList.addAll(loopResult.toList());
+                    }
 
-        this.setProperty("Condition", condition);
-        this.setProperty("Index", index);
-        this.setProperty("Max Loops", maxLoopsString);
-        this.setProperty("Empty", String.valueOf(isEmpty));
+                    i++;
+                    // define current value of index variable
+                    if (index != null && !"".equals(index)) {
+                        context.setVar(index, new NodeVariable(String.valueOf(i)));
+                    }
 
-        // iterates while testing variable represents boolean true or loop limit is exceeded
-        while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
-            Variable loopResult = new BodyProcessor(whileDef).execute(scraper, context);
-            if (!isEmpty) {
-                resultList.addAll(loopResult.toList());
+                    condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
+                }
             }
-
-            i++;
-            // define current value of index variable
-            if (index != null && !"".equals(index)) {
-                context.setVar(index, new NodeVariable(String.valueOf(i)));
-            }
-
-            condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
-        }
-
-        // restores previous value of index variable
-        if (index != null && indexBeforeLoop != null) {
-            context.setVar(index, indexBeforeLoop);
-        }
+        });
 
         return isEmpty ? new EmptyVariable() : new ListVariable(resultList);
     }

@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.utils.CommonUtil;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Definition of variable.
@@ -47,14 +47,14 @@ public class VarDefDef extends BaseElementDef {
     private String overwrite;
 
     public VarDefDef(XmlNode xmlNode) {
-    	super(xmlNode);
-    	
-        this.name = xmlNode.getAttribute("name");
+        super(xmlNode);
+
+        this.name = StringUtils.trim(xmlNode.getAttribute("name"));
         this.overwrite = xmlNode.getAttribute("overwrite");
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public String getOverwrite() {

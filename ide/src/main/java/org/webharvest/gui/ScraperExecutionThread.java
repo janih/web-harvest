@@ -59,7 +59,6 @@ public class ScraperExecutionThread extends Thread {
             scraper.execute();
         } catch (Exception e) {
             scraper.informListenersAboutError(e);
-            e.printStackTrace();
         }
     }
 

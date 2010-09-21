@@ -36,21 +36,23 @@
 */
 package org.webharvest.definition;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Definition of variable call.
  */
 public class VarDef extends BaseElementDef {
-	
+
     private String name;
 
     public VarDef(XmlNode xmlNode) {
-    	super(xmlNode, false);
-    	
-        this.name = xmlNode.getAttribute("name");
+        super(xmlNode, false);
+
+        this.name = StringUtils.trim(xmlNode.getAttribute("name"));
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public String getShortElementName() {

@@ -47,11 +47,13 @@ import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.InternalVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
+import org.webharvest.utils.SystemUtilities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -124,7 +126,11 @@ public class Scraper {
 
         this.httpClientManager = new HttpClientManager();
 
-        this.context = new ScraperContext(this);
+        this.context = new ScraperContext();
+
+        context.setVar("sys", new InternalVariable(new SystemUtilities(this)));
+        context.setVar("http", new InternalVariable(httpClientManager.getHttpInfo()));
+
         this.scriptEngine = configuration.createScriptEngine(this.context);
         this.usedScriptEngines.put(configuration.getDefaultScriptEngine(), this.scriptEngine);
     }
@@ -436,23 +442,6 @@ public class Scraper {
                     connection.close();
                 } catch (SQLException e) {
                     throw new DatabaseException(e);
-                }
-            }
-        }
-    }
-
-    public void dispose() {
-        // empty scraper's variable context
-        this.context.clear();
-
-        // free connection with context
-        this.context.dispose();
-
-        // releases script engines
-        if (this.usedScriptEngines != null) {
-            for (ScriptEngine engine : this.usedScriptEngines.values()) {
-                if (engine != null) {
-                    engine.dispose();
                 }
             }
         }

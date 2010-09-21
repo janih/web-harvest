@@ -36,6 +36,7 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.Scraper;
@@ -65,13 +66,13 @@ public class LoopProcessor extends BaseProcessor {
         this.loopDef = loopDef;
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String item = BaseTemplater.execute(loopDef.getItem(), scriptEngine);
-        String index = BaseTemplater.execute(loopDef.getIndex(), scriptEngine);
-        String maxLoopsString = BaseTemplater.execute(loopDef.getMaxloops(), scriptEngine);
-        String filter = BaseTemplater.execute(loopDef.getFilter(), scriptEngine);
-        boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(loopDef.getEmpty(), scriptEngine), false);
+    public Variable execute(final Scraper scraper, final ScraperContext context) {
+        final ScriptEngine scriptEngine = scraper.getScriptEngine();
+        final String item = BaseTemplater.execute(loopDef.getItem(), scriptEngine);
+        final String index = BaseTemplater.execute(loopDef.getIndex(), scriptEngine);
+        final String maxLoopsString = BaseTemplater.execute(loopDef.getMaxloops(), scriptEngine);
+        final String filter = BaseTemplater.execute(loopDef.getFilter(), scriptEngine);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(loopDef.getEmpty(), scriptEngine), false);
 
         this.setProperty("Item", item);
         this.setProperty("Index", index);
@@ -79,56 +80,43 @@ public class LoopProcessor extends BaseProcessor {
         this.setProperty("Filter", filter);
         this.setProperty("Empty", String.valueOf(isEmpty));
 
-        double maxLoops = Constants.DEFAULT_MAX_LOOPS;
-        if (maxLoopsString != null && !"".equals(maxLoopsString.trim())) {
-            maxLoops = Double.parseDouble(maxLoopsString);
-        }
-
         BaseElementDef loopValueDef = loopDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor(loopValueDef).run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
-        List resultList = new ArrayList();
+        final List resultList = new ArrayList();
 
-        List list = loopValue != null ? loopValue.toList() : null;
+        final List list = loopValue != null ? loopValue.toList() : null;
         if (list != null) {
-            Variable itemBeforeLoop = context.getVar(item, false); // todo: introduce loop context instead
-            Variable indexBeforeLoop = context.getVar(index, false); // todo: introduce loop context instead
+            context.executeWithinNewContext(new Runnable() {
+                public void run() {
+                    List filteredList = filter != null ? createFilteredList(list, filter) : list;
+                    Iterator it = filteredList.iterator();
 
-            List filteredList = filter != null ? createFilteredList(list, filter) : list;
-            Iterator it = filteredList.iterator();
+                    final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+                    for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
+                        Variable currElement = (Variable) it.next();
 
-            for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
-                Variable currElement = (Variable) it.next();
+                        // define current value of item variable
+                        if (item != null && !"".equals(item)) {
+                            context.setVar(item, currElement);
+                        }
 
-                // define current value of item variable
-                if (item != null && !"".equals(item)) {
-                    context.setVar(item, currElement);
+                        // define current value of index variable
+                        if (index != null && !"".equals(index)) {
+                            context.setVar(index, new NodeVariable(String.valueOf(i)));
+                        }
+
+                        // execute the loop body
+                        BaseElementDef bodyDef = loopDef.getLoopBodyDef();
+                        Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : new EmptyVariable();
+                        debug(bodyDef, scraper, loopResult);
+                        if (!isEmpty) {
+                            resultList.addAll(loopResult.toList());
+                        }
+                    }
                 }
-
-                // define current value of index variable
-                if (index != null && !"".equals(index)) {
-                    context.setVar(index, new NodeVariable(String.valueOf(i)));
-                }
-
-                // execute the loop body
-                BaseElementDef bodyDef = loopDef.getLoopBodyDef();
-                Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : new EmptyVariable();
-                debug(bodyDef, scraper, loopResult);
-                if (!isEmpty) {
-                    resultList.addAll(loopResult.toList());
-                }
-            }
-
-            // restores previous value of item variable
-            if (item != null && itemBeforeLoop != null) {
-                context.setVar(item, itemBeforeLoop);
-            }
-
-            // restores previous value of index variable
-            if (index != null && indexBeforeLoop != null) {
-                context.setVar(index, indexBeforeLoop);
-            }
+            });
         }
 
         return isEmpty ? new EmptyVariable() : new ListVariable(resultList);
@@ -143,7 +131,7 @@ public class LoopProcessor extends BaseProcessor {
      */
     private List createFilteredList(List list, String filterStr) {
         List result = new ArrayList();
-        Set stringSet = new HashSet();
+        Set<String> stringSet = new HashSet<String>();
 
         Filter filter = new Filter(filterStr, list.size());
 
@@ -242,11 +230,11 @@ public class LoopProcessor extends BaseProcessor {
     private static class Filter {
 
         private boolean isUnique = false;
-        private List filterList;
+        private List<CommonUtil.IntPair> filterList;
 
         private Filter(String filterStr, int size) {
             StringTokenizer tokenizer = new StringTokenizer(filterStr, ",");
-            filterList = new ArrayList();
+            filterList = new ArrayList<CommonUtil.IntPair>();
 
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken().trim();
@@ -276,7 +264,7 @@ public class LoopProcessor extends BaseProcessor {
             }
 
             for (int i = 0; i < listSize; i++) {
-                CommonUtil.IntPair curr = (CommonUtil.IntPair) filterList.get(i);
+                CommonUtil.IntPair curr = filterList.get(i);
                 if (curr instanceof IntRange && ((IntRange) curr).isInRange(num)) {
                     return true;
                 } else if (curr instanceof IntSublist && ((IntSublist) curr).isInSublist(num)) {

@@ -40,7 +40,7 @@ import bsh.CallStack;
 import bsh.EvalError;
 import bsh.Interpreter;
 import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.utils.CommonUtil;
 
 /**
@@ -51,13 +51,13 @@ public class SetContextVar {
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {
         try {
-            ScraperContext context = (ScraperContext) interpreter.get(ScriptEngine.CONTEXT_VARIABLE_NAME);
+            DynamicScopeContext context = (DynamicScopeContext) interpreter.get(ScriptEngine.CONTEXT_VARIABLE_NAME);
             if (context != null) {
                 context.setVar(name, CommonUtil.createVariable(value));
             }
         } catch (EvalError e) {
             throw new ScriptException("Cannot get web-Harvest context from interpreter: " + e.getMessage(), e);
         }
-   }
-    
+    }
+
 }

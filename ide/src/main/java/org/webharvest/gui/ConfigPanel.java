@@ -291,15 +291,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             }
         });
 
-        // creates document for this configuration panel
-        this.configDocument = new ConfigDocument(this, name);
-
-        // initialize document content
-        try {
-            this.configDocument.load(BASIC_CONFIG_SKELETON);
-        } catch (IOException e) {
-            GuiUtils.showErrorMessage(e.getMessage());
-        }
+        this.configDocument = loadConfigDocument(name);
 
         this.xmlEditorScrollPane = new XmlEditorScrollPane(this.xmlPane, this.ide.getSettings().isShowLineNumbersByDefault());
 
@@ -325,7 +317,46 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
         leftSplitter.setDividerLocation(250);
 
-//        JPanel bottomPanel = new JPanel( new BorderLayout() );
+        prepareLogArea();
+
+        bottomSplitter = new ProportionalSplitPane(JSplitPane.VERTICAL_SPLIT);
+        bottomSplitter.setResizeWeight(1.0d);
+        bottomSplitter.setBorder(null);
+        bottomSplitter.setTopComponent(leftSplitter);
+        bottomSplitter.setDividerSize(Constants.SPLITTER_WIDTH);
+        bottomView = new JScrollPane(logTextArea);
+        bottomView.setBorder(new EmptyBorder(0, 0, 0, 0));
+        bottomSplitter.setBottomComponent(this.bottomView);
+        bottomSplitter.setDividerLocation(0.8d);
+
+
+        this.add(bottomSplitter, BorderLayout.CENTER);
+
+        if (!ide.getSettings().isShowHierarchyByDefault()) {
+            showHierarchy();
+        }
+
+        if (!ide.getSettings().isShowLogByDefault()) {
+            showLog();
+        }
+
+        updateControls();
+    }
+
+    private ConfigDocument loadConfigDocument(String name) {
+        // creates document for this configuration panel
+        final ConfigDocument configDocument = new ConfigDocument(this, name);
+
+        // initialize document content
+        try {
+            configDocument.load(BASIC_CONFIG_SKELETON);
+        } catch (IOException e) {
+            GuiUtils.showErrorMessage(e.getMessage());
+        }
+        return configDocument;
+    }
+
+    private void prepareLogArea() {
         logTextArea = new JTextArea();
         logTextArea.setFont(new Font("Courier New", Font.PLAIN, 11));
         logTextArea.setEditable(false);
@@ -360,29 +391,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                 }
             }
         });
-
-        bottomSplitter = new ProportionalSplitPane(JSplitPane.VERTICAL_SPLIT);
-        bottomSplitter.setResizeWeight(1.0d);
-        bottomSplitter.setBorder(null);
-        bottomSplitter.setTopComponent(leftSplitter);
-        bottomSplitter.setDividerSize(Constants.SPLITTER_WIDTH);
-        bottomView = new JScrollPane(logTextArea);
-        bottomView.setBorder(new EmptyBorder(0, 0, 0, 0));
-        bottomSplitter.setBottomComponent(this.bottomView);
-        bottomSplitter.setDividerLocation(0.8d);
-
-
-        this.add(bottomSplitter, BorderLayout.CENTER);
-
-        if (!ide.getSettings().isShowHierarchyByDefault()) {
-            showHierarchy();
-        }
-
-        if (!ide.getSettings().isShowLogByDefault()) {
-            showLog();
-        }
-
-        updateControls();
     }
 
     /**
@@ -406,13 +414,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         this.htmlViewMenuItem.setEnabled(viewAllowed);
         this.imageViewMenuItem.setEnabled(viewAllowed);
         this.listViewMenuItem.setEnabled(viewAllowed);
-    }
-
-    private void releaseScraper() {
-        if (scraper != null) {
-            scraper.dispose();
-            scraper = null;
-        }
     }
 
     /**
@@ -485,7 +486,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
      * @return
      */
     public boolean refreshTree() {
-        releaseScraper();
         xmlPane.clearMarkerLine();
         xmlPane.clearErrorLine();
         xmlPane.clearStopDebugLine();

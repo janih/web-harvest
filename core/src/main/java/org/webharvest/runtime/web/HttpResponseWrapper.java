@@ -38,50 +38,49 @@ package org.webharvest.runtime.web;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.webharvest.utils.*;
+import org.webharvest.utils.KeyValuePair;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Class defines http server response. 
+ * Class defines http server response.
  */
 public class HttpResponseWrapper {
-	
-	private String charset;
-	private String mimeType;
-	private byte[] body;
-	private KeyValuePair<String> headers[];
+
+    private String charset;
+    private String mimeType;
+    private byte[] body;
+    private KeyValuePair<String> headers[];
     private int statusCode;
     private String statusText;
 
     /**
-	 * Constructor - defines response result based on specified HttpMethodBase instance.
-	 * @param method
-	 */
-	public HttpResponseWrapper(HttpMethodBase method) {
+     * Constructor - defines response result based on specified HttpMethodBase instance.
+     *
+     * @param method
+     */
+    public HttpResponseWrapper(HttpMethodBase method) {
         try {
-			this.body = method.getResponseBody();
+            this.body = method.getResponseBody();
         } catch (IOException e) {
-			// todo: handle exception
+            // todo: handle exception
             e.printStackTrace();
         }
-		
-		Header[] headerArray = method.getResponseHeaders();
+
+        Header[] headerArray = method.getResponseHeaders();
         if (headerArray != null) {
             headers = new KeyValuePair[headerArray.length];
-        	for (int i = 0; i < headerArray.length; i++) {
-        		String currName = headerArray[i].getName();
-        		String currValue = headerArray[i].getValue();
-        		headers[i] = new KeyValuePair<String>(currName, currValue);
-        		if ("content-type".equalsIgnoreCase(currName)) {
-        			int index = currValue.indexOf(';');
-        			this.mimeType = index > 0 ? currValue.substring(0, index) : currValue;
-        		}
-        	}
+            for (int i = 0; i < headerArray.length; i++) {
+                String currName = headerArray[i].getName();
+                String currValue = headerArray[i].getValue();
+                headers[i] = new KeyValuePair<String>(currName, currValue);
+                if ("content-type".equalsIgnoreCase(currName)) {
+                    int index = currValue.indexOf(';');
+                    this.mimeType = index > 0 ? currValue.substring(0, index) : currValue;
+                }
+            }
         }
 
         this.charset = method.getResponseCharSet();
@@ -95,24 +94,24 @@ public class HttpResponseWrapper {
     }
 
     public String getCharset() {
-		return this.charset;
-	}
-	
-	public String getMimeType() {
-		return this.mimeType;
-	}
-	
-	public byte[] getBody() {
-		return this.body;
-	}
-	
-	public InputStream getBodyAsInputStream() {
-		return new ByteArrayInputStream(body);
-	}
-	
-	public KeyValuePair<String>[] getHeaders() {
-		return this.headers;
-	}
+        return this.charset;
+    }
+
+    public String getMimeType() {
+        return this.mimeType;
+    }
+
+    public byte[] getBody() {
+        return this.body;
+    }
+
+    public InputStream getBodyAsInputStream() {
+        return new ByteArrayInputStream(body);
+    }
+
+    public KeyValuePair<String>[] getHeaders() {
+        return this.headers;
+    }
 
     public int getStatusCode() {
         return statusCode;

@@ -36,28 +36,32 @@
 */
 package org.webharvest.runtime.scripting;
 
-import java.util.Map;
-import java.util.Iterator;
+import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.variables.InternalVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.KeyValuePair;
 
 /**
  * Abstract scripting engine.
  */
-abstract public class ScriptEngine  {
+abstract public class ScriptEngine {
 
     public static final String CONTEXT_VARIABLE_NAME = "___web_harvest_context___";
 
-    protected Map context;
+    private DynamicScopeContext context;
 
     /**
      * Constructor - initializes context of variables.
+     *
      * @param context
      */
-    protected ScriptEngine(Map context) {
+    protected ScriptEngine(DynamicScopeContext context) {
         this.context = context;
     }
 
     /**
      * Sets variable in scripter context.
+     *
      * @param name
      * @param value
      */
@@ -65,41 +69,23 @@ abstract public class ScriptEngine  {
 
     /**
      * Evaluates specified expression or code block.
+     *
      * @return value of evaluation or null if there is nothing.
      */
-    public abstract Object eval(String expression);
-
-
-    /**
-     * Push all the variables from variables context to the script engine.
-     */
-    protected void pushAllVariablesFromContextToScriptEngine() {
+    public final Object evaluate(String expression) {
         // push all variables from context to the scripter
-        if (this.context != null) {
-            Iterator it = this.context.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry entry =  (Map.Entry) it.next();
-                String name = (String) entry.getKey();
-                setVariable( name, entry.getValue() );
-            }
+        for (KeyValuePair<Variable> pair : context) {
+            final Variable value = pair.getValue();
+
+            //todo: why not just unwrap every variable?
+            setVariable(pair.getKey(), (value instanceof InternalVariable)
+                    ? value.getWrappedObject()
+                    : value);
         }
+        return doEvaluate(expression);
     }
 
-    /**
-     * Sets the specified variable in the context.
-     * @param name
-     * @param value
-     */
-    public void setInContext(String name, Object value) {
-        if (this.context != null) {
-            this.context.put(name, value);
-        }
-    }
 
-    public void dispose() {
-        if (this.context != null) {
-            this.context.clear();
-        }
-    }
+    protected abstract Object doEvaluate(String expression);
 
 }

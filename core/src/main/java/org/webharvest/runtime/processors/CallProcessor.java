@@ -44,8 +44,8 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class CallProcessor extends BaseProcessor {
 
     private CallDef callDef;
 
-    ScraperContext functionContext;
+    ScraperContext context;
     ScriptEngine scriptEngine;
     Map<String, ScriptEngine> cachedScriptEngines = new HashMap<String, ScriptEngine>();
 
@@ -67,16 +67,13 @@ public class CallProcessor extends BaseProcessor {
     public CallProcessor(CallDef callDef, ScraperConfiguration configuration, Scraper scraper) {
         super(callDef);
         this.configuration = configuration;
-        CallProcessor runningFunction = scraper.getRunningFunction();
-        ScraperContext callerContext =
-                runningFunction == null ? scraper.getContext() : runningFunction.getFunctionContext();
-        this.functionContext = new ScraperContext(scraper, callerContext);
+        this.context = scraper.getContext();
         this.callDef = callDef;
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) {
         String functionName = BaseTemplater.execute(callDef.getName(), scraper.getScriptEngine());
-        FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
+        final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);
 
@@ -89,16 +86,24 @@ public class CallProcessor extends BaseProcessor {
         // executes body of call processor
         new BodyProcessor(callDef).execute(scraper, context);
 
-        functionContext.putAll(scraper.getFunctionParams());
+        context.executeWithinNewContext(new Runnable() {
 
-        // adds this runtime info to the running functions stack
-        scraper.addRunningFunction(this);
+            @Override
+            public void run() {
+                for (Map.Entry<String, Variable> entry : scraper.getFunctionParams().entrySet()) {
+                    context.setVar(entry.getKey(), entry.getValue());
+                }
 
-        // executes body of function using new context
-        new BodyProcessor(functionDef).execute(scraper, functionContext);
+                // adds this runtime info to the running functions stack
+                scraper.addRunningFunction(CallProcessor.this);
 
-        // remove running function from the stack  
-        scraper.removeRunningFunction();
+                // executes body of function using new context
+                new BodyProcessor(functionDef).execute(scraper, context);
+
+                // remove running function from the stack
+                scraper.removeRunningFunction();
+            }
+        });
 
         return functionResult;
     }
@@ -109,7 +114,7 @@ public class CallProcessor extends BaseProcessor {
 
     public ScriptEngine getScriptEngine() {
         if (scriptEngine == null) {
-            scriptEngine = configuration.createScriptEngine(functionContext);
+            scriptEngine = configuration.createScriptEngine(context);
         }
         return scriptEngine;
     }
@@ -117,14 +122,10 @@ public class CallProcessor extends BaseProcessor {
     public ScriptEngine getScriptEngine(String engineType) {
         ScriptEngine engine = cachedScriptEngines.get(engineType);
         if (engine == null) {
-            engine = configuration.createScriptEngine(functionContext, engineType);
+            engine = configuration.createScriptEngine(context, engineType);
             cachedScriptEngines.put(engineType, engine);
         }
         return engine;
-    }
-
-    public ScraperContext getFunctionContext() {
-        return functionContext;
     }
 
 }

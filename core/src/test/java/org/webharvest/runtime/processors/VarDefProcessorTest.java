@@ -82,7 +82,7 @@ public class VarDefProcessorTest {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(new HttpClientManager()).getHttpClientManager();
 
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
     }
 
     private VarDefProcessor newProcessor(String xml) {

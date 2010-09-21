@@ -167,7 +167,7 @@ public class HttpClientManager {
         // If cookie expiry date is not specified in the response, HttClient 3.1 doesn't send it back.
         // This leads to inability to login to some sites, being always redirected to login page.
         // Workaround here is to set cookies with null expiry dates to the current date.
-        // todo: remove this code if next vresion fixes the problem
+        // todo: remove this code if next version fixes the problem
         Cookie[] cookies = clientState.getCookies();
         if (cookies != null) {
             for (Cookie cookie: cookies) {

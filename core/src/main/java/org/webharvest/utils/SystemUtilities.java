@@ -41,7 +41,6 @@ import org.webharvest.exception.BaseException;
 import org.webharvest.exception.ScraperXPathException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -69,16 +68,12 @@ public class SystemUtilities {
         this.scraper = scraper;
     }
 
-    public void setScraper(Scraper scraper) {
-        this.scraper = scraper;
-    }
-
     /**
      * @param varName
      * @return True if scraper's context contain not-null variable with specified name.
      */
     public boolean isVariableDefined(String varName) {
-        return getCurrentContext().getVar(varName) != null;
+        return scraper.getContext().getVar(varName) != null;
     }
 
     /**
@@ -87,12 +82,7 @@ public class SystemUtilities {
      * @param varName Name of the variable
      */
     public Variable getVar(String varName) {
-        return getCurrentContext().getVar(varName);
-    }
-
-    private ScraperContext getCurrentContext() {
-        final CallProcessor runningFunction = scraper.getRunningFunction();
-        return (runningFunction != null) ? runningFunction.getFunctionContext() : scraper.getContext();
+        return scraper.getContext().getVar(varName);
     }
 
     /**

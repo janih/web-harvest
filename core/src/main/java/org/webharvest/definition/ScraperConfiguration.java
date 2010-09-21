@@ -36,6 +36,7 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.BeanShellScriptEngine;
 import org.webharvest.runtime.scripting.GroovyScriptEngine;
 import org.webharvest.runtime.scripting.JavascriptScriptEngine;
@@ -172,7 +173,7 @@ public class ScraperConfiguration {
         this.url = url;
     }
 
-    public ScriptEngine createScriptEngine(Map<String, Object> context, String engineType) {
+    public ScriptEngine createScriptEngine(ScraperContext context, String engineType) {
         if (JAVASCRIPT_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
             return new JavascriptScriptEngine(context);
         } else if (GROOVY_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
@@ -182,7 +183,7 @@ public class ScraperConfiguration {
         }
     }
 
-    public ScriptEngine createScriptEngine(Map<String, Object> context) {
+    public ScriptEngine createScriptEngine(ScraperContext context) {
         return createScriptEngine(context, this.defaultScriptEngine);
     }
 

@@ -36,26 +36,26 @@
 */
 package org.webharvest.utils;
 
+import org.apache.commons.collections.keyvalue.DefaultKeyValue;
+
 /**
  * @author: Vladimir Nikic
  * Date: Jul 2, 2007
  */
-public class KeyValuePair<T> {
-
-    private String key;
-    private T value;
+// todo: inline this class, it's useless.
+public class KeyValuePair<T> extends DefaultKeyValue {
 
     public KeyValuePair(String key, T value) {
-        this.key = key;
-        this.value = value;
+        super(key, value);
     }
 
     public String getKey() {
-        return key;
+        return (String) super.getKey();
     }
 
+    @SuppressWarnings({"unchecked"})
     public T getValue() {
-        return value;
+        return (T) super.getValue();
     }
-    
+
 }

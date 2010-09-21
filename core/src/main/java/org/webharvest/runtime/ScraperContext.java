@@ -36,53 +36,119 @@
 */
 package org.webharvest.runtime;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Transformer;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.SystemUtilities;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.KeyValuePair;
+import org.webharvest.utils.Stack;
 
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Context of scraper execution. All the variables created during
  * scraper execution are stored in this context.
  */
-public class ScraperContext extends HashMap<String, Object> {
+public class ScraperContext implements DynamicScopeContext {
 
-    // context of the caller if context is crated in a function 
-    private ScraperContext callerContext = null;
+    private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
+    private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
-    private SystemUtilities systemUtilities;
-
-    public ScraperContext(Scraper scraper, ScraperContext callerContext) {
-        super();
-        this.callerContext = callerContext;
-        this.systemUtilities = new SystemUtilities(scraper);
-        this.put("sys", this.systemUtilities);
-        this.put("http", scraper.getHttpClientManager().getHttpInfo());
+    {
+        // global scope initialization
+        variablesNamesStack.push(new HashSet<String>());
     }
 
-    public ScraperContext(Scraper scraper) {
-        this(scraper, null);
+    @SuppressWarnings({"UnusedDeclaration"})
+    public void setVar(String name, Object value) {
+        setVar(name, CommonUtil.createVariable(value));
     }
 
+    @Override
+    public void setVar(String name, Variable variable) {
+        Stack<Variable> variableValueStack = centralReferenceTable.get(name);
+        final Set<String> localVariableNames = variablesNamesStack.peek();
+
+        if (variableValueStack == null) {
+            variableValueStack = new Stack<Variable>();
+            centralReferenceTable.put(name, variableValueStack);
+            localVariableNames.add(name);
+        } else if (localVariableNames.contains(name)) {
+            variableValueStack.pop();
+        } else {
+            localVariableNames.add(name);
+        }
+        variableValueStack.push(variable);
+    }
+
+    /**
+     * Sets variable into local context.
+     * This method is kept for the backward compatibility only.
+     *
+     * @param varName
+     * @deprecated use {@link #setVar(String, Object)}
+     */
+    @Deprecated
+    public void put(String varName, Object value) {
+        setVar(varName, value);
+    }
+
+    /**
+     * Removes variable from the local context.
+     * This method is kept for the backward compatibility only.
+     *
+     * @param varName
+     * @return removed variable or null
+     * @deprecated use {@link #removeVar(String)}
+     */
+    @Deprecated
+    public Variable remove(String varName) {
+        return removeVar(varName);
+    }
+
+    public Variable removeVar(String varName) {
+        return (variablesNamesStack.peek().remove(varName)) ? removeVarFromCRT(varName) : null;
+    }
+
+    @Override
     public Variable getVar(String name) {
-        return getVar(name, true);
+        final Stack<Variable> stack = centralReferenceTable.get(name);
+        return (stack == null) ? null : stack.peek();
     }
 
-    public Variable getVar(String name, boolean lookInStack) {
-        final Variable value = (Variable) this.get(StringUtils.trimToNull(name));
-        return (value == null && lookInStack && callerContext != null) ? callerContext.getVar(name) : value;
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public Iterator<KeyValuePair<Variable>> iterator() {
+        return IteratorUtils.transformedIterator(centralReferenceTable.entrySet().iterator(), new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                final Map.Entry<String, Stack<Variable>> crtEntry = (Map.Entry<String, Stack<Variable>>) input;
+                return new KeyValuePair<Variable>(crtEntry.getKey(), crtEntry.getValue().peek());
+            }
+        });
     }
 
-    public Object setVar(String key, Variable value) {
-        return super.put(key, value);
+    @Override
+    public void executeWithinNewContext(Runnable runnable) {
+        try {
+            variablesNamesStack.push(new HashSet<String>());
+            runnable.run();
+        } finally {
+            for (String varName : variablesNamesStack.pop()) {
+                removeVarFromCRT(varName);
+            }
+        }
     }
 
-    public ScraperContext getCallerContext() {
-        return callerContext;
+    private Variable removeVarFromCRT(String varName) {
+        final Stack<Variable> stack = centralReferenceTable.get(varName);
+        try {
+            return stack.pop();
+        } finally {
+            if (stack.isEmpty()) {
+                centralReferenceTable.remove(varName);
+            }
+        }
     }
 
-    public void dispose() {
-        this.systemUtilities.setScraper(null);
-    }
 }

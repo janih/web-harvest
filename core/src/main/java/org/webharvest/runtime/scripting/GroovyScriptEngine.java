@@ -38,8 +38,7 @@ package org.webharvest.runtime.scripting;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-
-import java.util.Map;
+import org.webharvest.runtime.DynamicScopeContext;
 
 /**
  * Groovy scripting engine.
@@ -49,16 +48,13 @@ public class GroovyScriptEngine extends ScriptEngine {
     private Binding binding = new Binding();
     private GroovyShell shell = new GroovyShell(binding);
 
-    /**
-     * Constructor - initializes context used in engine.
-     * @param context
-     */
-    public GroovyScriptEngine(Map context) {
+    public GroovyScriptEngine(DynamicScopeContext context) {
         super(context);
     }
 
     /**
      * Sets variable in scripter context.
+     *
      * @param name
      * @param value
      */
@@ -68,10 +64,10 @@ public class GroovyScriptEngine extends ScriptEngine {
 
     /**
      * Evaluates specified expression or code block.
+     *
      * @return value of evaluation or null if there is nothing.
      */
-    public Object eval(String expression) {
-        pushAllVariablesFromContextToScriptEngine();
+    protected Object doEvaluate(String expression) {
         return shell.evaluate(expression);
     }
 

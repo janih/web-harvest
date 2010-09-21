@@ -39,8 +39,7 @@ package org.webharvest.runtime.scripting;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import java.util.Map;
+import org.webharvest.runtime.DynamicScopeContext;
 
 /**
  * javascript scripting engine based on Rhino.
@@ -50,11 +49,7 @@ public class JavascriptScriptEngine extends ScriptEngine {
     private Context javascriptContext = null;
     private Scriptable scope = null;
 
-    /**
-     * Constructor - initializes context used in engine.
-     * @param context
-     */
-    public JavascriptScriptEngine(Map context) {
+    public JavascriptScriptEngine(DynamicScopeContext context) {
         super(context);
     }
 
@@ -67,6 +62,7 @@ public class JavascriptScriptEngine extends ScriptEngine {
 
     /**
      * Sets variable in scripter context.
+     *
      * @param name
      * @param value
      */
@@ -78,11 +74,10 @@ public class JavascriptScriptEngine extends ScriptEngine {
 
     /**
      * Evaluates specified expression or code block.
+     *
      * @return value of evaluation or null if there is nothing.
      */
-    public Object eval(String expression) {
-        initContextIfNeeded();
-        pushAllVariablesFromContextToScriptEngine();
+    protected Object doEvaluate(String expression) {
         return this.javascriptContext.evaluateString(scope, expression, "<cmd>", 1, null);
     }
 

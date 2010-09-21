@@ -36,25 +36,29 @@
 */
 package org.webharvest.gui;
 
-import net.sf.saxon.trans.*;
+import net.sf.saxon.trans.XPathException;
+import org.webharvest.exception.ScriptException;
 import org.webharvest.gui.component.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.templaters.*;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.RuntimeConfig;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.*;
-import org.webharvest.exception.*;
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
 
 import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.io.StringReader;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author: Vladimir Nikic
@@ -71,8 +75,9 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     public static final int HTML_VIEW = 2;
     public static final int IMAGE_VIEW = 3;
     public static final int LIST_VIEW = 4;
-    
+
     private abstract class MyAction extends AbstractAction {
+
         public MyAction(String text, Icon icon, String desc, KeyStroke keyStroke) {
             super(text, icon);
             putValue(SHORT_DESCRIPTION, desc);
@@ -84,11 +89,11 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     private FindReplaceDialog findDialog;
 
     // array of flags indicating if specific view is refreshed with new value
-    private boolean refreshed[] = new boolean[5]; 
+    private boolean refreshed[] = new boolean[5];
 
     // name of the property being viewed
     private String propertyName;
-    
+
     // value that should be displayed in this viewer
     private Object value;
 
@@ -122,6 +127,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
 
     /**
      * Constructor.
+     *
      * @param scraper
      * @param propertyName
      * @param value
@@ -134,14 +140,14 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
             String elementName = nodeInfo.getElementDef().getShortElementName();
             setTitle(elementName + "->" + propertyName);
         }
-        
-        this.setIconImage( ((ImageIcon) ResourceManager.VIEW_ICON).getImage() );
+
+        this.setIconImage(((ImageIcon) ResourceManager.VIEW_ICON).getImage());
 
         this.propertyName = propertyName;
         this.value = value;
         this.nodeInfo = nodeInfo;
 
-        this.addWindowListener( new WindowAdapter() {
+        this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 // remove this viewer from the list of synchronized views
                 if (nodeInfo != null) {
@@ -155,8 +161,8 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         });
 
         Container contentPane = getContentPane();
-        contentPane.setLayout( new BorderLayout() );
-        
+        contentPane.setLayout(new BorderLayout());
+
         JToolBar toolBar = new JToolBar();
         toolBar.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
         toolBar.setFloatable(false);
@@ -169,7 +175,8 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                     protected void execute(final Object value) {
                         if (value != null) {
                             try {
-                                ViewerFrame.this.value = BaseTemplater.execute( "${" + value + "}", scraper.getScriptEngine() );;
+                                ViewerFrame.this.value = BaseTemplater.execute("${" + value + "}", scraper.getScriptEngine());
+                                ;
                             } catch (ScriptException e) {
                                 ViewerFrame.this.value = "Error evaluating \"" + value + "\"!";
                             }
@@ -180,11 +187,8 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                         }
                     }
                 };
-                if (context != null) {
-                    Iterator iterator = new TreeSet( context.keySet() ).iterator();
-                    while (iterator.hasNext()) {
-                        variablesComboBox.addItem(iterator.next());
-                    }
+                for (KeyValuePair<Variable> pair : context) {
+                    variablesComboBox.addItem(pair.getKey());
                 }
                 SmallButton goButton = new SmallButton("Eval");
                 goButton.addActionListener(new ActionListener() {
@@ -209,60 +213,60 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         }
 
         DropDownButton viewTypeButton = new DropDownButton();
-        viewTypeButton.addMenuItem( new MenuElements.MenuItem("Text    ", ResourceManager.TEXTTYPE_ICON) );
-        viewTypeButton.addMenuItem( new MenuElements.MenuItem("XML    ", ResourceManager.XMLTYPE_ICON) );
-        viewTypeButton.addMenuItem( new MenuElements.MenuItem("HTML    ", ResourceManager.HTMLTYPE_ICON) );
-        viewTypeButton.addMenuItem( new MenuElements.MenuItem("Image    ", ResourceManager.IMAGETYPE_ICON) );
-        viewTypeButton.addMenuItem( new MenuElements.MenuItem("List    ", ResourceManager.LISTTYPE_ICON) );
+        viewTypeButton.addMenuItem(new MenuElements.MenuItem("Text    ", ResourceManager.TEXTTYPE_ICON));
+        viewTypeButton.addMenuItem(new MenuElements.MenuItem("XML    ", ResourceManager.XMLTYPE_ICON));
+        viewTypeButton.addMenuItem(new MenuElements.MenuItem("HTML    ", ResourceManager.HTMLTYPE_ICON));
+        viewTypeButton.addMenuItem(new MenuElements.MenuItem("Image    ", ResourceManager.IMAGETYPE_ICON));
+        viewTypeButton.addMenuItem(new MenuElements.MenuItem("List    ", ResourceManager.LISTTYPE_ICON));
         viewTypeButton.changeSelectedTo(viewIndex);
         viewTypeButton.addListener(this);
-        toolBar.add( new JLabel(" View as: ") );
+        toolBar.add(new JLabel(" View as: "));
         toolBar.add(viewTypeButton);
 
-        final MyAction findTextAction = new MyAction("Find", ResourceManager.FIND_ICON, "Find text", KeyStroke.getKeyStroke( KeyEvent.VK_F, ActionEvent.CTRL_MASK)) {
+        final MyAction findTextAction = new MyAction("Find", ResourceManager.FIND_ICON, "Find text", KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK)) {
             public void actionPerformed(ActionEvent e) {
                 findText(FIND_OPEN);
             }
         };
 
-        final MyAction findNextAction = new MyAction("Find Next", null, "Find next occurence", KeyStroke.getKeyStroke( KeyEvent.VK_F3, 0)) {
+        final MyAction findNextAction = new MyAction("Find Next", null, "Find next occurence", KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0)) {
             public void actionPerformed(ActionEvent e) {
                 findText(FIND_NEXT);
             }
         };
 
-        final MyAction findPrevAction = new MyAction("Find Previous", null, "Find previous occurence", KeyStroke.getKeyStroke( KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK)) {
+        final MyAction findPrevAction = new MyAction("Find Previous", null, "Find previous occurence", KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK)) {
             public void actionPerformed(ActionEvent e) {
                 findText(FIND_PREVIOUS);
             }
         };
 
-        final MyAction zoomInAction = new MyAction("Zoom In", ResourceManager.ZOOMIN_ICON, "Zoom Image In", KeyStroke.getKeyStroke( KeyEvent.VK_PLUS, 0)) {
+        final MyAction zoomInAction = new MyAction("Zoom In", ResourceManager.ZOOMIN_ICON, "Zoom Image In", KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0)) {
             public void actionPerformed(ActionEvent e) {
                 zoom(true);
             }
         };
 
-        final MyAction zoomOutAction = new MyAction("Zoom Out", ResourceManager.ZOOMOUT_ICON, "Zoom Image Out", KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, 0)) {
+        final MyAction zoomOutAction = new MyAction("Zoom Out", ResourceManager.ZOOMOUT_ICON, "Zoom Image Out", KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0)) {
             public void actionPerformed(ActionEvent e) {
                 zoom(false);
             }
         };
 
         this.findButton = new CommonButton(findTextAction);
-        this.findButton.registerKeyboardAction(findTextAction, KeyStroke.getKeyStroke( KeyEvent.VK_F, ActionEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.findButton.registerKeyboardAction(findNextAction, KeyStroke.getKeyStroke( KeyEvent.VK_F3, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.findButton.registerKeyboardAction(findPrevAction, KeyStroke.getKeyStroke( KeyEvent.VK_F3, ActionEvent.SHIFT_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.findButton.registerKeyboardAction(findTextAction, KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.findButton.registerKeyboardAction(findNextAction, KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.findButton.registerKeyboardAction(findPrevAction, KeyStroke.getKeyStroke(KeyEvent.VK_F3, ActionEvent.SHIFT_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         this.wrapTextCheckBox = new WHCheckBox("Wrap Text");
         this.wrapTextCheckBox.addActionListener(this);
         toolBar.add(this.wrapTextCheckBox);
 
         this.zoomInButton = new CommonButton(zoomInAction);
-        this.zoomInButton.registerKeyboardAction(zoomInAction, KeyStroke.getKeyStroke( KeyEvent.VK_ADD, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.zoomInButton.registerKeyboardAction(zoomInAction, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         this.zoomOutButton = new CommonButton(zoomOutAction);
-        this.zoomOutButton.registerKeyboardAction(zoomOutAction, KeyStroke.getKeyStroke( KeyEvent.VK_SUBTRACT, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        this.zoomOutButton.registerKeyboardAction(zoomOutAction, KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         this.zoomFactorLabel = new JLabel();
 
@@ -290,14 +294,14 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
 
         contentPane.add(toolBar, BorderLayout.NORTH);
 
-        this.cardPanel = new JPanel( new CardLayout() );
+        this.cardPanel = new JPanel(new CardLayout());
 
         // text view
         this.textArea = new JTextArea();
         this.textArea.setEditable(false);
         this.textArea.setWrapStyleWord(true);
-        this.textArea.setFont( new Font("Monospaced", Font.PLAIN, 12) );
-        this.cardPanel.add( new WHScrollPane(this.textArea), String.valueOf(TEXT_VIEW) );
+        this.textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        this.cardPanel.add(new WHScrollPane(this.textArea), String.valueOf(TEXT_VIEW));
 
         // XML view
         this.xmlPane = new XmlTextPane();
@@ -307,7 +311,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         JToolBar xpathToolbar = new JToolBar();
         final JComboBox xpathComboBox = new EditableComboBox(50) {
             protected void execute(Object value) {
-                evaluateXPath((String)getEditor().getItem());
+                evaluateXPath((String) getEditor().getItem());
             }
         };
 
@@ -316,7 +320,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         xpathEvalButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String expression = (String) xpathComboBox.getSelectedItem();
-                if ( !CommonUtil.isEmptyString(expression) ) {
+                if (!CommonUtil.isEmptyString(expression)) {
                     xpathComboBox.removeItem(expression);
                     xpathComboBox.insertItemAt(expression, 0);
                     xpathComboBox.setSelectedItem(expression);
@@ -325,14 +329,14 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
             }
         });
         xpathToolbar.setFloatable(false);
-        xpathToolbar.add( new JLabel(" XPath expression: ") );
+        xpathToolbar.add(new JLabel(" XPath expression: "));
         xpathToolbar.add(xpathComboBox);
         xpathToolbar.add(xpathEvalButton);
 
         this.xpathResultPane = new JEditorPane();
         this.xpathResultPane.setEditable(false);
         this.xpathResultPane.setContentType("text/html");
-        this.xpathResultPane.setEditorKit( new HTMLEditorKit() );
+        this.xpathResultPane.setEditorKit(new HTMLEditorKit());
 
         xpathPanel.add(xpathToolbar, BorderLayout.NORTH);
         xpathPanel.add(new WHScrollPane(this.xpathResultPane), BorderLayout.CENTER);
@@ -340,19 +344,19 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         JSplitPane splitPane = new ProportionalSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setResizeWeight(1.0d);
         splitPane.setBorder(null);
-        splitPane.setTopComponent( new XmlEditorScrollPane(xmlPane, false) );
+        splitPane.setTopComponent(new XmlEditorScrollPane(xmlPane, false));
         splitPane.setBottomComponent(xpathPanel);
         splitPane.setDividerLocation(0.75d);
         splitPane.setDividerSize(Constants.SPLITTER_WIDTH);
 
-        this.cardPanel.add(splitPane , String.valueOf(XML_VIEW) );
+        this.cardPanel.add(splitPane, String.valueOf(XML_VIEW));
 
         // HTML view
         this.htmlPane = new JEditorPane();
         this.htmlPane.setEditable(false);
         this.htmlPane.setContentType("text/html");
-        this.htmlPane.setEditorKit( new HTMLEditorKit() );
-        this.cardPanel.add( new WHScrollPane(this.htmlPane), String.valueOf(HTML_VIEW) );
+        this.htmlPane.setEditorKit(new HTMLEditorKit());
+        this.cardPanel.add(new WHScrollPane(this.htmlPane), String.valueOf(HTML_VIEW));
 
         // image view
         this.imagePanel = new JPanel(new BorderLayout());
@@ -361,13 +365,13 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         this.imagePanel.add(imageLabel, BorderLayout.CENTER);
         this.imageLabel.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
-                zoom( e.getWheelRotation() > 0 );
+                zoom(e.getWheelRotation() > 0);
             }
         });
-        this.cardPanel.add( new WHScrollPane(this.imagePanel), String.valueOf(IMAGE_VIEW) );
+        this.cardPanel.add(new WHScrollPane(this.imagePanel), String.valueOf(IMAGE_VIEW));
 
         // List view
-        this.listTable = new JTable( new DefaultTableModel(0, 2) {
+        this.listTable = new JTable(new DefaultTableModel(0, 2) {
             public boolean isCellEditable(int row, int column) {
                 return column == 1;
             }
@@ -376,11 +380,11 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         this.listTable.getColumnModel().getColumn(0).setMaxWidth(30);
         this.listTable.setColumnSelectionAllowed(true);
         this.listTable.setRowSelectionAllowed(true);
-        this.listTable.getSelectionModel().setSelectionMode( ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
+        this.listTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         JScrollPane tableScrollPane = new WHScrollPane(this.listTable);
         tableScrollPane.getViewport().setBackground(Color.white);
-        this.cardPanel.add(tableScrollPane, String.valueOf(LIST_VIEW) );
+        this.cardPanel.add(tableScrollPane, String.valueOf(LIST_VIEW));
 
         openView(viewIndex);
 
@@ -390,7 +394,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     }
 
     private void findText(int type) {
-        if ( this.currentView == TEXT_VIEW  || this.currentView == XML_VIEW ) {
+        if (this.currentView == TEXT_VIEW || this.currentView == XML_VIEW) {
             if (this.findDialog == null) {
                 this.findDialog = new FindReplaceDialog(this);
             }
@@ -414,6 +418,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
 
     /**
      * Evaluates XPath expression against XML panel's text
+     *
      * @param text XML text to be searched
      */
     private void evaluateXPath(String text) {
@@ -460,14 +465,14 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     private boolean validateXml(boolean showOkMessage) {
         XmlValidator validator = new XmlValidator();
         String s = value == null ? "" : value.toString();
-        boolean valid = validator.parse( new InputSource(new StringReader(s)) );
+        boolean valid = validator.parse(new InputSource(new StringReader(s)));
         if (valid) {
             if (showOkMessage) {
                 GuiUtils.showInfoMessage("XML is well-formed.");
             }
         } else {
             String msg = "XML is not well-formed: " + validator.getException().getMessage() +
-                         " [line: " + validator.getLineNumber() + ", col: " + validator.getColumnNumber() + "].";
+                    " [line: " + validator.getLineNumber() + ", col: " + validator.getColumnNumber() + "].";
             GuiUtils.showErrorMessage(msg);
         }
 
@@ -475,24 +480,25 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     }
 
     private void refresh(int viewIndex) {
-        switch(viewIndex) {
+        switch (viewIndex) {
             case TEXT_VIEW:
                 if (!this.refreshed[TEXT_VIEW]) {
-                    this.textArea.setText( value == null ? null : value.toString() );
+                    this.textArea.setText(value == null ? null : value.toString());
                     this.textArea.setCaretPosition(0);
                 }
                 break;
             case XML_VIEW:
                 if (!this.refreshed[XML_VIEW]) {
-                    this.xmlPane.setText( value == null ? null : value.toString() );
+                    this.xmlPane.setText(value == null ? null : value.toString());
 
-                }this.xmlPane.setCaretPosition(0);
+                }
+                this.xmlPane.setCaretPosition(0);
                 break;
             case HTML_VIEW:
                 if (!this.refreshed[HTML_VIEW]) {
                     if (value != null) {
                         // Workaround for BUG 4695909: parse the HTML String and remove everything in the HEAD section before calling setText(String).
-                        Pattern pattern = Pattern.compile("<head(.)*</head>", Pattern.DOTALL|Pattern.UNICODE_CASE);
+                        Pattern pattern = Pattern.compile("<head(.)*</head>", Pattern.DOTALL | Pattern.UNICODE_CASE);
                         Matcher matcher = pattern.matcher(value.toString());
                         String htmlText = matcher.replaceFirst("");
 
@@ -530,10 +536,10 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                         for (int i = 0; i < list.size(); i++) {
                             Object curr = list.get(i);
                             String stringValue = curr == null ? "" : curr.toString();
-                            model.addRow( new String[] { String.valueOf(i + 1), stringValue} );
+                            model.addRow(new String[]{String.valueOf(i + 1), stringValue});
                         }
                     } else {
-                        model.addRow( new String[] {"1", value == null ? "" : value.toString()} );
+                        model.addRow(new String[]{"1", value == null ? "" : value.toString()});
                     }
                 }
                 break;
@@ -549,29 +555,30 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     }
 
     private void updateControls() {
-        this.findButton.setVisible( this.currentView == TEXT_VIEW  || this.currentView == XML_VIEW );
-        this.xmlValidateButton.setVisible( this.currentView == XML_VIEW );
-        this.xmlPrettyPrintButton.setVisible( this.currentView == XML_VIEW );
-        this.zoomInButton.setVisible( this.currentView == IMAGE_VIEW);
-        this.zoomOutButton.setVisible( this.currentView == IMAGE_VIEW);
-        this.zoomFactorLabel.setVisible( this.currentView == IMAGE_VIEW);
-        this.wrapTextCheckBox.setVisible( this.currentView == TEXT_VIEW);
+        this.findButton.setVisible(this.currentView == TEXT_VIEW || this.currentView == XML_VIEW);
+        this.xmlValidateButton.setVisible(this.currentView == XML_VIEW);
+        this.xmlPrettyPrintButton.setVisible(this.currentView == XML_VIEW);
+        this.zoomInButton.setVisible(this.currentView == IMAGE_VIEW);
+        this.zoomOutButton.setVisible(this.currentView == IMAGE_VIEW);
+        this.zoomFactorLabel.setVisible(this.currentView == IMAGE_VIEW);
+        this.wrapTextCheckBox.setVisible(this.currentView == TEXT_VIEW);
     }
 
     private void openView(int viewIndex) {
-        CardLayout cardLayout = (CardLayout)(this.cardPanel.getLayout());
+        CardLayout cardLayout = (CardLayout) (this.cardPanel.getLayout());
         this.currentView = viewIndex;
         refresh(viewIndex);
-        cardLayout.show( this.cardPanel, String.valueOf(viewIndex) );
+        cardLayout.show(this.cardPanel, String.valueOf(viewIndex));
         updateControls();
     }
 
     /**
      * When button changes
+     *
      * @param dropDownButton
      */
     public void onChange(DropDownButton dropDownButton) {
-        openView( dropDownButton.getSelectedItem() );
+        openView(dropDownButton.getSelectedItem());
     }
 
     public void setValue(Map properties) {
@@ -599,7 +606,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                 this.nodeInfo.removeSynchronizedView(this);
             }
         } else if (source == this.wrapTextCheckBox) {
-            this.textArea.setLineWrap( this.wrapTextCheckBox.isSelected() );
+            this.textArea.setLineWrap(this.wrapTextCheckBox.isSelected());
         }
     }
 
@@ -618,7 +625,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         ImageIcon imageIcon = new ImageIcon(var.toBinary());
         Image img = imageIcon.getImage();
 
-        int newWidth = (int) (img.getWidth(this) * zoomFactor / 100.0); 
+        int newWidth = (int) (img.getWidth(this) * zoomFactor / 100.0);
         int newHeight = (int) (img.getHeight(this) * zoomFactor / 100.0);
 
         if (newWidth > 0 && newHeight > 0) {

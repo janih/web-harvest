@@ -39,8 +39,7 @@ package org.webharvest.runtime.scripting;
 import bsh.EvalError;
 import bsh.Interpreter;
 import org.webharvest.exception.ScriptException;
-
-import java.util.Map;
+import org.webharvest.runtime.DynamicScopeContext;
 
 /**
  * BeanShell scripting engine.
@@ -51,13 +50,14 @@ public class BeanShellScriptEngine extends ScriptEngine {
 
     /**
      * Constructor - initializes context used in engine.
+     *
      * @param context
      */
-    public BeanShellScriptEngine(Map context) {
+    public BeanShellScriptEngine(DynamicScopeContext context) {
         super(context);
         this.beanShellInterpreter.getNameSpace().importCommands("org.webharvest.runtime.scripting");
         try {
-            this.beanShellInterpreter.set(CONTEXT_VARIABLE_NAME, this.context);
+            this.beanShellInterpreter.set(CONTEXT_VARIABLE_NAME, context);
         } catch (EvalError e) {
             throw new ScriptException("Cannot set Web-Harvest context in scripter: " + e.getMessage(), e);
         }
@@ -65,6 +65,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
 
     /**
      * Sets variable in scripter context.
+     *
      * @param name
      * @param value
      */
@@ -78,21 +79,15 @@ public class BeanShellScriptEngine extends ScriptEngine {
 
     /**
      * Evaluates specified expression or code block.
+     *
      * @return value of evaluation or null if there is nothing.
      */
-    public Object eval(String expression) {
-        pushAllVariablesFromContextToScriptEngine();
-
+    protected Object doEvaluate(String expression) {
         try {
             return this.beanShellInterpreter.eval(expression);
         } catch (EvalError e) {
             throw new ScriptException("Error during script execution: " + e.getMessage(), e);
         }
-    }
-
-    public void dispose() {
-        this.beanShellInterpreter.getNameSpace().clear();
-        super.dispose();
     }
 
 }

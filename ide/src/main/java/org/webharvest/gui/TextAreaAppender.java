@@ -73,7 +73,9 @@ public class TextAreaAppender extends WriterAppender {
      * JTextArea.
      */
     public void append(LoggingEvent loggingEvent) {
-        threadAppenderAdapter.get().append(loggingEvent);
+        if (threadAppenderAdapter.get() != null) {
+            threadAppenderAdapter.get().append(loggingEvent);
+        }
     }
 
     private class CurrentThreadTextAreaAppenderAdapter {
