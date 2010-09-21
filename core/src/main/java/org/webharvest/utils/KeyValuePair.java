@@ -42,7 +42,6 @@ import org.apache.commons.collections.keyvalue.DefaultKeyValue;
  * @author: Vladimir Nikic
  * Date: Jul 2, 2007
  */
-// todo: inline this class, it's useless.
 public class KeyValuePair<T> extends DefaultKeyValue {
 
     public KeyValuePair(String key, T value) {
