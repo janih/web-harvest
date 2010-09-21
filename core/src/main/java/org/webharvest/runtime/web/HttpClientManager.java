@@ -54,6 +54,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -148,16 +149,31 @@ public class HttpClientManager {
 
         url = CommonUtil.encodeUrl(url, charset);
 
+        HttpState clientState = client.getState();
+
         // if username and password are specified, define new credentials for authenticaton
         if (username != null && password != null) {
             try {
                 URL urlObj = new URL(url);
-                client.getState().setCredentials(
+                clientState.setCredentials(
                         new AuthScope(urlObj.getHost(), urlObj.getPort()),
                         new UsernamePasswordCredentials(username, password)
                 );
             } catch (MalformedURLException e) {
                 e.printStackTrace();
+            }
+        }
+
+        // If cookie expiry date is not specified in the response, HttClient 3.1 doesn't send it back.
+        // This leads to inability to login to some sites, being always redirected to login page.
+        // Workaround here is to set cookies with null expiry dates to the current date.
+        // todo: remove this code if next vresion fixes the problem
+        Cookie[] cookies = clientState.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie: cookies) {
+                if (cookie.getExpiryDate() == null) {
+                    cookie.setExpiryDate(new Date());
+                }
             }
         }
 
