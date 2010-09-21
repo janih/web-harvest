@@ -64,7 +64,7 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
+                    <source>1.6</source>
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
                     <optimize>true</optimize>
@@ -202,10 +202,18 @@
                 <artifactId>js</artifactId>
                 <version>1.7R2</version>
             </dependency>
+
+            <!-- Saxon -->
+
             <dependency>
                 <groupId>net.sourceforge.saxon</groupId>
                 <artifactId>saxon</artifactId>
                 <version>9.1.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>saxon-dom</artifactId>
+                <version>9</version>
             </dependency>
 
             <!-- TEST SCOPE -->
