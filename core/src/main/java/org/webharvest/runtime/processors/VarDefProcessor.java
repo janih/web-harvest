@@ -66,10 +66,12 @@ public class VarDefProcessor extends BaseProcessor {
         if (existingVar == null || toOverwrite) {
             context.setVar(name, var);
         } else {
+            this.setProperty("Shaded value", var);
             var = existingVar;
         }
 
         this.setProperty("Name", name);
+        this.setProperty("Overwrite", toOverwrite);
 
         // todo: is returning result actually needed? Why not <empty>?
         return var;

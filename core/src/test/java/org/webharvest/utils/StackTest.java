@@ -38,8 +38,11 @@
 
 package org.webharvest.utils;
 
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.NoSuchElementException;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,38 +52,80 @@ import org.junit.Test;
  */
 public class StackTest {
 
+    Stack<String> stack = new Stack<String>();
+
     @Test
-    @Ignore
     public void testPush() throws Exception {
+        stack.push("a");
+        stack.push("b");
+        stack.push("b"); // duplicate should be allowed
+        stack.push("c");
+
+        assertArrayEquals(new String[]{"a", "b", "b", "c"}, stack.getList().toArray());
     }
 
     @Test
-    @Ignore
     public void testPop() throws Exception {
+        stack.push("a");
+        stack.push("b");
+        stack.push("c");
+
+        stack.pop();
+        assertArrayEquals(new String[]{"a", "b"}, stack.getList().toArray());
+        stack.pop();
+        assertArrayEquals(new String[]{"a"}, stack.getList().toArray());
+        stack.pop();
+        assertArrayEquals(new String[]{}, stack.getList().toArray());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testPop_emptyStack() throws Exception {
+        stack.pop();
     }
 
     @Test
-    @Ignore
     public void testPeek() throws Exception {
+        stack.push("a");
+        assertEquals("a", stack.peek());
+
+        stack.push("b");
+        assertEquals("b", stack.peek());
+
+        stack.push("c");
+        assertEquals("c", stack.peek());
+        assertEquals("c", stack.peek()); // repeatable operation
+
+        stack.pop();
+        assertEquals("b", stack.peek());
+
+        stack.pop();
+        assertEquals("a", stack.peek());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testPeek_emptyStack() throws Exception {
+        stack.peek();
     }
 
     @Test
-    @Ignore
     public void testIsEmpty() throws Exception {
+        assertTrue(stack.isEmpty());
+        stack.push("a");
+        assertFalse(stack.isEmpty());
+        stack.pop();
+        assertTrue(stack.isEmpty());
     }
 
     @Test
-    @Ignore
     public void testSize() throws Exception {
-    }
-
-    @Test
-    @Ignore
-    public void testGetList() throws Exception {
-    }
-
-    @Test
-    @Ignore
-    public void testReplace() throws Exception {
+        assertEquals(0, stack.size());
+        stack.push("a");
+        assertEquals(1, stack.size());
+        stack.push("b");
+        assertEquals(2, stack.size());
+        stack.pop();
+        assertEquals(1, stack.size());
+        stack.pop();
+        assertEquals(0, stack.size());
     }
 }
