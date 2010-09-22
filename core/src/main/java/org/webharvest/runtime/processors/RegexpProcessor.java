@@ -138,7 +138,7 @@ public class RegexpProcessor extends BaseProcessor {
                             break;
                         }
 
-                        for (int i = 0; i <= groupCount; i++) {
+                        for (int i = 1; i <= groupCount; i++) {
                             context.setVar("_" + i, new NodeVariable(matcher.group(i)));
                         }
 

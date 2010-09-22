@@ -45,18 +45,15 @@ import org.slf4j.Logger;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.webharvest.definition.VarDefDef;
-import org.webharvest.definition.XmlNode;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.web.HttpClientManager;
-import org.xml.sax.InputSource;
 
-import java.io.StringReader;
 import java.util.Arrays;
 
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.webharvest.runtime.processors.ProcessorTestUtils.processor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -85,27 +82,23 @@ public class VarDefProcessorTest {
         context = new ScraperContext();
     }
 
-    private VarDefProcessor newProcessor(String xml) {
-        return new VarDefProcessor(new VarDefDef(XmlNode.getInstance(new InputSource(new StringReader(xml)))));
-    }
-
     @Test
     public void testExecute_newVar_overwriteDefault() throws Exception {
-        processor = newProcessor("<var-def name='x'>123</var-def>");
+        processor = processor("<var-def name='x'>123</var-def>");
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), processor.execute(scraperMock.getMock(), context).getWrappedObject());
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
     }
 
     @Test
     public void testExecute_newVar_overwriteTrue() throws Exception {
-        processor = newProcessor("<var-def name='x' overwrite='true'>123</var-def>");
+        processor = processor("<var-def name='x' overwrite='true'>123</var-def>");
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), processor.execute(scraperMock.getMock(), context).getWrappedObject());
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
     }
 
     @Test
     public void testExecute_newVar_overwriteFalse() throws Exception {
-        processor = newProcessor("<var-def name='x' overwrite='false'>123</var-def>");
+        processor = processor("<var-def name='x' overwrite='false'>123</var-def>");
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), processor.execute(scraperMock.getMock(), context).getWrappedObject());
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
     }
@@ -113,7 +106,7 @@ public class VarDefProcessorTest {
     @Test
     public void testExecute_reassigning_overwriteDefault() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
-        processor = newProcessor("<var-def name='x'>123</var-def>");
+        processor = processor("<var-def name='x'>123</var-def>");
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), processor.execute(scraperMock.getMock(), context).getWrappedObject());
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
     }
@@ -121,7 +114,7 @@ public class VarDefProcessorTest {
     @Test
     public void testExecute_reassigning_overwriteTrue() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
-        processor = newProcessor("<var-def name='x' overwrite='true'>123</var-def>");
+        processor = processor("<var-def name='x' overwrite='true'>123</var-def>");
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), processor.execute(scraperMock.getMock(), context).getWrappedObject());
         assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
     }
@@ -129,7 +122,7 @@ public class VarDefProcessorTest {
     @Test
     public void testExecute_reassigning_overwriteFalse() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
-        processor = newProcessor("<var-def name='x' overwrite='false'>123</var-def>");
+        processor = processor("<var-def name='x' overwrite='false'>123</var-def>");
 
         // todo: inconsistency in returning result when variable is NOT reassigned! NodeVariable versus ListVariable
         assertReflectionEquals("existing", processor.execute(scraperMock.getMock(), context).getWrappedObject());
