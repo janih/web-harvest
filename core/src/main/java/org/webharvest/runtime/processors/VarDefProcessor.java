@@ -46,20 +46,17 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Variable definition read processor.
  */
-public class VarDefProcessor extends BaseProcessor {
-
-    private VarDefDef varDef;
+public class VarDefProcessor extends BaseProcessor<VarDefDef> {
 
     public VarDefProcessor(VarDefDef varDef) {
         super(varDef);
-        this.varDef = varDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable var = new BodyProcessor(varDef).execute(scraper, context);
+        Variable var = new BodyProcessor(elementDef).execute(scraper, context);
 
-        String name = BaseTemplater.execute(varDef.getName(), scraper.getScriptEngine());
-        String overwrite = BaseTemplater.execute(varDef.getOverwrite(), scraper.getScriptEngine());
+        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        String overwrite = BaseTemplater.execute(elementDef.getOverwrite(), null, scraper);
         boolean toOverwrite = overwrite == null || CommonUtil.isBooleanTrue(overwrite);
 
         final Variable existingVar = context.getVar(name);

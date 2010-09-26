@@ -37,16 +37,9 @@
 package org.webharvest.exception;
 
 /**
- * Script execution exception - occured during executing script processor.
+ * Script execution exception - occurred during script compilation or evaluation.
  */
 public class ScriptException extends BaseException {
-
-    public ScriptException() {
-    }
-
-    public ScriptException(String message) {
-        super(message);
-    }
 
     public ScriptException(Throwable cause) {
         super(cause);

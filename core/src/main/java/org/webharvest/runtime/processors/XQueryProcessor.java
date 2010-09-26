@@ -45,12 +45,12 @@ import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.XQueryDef;
 import org.webharvest.definition.XQueryExternalParamDef;
 import org.webharvest.exception.ScraperXQueryException;
+import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.XmlUtil;
@@ -62,12 +62,13 @@ import java.util.*;
 /**
  * XQuery processor.
  */
-public class XQueryProcessor extends BaseProcessor {
+public class XQueryProcessor extends BaseProcessor<XQueryDef> {
 
-    public static Set ALLOWED_PARAM_TYPES = new TreeSet();
+    public static final Set<String> ALLOWED_PARAM_TYPES = new TreeSet<String>();
     public static String DEFAULT_PARAM_TYPE = "node()";
 
     // initialize set of allowed parameter types
+
     static {
         ALLOWED_PARAM_TYPES.add("node()");
         ALLOWED_PARAM_TYPES.add("node()*");
@@ -85,77 +86,75 @@ public class XQueryProcessor extends BaseProcessor {
         ALLOWED_PARAM_TYPES.add("string*");
     }
 
-    private XQueryDef xqueryDef;
 
     public XQueryProcessor(XQueryDef xqueryDef) {
         super(xqueryDef);
-        this.xqueryDef = xqueryDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        BaseElementDef xqueryElementDef = xqueryDef.getXqDef();
+        BaseElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
         debug(xqueryElementDef, scraper, xq);
 
         String xqExpression = xq.toString().trim();
-        XQueryExternalParamDef[] externalParamDefs = xqueryDef.getExternalParamDefs();
+        XQueryExternalParamDef[] externalParamDefs = elementDef.getExternalParamDefs();
 
         RuntimeConfig runtimeConfig = scraper.getRuntimeConfig();
         final StaticQueryContext sqc = runtimeConfig.getStaticQueryContext();
         final Configuration config = sqc.getConfiguration();
 
-	    try {
-	        final XQueryExpression exp = runtimeConfig.getXQueryExpressionPool().getCompiledExpression(xqExpression);
-		    final DynamicQueryContext dynamicContext = new DynamicQueryContext(config);
+        try {
+            final XQueryExpression exp = runtimeConfig.getXQueryExpressionPool().getCompiledExpression(xqExpression);
+            final DynamicQueryContext dynamicContext = new DynamicQueryContext(config);
 
             // define external parameters
-            for (int i = 0; i < externalParamDefs.length; i++) {
-                XQueryExternalParamDef externalParamDef = externalParamDefs[i];
-                String externalParamName = BaseTemplater.execute( externalParamDef.getName(), scraper.getScriptEngine() );
-                String externalParamType = BaseTemplater.execute( externalParamDefs[i].getType(), scraper.getScriptEngine() );
+            for (XQueryExternalParamDef externalParamDef : externalParamDefs) {
+                String externalParamName = BaseTemplater.execute(externalParamDef.getName(), null, scraper);
+                String externalParamType = BaseTemplater.execute(externalParamDef.getType(), null, scraper);
                 if (externalParamType == null) {
                     externalParamType = DEFAULT_PARAM_TYPE;
                 }
 
                 // check if param type is one of allowed
-                if ( !ALLOWED_PARAM_TYPES.contains(externalParamType) ) {
+                if (!ALLOWED_PARAM_TYPES.contains(externalParamType)) {
                     throw new ScraperXQueryException("Type " + externalParamType + " is not allowed. Use one of " + ALLOWED_PARAM_TYPES.toString());
                 }
 
-                if ( externalParamType.endsWith("*") ) {
+                if (externalParamType.endsWith("*")) {
                     BodyProcessor bodyProcessor = new BodyProcessor(externalParamDef);
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
                     ListVariable listVar = (ListVariable) bodyProcessor.run(scraper, context);
                     debug(externalParamDef, scraper, listVar);
-                    
+
                     Iterator it = listVar.toList().iterator();
-                    List paramList = new ArrayList(); 
+                    List<Object> paramList = new ArrayList<Object>();
                     while (it.hasNext()) {
-                        Variable currVar =  (Variable) it.next();
-                        paramList.add( castSimpleValue(externalParamType, currVar, sqc) );
+                        Variable currVar = (Variable) it.next();
+                        paramList.add(castSimpleValue(externalParamType, currVar, sqc));
                     }
 
                     dynamicContext.setParameter(externalParamName, paramList);
                 } else {
-                    KeyValuePair props[] = {new KeyValuePair("Name", externalParamName), new KeyValuePair("Type", externalParamType)}; 
+                    KeyValuePair props[] = {new KeyValuePair<String>("Name", externalParamName), new KeyValuePair<String>("Type", externalParamType)};
                     Variable var = getBodyTextContent(externalParamDef, scraper, context, true, props);
 
                     debug(externalParamDef, scraper, var);
-                    
+
                     Object value = castSimpleValue(externalParamType, var, sqc);
                     dynamicContext.setParameter(externalParamName, value);
                 }
             }
 
-	        return XmlUtil.createListOfXmlNodes(exp, dynamicContext);
-	    } catch (XPathException e) {
-	    	throw new ScraperXQueryException("Error executing XQuery expression (XQuery = [" + xqExpression + "])!", e);
-	    }
+            return XmlUtil.createListOfXmlNodes(exp, dynamicContext);
+        } catch (XPathException e) {
+            throw new ScraperXQueryException("Error executing XQuery expression (XQuery = [" + xqExpression + "])!", e);
+        }
     }
 
     /**
-     * For the specified type, value and static query context, returns proper Java typed value. 
+     * For the specified type, value and static query context, returns proper Java typed value.
+     *
      * @param type
      * @param value
      * @param sqc
@@ -165,18 +164,18 @@ public class XQueryProcessor extends BaseProcessor {
     private Object castSimpleValue(String type, Variable value, StaticQueryContext sqc) throws XPathException {
         type = type.toLowerCase();
 
-        if ( type.startsWith("node()") ) {
-            StringReader reader = new StringReader(value.toString() );
+        if (type.startsWith("node()")) {
+            StringReader reader = new StringReader(value.toString());
             return sqc.buildDocument(new StreamSource(reader));
-        } else if ( type.startsWith("integer") ) {
-            return new Integer( value.toString().trim() );
-        } else if ( type.startsWith("long") ) {
-            return new Long( value.toString().trim() );
-        } else if ( type.startsWith("float") ) {
-            return new Float( value.toString().trim() );
-        } else if ( type.startsWith("double") ) {
-            return new Double( value.toString().trim() );
-        } else if ( type.startsWith("boolean") ) {
+        } else if (type.startsWith("integer")) {
+            return new Integer(value.toString().trim());
+        } else if (type.startsWith("long")) {
+            return new Long(value.toString().trim());
+        } else if (type.startsWith("float")) {
+            return new Float(value.toString().trim());
+        } else if (type.startsWith("double")) {
+            return new Double(value.toString().trim());
+        } else if (type.startsWith("boolean")) {
             return CommonUtil.isBooleanTrue(value.toString()) ? Boolean.TRUE : Boolean.FALSE;
         } else {
             return value.toString();

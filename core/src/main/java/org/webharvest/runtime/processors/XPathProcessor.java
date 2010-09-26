@@ -49,18 +49,15 @@ import org.webharvest.utils.XmlUtil;
 /**
  * XQuery processor.
  */
-public class XPathProcessor extends BaseProcessor {
-
-    private XPathDef xpathDef;
+public class XPathProcessor extends BaseProcessor<XPathDef> {
 
     public XPathProcessor(XPathDef xpathDef) {
         super(xpathDef);
-        this.xpathDef = xpathDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable xml = getBodyTextContent(xpathDef, scraper, context);
-        String expression = BaseTemplater.execute( xpathDef.getExpression(), scraper.getScriptEngine() );
+        Variable xml = getBodyTextContent(elementDef, scraper, context);
+        String expression = BaseTemplater.execute(elementDef.getExpression(), null, scraper);
         this.setProperty("Expression", expression);
 
         try {

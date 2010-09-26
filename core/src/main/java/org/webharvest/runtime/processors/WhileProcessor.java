@@ -40,7 +40,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.WhileDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -55,22 +54,18 @@ import java.util.List;
 /**
  * Conditional processor.
  */
-public class WhileProcessor extends BaseProcessor {
-
-    private WhileDef whileDef;
+public class WhileProcessor extends BaseProcessor<WhileDef> {
 
     public WhileProcessor(WhileDef whileDef) {
         super(whileDef);
-        this.whileDef = whileDef;
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        final ScriptEngine scriptEngine = scraper.getScriptEngine();
-        final String index = BaseTemplater.execute(whileDef.getIndex(), scriptEngine);
-        final String maxLoopsString = BaseTemplater.execute(whileDef.getMaxLoops(), scriptEngine);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(whileDef.getEmpty(), scriptEngine), false);
+        final String index = BaseTemplater.execute(elementDef.getIndex(), null, scraper);
+        final String maxLoopsString = BaseTemplater.execute(elementDef.getMaxLoops(), null, scraper);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getEmpty(), null, scraper), false);
 
-        final List resultList = new ArrayList();
+        final List<Object> resultList = new ArrayList<Object>();
 
         context.executeWithinNewContext(new Runnable() {
             public void run() {
@@ -81,7 +76,7 @@ public class WhileProcessor extends BaseProcessor {
                     context.setVar(index, new NodeVariable(String.valueOf(i)));
                 }
 
-                String condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
+                String condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
 
                 setProperty("Condition", condition);
                 setProperty("Index", index);
@@ -91,7 +86,7 @@ public class WhileProcessor extends BaseProcessor {
                 // iterates while testing variable represents boolean true or loop limit is exceeded
                 final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
                 while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
-                    Variable loopResult = new BodyProcessor(whileDef).execute(scraper, context);
+                    Variable loopResult = new BodyProcessor(elementDef).execute(scraper, context);
                     if (!isEmpty) {
                         resultList.addAll(loopResult.toList());
                     }
@@ -102,7 +97,7 @@ public class WhileProcessor extends BaseProcessor {
                         context.setVar(index, new NodeVariable(String.valueOf(i)));
                     }
 
-                    condition = BaseTemplater.execute(whileDef.getCondition(), scriptEngine);
+                    condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
                 }
             }
         });

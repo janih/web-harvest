@@ -45,21 +45,18 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Function's return value processor.
  */
-public class ReturnProcessor extends BaseProcessor {
-
-    private ReturnDef returnDef;
+public class ReturnProcessor extends BaseProcessor<ReturnDef> {
 
     public ReturnProcessor(ReturnDef returnDef) {
         super(returnDef);
-        this.returnDef = returnDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         CallProcessor callProcessor = scraper.getRunningFunction();
 
         if (callProcessor != null) {
-            Variable returnValue = new BodyProcessor(returnDef).execute(scraper, context);
-            callProcessor.setFunctionResult( returnValue );
+            Variable returnValue = new BodyProcessor(elementDef).execute(scraper, context);
+            callProcessor.setFunctionResult(returnValue);
         }
 
         return new EmptyVariable();

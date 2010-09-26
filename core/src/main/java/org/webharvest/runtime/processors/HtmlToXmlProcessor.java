@@ -41,10 +41,9 @@ import org.webharvest.definition.HtmlToXmlDef;
 import org.webharvest.exception.ParserException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
 import java.io.IOException;
@@ -52,128 +51,123 @@ import java.io.IOException;
 /**
  * HTML to XML processor.
  */
-public class HtmlToXmlProcessor extends BaseProcessor {
-
-    private HtmlToXmlDef htmlToXmlDef;
+public class HtmlToXmlProcessor extends BaseProcessor<HtmlToXmlDef> {
 
     public HtmlToXmlProcessor(HtmlToXmlDef htmlToXmlDef) {
         super(htmlToXmlDef);
-        this.htmlToXmlDef = htmlToXmlDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable body = getBodyTextContent(htmlToXmlDef, scraper, context);
+        Variable body = getBodyTextContent(elementDef, scraper, context);
 
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = cleaner.getProperties();
 
-        final ScriptEngine scriptEngine = scraper.getScriptEngine();
-
-        final String advancedXmlEscape = BaseTemplater.execute( htmlToXmlDef.getAdvancedXmlEscape(), scriptEngine);
-        if ( advancedXmlEscape != null) {
-            properties.setAdvancedXmlEscape(CommonUtil.isBooleanTrue(advancedXmlEscape) );
+        final String advancedXmlEscape = BaseTemplater.execute(elementDef.getAdvancedXmlEscape(), null, scraper);
+        if (advancedXmlEscape != null) {
+            properties.setAdvancedXmlEscape(CommonUtil.isBooleanTrue(advancedXmlEscape));
         }
 
-        final String cdataForScriptAndStyle = BaseTemplater.execute( htmlToXmlDef.getUseCdataForScriptAndStyle(), scriptEngine);
-        if ( cdataForScriptAndStyle != null) {
-            properties.setUseCdataForScriptAndStyle(CommonUtil.isBooleanTrue(cdataForScriptAndStyle) );
+        final String cdataForScriptAndStyle = BaseTemplater.execute(elementDef.getUseCdataForScriptAndStyle(), null, scraper);
+        if (cdataForScriptAndStyle != null) {
+            properties.setUseCdataForScriptAndStyle(CommonUtil.isBooleanTrue(cdataForScriptAndStyle));
         }
 
-        final String specialEntities = BaseTemplater.execute( htmlToXmlDef.getTranslateSpecialEntities(), scriptEngine);
-        if ( specialEntities != null) {
-            properties.setTranslateSpecialEntities(CommonUtil.isBooleanTrue(specialEntities) );
+        final String specialEntities = BaseTemplater.execute(elementDef.getTranslateSpecialEntities(), null, scraper);
+        if (specialEntities != null) {
+            properties.setTranslateSpecialEntities(CommonUtil.isBooleanTrue(specialEntities));
         }
 
-        final String recognizeUnicodeChars = BaseTemplater.execute(htmlToXmlDef.getRecognizeUnicodeChars(), scriptEngine);
-        if ( recognizeUnicodeChars != null) {
-            properties.setRecognizeUnicodeChars( CommonUtil.isBooleanTrue(recognizeUnicodeChars) );
+        final String recognizeUnicodeChars = BaseTemplater.execute(elementDef.getRecognizeUnicodeChars(), null, scraper);
+        if (recognizeUnicodeChars != null) {
+            properties.setRecognizeUnicodeChars(CommonUtil.isBooleanTrue(recognizeUnicodeChars));
         }
 
-        final String omitUnknownTags = BaseTemplater.execute(htmlToXmlDef.getOmitUnknownTags(), scriptEngine);
-        if ( omitUnknownTags != null) {
-            properties.setOmitUnknownTags( CommonUtil.isBooleanTrue(omitUnknownTags) );
+        final String omitUnknownTags = BaseTemplater.execute(elementDef.getOmitUnknownTags(), null, scraper);
+        if (omitUnknownTags != null) {
+            properties.setOmitUnknownTags(CommonUtil.isBooleanTrue(omitUnknownTags));
         }
 
-        final String useEmptyElementTags = BaseTemplater.execute(htmlToXmlDef.getUseEmptyElementTags(), scriptEngine);
-        if ( useEmptyElementTags != null) {
-            properties.setUseEmptyElementTags( CommonUtil.isBooleanTrue(useEmptyElementTags) );
+        final String useEmptyElementTags = BaseTemplater.execute(elementDef.getUseEmptyElementTags(), null, scraper);
+        if (useEmptyElementTags != null) {
+            properties.setUseEmptyElementTags(CommonUtil.isBooleanTrue(useEmptyElementTags));
         }
 
-        final String treatUnknownTagsAsContent = BaseTemplater.execute(htmlToXmlDef.getTreatUnknownTagsAsContent(), scriptEngine);
-        if ( treatUnknownTagsAsContent != null) {
-            properties.setTreatUnknownTagsAsContent( CommonUtil.isBooleanTrue(treatUnknownTagsAsContent) );
+        final String treatUnknownTagsAsContent = BaseTemplater.execute(elementDef.getTreatUnknownTagsAsContent(), null, scraper);
+        if (treatUnknownTagsAsContent != null) {
+            properties.setTreatUnknownTagsAsContent(CommonUtil.isBooleanTrue(treatUnknownTagsAsContent));
         }
 
-        final String omitDeprecatedTags = BaseTemplater.execute(htmlToXmlDef.getOmitDeprecatedTags(), scriptEngine);
-        if ( omitDeprecatedTags != null) {
-            properties.setOmitDeprecatedTags( CommonUtil.isBooleanTrue(omitDeprecatedTags) );
+        final String omitDeprecatedTags = BaseTemplater.execute(elementDef.getOmitDeprecatedTags(), null, scraper);
+        if (omitDeprecatedTags != null) {
+            properties.setOmitDeprecatedTags(CommonUtil.isBooleanTrue(omitDeprecatedTags));
         }
 
-        final String treatDeprTagsAsContent = BaseTemplater.execute(htmlToXmlDef.getTreatDeprecatedTagsAsContent(), scriptEngine);
-        if ( treatDeprTagsAsContent != null) {
-            properties.setTreatDeprecatedTagsAsContent( CommonUtil.isBooleanTrue(treatDeprTagsAsContent) );
+        final String treatDeprTagsAsContent = BaseTemplater.execute(elementDef.getTreatDeprecatedTagsAsContent(), null, scraper);
+        if (treatDeprTagsAsContent != null) {
+            properties.setTreatDeprecatedTagsAsContent(CommonUtil.isBooleanTrue(treatDeprTagsAsContent));
         }
 
-        final String omitXmlDecl = BaseTemplater.execute(htmlToXmlDef.getOmitXmlDecl(), scriptEngine);
-        if ( omitXmlDecl != null) {
-            properties.setOmitXmlDeclaration( CommonUtil.isBooleanTrue(omitXmlDecl) );
+        final String omitXmlDecl = BaseTemplater.execute(elementDef.getOmitXmlDecl(), null, scraper);
+        if (omitXmlDecl != null) {
+            properties.setOmitXmlDeclaration(CommonUtil.isBooleanTrue(omitXmlDecl));
         }
 
-        final String omitComments = BaseTemplater.execute(htmlToXmlDef.getOmitComments(), scriptEngine);
-        if ( omitComments != null) {
-            properties.setOmitComments( CommonUtil.isBooleanTrue(omitComments) );
+        final String omitComments = BaseTemplater.execute(elementDef.getOmitComments(), null, scraper);
+        if (omitComments != null) {
+            properties.setOmitComments(CommonUtil.isBooleanTrue(omitComments));
         }
 
-        final String omitHtmlEnvelope = BaseTemplater.execute(htmlToXmlDef.getOmitHtmlEnvelope(), scriptEngine);
-        if ( omitHtmlEnvelope != null) {
-            properties.setOmitHtmlEnvelope( CommonUtil.isBooleanTrue(omitHtmlEnvelope) );
+        final String omitHtmlEnvelope = BaseTemplater.execute(elementDef.getOmitHtmlEnvelope(), null, scraper);
+        if (omitHtmlEnvelope != null) {
+            properties.setOmitHtmlEnvelope(CommonUtil.isBooleanTrue(omitHtmlEnvelope));
         }
 
-        final String allowMultiWordAttributes = BaseTemplater.execute(htmlToXmlDef.getAllowMultiWordAttributes(), scriptEngine);
-        if ( allowMultiWordAttributes != null) {
-            properties.setAllowMultiWordAttributes( CommonUtil.isBooleanTrue(allowMultiWordAttributes) );
+        final String allowMultiWordAttributes = BaseTemplater.execute(elementDef.getAllowMultiWordAttributes(), null, scraper);
+        if (allowMultiWordAttributes != null) {
+            properties.setAllowMultiWordAttributes(CommonUtil.isBooleanTrue(allowMultiWordAttributes));
         }
 
-        final String allowHtmlInsideAttributes = BaseTemplater.execute(htmlToXmlDef.getAllowHtmlInsideAttributes(), scriptEngine);
-        if ( allowHtmlInsideAttributes != null) {
-            properties.setAllowHtmlInsideAttributes( CommonUtil.isBooleanTrue(allowHtmlInsideAttributes) );
+        final String allowHtmlInsideAttributes = BaseTemplater.execute(elementDef.getAllowHtmlInsideAttributes(), null, scraper);
+        if (allowHtmlInsideAttributes != null) {
+            properties.setAllowHtmlInsideAttributes(CommonUtil.isBooleanTrue(allowHtmlInsideAttributes));
         }
 
-        final String namespacesAware = BaseTemplater.execute(htmlToXmlDef.getNamespacesAware(), scriptEngine);
-        if ( namespacesAware != null) {
-            properties.setNamespacesAware( CommonUtil.isBooleanTrue(namespacesAware) );
+        final String namespacesAware = BaseTemplater.execute(elementDef.getNamespacesAware(), null, scraper);
+        if (namespacesAware != null) {
+            properties.setNamespacesAware(CommonUtil.isBooleanTrue(namespacesAware));
         } else {
             properties.setNamespacesAware(false);
         }
 
-        final String hyphenReplacement = BaseTemplater.execute(htmlToXmlDef.getHyphenReplacement(), scriptEngine);
-        if ( hyphenReplacement != null) {
+        final String hyphenReplacement = BaseTemplater.execute(elementDef.getHyphenReplacement(), null, scraper);
+        if (hyphenReplacement != null) {
             properties.setHyphenReplacementInComment(hyphenReplacement);
         }
 
-        final String pruneTags = BaseTemplater.execute(htmlToXmlDef.getPrunetags(), scriptEngine);
-        if ( pruneTags != null) {
+        final String pruneTags = BaseTemplater.execute(elementDef.getPrunetags(), null, scraper);
+        if (pruneTags != null) {
             properties.setPruneTags(pruneTags);
         }
 
-        final String booleanAtts = BaseTemplater.execute(htmlToXmlDef.getBooleanAtts(), scriptEngine);
-        if ( booleanAtts != null) {
+        final String booleanAtts = BaseTemplater.execute(elementDef.getBooleanAtts(), null, scraper);
+        if (booleanAtts != null) {
             properties.setBooleanAttributeValues(booleanAtts);
         }
 
-        String outputType = BaseTemplater.execute(htmlToXmlDef.getOutputType(), scriptEngine);
+        String outputType = BaseTemplater.execute(elementDef.getOutputType(), null, scraper);
 
         try {
             TagNode node = cleaner.clean(body.toString());
             String result;
 
-            if ( "simple".equalsIgnoreCase(outputType) ) {
+            if ("simple".equalsIgnoreCase(outputType)) {
                 result = new SimpleXmlSerializer(properties).getXmlAsString(node);
-            } else if ( "pretty".equalsIgnoreCase(outputType) ) {
+            } else if ("pretty".equalsIgnoreCase(outputType)) {
                 result = new PrettyXmlSerializer(properties).getXmlAsString(node);
-            } else if ( "browser-compact".equalsIgnoreCase(outputType) ) {
+            } else if ("browser-compact".equalsIgnoreCase(outputType)) {
                 result = new BrowserCompactXmlSerializer(properties).getXmlAsString(node);
-            }  else {
+            } else {
                 result = new CompactXmlSerializer(properties).getXmlAsString(node);
             }
 

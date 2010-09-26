@@ -41,8 +41,8 @@ import org.webharvest.definition.XsltDef;
 import org.webharvest.exception.XsltException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
@@ -53,37 +53,34 @@ import java.io.StringWriter;
 /**
  * XSLT processor.
  */
-public class XsltProcessor extends BaseProcessor {
-
-    private XsltDef xsltDef;
+public class XsltProcessor extends BaseProcessor<XsltDef> {
 
     public XsltProcessor(XsltDef xsltDef) {
         super(xsltDef);
-        this.xsltDef = xsltDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        BaseElementDef xsltElementDef = xsltDef.getXmlDef();
+        final BaseElementDef xsltElementDef = elementDef.getXmlDef();
         Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
         debug(xsltElementDef, scraper, xmlStr);
 
-        BaseElementDef stylesheetElementDef = xsltDef.getStylesheetDef();
+        BaseElementDef stylesheetElementDef = elementDef.getStylesheetDef();
         Variable stylesheetStr = getBodyTextContent(stylesheetElementDef, scraper, context, true);
         debug(stylesheetElementDef, scraper, stylesheetStr);
-    	
+
         try {
-    		TransformerFactory xformFactory = TransformerFactory.newInstance();
-    		Source xsl = new StreamSource( new StringReader(stylesheetStr.toString()) );
-    		Transformer stylesheet = xformFactory.newTransformer(xsl);
-    		Source request  = new StreamSource( new StringReader(xmlStr.toString()) );
-    		StringWriter writer = new StringWriter();
-    		Result response = new StreamResult(writer);
-    		stylesheet.transform(request, response);
-    		
-    		return new NodeVariable(writer.toString()); 
-    	} catch (TransformerException e) {
-    		throw new XsltException("Error during XSLT transforming!", e);
-    	}
+            TransformerFactory xformFactory = TransformerFactory.newInstance();
+            Source xsl = new StreamSource(new StringReader(stylesheetStr.toString()));
+            Transformer stylesheet = xformFactory.newTransformer(xsl);
+            Source request = new StreamSource(new StringReader(xmlStr.toString()));
+            StringWriter writer = new StringWriter();
+            Result response = new StreamResult(writer);
+            stylesheet.transform(request, response);
+
+            return new NodeVariable(writer.toString());
+        } catch (TransformerException e) {
+            throw new XsltException("Error during XSLT transforming!", e);
+        }
     }
 
 }

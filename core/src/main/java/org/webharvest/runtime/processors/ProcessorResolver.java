@@ -37,69 +37,67 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.*;
-import org.webharvest.runtime.Scraper;
 
 public class ProcessorResolver {
-	
-    public static BaseProcessor createProcessor(IElementDef elementDef, ScraperConfiguration configuration, Scraper scraper) {
+
+    public static BaseProcessor createProcessor(IElementDef elementDef) {
         if (elementDef instanceof EmptyDef) {
-            return new EmptyProcessor( (EmptyDef)elementDef );
+            return new EmptyProcessor((EmptyDef) elementDef);
         } else if (elementDef instanceof TextDef) {
-        	return new TextProcessor( (TextDef)elementDef );
+            return new TextProcessor((TextDef) elementDef);
         } else if (elementDef instanceof ConstantDef) {
-        	return new ConstantProcessor( (ConstantDef)elementDef );
+            return new ConstantProcessor((ConstantDef) elementDef);
         } else if (elementDef instanceof FileDef) {
-        	return new FileProcessor( (FileDef)elementDef );
-	    } else if (elementDef instanceof VarDefDef) {
-	    	return new VarDefProcessor( (VarDefDef)elementDef );
-	    } else if (elementDef instanceof VarDef) {
-	    	return new VarProcessor( (VarDef)elementDef );
-	    } else if (elementDef instanceof HttpDef) {
-	    	return new HttpProcessor( (HttpDef)elementDef );
-	    } else if (elementDef instanceof HttpParamDef) {
-	    	return new HttpParamProcessor( (HttpParamDef)elementDef );
-	    } else if (elementDef instanceof HttpHeaderDef) {
-	    	return new HttpHeaderProcessor( (HttpHeaderDef)elementDef );
-	    } else if (elementDef instanceof XPathDef) {
-	    	return new XPathProcessor( (XPathDef)elementDef );
-	    } else if (elementDef instanceof XQueryDef) {
-	    	return new XQueryProcessor( (XQueryDef)elementDef );
-	    } else if (elementDef instanceof XsltDef) {
-	    	return new XsltProcessor( (XsltDef)elementDef );
-	    } else if (elementDef instanceof TemplateDef) {
-	    	return new TemplateProcessor( (TemplateDef)elementDef );
-	    } else if (elementDef instanceof RegexpDef) {
-	    	return new RegexpProcessor( (RegexpDef)elementDef );
-	    } else if (elementDef instanceof HtmlToXmlDef) {
-	    	return new HtmlToXmlProcessor( (HtmlToXmlDef)elementDef );
-	    } else if (elementDef instanceof CaseDef) {
-            return new CaseProcessor( (CaseDef)elementDef );
-	    } else if (elementDef instanceof LoopDef) {
-	    	return new LoopProcessor( (LoopDef)elementDef );
-	    } else if (elementDef instanceof WhileDef) {
-	    	return new WhileProcessor( (WhileDef)elementDef );
-	    } else if (elementDef instanceof FunctionDef) {
-	    	return new FunctionProcessor( (FunctionDef)elementDef );
-	    } else if (elementDef instanceof IncludeDef) {
-	    	return new IncludeProcessor( (IncludeDef)elementDef );
-	    } else if (elementDef instanceof CallDef) {
-	    	return new CallProcessor( (CallDef)elementDef, configuration, scraper );
-	    } else if (elementDef instanceof CallParamDef) {
-	    	return new CallParamProcessor( (CallParamDef)elementDef );
-	    } else if (elementDef instanceof ReturnDef) {
-	    	return new ReturnProcessor( (ReturnDef)elementDef );
-	    } else if (elementDef instanceof TryDef) {
-	    	return new TryProcessor( (TryDef)elementDef );
-	    } else if (elementDef instanceof ScriptDef) {
-	    	return new ScriptProcessor( (ScriptDef)elementDef );
-	    } else if (elementDef instanceof ExitDef) {
-	    	return new ExitProcessor( (ExitDef)elementDef );
-	    } else if (elementDef instanceof WebHarvestPluginDef) {
-            WebHarvestPluginDef pluginDef = (WebHarvestPluginDef) elementDef;
-            return pluginDef.createPlugin();
+            return new FileProcessor((FileDef) elementDef);
+        } else if (elementDef instanceof VarDefDef) {
+            return new VarDefProcessor((VarDefDef) elementDef);
+        } else if (elementDef instanceof VarDef) {
+            return new VarProcessor((VarDef) elementDef);
+        } else if (elementDef instanceof HttpDef) {
+            return new HttpProcessor((HttpDef) elementDef);
+        } else if (elementDef instanceof HttpParamDef) {
+            return new HttpParamProcessor((HttpParamDef) elementDef);
+        } else if (elementDef instanceof HttpHeaderDef) {
+            return new HttpHeaderProcessor((HttpHeaderDef) elementDef);
+        } else if (elementDef instanceof XPathDef) {
+            return new XPathProcessor((XPathDef) elementDef);
+        } else if (elementDef instanceof XQueryDef) {
+            return new XQueryProcessor((XQueryDef) elementDef);
+        } else if (elementDef instanceof XsltDef) {
+            return new XsltProcessor((XsltDef) elementDef);
+        } else if (elementDef instanceof TemplateDef) {
+            return new TemplateProcessor((TemplateDef) elementDef);
+        } else if (elementDef instanceof RegexpDef) {
+            return new RegexpProcessor((RegexpDef) elementDef);
+        } else if (elementDef instanceof HtmlToXmlDef) {
+            return new HtmlToXmlProcessor((HtmlToXmlDef) elementDef);
+        } else if (elementDef instanceof CaseDef) {
+            return new CaseProcessor((CaseDef) elementDef);
+        } else if (elementDef instanceof LoopDef) {
+            return new LoopProcessor((LoopDef) elementDef);
+        } else if (elementDef instanceof WhileDef) {
+            return new WhileProcessor((WhileDef) elementDef);
+        } else if (elementDef instanceof FunctionDef) {
+            return new FunctionProcessor((FunctionDef) elementDef);
+        } else if (elementDef instanceof IncludeDef) {
+            return new IncludeProcessor((IncludeDef) elementDef);
+        } else if (elementDef instanceof CallDef) {
+            return new CallProcessor((CallDef) elementDef);
+        } else if (elementDef instanceof CallParamDef) {
+            return new CallParamProcessor((CallParamDef) elementDef);
+        } else if (elementDef instanceof ReturnDef) {
+            return new ReturnProcessor((ReturnDef) elementDef);
+        } else if (elementDef instanceof TryDef) {
+            return new TryProcessor((TryDef) elementDef);
+        } else if (elementDef instanceof ScriptDef) {
+            return new ScriptProcessor((ScriptDef) elementDef);
+        } else if (elementDef instanceof ExitDef) {
+            return new ExitProcessor((ExitDef) elementDef);
+        } else if (elementDef instanceof WebHarvestPluginDef) {
+            return ((WebHarvestPluginDef) elementDef).createPlugin();
         }
 
         return null;
     }
-    
+
 }

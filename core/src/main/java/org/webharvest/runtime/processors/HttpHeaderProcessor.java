@@ -40,36 +40,31 @@ import org.webharvest.definition.HttpHeaderDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 
 /**
  * Variable definition http header processor.
  */
-public class HttpHeaderProcessor extends BaseProcessor {
-
-    private HttpHeaderDef httpHeaderDef;
+public class HttpHeaderProcessor extends BaseProcessor<HttpHeaderDef> {
 
     public HttpHeaderProcessor(HttpHeaderDef httpHeaderDef) {
         super(httpHeaderDef);
-        this.httpHeaderDef = httpHeaderDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String name = BaseTemplater.execute( httpHeaderDef.getName(), scriptEngine);
-    	Variable value = getBodyTextContent(httpHeaderDef, scraper, context);
-        
-    	HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
-    	if (httpProcessor != null) {
-    		httpProcessor.addHttpHeader(name, value.toString());
+        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        Variable value = getBodyTextContent(elementDef, scraper, context);
+
+        HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
+        if (httpProcessor != null) {
+            httpProcessor.addHttpHeader(name, value.toString());
             this.setProperty("Name", name);
         } else {
-    		throw new HttpException("Usage of http-header processor is not allowed outside of http processor!");
-    	}
-        
-    	return value;
+            throw new HttpException("Usage of http-header processor is not allowed outside of http processor!");
+        }
+
+        return value;
     }
 
 }

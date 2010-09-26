@@ -41,7 +41,6 @@ import org.webharvest.definition.HttpDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -63,33 +62,29 @@ import java.util.regex.Pattern;
 /**
  * Http processor.
  */
-public class HttpProcessor extends BaseProcessor {
+public class HttpProcessor extends BaseProcessor<HttpDef> {
 
     private static final String HTML_META_CHARSET_REGEX =
             "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')/?>)";
-
-    private HttpDef httpDef;
 
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
 
     public HttpProcessor(HttpDef httpDef) {
         super(httpDef);
-        this.httpDef = httpDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         scraper.setRunningHttpProcessor(this);
 
-        final ScriptEngine scriptEngine = scraper.getScriptEngine();
-        final String url = BaseTemplater.execute(httpDef.getUrl(), scriptEngine);
-        final String method = BaseTemplater.execute(httpDef.getMethod(), scriptEngine);
-        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.execute(httpDef.getFollowRedirects(), scriptEngine), null);
-        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.execute(httpDef.getMultipart(), scriptEngine), false);
-        final String specifiedCharset = BaseTemplater.execute(httpDef.getCharset(), scriptEngine);
-        final String username = BaseTemplater.execute(httpDef.getUsername(), scriptEngine);
-        final String password = BaseTemplater.execute(httpDef.getPassword(), scriptEngine);
-        final String cookiePolicy = BaseTemplater.execute(httpDef.getCookiePolicy(), scriptEngine);
+        final String url = BaseTemplater.execute(elementDef.getUrl(), null, scraper);
+        final String method = BaseTemplater.execute(elementDef.getMethod(), null, scraper);
+        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFollowRedirects(), null, scraper), null);
+        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getMultipart(), null, scraper), false);
+        final String specifiedCharset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
+        final String username = BaseTemplater.execute(elementDef.getUsername(), null, scraper);
+        final String password = BaseTemplater.execute(elementDef.getPassword(), null, scraper);
+        final String cookiePolicy = BaseTemplater.execute(elementDef.getCookiePolicy(), null, scraper);
 
         String charset = specifiedCharset;
 
@@ -98,7 +93,7 @@ public class HttpProcessor extends BaseProcessor {
         }
 
         // executes body of HTTP processor
-        new BodyProcessor(httpDef).execute(scraper, context);
+        new BodyProcessor(elementDef).execute(scraper, context);
 
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);

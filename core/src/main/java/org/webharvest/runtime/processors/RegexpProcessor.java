@@ -41,7 +41,6 @@ import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -57,34 +56,30 @@ import java.util.regex.Pattern;
 /**
  * Regular expression replace processor.
  */
-public class RegexpProcessor extends BaseProcessor {
-
-    private RegexpDef regexpDef;
+public class RegexpProcessor extends BaseProcessor<RegexpDef> {
 
     public RegexpProcessor(RegexpDef regexpDef) {
         super(regexpDef);
-        this.regexpDef = regexpDef;
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
 
-        BaseElementDef patternDef = regexpDef.getRegexpPatternDef();
+        BaseElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
         debug(patternDef, scraper, patternVar);
 
-        BaseElementDef sourceDef = regexpDef.getRegexpSourceDef();
+        BaseElementDef sourceDef = elementDef.getRegexpSourceDef();
         Variable source = new BodyProcessor(sourceDef).run(scraper, context);
         debug(sourceDef, scraper, source);
 
-        String replace = BaseTemplater.execute(regexpDef.getReplace(), scriptEngine);
+        String replace = BaseTemplater.execute(elementDef.getReplace(), null, scraper);
         final boolean isReplace = CommonUtil.isBooleanTrue(replace);
 
-        boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagCaseInsensitive(), scriptEngine), false);
-        boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagMultiline(), scriptEngine), false);
-        boolean flagDotall = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagDotall(), scriptEngine), true);
-        boolean flagUnicodecase = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagUnicodecase(), scriptEngine), true);
-        boolean flagCanoneq = CommonUtil.getBooleanValue(BaseTemplater.execute(regexpDef.getFlagCanoneq(), scriptEngine), false);
+        boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFlagCaseInsensitive(), null, scraper), false);
+        boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFlagMultiline(), null, scraper), false);
+        boolean flagDotall = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFlagDotall(), null, scraper), true);
+        boolean flagUnicodecase = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFlagUnicodecase(), null, scraper), true);
+        boolean flagCanoneq = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFlagCanoneq(), null, scraper), false);
 
         this.setProperty("Is replacing", String.valueOf(isReplace));
         this.setProperty("Flag CaseInsensitive", String.valueOf(flagCaseInsensitive));
@@ -93,7 +88,7 @@ public class RegexpProcessor extends BaseProcessor {
         this.setProperty("Flag UnicodeCase", String.valueOf(flagUnicodecase));
         this.setProperty("Flag CanonEq", String.valueOf(flagCanoneq));
 
-        final double maxLoops = NumberUtils.toDouble(BaseTemplater.execute(regexpDef.getMax(), scriptEngine), Constants.DEFAULT_MAX_LOOPS);
+        final double maxLoops = NumberUtils.toDouble(BaseTemplater.execute(elementDef.getMax(), null, scraper), Constants.DEFAULT_MAX_LOOPS);
 
         this.setProperty("Max loops", String.valueOf(maxLoops));
 
@@ -116,7 +111,7 @@ public class RegexpProcessor extends BaseProcessor {
 
         final Pattern pattern = Pattern.compile(patternVar.toString(), flags);
 
-        final List resultList = new ArrayList();
+        final List<NodeVariable> resultList = new ArrayList<NodeVariable>();
 
         List bodyList = source.toList();
         for (final Object currVar : bodyList) {
@@ -142,7 +137,7 @@ public class RegexpProcessor extends BaseProcessor {
                             context.setVar("_" + i, new NodeVariable(matcher.group(i)));
                         }
 
-                        BaseElementDef resultDef = regexpDef.getRegexpResultDef();
+                        BaseElementDef resultDef = elementDef.getRegexpResultDef();
                         Variable result = getBodyTextContent(resultDef, scraper, context, true);
                         debug(resultDef, scraper, result);
 

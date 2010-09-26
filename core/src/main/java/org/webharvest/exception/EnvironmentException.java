@@ -36,27 +36,20 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
-
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+package org.webharvest.exception;
 
 /**
+ * Thrown when current JVM does not support a specific required feature.
+ * E.g. character set, cryptographic algorithm, etc.
+ * <p/>
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 6:39:53 PM
  */
-public final class ProcessorTestUtils {
+public class EnvironmentException extends BaseException {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    public EnvironmentException(Exception e) {
+        super(e);
     }
-
 }

@@ -36,27 +36,39 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.runtime.scripting;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 6:02:52 PM
  */
-public final class ProcessorTestUtils {
+public class ScriptingLanguageTest {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    @Test
+    public void testRecognize_ok() {
+        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" beanshell "));
+        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" BEANSHELL "));
+        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" BeAnShElL "));
+
+        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" javascript "));
+        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" JAVASCRIPT "));
+        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" jAvAsCrIpT "));
+
+        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" groovy "));
+        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" GROOVY "));
+        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" GrOOvY "));
     }
 
+    @Test
+    public void testRecognize_fail() {
+        Assert.assertNull(ScriptingLanguage.recognize(null));
+        Assert.assertNull(ScriptingLanguage.recognize(""));
+        Assert.assertNull(ScriptingLanguage.recognize(" "));
+        Assert.assertNull(ScriptingLanguage.recognize("obviously wrong language"));
+    }
 }

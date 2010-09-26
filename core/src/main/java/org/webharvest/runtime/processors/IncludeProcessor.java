@@ -55,30 +55,27 @@ import java.net.URL;
 /**
  * Include processor.
  */
-public class IncludeProcessor extends BaseProcessor {
-
-    private IncludeDef includeDef;
+public class IncludeProcessor extends BaseProcessor<IncludeDef> {
 
     public IncludeProcessor(IncludeDef includeDef) {
         super(includeDef);
-        this.includeDef = includeDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         boolean isUrl = false;
-        
-        String path = BaseTemplater.execute( includeDef.getPath(), scraper.getScriptEngine() );
+
+        String path = BaseTemplater.execute(elementDef.getPath(), null, scraper);
 
         this.setProperty("Path", path);
-        
+
         path = CommonUtil.adaptFilename(path);
         String fullPath = path;
 
-        ScraperConfiguration configuration = scraper.getConfiguration(); 
+        ScraperConfiguration configuration = scraper.getConfiguration();
         File originalFile = configuration.getSourceFile();
         String originalUrl = configuration.getUrl();
         if (originalFile != null) {
-            String originalPath = CommonUtil.adaptFilename( originalFile.getAbsolutePath() );
+            String originalPath = CommonUtil.adaptFilename(originalFile.getAbsolutePath());
             int index = originalPath.lastIndexOf('/');
             if (index > 0) {
                 String workingPath = originalPath.substring(0, index);

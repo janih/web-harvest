@@ -36,7 +36,9 @@
 */
 package org.webharvest.runtime.templaters;
 
-import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.scripting.ScriptSource;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 
 /**
  * Simple templater - replaces ${expression} sequences in string with evaluated expressions.
@@ -47,32 +49,36 @@ public class BaseTemplater {
     public static String VAR_START = "${";
     public static String VAR_END = "}";
 
-    public static String execute(String source, ScriptEngine scriptEngine) {
+    public static String execute(String source, ScriptingLanguage language, Scraper scraper) {
         if (source == null) {
             return source;
         }
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
         int startIndex = source.indexOf(VAR_START);
         int endIndex = -1;
 
         while (startIndex >= 0 && startIndex < source.length()) {
-            result += source.substring(endIndex + 1, startIndex);
+            result.append(source.substring(endIndex + 1, startIndex));
             endIndex = source.indexOf(VAR_END, startIndex);
 
             if (endIndex > startIndex) {
-                String expression = source.substring(startIndex + VAR_START.length(), endIndex);
-                Object resultObj = scriptEngine.evaluate(expression);
-                result += resultObj == null ? "" : resultObj.toString();
+                final Object resultObj = scraper.getScriptEngineFactory().
+                        getEngine(new ScriptSource(source.substring(startIndex + VAR_START.length(), endIndex), language)).
+                        evaluate(scraper.getContext());
+
+                if (resultObj != null) {
+                    result.append(resultObj.toString());
+                }
             }
 
             startIndex = source.indexOf(VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1));
         }
 
-        result += source.substring(endIndex + 1);
+        result.append(source.substring(endIndex + 1));
 
-        return result;
+        return result.toString();
     }
 
 }

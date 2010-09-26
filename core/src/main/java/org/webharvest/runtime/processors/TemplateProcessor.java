@@ -39,36 +39,26 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.TemplateDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 /**
  * Template processor. Responsible for replacing marked portions of the
  * text with evaluated expressions.
  */
-public class TemplateProcessor extends BaseProcessor {
-
-    private TemplateDef templateDef;
+public class TemplateProcessor extends BaseProcessor<TemplateDef> {
 
     public TemplateProcessor(TemplateDef templateDef) {
         super(templateDef);
-        this.templateDef = templateDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable body = getBodyTextContent(templateDef, scraper, context);
-
-        String language = BaseTemplater.execute( templateDef.getLanguage(), scraper.getScriptEngine());
-        if (language != null) {
-            language = language.toLowerCase();
-        }
-        ScriptEngine scriptEngine = language == null ? scraper.getScriptEngine() : scraper.getScriptEngine(language);
-
-        String result = BaseTemplater.execute(body.toString(), scriptEngine);
-        
-        return new NodeVariable(result);
+        return new NodeVariable(BaseTemplater.execute(
+                getBodyTextContent(elementDef, scraper, context).toString(),
+                ScriptingLanguage.recognize(BaseTemplater.execute(elementDef.getLanguage(), null, scraper)),
+                scraper));
     }
 
 }

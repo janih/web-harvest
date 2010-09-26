@@ -45,19 +45,16 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Function definition processor.
  */
-public class FunctionProcessor extends BaseProcessor {
-
-    private FunctionDef functionDef;
+public class FunctionProcessor extends BaseProcessor<FunctionDef> {
 
     public FunctionProcessor(FunctionDef functionDef) {
         super(functionDef);
-        this.functionDef = functionDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        scraper.getConfiguration().addFunctionDef( functionDef );
+        scraper.getConfiguration().addFunctionDef(elementDef);
 
-        this.setProperty("Name", functionDef.getName());
+        this.setProperty("Name", elementDef.getName());
 
         return new EmptyVariable();
     }

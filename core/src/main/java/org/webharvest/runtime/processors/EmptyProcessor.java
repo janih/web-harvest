@@ -45,19 +45,16 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Empty processor = executes body and returns empty variable.
  */
-public class EmptyProcessor extends BaseProcessor {
-
-    private EmptyDef emptyDef;
+public class EmptyProcessor extends BaseProcessor<EmptyDef> {
 
     public EmptyProcessor(EmptyDef emptyDef) {
         super(emptyDef);
-        this.emptyDef = emptyDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-    	new BodyProcessor(emptyDef).execute(scraper, context);
+        new BodyProcessor(elementDef).execute(scraper, context);
 
-		return new EmptyVariable();
+        return new EmptyVariable();
     }
 
 }

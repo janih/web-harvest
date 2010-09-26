@@ -44,48 +44,32 @@ import org.webharvest.utils.KeyValuePair;
 /**
  * Abstract scripting engine.
  */
-abstract public class ScriptEngine {
+public abstract class ScriptEngine {
 
     public static final String CONTEXT_VARIABLE_NAME = "___web_harvest_context___";
 
-    private DynamicScopeContext context;
-
-    /**
-     * Constructor - initializes context of variables.
-     *
-     * @param context
-     */
-    protected ScriptEngine(DynamicScopeContext context) {
-        this.context = context;
-    }
-
-    /**
-     * Sets variable in scripter context.
-     *
-     * @param name
-     * @param value
-     */
-    public abstract void setVariable(String name, Object value);
-
-    /**
-     * Evaluates specified expression or code block.
-     *
-     * @return value of evaluation or null if there is nothing.
-     */
-    public final Object evaluate(String expression) {
-        // push all variables from context to the scripter
-        for (KeyValuePair<Variable> pair : context) {
-            final Variable value = pair.getValue();
-
-            //todo: why not just unwrap every variable?
-            setVariable(pair.getKey(), (value instanceof InternalVariable)
-                    ? value.getWrappedObject()
-                    : value);
+    public Object evaluate(DynamicScopeContext context) {
+        try {
+            beforeEvaluation();
+            // push all variables from context to the scripter
+            for (KeyValuePair<Variable> pair : context) {
+                final Variable value = pair.getValue();
+                //todo: why not just unwrap every variable?
+                setVariable(pair.getKey(), (value instanceof InternalVariable)
+                        ? value.getWrappedObject()
+                        : value);
+            }
+            return doEvaluate();
+        } finally {
+            afterEvaluation();
         }
-        return doEvaluate(expression);
     }
 
+    protected abstract void beforeEvaluation();
 
-    protected abstract Object doEvaluate(String expression);
+    protected abstract void setVariable(String name, Object value);
 
+    protected abstract Object doEvaluate();
+
+    protected abstract void afterEvaluation();
 }

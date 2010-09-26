@@ -38,7 +38,6 @@ package org.webharvest.runtime.processors;
 
 import org.apache.commons.io.FileUtils;
 import org.webharvest.definition.BaseElementDef;
-import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -60,11 +59,11 @@ import java.util.Map;
  * Base processor that contains common processor logic.
  * All other processors extend this class.
  */
-abstract public class BaseProcessor {
+abstract public class BaseProcessor<TDef extends BaseElementDef> {
 
     abstract public Variable execute(Scraper scraper, ScraperContext context);
 
-    protected BaseElementDef elementDef;
+    protected TDef elementDef;
     private Map properties = new LinkedHashMap();
 
     protected BaseProcessor() {
@@ -75,12 +74,12 @@ abstract public class BaseProcessor {
      *
      * @param elementDef
      */
-    protected BaseProcessor(BaseElementDef elementDef) {
+    protected BaseProcessor(TDef elementDef) {
         this.elementDef = elementDef;
     }
 
     /**
-     * Wrapper for the execute method. Adds controling and logging logic.
+     * Wrapper for the execute method. Adds controlling and logging logic.
      */
     public Variable run(Scraper scraper, ScraperContext context) {
         int scraperStatus = scraper.getStatus();
@@ -112,7 +111,7 @@ abstract public class BaseProcessor {
 
         int runningLevel = scraper.getRunningLevel();
 
-        String id = (this.elementDef != null) ? BaseTemplater.execute(this.elementDef.getId(), scraper.getScriptEngine()) : null;
+        String id = (this.elementDef != null) ? BaseTemplater.execute(this.elementDef.getId(), null, scraper) : null;
         String idDesc = id != null ? "[ID=" + id + "] " : "";
         String indent = CommonUtil.replicate("    ", runningLevel - 1);
 
@@ -157,7 +156,7 @@ abstract public class BaseProcessor {
     }
 
     protected void debug(BaseElementDef elementDef, Scraper scraper, Variable variable) {
-        String id = (elementDef != null) ? BaseTemplater.execute(elementDef.getId(), scraper.getScriptEngine()) : null;
+        String id = (elementDef != null) ? BaseTemplater.execute(elementDef.getId(), null, scraper) : null;
 
         if (scraper.isDebugMode() && id != null) {
             if (variable != null) {
@@ -190,17 +189,6 @@ abstract public class BaseProcessor {
 
     protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context) {
         return getBodyTextContent(elementDef, scraper, context, false);
-    }
-
-    protected BaseProcessor[] getSubprocessors(Scraper scraper) {
-        IElementDef[] defs = elementDef.getOperationDefs();
-        BaseProcessor result[] = new BaseProcessor[defs.length];
-
-        for (int i = 0; i < defs.length; i++) {
-            result[i] = ProcessorResolver.createProcessor(defs[i], scraper.getConfiguration(), scraper);
-        }
-
-        return result;
     }
 
     public BaseElementDef getElementDef() {

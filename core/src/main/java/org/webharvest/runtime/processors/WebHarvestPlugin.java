@@ -36,19 +36,20 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.templaters.*;
-import org.webharvest.runtime.scripting.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.CommonUtil;
 import org.webharvest.definition.WebHarvestPluginDef;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.util.*;
+import java.util.Map;
 
 /**
- * Base for all user-defined plugins. 
+ * Base for all user-defined plugins.
  */
-abstract public class WebHarvestPlugin extends BaseProcessor {
+@SuppressWarnings({"UnusedDeclaration"})
+public abstract class WebHarvestPlugin extends BaseProcessor {
 
     private Map attributes;
 
@@ -59,30 +60,34 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
     /**
      * Defines name of the processor. Should be valid identifier.
      * Processor's tag will use this name. For example, if this name is
-     * "myprocessor" in config file it will be used as &lt;myprocessor...&gt;...&lt;/myprocessor&gt; 
+     * "myprocessor" in config file it will be used as &lt;myprocessor...&gt;...&lt;/myprocessor&gt;
+     *
      * @return Name of the processor
      */
     public abstract String getName();
 
     /**
      * This method should return all possible attribute names for the plugin processor.
+     *
      * @return Array of attribute names (case insensitive)
      */
     public String[] getValidAttributes() {
-        return new String[] {};
+        return new String[]{};
     }
 
     /**
      * This method should return all mandatory attribute names for the plugin processor.
+     *
      * @return Array of attribute names (case insensitive)
      */
     public String[] getRequiredAttributes() {
-        return new String[] {};
+        return new String[]{};
     }
 
     /**
      * This method should return all names of all allowed processors inside the body of
      * this processor plugin. If null is returned, then all subprocessors are allowed.
+     *
      * @return Array of allowed subprocessor names (case insensitive)
      */
     public String[] getValidSubprocessors() {
@@ -92,15 +97,17 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
     /**
      * This method should return all mandatory subprocessor names, or in other words all
      * mandatory subtags that must be present in the body of this processor plugin.
+     *
      * @return Array of mandatory subprocessor names (case insensitive)
      */
     public String[] getRequiredSubprocessors() {
-        return new String[] {};
+        return new String[]{};
     }
 
     /**
      * Defines dependant subprocessors that are used inside this plugin and that will
      * automatically be registered with this plugin.
+     *
      * @return Array of subprocessor classes
      */
     public Class[] getDependantProcessors() {
@@ -110,7 +117,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
     /**
      * @param attributeName Name of plugin attribute
      * @return Array of valuee suggestions for specified attribute (this is used for auto-complete feature in IDE).
-     * null means nothing to suggest.
+     *         null means nothing to suggest.
      */
     public String[] getAttributeValueSuggestions(String attributeName) {
         return null;
@@ -122,7 +129,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
 
     public final Variable execute(Scraper scraper, ScraperContext context) {
         // pre processing
-        Variable variable = executePlugin(scraper, context);
+        final Variable variable = executePlugin(scraper, context);
         // post processing
         return variable;
     }
@@ -131,6 +138,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
      * Mathod that actually executes processor. Since one instance of this class may
      * be used for multiple executions, creator of plugin is responsible for initiating
      * local variables at the beginning of this method.
+     *
      * @param scraper
      * @param context
      * @return Instance of variable as result of xecution.
@@ -150,11 +158,10 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
         String requiredTags[] = getRequiredSubprocessors();
 
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < validSubprocessors.length; i++) {
+        for (String subProcessor : validSubprocessors) {
             if (result.length() != 0) {
                 result.append(',');
             }
-            String subProcessor = validSubprocessors[i];
             if (CommonUtil.existsInStringArray(requiredTags, subProcessor, true)) {
                 result.append('!');
             }
@@ -172,12 +179,11 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
         String requiredAtts[] = getRequiredAttributes();
 
         StringBuffer result = new StringBuffer("id,");
-        for (int i = 0; i < validAtts.length; i++) {
-            String att = validAtts[i];
-            if (CommonUtil.existsInStringArray(requiredAtts, att, true)) {
+        for (String attr : validAtts) {
+            if (CommonUtil.existsInStringArray(requiredAtts, attr, true)) {
                 result.append('!');
             }
-            result.append(att);
+            result.append(attr);
             result.append(",");
         }
         return result.toString();
@@ -201,13 +207,12 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
     protected String evaluateAttribute(String attName, Scraper scraper) {
-        String attValue = (String) attributes.get(attName);
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        return BaseTemplater.execute(attValue, scriptEngine);
+        final String attValue = (String) attributes.get(attName);
+        return BaseTemplater.execute(attValue, null, scraper);
     }
 
     /**
-     * @param attName Name of attrubte
+     * @param attName      Name of attrubte
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as boolean, or default value if it cannot be recognized as valid boolean
@@ -217,7 +222,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
     }
 
     /**
-     * @param attName Name of attrubte
+     * @param attName      Name of attrubte
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as integer, or default value if it cannot be recognized as valid integer
@@ -227,7 +232,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
     }
 
     /**
-     * @param attName Name of attrubte
+     * @param attName      Name of attrubte
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as double, or default value if it cannot be recognized as valid double
@@ -238,6 +243,7 @@ abstract public class WebHarvestPlugin extends BaseProcessor {
 
     /**
      * Executes body of plugin processor
+     *
      * @param scraper
      * @param context
      * @return Instance of Variable

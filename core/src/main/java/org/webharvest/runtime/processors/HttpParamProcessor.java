@@ -42,40 +42,37 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.*;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Variable definition http param processor.
  */
-public class HttpParamProcessor extends BaseProcessor {
-
-    private HttpParamDef httpParamDef;
+public class HttpParamProcessor extends BaseProcessor<HttpParamDef> {
 
     public HttpParamProcessor(HttpParamDef httpParamDef) {
         super(httpParamDef);
-        this.httpParamDef = httpParamDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-    	String name = BaseTemplater.execute( httpParamDef.getName(), scraper.getScriptEngine() );
-    	String isFileStr = BaseTemplater.execute( httpParamDef.getIsfile(), scraper.getScriptEngine() );
+        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        String isFileStr = BaseTemplater.execute(elementDef.getIsfile(), null, scraper);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);
-    	String fileName = BaseTemplater.execute( httpParamDef.getFilename(), scraper.getScriptEngine() );
-    	String contentType = BaseTemplater.execute( httpParamDef.getContenttype(), scraper.getScriptEngine() );
-    	Variable value = new BodyProcessor(httpParamDef).execute(scraper, context);
+        String fileName = BaseTemplater.execute(elementDef.getFilename(), null, scraper);
+        String contentType = BaseTemplater.execute(elementDef.getContenttype(), null, scraper);
+        Variable value = new BodyProcessor(elementDef).execute(scraper, context);
 
-    	HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
-    	if (httpProcessor != null) {
+        HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
+        if (httpProcessor != null) {
             httpProcessor.addHttpParam(name, isFile, fileName, contentType, value);
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);
             this.setProperty("Content Type", contentType);
         } else {
-    		throw new HttpException("Usage of http-param processor is not allowed outside of http processor!");
-    	}
-        
-    	return value;
+            throw new HttpException("Usage of http-param processor is not allowed outside of http processor!");
+        }
+
+        return value;
     }
 
 }

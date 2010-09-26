@@ -36,11 +36,9 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.BeanShellScriptEngine;
-import org.webharvest.runtime.scripting.GroovyScriptEngine;
-import org.webharvest.runtime.scripting.JavascriptScriptEngine;
-import org.webharvest.runtime.scripting.ScriptEngine;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.xml.sax.InputSource;
 
 import java.io.*;
@@ -55,11 +53,8 @@ import java.util.Map;
  */
 public class ScraperConfiguration {
 
-    public static final String BEANSHELL_SCRIPT_ENGINE = "beanshell";
-    public static final String JAVASCRIPT_SCRIPT_ENGINE = "javascript";
-    public static final String GROOVY_SCRIPT_ENGINE = "groovy";
-
     public static final String DEFAULT_CHARSET = "UTF-8";
+    private static final ScriptingLanguage DEFAULT_SCRIPTING_LANGUAGE = ScriptingLanguage.BEANSHELL;
 
     // map of function definitions
     private Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
@@ -67,9 +62,8 @@ public class ScraperConfiguration {
     // sequence of operationDefs
     private List<IElementDef> operations = new ArrayList<IElementDef>();
 
-    private String charset = DEFAULT_CHARSET;
-    private String defaultScriptEngine = BEANSHELL_SCRIPT_ENGINE;
-
+    private String charset;
+    private ScriptingLanguage scriptingLanguage;
     private File sourceFile;
     private String url;
 
@@ -81,29 +75,6 @@ public class ScraperConfiguration {
     public ScraperConfiguration(InputSource in) {
         createFromInputStream(in);
 
-    }
-
-    private void createFromInputStream(InputSource in) {
-        // loads configuration from input stream to the internal structure
-        XmlNode node = XmlNode.getInstance(in);
-
-        String charsetString = node.getString("charset");
-        this.charset = charsetString != null ? charsetString : DEFAULT_CHARSET;
-
-        String scriptEngineDesc = node.getString("scriptlang");
-        if ("javascript".equalsIgnoreCase(scriptEngineDesc)) {
-            this.defaultScriptEngine = JAVASCRIPT_SCRIPT_ENGINE;
-        } else if ("groovy".equalsIgnoreCase(scriptEngineDesc)) {
-            this.defaultScriptEngine = GROOVY_SCRIPT_ENGINE;
-        } else {
-            this.defaultScriptEngine = BEANSHELL_SCRIPT_ENGINE;
-        }
-
-        for (Object element : node.getElementList()) {
-            operations.add((element instanceof XmlNode)
-                    ? DefinitionResolver.createElementDefinition((XmlNode) element)
-                    : new ConstantDef(element.toString()));
-        }
     }
 
     /**
@@ -137,6 +108,23 @@ public class ScraperConfiguration {
         createFromInputStream(new InputSource(new InputStreamReader(sourceUrl.openStream())));
     }
 
+    private void createFromInputStream(InputSource in) {
+        // loads configuration from input stream to the internal structure
+        XmlNode node = XmlNode.getInstance(in);
+
+        this.charset = StringUtils.defaultIfEmpty(node.getString("charset"), DEFAULT_CHARSET);
+
+        this.scriptingLanguage = (ScriptingLanguage) ObjectUtils.defaultIfNull(
+                ScriptingLanguage.recognize(node.getString("scriptlang")),
+                DEFAULT_SCRIPTING_LANGUAGE);
+
+        for (Object element : node.getElementList()) {
+            operations.add((element instanceof XmlNode)
+                    ? DefinitionResolver.createElementDefinition((XmlNode) element)
+                    : new ConstantDef(element.toString()));
+        }
+    }
+
     public List<IElementDef> getOperations() {
         return operations;
     }
@@ -145,8 +133,8 @@ public class ScraperConfiguration {
         return charset;
     }
 
-    public String getDefaultScriptEngine() {
-        return defaultScriptEngine;
+    public ScriptingLanguage getScriptingLanguage() {
+        return scriptingLanguage;
     }
 
     public FunctionDef getFunctionDef(String name) {
@@ -171,20 +159,6 @@ public class ScraperConfiguration {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public ScriptEngine createScriptEngine(ScraperContext context, String engineType) {
-        if (JAVASCRIPT_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
-            return new JavascriptScriptEngine(context);
-        } else if (GROOVY_SCRIPT_ENGINE.equalsIgnoreCase(engineType)) {
-            return new GroovyScriptEngine(context);
-        } else {
-            return new BeanShellScriptEngine(context);
-        }
-    }
-
-    public ScriptEngine createScriptEngine(ScraperContext context) {
-        return createScriptEngine(context, this.defaultScriptEngine);
     }
 
 }

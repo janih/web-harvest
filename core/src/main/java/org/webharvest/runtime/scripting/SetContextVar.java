@@ -47,6 +47,7 @@ import org.webharvest.utils.CommonUtil;
  * Implementation of set command for saving variables back to web-harvest
  * context from the script.
  */
+// todo: is it used somewhere?
 public class SetContextVar {
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {

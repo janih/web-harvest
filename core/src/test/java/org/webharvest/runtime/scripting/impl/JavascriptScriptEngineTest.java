@@ -36,27 +36,29 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.runtime.scripting.impl;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+import org.junit.Assert;
+import org.junit.Test;
+import org.webharvest.runtime.ScraperContext;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 10:41:09 PM
  */
-public final class ProcessorTestUtils {
+public class JavascriptScriptEngineTest {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    private ScraperContext context = new ScraperContext();
+
+    @Test
+    public void testEvaluate() {
+        context.setVar("x", 2);
+        context.setVar("y", 5);
+        Assert.assertEquals(7.0, new JavascriptScriptEngine(
+                "function f(a, b) {return a + b} f(parseInt(x), parseInt(y))").
+                evaluate(context));
     }
 
 }

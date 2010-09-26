@@ -36,7 +36,8 @@
 */
 package org.webharvest.runtime.variables;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Variables Interface.
@@ -59,6 +60,7 @@ public abstract class Variable {
 
     /**
      * Safely converts this variable to boolean value.
+     *
      * @return boolean value
      */
     public boolean toBoolean() {
@@ -66,7 +68,7 @@ public abstract class Variable {
         if (wrappedObject == null) {
             return false;
         } else if (wrappedObject instanceof Boolean) {
-            return ((Boolean) wrappedObject).booleanValue(); 
+            return ((Boolean) wrappedObject).booleanValue();
         } else {
             String strValue = toString().trim();
             return "true".equalsIgnoreCase(strValue) || "yes".equalsIgnoreCase(strValue) || "1".equalsIgnoreCase(strValue);
@@ -75,6 +77,7 @@ public abstract class Variable {
 
     /**
      * Safely converts this variable to integer value.
+     *
      * @return int value
      */
     public int toInt() {
@@ -82,16 +85,17 @@ public abstract class Variable {
         if (wrappedObject == null) {
             return 0;
         } else if (wrappedObject instanceof Number) {
-            return ((Number)wrappedObject).intValue();
+            return ((Number) wrappedObject).intValue();
         } else if (wrappedObject instanceof Boolean) {
-            return ((Boolean)wrappedObject).booleanValue() ? 1 : 0;
+            return ((Boolean) wrappedObject).booleanValue() ? 1 : 0;
         } else {
-            return Integer.parseInt( toString().trim() );
+            return Integer.parseInt(toString().trim());
         }
     }
 
     /**
      * Safely converts this variable to long value.
+     *
      * @return long value
      */
     public long toLong() {
@@ -99,16 +103,17 @@ public abstract class Variable {
         if (wrappedObject == null) {
             return 0L;
         } else if (wrappedObject instanceof Number) {
-            return ((Number)wrappedObject).longValue();
+            return ((Number) wrappedObject).longValue();
         } else if (wrappedObject instanceof Boolean) {
-            return ((Boolean)wrappedObject).booleanValue() ? 1L : 0L;
+            return ((Boolean) wrappedObject).booleanValue() ? 1L : 0L;
         } else {
-            return Long.parseLong( toString().trim() );
+            return Long.parseLong(toString().trim());
         }
     }
 
     /**
      * Safely converts this variable to double value.
+     *
      * @return double value
      */
     public double toDouble() {
@@ -116,37 +121,30 @@ public abstract class Variable {
         if (wrappedObject == null) {
             return 0d;
         } else if (wrappedObject instanceof Number) {
-            return ((Number)wrappedObject).doubleValue();
+            return ((Number) wrappedObject).doubleValue();
         } else if (wrappedObject instanceof Boolean) {
-            return ((Boolean)wrappedObject).booleanValue() ? 1d : 0d;
+            return ((Boolean) wrappedObject).booleanValue() ? 1d : 0d;
         } else {
-            return Double.parseDouble( toString().trim() );
+            return Double.parseDouble(toString().trim());
         }
     }
 
     /**
      * Safely converts this variable to array of objects.
+     *
      * @return array of objects
      */
     public Object[] toArray() {
         Object wrappedObject = getWrappedObject();
         if (wrappedObject == null) {
-            return new Object[] {};
+            return new Object[]{};
         } else if (wrappedObject instanceof Object[]) {
             return (Object[]) wrappedObject;
         } else if (wrappedObject instanceof Collection) {
-            Collection collection = (Collection) wrappedObject;
-            Object result[] = new Object[collection.size()];
-            int index = 0;
-            Iterator iterator = collection.iterator();
-            while (iterator.hasNext()) {
-                result[index] = iterator.next();
-                index++;
-            }
-
-            return result;
+            final Collection collection = (Collection) wrappedObject;
+            return collection.toArray(new Object[collection.size()]);
         } else {
-            return new Object[] {wrappedObject};
+            return new Object[]{wrappedObject};
         }
     }
 

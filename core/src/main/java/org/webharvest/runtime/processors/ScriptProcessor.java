@@ -39,45 +39,29 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.ScriptDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptSource;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
 /**
- * Script processor - executes script defined in the body and optionally returns result.
+ * Script processor - executes script defined in the body.
  */
-public class ScriptProcessor extends BaseProcessor {
-
-    private ScriptDef scriptDef;
+public class ScriptProcessor extends BaseProcessor<ScriptDef> {
 
     public ScriptProcessor(ScriptDef scriptDef) {
         super(scriptDef);
-        this.scriptDef = scriptDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable scriptText = getBodyTextContent(scriptDef, scraper, context);
-
-        String language = BaseTemplater.execute( scriptDef.getLanguage(), scraper.getScriptEngine());
-        if (language != null) {
-            language = language.toLowerCase();
-        }
-
-        String returnExpression = scriptDef.getReturnExpression();
-
-        ScriptEngine scriptEngine = language == null ? scraper.getScriptEngine() : scraper.getScriptEngine(language);
-        scriptEngine.evaluate( scriptText.toString() );
-
-        if (returnExpression != null) {
-            String returnExpressionEvaluated = BaseTemplater.execute( scriptDef.getReturnExpression(), scraper.getScriptEngine());
-            Object returnValue = scriptEngine.evaluate(returnExpressionEvaluated);
-            return CommonUtil.createVariable(returnValue);
-        } else {
-            return new EmptyVariable();
-        }
-        
+        return CommonUtil.createVariable(
+                scraper.getScriptEngineFactory().
+                        getEngine(new ScriptSource(
+                                getBodyTextContent(elementDef, scraper, context).toString(),
+                                ScriptingLanguage.recognize(
+                                        BaseTemplater.execute(elementDef.getLanguage(), null, scraper)))).
+                        evaluate(context));
     }
 
 }

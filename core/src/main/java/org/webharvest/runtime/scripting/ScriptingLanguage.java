@@ -36,27 +36,40 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.runtime.scripting;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
+import org.webharvest.runtime.scripting.impl.GroovyScriptEngine;
+import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 5:43:14 PM
  */
-public final class ProcessorTestUtils {
+public enum ScriptingLanguage {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    BEANSHELL(BeanShellScriptEngine.class),
+    JAVASCRIPT(JavascriptScriptEngine.class),
+    GROOVY(GroovyScriptEngine.class);
+
+    public final Class<? extends ScriptEngine> engineClass;
+
+    ScriptingLanguage(Class<? extends ScriptEngine> engineClass) {
+        this.engineClass = engineClass;
     }
 
+    public static ScriptingLanguage recognize(String name) {
+        name = StringUtils.upperCase(StringUtils.trimToNull(name));
+        if (name == null) {
+            return null;
+        }
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }

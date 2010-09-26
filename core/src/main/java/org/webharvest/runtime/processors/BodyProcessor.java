@@ -11,7 +11,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Processor which executes only body and returns variables list.
  */
-public class BodyProcessor extends BaseProcessor {
+public class BodyProcessor extends BaseProcessor<BaseElementDef> {
 
     public BodyProcessor(BaseElementDef elementDef) {
         super(elementDef);
@@ -23,7 +23,7 @@ public class BodyProcessor extends BaseProcessor {
 
         if (defs.length > 0) {
             for (IElementDef def : defs) {
-                BaseProcessor processor = ProcessorResolver.createProcessor(def, scraper.getConfiguration(), scraper);
+                BaseProcessor processor = ProcessorResolver.createProcessor(def);
                 result.addVariable(processor.run(scraper, context));
             }
         } else {

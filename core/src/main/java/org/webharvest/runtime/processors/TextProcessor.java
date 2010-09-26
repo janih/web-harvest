@@ -39,34 +39,33 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.TextDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.templaters.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Text processor.
  */
-public class TextProcessor extends BaseProcessor {
-
-    private TextDef textDef;
+public class TextProcessor extends BaseProcessor<TextDef> {
 
     public TextProcessor(TextDef textDef) {
         super(textDef);
-        this.textDef = textDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String charset = BaseTemplater.execute( textDef.getCharset(), scraper.getScriptEngine() );
+        String charset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();
         }
-        String delimiter = BaseTemplater.execute( textDef.getDelimiter(), scraper.getScriptEngine() );
+        String delimiter = BaseTemplater.execute(elementDef.getDelimiter(), null, scraper);
         if (delimiter == null) {
             delimiter = "\n";
         }
 
-        Variable body = new BodyProcessor(textDef).execute(scraper, context);
-        return new NodeVariable( body instanceof ListVariable ? ((ListVariable)body).toString(charset, delimiter) : body.toString(charset) );
+        Variable body = new BodyProcessor(elementDef).execute(scraper, context);
+        return new NodeVariable(body instanceof ListVariable ? ((ListVariable) body).toString(charset, delimiter) : body.toString(charset));
     }
 
 }

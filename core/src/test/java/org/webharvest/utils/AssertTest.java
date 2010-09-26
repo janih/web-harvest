@@ -36,27 +36,77 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.utils;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
+import org.junit.Test;
 
-import java.io.StringReader;
+import static org.webharvest.utils.Assert.*;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 10:13:39 PM
  */
-public final class ProcessorTestUtils {
+public class AssertTest {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    private static final Object DUMMY = new Object();
+
+    @Test
+    public void testIsNull_Ok() throws Exception {
+        isNull(null);
+        isNull(null, "msg");
     }
 
+    @Test(expected = AssertionError.class)
+    public void testIsNull_Fail() throws Exception {
+        isNull(DUMMY);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testIsNull_Fail_withMsg() throws Exception {
+        isNull(DUMMY, "msg");
+    }
+
+    @Test
+    public void testNotNull_Ok() throws Exception {
+        notNull(DUMMY);
+        notNull(DUMMY, "msg");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testNotNull_Fail() throws Exception {
+        notNull(null);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testNotNull_Fail_withMsg() throws Exception {
+        notNull(null, "msg");
+    }
+
+    @Test
+    public void testIsTrue_Ok() throws Exception {
+        isTrue(true, "msg");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testIsTrue_Fail() throws Exception {
+        isTrue(false, "msg");
+    }
+
+    @Test
+    public void testIsFalse_Ok() throws Exception {
+        isFalse(false, "msg");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testIsFalse_Fail() throws Exception {
+        isFalse(true, "msg");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
+    public void testShouldNeverHappen() throws Exception {
+        shouldNeverHappen(null);
+    }
 }

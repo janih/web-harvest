@@ -36,27 +36,48 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.utils;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+import java.text.MessageFormat;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 23, 2010
+ * Time: 10:46:47 PM
  */
-public final class ProcessorTestUtils {
+@SuppressWarnings({"UnusedDeclaration"})
+public class Assert {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    public static void isNull(Object obj) {
+        isNull(obj, "Expected null reference, but was {0}", obj);
     }
 
+    public static void isNull(Object obj, String messagePattern, Object... args) {
+        isTrue(obj == null, messagePattern, args);
+    }
+
+    public static void notNull(Object obj) {
+        notNull(obj, "Should not be null");
+    }
+
+    public static void notNull(Object obj, String messagePattern, Object... args) {
+        isTrue(obj != null, messagePattern, args);
+    }
+
+    public static void isTrue(boolean bool, String messagePattern, Object... args) {
+        if (!bool) {
+            throw new AssertionError(MessageFormat.format(messagePattern, args));
+        }
+    }
+
+    public static void isFalse(boolean bool, String messagePattern, Object... args) {
+        if (bool) {
+            throw new AssertionError(MessageFormat.format(messagePattern, args));
+        }
+    }
+
+    public static IllegalStateException shouldNeverHappen(Throwable th) {
+        throw new IllegalStateException("This should NEVER happen", th);
+    }
 }

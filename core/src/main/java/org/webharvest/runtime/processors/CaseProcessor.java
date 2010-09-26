@@ -49,36 +49,33 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Conditional processor.
  */
-public class CaseProcessor extends BaseProcessor {
-
-    private CaseDef caseDef;
+public class CaseProcessor extends BaseProcessor<CaseDef> {
 
     public CaseProcessor(CaseDef caseDef) {
         super(caseDef);
-        this.caseDef = caseDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        IfDef[] ifDefs = caseDef.getIfDefs();
-        
+        IfDef[] ifDefs = elementDef.getIfDefs();
+
         if (ifDefs != null) {
-        	for (int i = 0; i < ifDefs.length; i++) {
-        		String condition = BaseTemplater.execute( ifDefs[i].getCondition(), scraper.getScriptEngine() );
-        		if ( CommonUtil.isBooleanTrue(condition) ) {
-        			Variable ifResult = new BodyProcessor(ifDefs[i]).run(scraper, context);
-                    debug(ifDefs[i], scraper, ifResult);
+            for (IfDef ifDef : ifDefs) {
+                String condition = BaseTemplater.execute(ifDef.getCondition(), null, scraper);
+                if (CommonUtil.isBooleanTrue(condition)) {
+                    Variable ifResult = new BodyProcessor(ifDef).run(scraper, context);
+                    debug(ifDef, scraper, ifResult);
                     return ifResult;
                 }
-        	}
+            }
         }
 
-        BaseElementDef elseDef = caseDef.getElseDef();
+        BaseElementDef elseDef = elementDef.getElseDef();
         if (elseDef != null) {
-        	Variable elseResult = new BodyProcessor(elseDef).run(scraper, context);
+            Variable elseResult = new BodyProcessor(elseDef).run(scraper, context);
             debug(elseDef, scraper, elseResult);
             return elseResult;
         }
-        
+
         return new EmptyVariable();
     }
 

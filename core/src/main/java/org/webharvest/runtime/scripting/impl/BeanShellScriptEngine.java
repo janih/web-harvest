@@ -34,51 +34,63 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.scripting;
+package org.webharvest.runtime.scripting.impl;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.webharvest.runtime.DynamicScopeContext;
+import bsh.*;
+import org.webharvest.exception.ScriptException;
+import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.utils.Assert;
 
 /**
- * javascript scripting engine based on Rhino.
+ * BeanShell scripting engine.
  */
-public class JavascriptScriptEngine extends ScriptEngine {
+public class BeanShellScriptEngine extends ScriptEngine {
 
-    private Context javascriptContext = null;
-    private Scriptable scope = null;
+    final private Interpreter bshInterpreter;
+    final private BshClassManager bshClassManager;
 
-    public JavascriptScriptEngine(DynamicScopeContext context) {
-        super(context);
+    private String sourceCode;
+
+    private transient NameSpace bshNameSpace;
+
+    public BeanShellScriptEngine(String sourceCode) {
+        bshInterpreter = new Interpreter();
+        bshClassManager = bshInterpreter.getNameSpace().getClassManager();
+
+        // BeanShell does not support pre-compiled scripts
+        this.sourceCode = sourceCode;
     }
 
-    private synchronized void initContextIfNeeded() {
-        if (this.javascriptContext == null) {
-            this.javascriptContext = Context.enter();
-            this.scope = javascriptContext.initStandardObjects();
+    @Override
+    protected void beforeEvaluation() {
+        Assert.isNull(bshNameSpace);
+        bshNameSpace = new NameSpace(bshClassManager, "WebHarvest");
+        bshNameSpace.importCommands("org.webharvest.runtime.scripting");
+    }
+
+    @Override
+    protected void setVariable(String name, Object value) {
+        try {
+            bshNameSpace.setVariable(name, value, false);
+        } catch (UtilEvalError e) {
+            throw new ScriptException("Cannot set variable in scripter: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Sets variable in scripter context.
-     *
-     * @param name
-     * @param value
-     */
-    public void setVariable(String name, Object value) {
-        initContextIfNeeded();
-        Object wrappedOut = Context.javaToJS(value, scope);
-        ScriptableObject.putProperty(this.scope, name, wrappedOut);
+    @Override
+    protected Object doEvaluate() {
+        try {
+            bshInterpreter.setNameSpace(bshNameSpace);
+            return bshInterpreter.eval(sourceCode);
+        } catch (EvalError e) {
+            throw new ScriptException("Error during script execution: " + e.getMessage(), e);
+        }
     }
 
-    /**
-     * Evaluates specified expression or code block.
-     *
-     * @return value of evaluation or null if there is nothing.
-     */
-    protected Object doEvaluate(String expression) {
-        return this.javascriptContext.evaluateString(scope, expression, "<cmd>", 1, null);
+    @Override
+    protected void afterEvaluation() {
+        bshNameSpace = null;
+        bshInterpreter.setNameSpace(null);
     }
 
 }

@@ -40,14 +40,12 @@ package org.webharvest.definition;
  * Definition of script processor.
  */
 public class ScriptDef extends BaseElementDef {
-    
+
     private String language;
-    private String returnExpression;
 
     public ScriptDef(XmlNode xmlNode) {
         super(xmlNode);
         this.language = xmlNode.getAttribute("language");
-        this.returnExpression = xmlNode.getAttribute("return");
     }
 
     public String getShortElementName() {
@@ -58,8 +56,4 @@ public class ScriptDef extends BaseElementDef {
         return language;
     }
 
-    public String getReturnExpression() {
-        return returnExpression;
-    }
-    
 }

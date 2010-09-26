@@ -45,24 +45,20 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Variable definition http param processor.
  */
-public class CallParamProcessor extends BaseProcessor {
-
-    private CallParamDef callParamDef;
+public class CallParamProcessor extends BaseProcessor<CallParamDef> {
 
     public CallParamProcessor(CallParamDef callParamDef) {
         super(callParamDef);
-        
-        this.callParamDef = callParamDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String name = BaseTemplater.execute( callParamDef.getName(), scraper.getScriptEngine() );
-    	Variable variable =  new BodyProcessor(callParamDef).execute(scraper, context);
+        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        Variable variable = new BodyProcessor(elementDef).execute(scraper, context);
 
         scraper.addFunctionParam(name, variable);
         this.setProperty("Name", name);
 
-    	return variable;
+        return variable;
     }
 
 }

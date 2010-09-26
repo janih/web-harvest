@@ -40,62 +40,66 @@ import org.webharvest.definition.FileDef;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Types;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 /**
  * File processor.
  */
-public class FileProcessor extends BaseProcessor {
-
-    private FileDef fileDef;
+public class FileProcessor extends BaseProcessor<FileDef> {
 
     public FileProcessor(FileDef fileDef) {
         super(fileDef);
-        this.fileDef = fileDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         String workingDir = scraper.getWorkingDir();
 
-        ScriptEngine scriptEngine = scraper.getScriptEngine();
-        String action = BaseTemplater.execute( fileDef.getAction(), scriptEngine);
-        String filePath = BaseTemplater.execute( fileDef.getPath(), scriptEngine);
-        String type = BaseTemplater.execute( fileDef.getType(), scriptEngine);
-        String charset = BaseTemplater.execute( fileDef.getCharset(), scriptEngine);
+        String action = BaseTemplater.execute(elementDef.getAction(), null, scraper);
+        String filePath = BaseTemplater.execute(elementDef.getPath(), null, scraper);
+        String type = BaseTemplater.execute(elementDef.getType(), null, scraper);
+        String charset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
-        String listFilter = BaseTemplater.execute( fileDef.getListFilter(), scriptEngine);
-        String listFiles = BaseTemplater.execute( fileDef.getListFiles(), scriptEngine);
+        String listFilter = BaseTemplater.execute(elementDef.getListFilter(), null, scraper);
+        String listFiles = BaseTemplater.execute(elementDef.getListFiles(), null, scraper);
         boolean isListFiles = CommonUtil.getBooleanValue(listFiles, true);
-        String listDirs = BaseTemplater.execute( fileDef.getListDirs(), scriptEngine);
+        String listDirs = BaseTemplater.execute(elementDef.getListDirs(), null, scraper);
         boolean isListDirs = CommonUtil.getBooleanValue(listDirs, true);
-        String listRecursive = BaseTemplater.execute( fileDef.getListRecursive(), scriptEngine);
+        String listRecursive = BaseTemplater.execute(elementDef.getListRecursive(), null, scraper);
         boolean isListRecursive = CommonUtil.getBooleanValue(listRecursive, false);
 
         this.setProperty("Action", action);
         this.setProperty("File Path", filePath);
         this.setProperty("Type", type);
         this.setProperty("Charset", charset);
-        this.setProperty("List Files", Boolean.valueOf(isListFiles));
-        this.setProperty("List Directories", Boolean.valueOf(isListDirs));
-        this.setProperty("List Recursive", Boolean.valueOf(isListRecursive));
+        this.setProperty("List Files", isListFiles);
+        this.setProperty("List Directories", isListDirs);
+        this.setProperty("List Recursive", isListRecursive);
 
         String fullPath = CommonUtil.getAbsoluteFilename(workingDir, filePath);
 
         // depending on file acton calls appropriate method
-        if ( "write".equalsIgnoreCase(action) ) {
+        if ("write".equalsIgnoreCase(action)) {
             return executeFileWrite(false, scraper, context, fullPath, type, charset);
-        } else if ( "append".equalsIgnoreCase(action) ) {
+        } else if ("append".equalsIgnoreCase(action)) {
             return executeFileWrite(true, scraper, context, fullPath, type, charset);
-        } else if ( "list".equalsIgnoreCase(action) ) {
+        } else if ("list".equalsIgnoreCase(action)) {
             return executeFileList(filePath, listFilter, isListFiles, isListDirs, isListRecursive);
         } else {
             return executeFileRead(fullPath, type, charset, scraper);
@@ -104,24 +108,22 @@ public class FileProcessor extends BaseProcessor {
 
     private Variable executeFileList(String filePath, String listFilter, boolean listFiles, boolean listDirs, boolean listRecursive) {
         File dir = new File(filePath);
-        if ( !dir.exists() ) {
+        if (!dir.exists()) {
             throw new FileException("Directory \"" + dir + "\" doesn't exist!");
-        } else if ( !dir.isDirectory() ) {
+        } else if (!dir.isDirectory()) {
             throw new FileException("\"" + dir + "\" is not directory!");
         }
 
-        Collection collection = listFiles(dir, new CommandPromptFilenameFilter(listFilter), listRecursive);
-        TreeSet sortedFileNames = new TreeSet();
-        Iterator iterator = collection.iterator();
-        while (iterator.hasNext()) {
-            File file = (File) iterator.next();
+        Collection<File> collection = listFiles(dir, new CommandPromptFilenameFilter(listFilter), listRecursive);
+        TreeSet<String> sortedFileNames = new TreeSet<String>();
+        for (File file : collection) {
             boolean isDir = file.isDirectory();
-            if ( !((!listDirs && isDir) || (!listFiles && !isDir)) ) {
-                sortedFileNames.add( file.getAbsolutePath() );
+            if (!((!listDirs && isDir) || (!listFiles && !isDir))) {
+                sortedFileNames.add(file.getAbsolutePath());
             }
         }
 
-        return new ListVariable( new ArrayList(sortedFileNames) );
+        return new ListVariable(new ArrayList<String>(sortedFileNames));
     }
 
     /**
@@ -130,20 +132,20 @@ public class FileProcessor extends BaseProcessor {
      */
     private Variable executeFileWrite(boolean append, Scraper scraper, ScraperContext context, String fullPath, String type, String charset) {
         Variable result;
-        
+
         try {
-        	// ensure that target directory exists
-        	new File( CommonUtil.getDirectoryFromPath(fullPath) ).mkdirs();
-        	
+            // ensure that target directory exists
+            new File(CommonUtil.getDirectoryFromPath(fullPath)).mkdirs();
+
             FileOutputStream out = new FileOutputStream(fullPath, append);
             byte[] data;
 
-            if ( Types.TYPE_BINARY.equalsIgnoreCase(type) ) {
-                Variable bodyListVar = new BodyProcessor(fileDef).execute(scraper, context);
+            if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
+                Variable bodyListVar = new BodyProcessor(elementDef).execute(scraper, context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {
-                Variable body = getBodyTextContent(fileDef, scraper, context);
+                Variable body = getBodyTextContent(elementDef, scraper, context);
                 String content = body.toString();
                 data = content.getBytes(charset);
                 result = new NodeVariable(content);
@@ -163,10 +165,10 @@ public class FileProcessor extends BaseProcessor {
      * Reading the specified file.
      */
     private Variable executeFileRead(String fullPath, String type, String charset, Scraper scraper) {
-        if ( Types.TYPE_BINARY.equalsIgnoreCase(type) ) {
+        if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
             try {
                 byte[] data = CommonUtil.readBytesFromFile(new File(fullPath));
-                if ( scraper.getLogger().isInfoEnabled() ) {
+                if (scraper.getLogger().isInfoEnabled()) {
                     scraper.getLogger().info("Binary file read processor: " + data.length + " bytes read.");
                 }
                 return new NodeVariable(data);
@@ -176,8 +178,8 @@ public class FileProcessor extends BaseProcessor {
         } else {
             try {
                 String content = CommonUtil.readStringFromFile(new File(fullPath), charset);
-                if ( scraper.getLogger().isInfoEnabled() ) {
-                    scraper.getLogger().info( "Text file read processor: " + (content == null ? 0 : content.length()) + " characters read." );
+                if (scraper.getLogger().isInfoEnabled()) {
+                    scraper.getLogger().info("Text file read processor: " + (content == null ? 0 : content.length()) + " characters read.");
                 }
                 return new NodeVariable(content);
             } catch (IOException e) {
@@ -193,9 +195,8 @@ public class FileProcessor extends BaseProcessor {
 
         byte[] result = null;
 
-        Iterator iterator = body.toList().iterator();
-        while (iterator.hasNext()) {
-            Variable currVariable =  (Variable) iterator.next();
+        for (Object var : body.toList()) {
+            final Variable currVariable = (Variable) var;
             byte bytes[] = currVariable.toBinary();
             if (bytes != null) {
                 if (result == null) {
@@ -212,12 +213,11 @@ public class FileProcessor extends BaseProcessor {
         return new NodeVariable(result);
     }
 
-    private Collection listFiles(File directory, FilenameFilter filter, boolean recurse) {
-        Vector files = new Vector();
+    private Collection<File> listFiles(File directory, FilenameFilter filter, boolean recurse) {
+        List<File> files = new ArrayList<File>();
         File[] entries = directory.listFiles();
         if (entries != null) {
-            for (int f = 0; f < entries.length; f++) {
-                File entry = entries[f];
+            for (File entry : entries) {
                 if (filter == null || filter.accept(directory, entry.getName())) {
                     files.add(entry);
                 }
@@ -230,22 +230,31 @@ public class FileProcessor extends BaseProcessor {
     }
 
     private class CommandPromptFilenameFilter implements FilenameFilter {
+
         Pattern pattern = Pattern.compile(".*");
 
         private CommandPromptFilenameFilter(String filter) {
-            if ( !CommonUtil.isEmpty(filter) ) {
+            if (!CommonUtil.isEmpty(filter)) {
                 StringBuffer buffer = new StringBuffer();
                 for (int i = 0; i < filter.length(); i++) {
                     char ch = filter.charAt(i);
                     switch (ch) {
-                        case '.' : buffer.append("\\."); break;
-                        case '*' : buffer.append(".*"); break;
-                        case '?' : buffer.append("."); break;
-                        default : buffer.append(ch); break;
+                        case '.':
+                            buffer.append("\\.");
+                            break;
+                        case '*':
+                            buffer.append(".*");
+                            break;
+                        case '?':
+                            buffer.append(".");
+                            break;
+                        default:
+                            buffer.append(ch);
+                            break;
                     }
                 }
                 try {
-                    pattern = Pattern.compile( buffer.toString() );
+                    pattern = Pattern.compile(buffer.toString());
                 } catch (Exception e) {
                     pattern = Pattern.compile("");
                 }

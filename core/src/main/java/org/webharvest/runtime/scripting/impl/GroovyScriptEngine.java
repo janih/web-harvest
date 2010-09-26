@@ -34,60 +34,52 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.scripting;
+package org.webharvest.runtime.scripting.impl;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.DynamicScopeContext;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.utils.Assert;
 
 /**
- * BeanShell scripting engine.
+ * Groovy scripting engine.
  */
-public class BeanShellScriptEngine extends ScriptEngine {
+public class GroovyScriptEngine extends ScriptEngine {
 
-    private Interpreter beanShellInterpreter = new Interpreter();
+    private static long scriptNameCounter;
 
-    /**
-     * Constructor - initializes context used in engine.
-     *
-     * @param context
-     */
-    public BeanShellScriptEngine(DynamicScopeContext context) {
-        super(context);
-        this.beanShellInterpreter.getNameSpace().importCommands("org.webharvest.runtime.scripting");
-        try {
-            this.beanShellInterpreter.set(CONTEXT_VARIABLE_NAME, context);
-        } catch (EvalError e) {
-            throw new ScriptException("Cannot set Web-Harvest context in scripter: " + e.getMessage(), e);
-        }
+    private static synchronized String generateScriptName() {
+        return "WebHarvest.Script" + (++scriptNameCounter) + ".groovy";
     }
 
-    /**
-     * Sets variable in scripter context.
-     *
-     * @param name
-     * @param value
-     */
-    public void setVariable(String name, Object value) {
-        try {
-            this.beanShellInterpreter.set(name, value);
-        } catch (EvalError e) {
-            throw new ScriptException("Cannot set variable in scripter: " + e.getMessage(), e);
-        }
+    private final Script grvScript;
+
+    private transient Binding grvBinding;
+
+    public GroovyScriptEngine(String sourceCode) {
+        grvScript = new GroovyShell().parse(sourceCode, generateScriptName());
     }
 
-    /**
-     * Evaluates specified expression or code block.
-     *
-     * @return value of evaluation or null if there is nothing.
-     */
-    protected Object doEvaluate(String expression) {
-        try {
-            return this.beanShellInterpreter.eval(expression);
-        } catch (EvalError e) {
-            throw new ScriptException("Error during script execution: " + e.getMessage(), e);
-        }
+    @Override
+    protected void beforeEvaluation() {
+        Assert.isNull(grvBinding);
+        grvBinding = new Binding();
+    }
+
+    @Override
+    protected void setVariable(String name, Object value) {
+        grvBinding.setVariable(name, value);
+    }
+
+    protected Object doEvaluate() {
+        grvScript.setBinding(grvBinding);
+        return grvScript.run();
+    }
+
+    @Override
+    protected void afterEvaluation() {
+        grvBinding = null;
     }
 
 }

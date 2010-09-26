@@ -36,27 +36,35 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.runtime;
 
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+import org.webharvest.utils.Assert;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 25, 2010
+ * Time: 3:50:39 PM
  */
-public final class ProcessorTestUtils {
+public final class ScraperContextHolder {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    private static final ThreadLocal<DynamicScopeContext> _currentContext = new ThreadLocal<DynamicScopeContext>();
+
+    private ScraperContextHolder() {
     }
+
+    public static void init(DynamicScopeContext context) {
+        Assert.isNull(_currentContext.get());
+        _currentContext.set(context);
+    }
+
+    public static DynamicScopeContext getCurrentContext() {
+        return _currentContext.get();
+    }
+
+    public static void clear() {
+        _currentContext.remove();
+    }
+
 
 }

@@ -45,7 +45,7 @@ import org.webharvest.runtime.processors.BaseProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
-import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.InternalVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -79,6 +79,7 @@ public class Scraper {
     private ScraperConfiguration configuration;
     private String workingDir;
     private ScraperContext context;
+    private ScriptEngineFactory scriptEngineFactory;
 
     private RuntimeConfig runtimeConfig;
 
@@ -97,12 +98,6 @@ public class Scraper {
 
     // stack of running http processors
     private transient Stack<HttpProcessor> runningHttpProcessors = new Stack<HttpProcessor>();
-
-    // default script engine used throughout the configuration execution
-    private ScriptEngine scriptEngine = null;
-
-    // all used script engines in this scraper
-    private Map<String, ScriptEngine> usedScriptEngines = new HashMap<String, ScriptEngine>();
 
     // pool of used database connections
     Map<String, Connection> dbPool = new HashMap<String, Connection>();
@@ -127,12 +122,10 @@ public class Scraper {
         this.httpClientManager = new HttpClientManager();
 
         this.context = new ScraperContext();
-
         context.setVar("sys", new InternalVariable(new SystemUtilities(this)));
         context.setVar("http", new InternalVariable(httpClientManager.getHttpInfo()));
 
-        this.scriptEngine = configuration.createScriptEngine(this.context);
-        this.usedScriptEngines.put(configuration.getDefaultScriptEngine(), this.scriptEngine);
+        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage());
     }
 
     /**
@@ -170,7 +163,7 @@ public class Scraper {
 
         try {
             for (IElementDef elementDef : ops) {
-                BaseProcessor processor = ProcessorResolver.createProcessor(elementDef, this.configuration, this);
+                BaseProcessor processor = ProcessorResolver.createProcessor(elementDef);
                 if (processor != null) {
                     processor.run(this, context);
                 }
@@ -185,7 +178,12 @@ public class Scraper {
     public void execute() {
         long startTime = System.currentTimeMillis();
 
-        execute(configuration.getOperations());
+        try {
+            ScraperContextHolder.init(context);
+            execute(configuration.getOperations());
+        } finally {
+            ScraperContextHolder.clear();
+        }
 
         if (this.status == STATUS_RUNNING) {
             this.setStatus(STATUS_FINISHED);
@@ -267,25 +265,6 @@ public class Scraper {
 
     public void setDebug(boolean debug) {
         this.isDebugMode = debug;
-    }
-
-    public ScriptEngine getScriptEngine() {
-        return runningFunctions.isEmpty()
-                ? this.scriptEngine
-                : getRunningFunction().getScriptEngine();
-    }
-
-    public synchronized ScriptEngine getScriptEngine(String engineType) {
-        if (!runningFunctions.isEmpty()) {
-            return getRunningFunction().getScriptEngine(engineType);
-        }
-        ScriptEngine engine = this.usedScriptEngines.get(engineType);
-        if (engine == null) {
-            engine = configuration.createScriptEngine(this.context, engineType);
-            this.usedScriptEngines.put(engineType, engine);
-        }
-
-        return engine;
     }
 
     public Logger getLogger() {
@@ -447,4 +426,7 @@ public class Scraper {
         }
     }
 
+    public ScriptEngineFactory getScriptEngineFactory() {
+        return scriptEngineFactory;
+    }
 }

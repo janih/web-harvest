@@ -46,27 +46,24 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * OnError processor - sets .
  */
-public class TryProcessor extends BaseProcessor {
-
-    private TryDef tryDef;
+public class TryProcessor extends BaseProcessor<TryDef> {
 
     public TryProcessor(TryDef tryDef) {
         super(tryDef);
-        this.tryDef = tryDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         try {
-            BaseElementDef tryBodyDef = tryDef.getTryBodyDef();
+            BaseElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor(tryBodyDef).run(scraper, context);
             debug(tryBodyDef, scraper, result);
 
             return result;
-        } catch(BaseException e) {
-            if ( scraper.getLogger().isInfoEnabled() ) {
+        } catch (BaseException e) {
+            if (scraper.getLogger().isInfoEnabled()) {
                 scraper.getLogger().info("Exception caught with try processor: " + e.getMessage());
             }
-            BaseElementDef catchValueDef = tryDef.getCatchValueDef();
+            BaseElementDef catchValueDef = elementDef.getCatchValueDef();
             Variable result = new BodyProcessor(catchValueDef).run(scraper, context);
             debug(catchValueDef, scraper, result);
 

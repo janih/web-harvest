@@ -41,7 +41,6 @@ import org.webharvest.definition.BaseElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -57,22 +56,18 @@ import java.util.regex.Pattern;
 /**
  * Loop list processor.
  */
-public class LoopProcessor extends BaseProcessor {
-
-    private LoopDef loopDef;
+public class LoopProcessor extends BaseProcessor<LoopDef> {
 
     public LoopProcessor(LoopDef loopDef) {
         super(loopDef);
-        this.loopDef = loopDef;
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        final ScriptEngine scriptEngine = scraper.getScriptEngine();
-        final String item = BaseTemplater.execute(loopDef.getItem(), scriptEngine);
-        final String index = BaseTemplater.execute(loopDef.getIndex(), scriptEngine);
-        final String maxLoopsString = BaseTemplater.execute(loopDef.getMaxloops(), scriptEngine);
-        final String filter = BaseTemplater.execute(loopDef.getFilter(), scriptEngine);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(loopDef.getEmpty(), scriptEngine), false);
+        final String item = BaseTemplater.execute(elementDef.getItem(), null, scraper);
+        final String index = BaseTemplater.execute(elementDef.getIndex(), null, scraper);
+        final String maxLoopsString = BaseTemplater.execute(elementDef.getMaxloops(), null, scraper);
+        final String filter = BaseTemplater.execute(elementDef.getFilter(), null, scraper);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getEmpty(), null, scraper), false);
 
         this.setProperty("Item", item);
         this.setProperty("Index", index);
@@ -80,11 +75,11 @@ public class LoopProcessor extends BaseProcessor {
         this.setProperty("Filter", filter);
         this.setProperty("Empty", String.valueOf(isEmpty));
 
-        BaseElementDef loopValueDef = loopDef.getLoopValueDef();
+        BaseElementDef loopValueDef = elementDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor(loopValueDef).run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
-        final List resultList = new ArrayList();
+        final List<Object> resultList = new ArrayList<Object>();
 
         final List list = loopValue != null ? loopValue.toList() : null;
         if (list != null) {
@@ -108,7 +103,7 @@ public class LoopProcessor extends BaseProcessor {
                         }
 
                         // execute the loop body
-                        BaseElementDef bodyDef = loopDef.getLoopBodyDef();
+                        BaseElementDef bodyDef = elementDef.getLoopBodyDef();
                         Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : new EmptyVariable();
                         debug(bodyDef, scraper, loopResult);
                         if (!isEmpty) {
@@ -164,16 +159,12 @@ public class LoopProcessor extends BaseProcessor {
      */
     private static class IntRange extends CommonUtil.IntPair {
 
-        // checks if strins is in form [n][-][m]
+        // checks if strings is in form [n][-][m]
 
         static boolean isValid(String s) {
             Pattern pattern = Pattern.compile("(\\d*)(-?)(\\d*?)");
             Matcher matcher = pattern.matcher(s);
             return matcher.matches();
-        }
-
-        private IntRange(int x, int y) {
-            super(x, y);
         }
 
         public IntRange(String s, int size) {
@@ -192,7 +183,7 @@ public class LoopProcessor extends BaseProcessor {
      */
     private static class IntSublist extends CommonUtil.IntPair {
 
-        // checks if strins is in form [n][:][m]
+        // checks if strings is in form [n][:][m]
 
         static boolean isValid(String s) {
             Pattern pattern = Pattern.compile("(\\d*)(:?)(\\d*?)");

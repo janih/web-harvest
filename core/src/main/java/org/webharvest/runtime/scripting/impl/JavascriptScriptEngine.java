@@ -34,41 +34,55 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.scripting;
+package org.webharvest.runtime.scripting.impl;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import org.webharvest.runtime.DynamicScopeContext;
+import org.mozilla.javascript.*;
+import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.utils.Assert;
 
 /**
- * Groovy scripting engine.
+ * javascript scripting engine based on Rhino.
  */
-public class GroovyScriptEngine extends ScriptEngine {
+public class JavascriptScriptEngine extends ScriptEngine {
 
-    private Binding binding = new Binding();
-    private GroovyShell shell = new GroovyShell(binding);
+    private final Script jsScript;
 
-    public GroovyScriptEngine(DynamicScopeContext context) {
-        super(context);
+    private transient Context jsContext;
+    private transient ScriptableObject jsScope;
+
+    public JavascriptScriptEngine(final String sourceCode) {
+        jsScript = (Script) ContextFactory.getGlobal().call(new ContextAction() {
+            @Override
+            public Object run(Context cx) {
+                return cx.compileString(sourceCode, "JavaScript", 1, null);
+            }
+        });
     }
 
-    /**
-     * Sets variable in scripter context.
-     *
-     * @param name
-     * @param value
-     */
-    public void setVariable(String name, Object value) {
-        this.binding.setVariable(name, value);
+    @Override
+    protected void beforeEvaluation() {
+        Assert.isNull(jsContext);
+        Assert.isNull(jsScope);
+        jsContext = Context.enter();
+        jsScope = jsContext.initStandardObjects();
     }
 
-    /**
-     * Evaluates specified expression or code block.
-     *
-     * @return value of evaluation or null if there is nothing.
-     */
-    protected Object doEvaluate(String expression) {
-        return shell.evaluate(expression);
+    @Override
+    protected void setVariable(String name, Object value) {
+        ScriptableObject.putProperty(jsScope, name, Context.javaToJS(value, jsScope));
+    }
+
+    @Override
+    protected Object doEvaluate() {
+        final Object result = jsScript.exec(jsContext, jsScope);
+        return (result instanceof Wrapper) ? ((Wrapper) result).unwrap() : result;
+    }
+
+    @Override
+    protected void afterEvaluation() {
+        Context.exit();
+        jsContext = null;
+        jsScope = null;
     }
 
 }

@@ -38,41 +38,28 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Function call processor.
  */
-public class CallProcessor extends BaseProcessor {
-
-    private CallDef callDef;
-
-    ScraperContext context;
-    ScriptEngine scriptEngine;
-    Map<String, ScriptEngine> cachedScriptEngines = new HashMap<String, ScriptEngine>();
+public class CallProcessor extends BaseProcessor<CallDef> {
 
     private Variable functionResult = new NodeVariable("");
-    private ScraperConfiguration configuration;
 
-    public CallProcessor(CallDef callDef, ScraperConfiguration configuration, Scraper scraper) {
+    public CallProcessor(CallDef callDef) {
         super(callDef);
-        this.configuration = configuration;
-        this.context = scraper.getContext();
-        this.callDef = callDef;
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        String functionName = BaseTemplater.execute(callDef.getName(), scraper.getScriptEngine());
+        String functionName = BaseTemplater.execute(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);
@@ -84,7 +71,7 @@ public class CallProcessor extends BaseProcessor {
         scraper.clearFunctionParams();
 
         // executes body of call processor
-        new BodyProcessor(callDef).execute(scraper, context);
+        new BodyProcessor(elementDef).execute(scraper, context);
 
         context.executeWithinNewContext(new Runnable() {
 
@@ -96,12 +83,14 @@ public class CallProcessor extends BaseProcessor {
 
                 // adds this runtime info to the running functions stack
                 scraper.addRunningFunction(CallProcessor.this);
+                try {
+                    // executes body of function using new context
+                    new BodyProcessor(functionDef).execute(scraper, context);
 
-                // executes body of function using new context
-                new BodyProcessor(functionDef).execute(scraper, context);
-
-                // remove running function from the stack
-                scraper.removeRunningFunction();
+                } finally {
+                    // remove running function from the stack
+                    scraper.removeRunningFunction();
+                }
             }
         });
 
@@ -110,22 +99,6 @@ public class CallProcessor extends BaseProcessor {
 
     public void setFunctionResult(Variable result) {
         this.functionResult = result;
-    }
-
-    public ScriptEngine getScriptEngine() {
-        if (scriptEngine == null) {
-            scriptEngine = configuration.createScriptEngine(context);
-        }
-        return scriptEngine;
-    }
-
-    public ScriptEngine getScriptEngine(String engineType) {
-        ScriptEngine engine = cachedScriptEngines.get(engineType);
-        if (engine == null) {
-            engine = configuration.createScriptEngine(context, engineType);
-            cachedScriptEngines.put(engineType, engine);
-        }
-        return engine;
     }
 
 }

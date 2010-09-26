@@ -54,8 +54,7 @@ public class ScraperContext implements DynamicScopeContext {
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
     private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
-    {
-        // global scope initialization
+    public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
     }
 

@@ -46,17 +46,14 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Variable definition read processor.
  */
-public class VarProcessor extends BaseProcessor {
-
-    private VarDef varDef;
+public class VarProcessor extends BaseProcessor<VarDef> {
 
     public VarProcessor(VarDef varDef) {
         super(varDef);
-        this.varDef = varDef;
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String name = BaseTemplater.execute( varDef.getName(), scraper.getScriptEngine() );
+        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
         this.setProperty("Name", name);
 
         Variable var = context.getVar(name);

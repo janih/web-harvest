@@ -36,27 +36,30 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
-
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
+package org.webharvest.runtime.scripting;
 
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Date: Sep 26, 2010
+ * Time: 4:37:57 PM
  */
-public final class ProcessorTestUtils {
+public final class ScriptSource {
 
-    @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
-        return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+    private String sourceCode;
+    private ScriptingLanguage language;
+
+    public ScriptSource(String sourceCode, ScriptingLanguage language) {
+        this.sourceCode = sourceCode;
+        this.language = language;
+    }
+
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    public ScriptingLanguage getLanguage() {
+        return language;
     }
 
 }

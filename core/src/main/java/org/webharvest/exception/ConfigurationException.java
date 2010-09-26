@@ -37,7 +37,7 @@
 package org.webharvest.exception;
 
 /**
- * Configuration exception - occured during parsing configuration file etc.
+ * Configuration exception - occurred during parsing configuration file etc.
  */
 public class ConfigurationException extends BaseException {
 
