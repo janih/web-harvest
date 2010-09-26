@@ -43,9 +43,13 @@ public class ScriptDef extends BaseElementDef {
 
     private String language;
 
+    // For backward compatibility with ver.2b1 only!
+    private String returnExpression;
+
     public ScriptDef(XmlNode xmlNode) {
         super(xmlNode);
         this.language = xmlNode.getAttribute("language");
+        this.returnExpression = xmlNode.getAttribute("return");
     }
 
     public String getShortElementName() {
@@ -54,6 +58,15 @@ public class ScriptDef extends BaseElementDef {
 
     public String getLanguage() {
         return language;
+    }
+
+    /**
+     * For backward compatibility with ver.2b1 only!
+     *
+     * @return
+     */
+    public String getReturnExpression() {
+        return returnExpression;
     }
 
 }

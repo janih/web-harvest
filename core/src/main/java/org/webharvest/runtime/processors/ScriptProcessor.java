@@ -55,10 +55,18 @@ public class ScriptProcessor extends BaseProcessor<ScriptDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
+        String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
+
+        // For backward compatibility with ver.2b1 only!
+        final String returnExpression = elementDef.getReturnExpression();
+        if (returnExpression != null) {
+            sourceCode += ("; " + BaseTemplater.execute(returnExpression, null, scraper));
+        }
+
         return CommonUtil.createVariable(
                 scraper.getScriptEngineFactory().
                         getEngine(new ScriptSource(
-                                getBodyTextContent(elementDef, scraper, context).toString(),
+                                sourceCode,
                                 ScriptingLanguage.recognize(
                                         BaseTemplater.execute(elementDef.getLanguage(), null, scraper)))).
                         evaluate(context));

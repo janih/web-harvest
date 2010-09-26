@@ -63,7 +63,6 @@ import static org.webharvest.runtime.processors.ProcessorTestUtils.processor;
  */
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-
 public class VarDefProcessorTest {
 
     VarDefProcessor processor;

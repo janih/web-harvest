@@ -58,7 +58,6 @@ import org.webharvest.runtime.web.HttpClientManager;
  */
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-
 public class RegexpProcessorTest {
 
     ScraperContext context;
