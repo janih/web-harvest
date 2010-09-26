@@ -102,6 +102,8 @@ public class ScriptEngineFactoryTest {
     }
 
     private void runBulkTest(int count, String code, ScriptingLanguage lang) {
+        System.out.print(MessageFormat.format("{0}: {1} cycles", StringUtils.rightPad(lang.name(), 10), count));
+
         final ScraperContext context = new ScraperContext();
         context.setVar("x", 2);
 
@@ -113,7 +115,6 @@ public class ScriptEngineFactoryTest {
         }
         watch.stop();
 
-        System.out.println(MessageFormat.format("{0}: {1} cycles \t=> {2}",
-                StringUtils.rightPad(lang.name(), 10), count, watch.toString()));
+        System.out.println(MessageFormat.format("\t=> {0}", watch.toString()));
     }
 }
