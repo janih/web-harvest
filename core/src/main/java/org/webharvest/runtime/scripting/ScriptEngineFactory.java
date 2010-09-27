@@ -38,16 +38,10 @@
 
 package org.webharvest.runtime.scripting;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
-import org.apache.commons.collections.map.IdentityMap;
-import org.webharvest.exception.EnvironmentException;
 import org.webharvest.exception.ScriptEngineException;
 import org.webharvest.exception.ScriptException;
 
 import java.lang.reflect.InvocationTargetException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,34 +58,25 @@ public class ScriptEngineFactory {
     private ScriptingLanguage defaultScriptingLanguage;
 
     private Map<ScriptingLanguage, Map<String, ScriptEngine>> engineCachePerLanguage;
-    private MessageDigest sha1Digest;
 
     public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage) {
-        try {
-            sha1Digest = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new EnvironmentException(e);
-        }
-
         this.defaultScriptingLanguage = defaultScriptingLanguage;
         this.engineCachePerLanguage = new HashMap<ScriptingLanguage, Map<String, ScriptEngine>>();
 
         // initialize cache for each language
         for (ScriptingLanguage language : ScriptingLanguage.values()) {
-            @SuppressWarnings({"unchecked"})
-            final Map<String, ScriptEngine> identityMap = new IdentityMap();
-            engineCachePerLanguage.put(language, identityMap);
+            engineCachePerLanguage.put(language, new HashMap<String, ScriptEngine>());
         }
     }
 
     public ScriptEngine getEngine(ScriptSource scriptSource) {
         final Map<String, ScriptEngine> engineCache = engineCachePerLanguage.get(getLanguageNotNull(scriptSource.getLanguage()));
-        final String sha1 = calculateSHA1(scriptSource.getSourceCode());
+        final String key = createCacheKey(scriptSource.getSourceCode());
 
-        ScriptEngine engine = engineCache.get(sha1);
+        ScriptEngine engine = engineCache.get(key);
         if (engine == null) {
             engine = createEngine(scriptSource);
-            engineCache.put(sha1, engine);
+            engineCache.put(key, engine);
         }
 
         return engine;
@@ -113,11 +98,11 @@ public class ScriptEngineFactory {
         }
     }
 
-    private ScriptingLanguage getLanguageNotNull(ScriptingLanguage language) {
-        return (ScriptingLanguage) defaultIfNull(language, defaultScriptingLanguage);
+    private String createCacheKey(String input) {
+        return input;
     }
 
-    private String calculateSHA1(String input) {
-        return Hex.encodeHexString(sha1Digest.digest(StringUtils.getBytesUtf8(input))).intern();
+    private ScriptingLanguage getLanguageNotNull(ScriptingLanguage language) {
+        return (ScriptingLanguage) defaultIfNull(language, defaultScriptingLanguage);
     }
 }
