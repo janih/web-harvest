@@ -65,7 +65,7 @@ import java.util.regex.Pattern;
 public class HttpProcessor extends BaseProcessor<HttpDef> {
 
     private static final String HTML_META_CHARSET_REGEX =
-            "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')/?>)";
+            "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')\\s*/?>)";
 
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
