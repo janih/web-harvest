@@ -36,7 +36,9 @@
 */
 package org.webharvest.runtime.variables;
 
-import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,38 +47,44 @@ import java.util.List;
 public class EmptyVariable extends Variable {
 
     public static final EmptyVariable INSTANCE = new EmptyVariable();
-
-    public static final String EMPTY_VALUE_OBJECT = "";
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
     private EmptyVariable() {
     }
 
+    @Override
     public String toString() {
-    	return EMPTY_VALUE_OBJECT;
+        return StringUtils.EMPTY;
     }
 
+    @Override
     public String toString(String charset) {
-        return toString();
+        return StringUtils.EMPTY;
     }
 
+    @Override
     public byte[] toBinary() {
-        return new byte[] {};
+        return EMPTY_BYTE_ARRAY;
     }
 
+    @Override
     public byte[] toBinary(String charset) {
-        return toBinary();
+        return EMPTY_BYTE_ARRAY;
     }
 
+    @Override
     public List toList() {
-        return new ArrayList();
+        return Collections.EMPTY_LIST;
     }
 
+    @Override
     public boolean isEmpty() {
         return true;
     }
 
+    @Override
     public Object getWrappedObject() {
-        return EMPTY_VALUE_OBJECT;
+        return StringUtils.EMPTY;
     }
 
 }
