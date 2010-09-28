@@ -52,8 +52,6 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.web.HttpClientManager;
 
-import java.util.Arrays;
-
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -89,40 +87,39 @@ public class VarDefProcessorTest {
     @Test
     public void testExecute_newVar_overwriteDefault() throws Exception {
         invoke("<var-def name='x'>123</var-def>");
-        assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_newVar_overwriteTrue() throws Exception {
         invoke("<var-def name='x' overwrite='true'>123</var-def>");
-        assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_newVar_overwriteFalse() throws Exception {
         invoke("<var-def name='x' overwrite='false'>123</var-def>");
-        assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteDefault() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x'>123</var-def>");
-        assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteTrue() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x' overwrite='true'>123</var-def>");
-        assertReflectionEquals(Arrays.asList(new NodeVariable("123")), context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteFalse() throws Exception {
         context.setVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x' overwrite='false'>123</var-def>");
-        // todo: inconsistency in returning result when variable is NOT reassigned! NodeVariable versus ListVariable
-        assertReflectionEquals("existing", context.getVar("x").getWrappedObject());
+        assertReflectionEquals(new NodeVariable("existing"), context.getVar("x"));
     }
 }

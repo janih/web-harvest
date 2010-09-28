@@ -5,8 +5,8 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.ListVariable;
-import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Processor which executes only body and returns variables list.
@@ -18,20 +18,19 @@ public class BodyProcessor extends BaseProcessor<BaseElementDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        IElementDef[] defs = elementDef.getOperationDefs();
-        ListVariable result = new ListVariable();
+        final IElementDef[] defs = elementDef.getOperationDefs();
 
-        if (defs.length > 0) {
-            for (IElementDef def : defs) {
-                BaseProcessor processor = ProcessorResolver.createProcessor(def);
-                result.addVariable(processor.run(scraper, context));
-            }
-        } else {
-            result.addVariable(new NodeVariable(elementDef.getBodyText()));
+        if (defs.length == 0) {
+            return CommonUtil.createVariable(elementDef.getBodyText());
+        }
+        if (defs.length == 1) {
+            return CommonUtil.createVariable(ProcessorResolver.createProcessor(defs[0]).run(scraper, context));
         }
 
-        // todo: why always list ???
+        final ListVariable result = new ListVariable();
+        for (IElementDef def : defs) {
+            result.addVariable(ProcessorResolver.createProcessor(def).run(scraper, context));
+        }
         return result;
     }
-
 }

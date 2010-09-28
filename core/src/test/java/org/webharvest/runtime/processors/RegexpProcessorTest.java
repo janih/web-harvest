@@ -94,7 +94,7 @@ public class RegexpProcessorTest {
     @Test
     public void testExecute_empty() throws Exception {
         Assert.assertEquals(
-                "[][][]",
+                "", // <regexp-result> is not evaluated
                 ProcessorTestUtils.<RegexpProcessor>processor("" +
                         "<regexp>" +
                         "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +

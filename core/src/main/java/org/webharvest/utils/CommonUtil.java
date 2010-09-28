@@ -562,7 +562,7 @@ public class CommonUtil {
     public static Variable createVariable(Object value) {
         if (value instanceof Variable) {
             return (Variable) value;
-        } else if (value == null) {
+        } else if (value == null || value instanceof String && StringUtils.isEmpty((String) value)) {
             return EmptyVariable.INSTANCE;
         } else if (value instanceof Collection) {
             return new ListVariable(new ArrayList((Collection) value));
