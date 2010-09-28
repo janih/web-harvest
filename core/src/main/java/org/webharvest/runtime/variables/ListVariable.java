@@ -41,12 +41,13 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * List variable - String wrapper.
  */
-public class ListVariable extends Variable {
+public class ListVariable extends Variable implements Iterable {
 
     private List<Variable> list;
 
@@ -178,4 +179,8 @@ public class ListVariable extends Variable {
         return list.get(index);
     }
 
+    @Override
+    public Iterator iterator() {
+        return list.iterator();
+    }
 }
