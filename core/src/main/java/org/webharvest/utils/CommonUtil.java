@@ -41,6 +41,8 @@ import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.query.QueryResult;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.type.Type;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -104,11 +106,11 @@ public class CommonUtil {
     }
 
     public static boolean isEmptyString(Object o) {
-        return o == null || "".equals(o.toString().trim());
+        return StringUtils.isBlank(ObjectUtils.toString(o));
     }
 
     public static String nvl(Object value, String defaultValue) {
-        return value != null ? value.toString() : defaultValue;
+        return ObjectUtils.toString(value, defaultValue);
     }
 
     public static String adaptFilename(String filePath) {
@@ -116,7 +118,7 @@ public class CommonUtil {
     }
 
     public static boolean isEmpty(String s) {
-        return s == null || "".equals(s);
+        return StringUtils.isEmpty(s);
     }
 
     /**
@@ -563,11 +565,9 @@ public class CommonUtil {
         } else if (value == null) {
             return EmptyVariable.INSTANCE;
         } else if (value instanceof Collection) {
-            Collection collection = (Collection) value;
-            return new ListVariable(new ArrayList(collection));
+            return new ListVariable(new ArrayList((Collection) value));
         } else if (value instanceof Object[]) {
-            List list = Arrays.asList((Object[]) value);
-            return new ListVariable(list);
+            return new ListVariable(Arrays.asList((Object[]) value));
         } else {
             return new NodeVariable(value);
         }
@@ -630,11 +630,10 @@ public class CommonUtil {
      */
     public static boolean existsInStringArray(String[] array, String s, boolean caseSensitive) {
         if (s != null && array != null) {
-            for (int i = 0; i < array.length; i++) {
-                if ((caseSensitive && s.equals(array[i])) || s.equalsIgnoreCase(array[i])) {
+            for (String e : array) {
+                if ((caseSensitive && s.equals(e)) || s.equalsIgnoreCase(e)) {
                     return true;
                 }
-
             }
         }
         return false;
