@@ -40,6 +40,7 @@ import org.webharvest.definition.VarDefDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -53,25 +54,22 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        Variable var = new BodyProcessor(elementDef).execute(scraper, context);
+        final Variable var = new BodyProcessor(elementDef).execute(scraper, context);
 
-        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
-        String overwrite = BaseTemplater.execute(elementDef.getOverwrite(), null, scraper);
-        boolean toOverwrite = overwrite == null || CommonUtil.isBooleanTrue(overwrite);
+        final String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        final String overwrite = BaseTemplater.execute(elementDef.getOverwrite(), null, scraper);
+        final boolean toOverwrite = (overwrite == null || CommonUtil.isBooleanTrue(overwrite));
 
-        final Variable existingVar = context.getVar(name);
-        if (existingVar == null || toOverwrite) {
+        if (context.getVar(name) == null || toOverwrite) {
             context.setVar(name, var);
         } else {
-            this.setProperty("Shaded value", var);
-            var = existingVar;
+            this.setProperty("[Default Value]", var);
         }
 
         this.setProperty("Name", name);
         this.setProperty("Overwrite", toOverwrite);
 
-        // todo: is returning result actually needed? Why not <empty>?
-        return var;
+        return EmptyVariable.INSTANCE;
     }
 
 }

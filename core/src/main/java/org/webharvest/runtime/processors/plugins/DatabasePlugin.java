@@ -1,16 +1,17 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.exception.*;
+import org.webharvest.exception.DatabaseException;
+import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.*;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Support for database operations.
@@ -126,7 +127,7 @@ public class DatabasePlugin extends WebHarvestPlugin {
                 }
                 return queryResult;
             } else {
-                return new EmptyVariable();
+                return EmptyVariable.INSTANCE;
             }
         } catch (SQLException e) {
             throw new DatabaseException(e);

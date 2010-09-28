@@ -1,14 +1,18 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.apache.commons.net.ftp.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.net.ftp.FTPClient;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
-import java.util.*;
-import java.nio.charset.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Ftp Put plugin - can be used only inside ftp plugin for storing file to remote directory.
@@ -49,7 +53,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
             throw new FtpPluginException("Cannot use ftp put plugin out of ftp plugin context!");
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {

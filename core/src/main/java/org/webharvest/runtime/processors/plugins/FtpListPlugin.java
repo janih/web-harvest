@@ -1,15 +1,19 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.apache.commons.net.ftp.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-import java.nio.charset.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Ftp List plugin - can be used only inside ftp plugin for listing file in working remote directory.
@@ -77,8 +81,8 @@ public class FtpListPlugin extends WebHarvestPlugin {
         } else {
             throw new FtpPluginException("Cannot use ftp list plugin out of ftp plugin context!");
         }
-        
-        return new EmptyVariable();
+
+        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {

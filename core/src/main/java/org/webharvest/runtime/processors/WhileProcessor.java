@@ -102,7 +102,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
             }
         });
 
-        return isEmpty ? new EmptyVariable() : new ListVariable(resultList);
+        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
     }
 
 }

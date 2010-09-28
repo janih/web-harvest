@@ -68,7 +68,7 @@ public abstract class Variable {
         if (wrappedObject == null) {
             return false;
         } else if (wrappedObject instanceof Boolean) {
-            return ((Boolean) wrappedObject).booleanValue();
+            return (Boolean) wrappedObject;
         } else {
             String strValue = toString().trim();
             return "true".equalsIgnoreCase(strValue) || "yes".equalsIgnoreCase(strValue) || "1".equalsIgnoreCase(strValue);

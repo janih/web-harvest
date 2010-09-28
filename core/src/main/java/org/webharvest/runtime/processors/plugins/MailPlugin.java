@@ -1,16 +1,18 @@
 package org.webharvest.runtime.processors.plugins;
 
+import org.apache.commons.mail.*;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.apache.commons.mail.*;
 
-import javax.activation.*;
-import java.io.*;
-import java.util.*;
-import java.nio.charset.*;
+import javax.activation.DataSource;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Mail sending processor.
@@ -124,8 +126,8 @@ public class MailPlugin extends WebHarvestPlugin {
         }
 
         email = null;
-        
-        return new EmptyVariable();
+
+        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {

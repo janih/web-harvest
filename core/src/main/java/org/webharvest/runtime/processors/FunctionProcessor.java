@@ -56,7 +56,7 @@ public class FunctionProcessor extends BaseProcessor<FunctionDef> {
 
         this.setProperty("Name", elementDef.getName());
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
 }

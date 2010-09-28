@@ -43,16 +43,16 @@ import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.type.Type;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -561,7 +561,7 @@ public class CommonUtil {
         if (value instanceof Variable) {
             return (Variable) value;
         } else if (value == null) {
-            return new EmptyVariable();
+            return EmptyVariable.INSTANCE;
         } else if (value instanceof Collection) {
             Collection collection = (Collection) value;
             return new ListVariable(new ArrayList(collection));

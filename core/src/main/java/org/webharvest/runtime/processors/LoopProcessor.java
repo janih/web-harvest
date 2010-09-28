@@ -104,7 +104,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
 
                         // execute the loop body
                         BaseElementDef bodyDef = elementDef.getLoopBodyDef();
-                        Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : new EmptyVariable();
+                        Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
                         debug(bodyDef, scraper, loopResult);
                         if (!isEmpty) {
                             resultList.addAll(loopResult.toList());
@@ -114,7 +114,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
             });
         }
 
-        return isEmpty ? new EmptyVariable() : new ListVariable(resultList);
+        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
     }
 
     /**

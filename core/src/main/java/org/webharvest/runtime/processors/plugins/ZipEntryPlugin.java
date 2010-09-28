@@ -1,14 +1,18 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
-import java.nio.charset.*;
-import java.util.*;
-import java.util.zip.*;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Zip entry plugin - can be used only inside zip plugin.
@@ -43,7 +47,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
         } else {
             throw new ZipPluginException("Cannot use zip entry plugin out of zip plugin context!");
         }
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {

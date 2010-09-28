@@ -172,7 +172,7 @@ public class Scraper {
             releaseDBConnections();
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
     public void execute() {

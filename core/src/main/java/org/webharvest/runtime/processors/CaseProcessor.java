@@ -76,7 +76,7 @@ public class CaseProcessor extends BaseProcessor<CaseDef> {
             return elseResult;
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
 }

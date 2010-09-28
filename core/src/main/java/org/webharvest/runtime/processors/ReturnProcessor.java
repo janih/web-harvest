@@ -59,7 +59,7 @@ public class ReturnProcessor extends BaseProcessor<ReturnDef> {
             callProcessor.setFunctionResult(returnValue);
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
 }

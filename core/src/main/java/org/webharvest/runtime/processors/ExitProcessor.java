@@ -34,7 +34,7 @@ public class ExitProcessor extends BaseProcessor<ExitDef> {
             }
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
 }

@@ -48,11 +48,7 @@ public class EmptyVariable extends Variable {
 
     public static final String EMPTY_VALUE_OBJECT = "";
 
-    public EmptyVariable() {
-    }
-
-    public String getType() {
-        return Types.TYPE_EMPTY;
+    private EmptyVariable() {
     }
 
     public String toString() {
@@ -74,10 +70,6 @@ public class EmptyVariable extends Variable {
     public List toList() {
         return new ArrayList();
     }
-    
-    public String toXml() {
-    	return EMPTY_VALUE_OBJECT;
-	}
 
     public boolean isEmpty() {
         return true;
@@ -86,5 +78,5 @@ public class EmptyVariable extends Variable {
     public Object getWrappedObject() {
         return EMPTY_VALUE_OBJECT;
     }
-    
+
 }

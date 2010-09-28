@@ -45,7 +45,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
                     }
                     DataSource dataSource = MailPlugin.createDataSourceOfVariable(bodyVar, scraper.getConfiguration().getCharset(), mimeType);
                     String cid = htmlEmail.embed(dataSource, attachmentName);
-                    return isInline ? new NodeVariable("cid:" + cid) : new EmptyVariable();
+                    return isInline ? new NodeVariable("cid:" + cid) : EmptyVariable.INSTANCE;
                 } catch (IOException e) {
                     throw new MailPluginException(e);
                 } catch (EmailException e) {

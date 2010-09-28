@@ -1,12 +1,14 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.apache.commons.net.ftp.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.net.ftp.FTPClient;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Ftp Mkdir plugin - can be used only inside ftp plugin for removing subdirectory on remote directory.
@@ -38,7 +40,7 @@ public class FtpRmdirPlugin extends WebHarvestPlugin {
             throw new FtpPluginException("Cannot use ftp rmdir plugin out of ftp plugin context!");
         }
 
-        return new EmptyVariable();
+        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {

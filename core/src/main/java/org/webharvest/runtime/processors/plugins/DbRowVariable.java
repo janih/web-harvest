@@ -1,12 +1,14 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.runtime.variables.*;
 import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Special variable used for database records
@@ -43,7 +45,7 @@ public class DbRowVariable extends NodeVariable {
     }
 
     public Variable get(int index) {
-        return data[index] == null ? new EmptyVariable() : new NodeVariable(data[index]);
+        return data[index] == null ? EmptyVariable.INSTANCE : new NodeVariable(data[index]);
     }
 
     public Variable get(String columnName) {
