@@ -52,7 +52,11 @@
 
     <repositories>
         <repository>
-            <!-- is only needed for net.sourceforge.htmlcleaner:htmlcleaner:2.1 -->
+            <id>ibiblio.org</id>
+            <name>ibiblio Mirror of http://repo1.maven.org/maven2/</name>
+            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+        </repository>
+        <repository>
             <id>externals.maven.xwiki.org</id>
             <name>XWiki Maven repo (externals)</name>
             <url>http://maven.xwiki.org/externals/</url>
@@ -61,6 +65,11 @@
             <id>repository.jboss.org</id>
             <name>JBoss Repository</name>
             <url>http://repository.jboss.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>repository.apache.org/releases</id>
+            <name>Apache repo (releases)</name>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
         </repository>
     </repositories>
 
