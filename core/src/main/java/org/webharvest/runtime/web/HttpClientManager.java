@@ -46,6 +46,7 @@ import org.apache.commons.httpclient.methods.multipart.*;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.lang.BooleanUtils;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -170,7 +171,7 @@ public class HttpClientManager {
         // todo: remove this code if next version fixes the problem
         Cookie[] cookies = clientState.getCookies();
         if (cookies != null) {
-            for (Cookie cookie: cookies) {
+            for (Cookie cookie : cookies) {
                 if (cookie.getExpiryDate() == null) {
                     cookie.setExpiryDate(new Date());
                 }
@@ -203,7 +204,7 @@ public class HttpClientManager {
         }
 
         try {
-            client.executeMethod(method);
+            method = executeFollowingRedirects(method, url, followRedirects);
 
             final HttpResponseWrapper httpResponseWrapper = new HttpResponseWrapper(method);
 
@@ -216,6 +217,29 @@ public class HttpClientManager {
         } finally {
             method.releaseConnection();
         }
+    }
+
+    private HttpMethodBase executeFollowingRedirects(HttpMethodBase method, String url, Boolean followRedirects) throws IOException {
+        final int statusCode = client.executeMethod(method);
+        // POST method is not redirected automatically, so it's on our responsibility then.
+        if (BooleanUtils.isTrue(followRedirects)
+                && ((statusCode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                (statusCode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                (statusCode == HttpStatus.SC_SEE_OTHER) ||
+                (statusCode == HttpStatus.SC_TEMPORARY_REDIRECT))) {
+            final Header header = method.getResponseHeader("location");
+            if (header != null) {
+                final String nextURI = header.getValue();
+                if (!CommonUtil.isEmptyString(nextURI)) {
+                    method.releaseConnection();
+                    final GetMethod nextMethod = new GetMethod(CommonUtil.fullUrl(url, nextURI));
+                    identifyAsDefaultBrowser(nextMethod);
+                    client.executeMethod(nextMethod);
+                    return nextMethod;
+                }
+            }
+        }
+        return method;
     }
 
     /**
