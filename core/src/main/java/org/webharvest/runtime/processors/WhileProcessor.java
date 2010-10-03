@@ -100,7 +100,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
                     condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
                 }
             }
-        });
+        }, true);
 
         return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
     }

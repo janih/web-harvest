@@ -111,7 +111,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
                         }
                     }
                 }
-            });
+            }, true);
         }
 
         return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);

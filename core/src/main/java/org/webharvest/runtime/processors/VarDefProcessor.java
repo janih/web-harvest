@@ -46,7 +46,9 @@ import org.webharvest.utils.CommonUtil;
 
 /**
  * Variable definition read processor.
+ * @deprecated Use either DefProcessor or SetProcessor
  */
+@Deprecated
 public class VarDefProcessor extends BaseProcessor<VarDefDef> {
 
     public VarDefProcessor(VarDefDef varDef) {
@@ -61,7 +63,7 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
         final boolean toOverwrite = (overwrite == null || CommonUtil.isBooleanTrue(overwrite));
 
         if (context.getVar(name) == null || toOverwrite) {
-            context.setVar(name, var);
+            context.setVar_compat2b1(name, var);
         } else {
             this.setProperty("[Default Value]", var);
         }

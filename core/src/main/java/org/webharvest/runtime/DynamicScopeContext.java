@@ -53,5 +53,5 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     void setVar(String key, Variable value);
 
-    void executeWithinNewContext(Runnable runnable);
+    void executeWithinNewContext(Runnable runnable, boolean loopBody_compat2b1);
 }

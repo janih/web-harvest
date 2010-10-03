@@ -128,11 +128,13 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     @Override
-    public void executeWithinNewContext(Runnable runnable) {
+    public void executeWithinNewContext(Runnable runnable, boolean loopBody_compat2b1) {
         try {
             variablesNamesStack.push(new HashSet<String>());
+            loopBodyScope_compat2b1.push(loopBody_compat2b1);
             runnable.run();
         } finally {
+            loopBodyScope_compat2b1.pop();
             for (String varName : variablesNamesStack.pop()) {
                 removeVarFromCRT(varName);
             }
@@ -150,4 +152,69 @@ public class ScraperContext implements DynamicScopeContext {
         }
     }
 
+    /**
+     * Compatibility stuff dedicated to <var-def> processor
+     * which is deprecated and replaced by <def> and <set> processors.
+     * <p/>
+     * ========= THE FOLLOWING MUST BE REMOVED IN 3.0 MAJOR RELEASE =========
+     */
+
+    private Stack<Boolean> loopBodyScope_compat2b1 = new Stack<Boolean>();
+
+    {
+        loopBodyScope_compat2b1.push(false);
+    }
+
+    @Deprecated
+    public void setVar_compat2b1(String name, Variable var) {
+        if (!loopBodyScope_compat2b1.peek()) {
+            setVar(name, var);
+            return;
+        }
+
+        // Inside loops <var-def> used to operate with the parent scope
+        // (the one of the loop itself instead of the loop body's scope)
+        // and so do we below.
+
+        Stack<Variable> variableValueStack = centralReferenceTable.get(name);
+        final Set<String> localVariableNames = variablesNamesStack.peek();
+        final Set<String> prevVariableNames = variablesNamesStack.getList().get(variablesNamesStack.size() - 2);
+
+        if (variableValueStack == null) {
+            // Case A - new variable for the whole stack
+            // [-]...[-][-]
+            //        v
+            // [-]...[+][-]
+            variableValueStack = new Stack<Variable>();
+            centralReferenceTable.put(name, variableValueStack);
+            prevVariableNames.add(name);
+            variableValueStack.push(var);
+        } else if (prevVariableNames.contains(name) && localVariableNames.contains(name)) {
+            // Case B - variable is defined in both the parent and the local scopes
+            // [?]...[1][+]
+            //        v
+            // [?]...[2][+]
+            variableValueStack.getList().set(variableValueStack.size() - 2, var);
+        } else if (prevVariableNames.contains(name)) {
+            // Case C - variable is defined in the parent scope but local
+            // [?]...[1][-]
+            //        v
+            // [?]...[2][-]
+            variableValueStack.getList().set(variableValueStack.size() - 1, var);
+        } else if (localVariableNames.contains(name)) {
+            // Case D - variable is defined in the parent local scope but parent
+            // [?]...[-][+]
+            //        v
+            // [?]...[+][+]
+            prevVariableNames.add(name);
+            variableValueStack.getList().add(variableValueStack.size() - 1, var);
+        } else {
+            // Case E - variable is NOT defined in the parent or local scopes, but defined somewhere earlier.
+            // [+]...[-][-]
+            //        v
+            // [+]...[+][-]
+            prevVariableNames.add(name);
+            variableValueStack.push(var);
+        }
+    }
 }

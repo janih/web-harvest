@@ -154,7 +154,7 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
                         resultList.add(new NodeVariable(buffer.toString()));
                     }
                 }
-            });
+            }, true);
         }
 
 

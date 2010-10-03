@@ -92,7 +92,7 @@ public class CallProcessor extends BaseProcessor<CallDef> {
                     scraper.removeRunningFunction();
                 }
             }
-        });
+        }, false);
 
         return functionResult;
     }
