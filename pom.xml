@@ -57,6 +57,11 @@
             <name>XWiki Maven repo (externals)</name>
             <url>http://maven.xwiki.org/externals/</url>
         </repository>
+        <repository>
+            <id>repository.jboss.org</id>
+            <name>JBoss Repository</name>
+            <url>http://repository.jboss.org/maven2/</url>
+        </repository>
     </repositories>
 
     <build>
@@ -213,7 +218,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>saxon-dom</artifactId>
-                <version>9</version>
+                <version>9.1.0.8</version>
             </dependency>
 
             <!-- TEST SCOPE -->
