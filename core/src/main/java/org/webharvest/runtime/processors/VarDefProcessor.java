@@ -46,6 +46,7 @@ import org.webharvest.utils.CommonUtil;
 
 /**
  * Variable definition read processor.
+ *
  * @deprecated Use either DefProcessor or SetProcessor
  */
 @Deprecated
@@ -65,10 +66,10 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
         if (context.getVar(name) == null || toOverwrite) {
             context.setVar_compat2b1(name, var);
         } else {
-            this.setProperty("[Default Value]", var);
+            this.setProperty("Default", var);
         }
 
-        this.setProperty("Name", name);
+        this.setProperty("\"" + name + "\"", var);
         this.setProperty("Overwrite", toOverwrite);
 
         return EmptyVariable.INSTANCE;
