@@ -46,8 +46,6 @@ import org.webharvest.utils.KeyValuePair;
  */
 public abstract class ScriptEngine {
 
-    public static final String CONTEXT_VARIABLE_NAME = "___web_harvest_context___";
-
     public Object evaluate(DynamicScopeContext context) {
         try {
             beforeEvaluation();

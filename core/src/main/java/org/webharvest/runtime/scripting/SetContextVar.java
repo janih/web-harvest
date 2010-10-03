@@ -37,28 +37,18 @@
 package org.webharvest.runtime.scripting;
 
 import bsh.CallStack;
-import bsh.EvalError;
 import bsh.Interpreter;
-import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.utils.CommonUtil;
 
 /**
  * Implementation of set command for saving variables back to web-harvest
  * context from the script.
  */
-// todo: is it used somewhere?
+@SuppressWarnings({"UnusedDeclaration"})
 public class SetContextVar {
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {
-        try {
-            DynamicScopeContext context = (DynamicScopeContext) interpreter.get(ScriptEngine.CONTEXT_VARIABLE_NAME);
-            if (context != null) {
-                context.setVar(name, CommonUtil.createVariable(value));
-            }
-        } catch (EvalError e) {
-            throw new ScriptException("Cannot get web-Harvest context from interpreter: " + e.getMessage(), e);
-        }
+        ScraperContextHolder.getCurrentContext().setVar(name, CommonUtil.createVariable(value));
     }
-
 }
