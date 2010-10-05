@@ -77,14 +77,14 @@ public class HttpProcessor extends BaseProcessor<HttpDef> {
     public Variable execute(Scraper scraper, ScraperContext context) {
         scraper.setRunningHttpProcessor(this);
 
-        final String url = BaseTemplater.execute(elementDef.getUrl(), null, scraper);
-        final String method = BaseTemplater.execute(elementDef.getMethod(), null, scraper);
-        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getFollowRedirects(), null, scraper), null);
-        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getMultipart(), null, scraper), false);
-        final String specifiedCharset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
-        final String username = BaseTemplater.execute(elementDef.getUsername(), null, scraper);
-        final String password = BaseTemplater.execute(elementDef.getPassword(), null, scraper);
-        final String cookiePolicy = BaseTemplater.execute(elementDef.getCookiePolicy(), null, scraper);
+        final String url = BaseTemplater.evaluateToString(elementDef.getUrl(), null, scraper);
+        final String method = BaseTemplater.evaluateToString(elementDef.getMethod(), null, scraper);
+        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFollowRedirects(), null, scraper), null);
+        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getMultipart(), null, scraper), false);
+        final String specifiedCharset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
+        final String username = BaseTemplater.evaluateToString(elementDef.getUsername(), null, scraper);
+        final String password = BaseTemplater.evaluateToString(elementDef.getPassword(), null, scraper);
+        final String cookiePolicy = BaseTemplater.evaluateToString(elementDef.getCookiePolicy(), null, scraper);
 
         String charset = specifiedCharset;
 

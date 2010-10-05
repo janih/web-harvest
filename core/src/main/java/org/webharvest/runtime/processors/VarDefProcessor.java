@@ -59,8 +59,8 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
     public Variable execute(Scraper scraper, ScraperContext context) {
         final Variable var = new BodyProcessor(elementDef).execute(scraper, context);
 
-        final String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
-        final String overwrite = BaseTemplater.execute(elementDef.getOverwrite(), null, scraper);
+        final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
+        final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, scraper);
         final boolean toOverwrite = (overwrite == null || CommonUtil.isBooleanTrue(overwrite));
 
         if (context.getVar(name) == null || toOverwrite) {

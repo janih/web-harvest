@@ -57,7 +57,7 @@ public class XPathProcessor extends BaseProcessor<XPathDef> {
 
     public Variable execute(Scraper scraper, ScraperContext context) {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
-        String expression = BaseTemplater.execute(elementDef.getExpression(), null, scraper);
+        String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);
         this.setProperty("Expression", expression);
 
         try {

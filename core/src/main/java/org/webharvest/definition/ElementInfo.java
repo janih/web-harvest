@@ -38,7 +38,6 @@ package org.webharvest.definition;
 
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -56,12 +55,11 @@ public class ElementInfo {
     private boolean isInternalPlugin;
     private Class definitionClass;
     private String validTags;
-    private String validAtts;
 
-    private Set tagsSet = new TreeSet();
-    private Set requiredTagsSet = new TreeSet();
-    private Set attsSet = new TreeSet();
-    private Set requiredAttsSet = new TreeSet();
+    private Set<String> tagsSet = new TreeSet<String>();
+    private Set<String> requiredTagsSet = new TreeSet<String>();
+    private Set<String> attsSet = new TreeSet<String>();
+    private Set<String> requiredAttsSet = new TreeSet<String>();
 
     private boolean allTagsAllowed;
 
@@ -78,7 +76,6 @@ public class ElementInfo {
         this.isInternalPlugin = isInternalPlugin;
         this.definitionClass = definitionClass;
         this.validTags = validTags;
-        this.validAtts = validAtts;
 
         this.allTagsAllowed = validTags == null;
 
@@ -114,19 +111,15 @@ public class ElementInfo {
     public String getTemplate(boolean onlyRequiredAtts) {
         StringBuffer result = new StringBuffer("<" + this.name);
 
-        Set atts = onlyRequiredAtts ? this.requiredAttsSet : this.attsSet;
-
-        Iterator iterator = atts.iterator();
-        while (iterator.hasNext()) {
-            String att = (String) iterator.next();
-            result.append(" " + att + "=\"\"");
+        for (String att : (onlyRequiredAtts ? this.requiredAttsSet : this.attsSet)) {
+            result.append(" ").append(att).append("=\"\"");
         }
 
         // if no valid subtags
         if (this.validTags != null && "".equals(this.validTags.trim())) {
             result.append("/>");
         } else {
-            result.append("></" + name + ">");
+            result.append("></").append(name).append(">");
         }
 
         return result.toString();
@@ -149,19 +142,19 @@ public class ElementInfo {
         return name;
     }
 
-    public Set getTagsSet() {
+    public Set<String> getTagsSet() {
         return tagsSet;
     }
 
-    public Set getAttsSet() {
+    public Set<String> getAttsSet() {
         return attsSet;
     }
 
-    public Set getRequiredAttsSet() {
+    public Set<String> getRequiredAttsSet() {
         return requiredAttsSet;
     }
 
-    public Set getRequiredTagsSet() {
+    public Set<String> getRequiredTagsSet() {
         return requiredTagsSet;
     }
 

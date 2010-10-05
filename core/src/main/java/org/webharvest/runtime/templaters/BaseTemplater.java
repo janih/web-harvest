@@ -36,9 +36,17 @@
 */
 package org.webharvest.runtime.templaters;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple templater - replaces ${expression} sequences in string with evaluated expressions.
@@ -49,18 +57,28 @@ public class BaseTemplater {
     public static String VAR_START = "${";
     public static String VAR_END = "}";
 
-    public static String execute(String source, ScriptingLanguage language, Scraper scraper) {
+    public static String evaluateToString(String source, ScriptingLanguage language, Scraper scraper) {
+        return ObjectUtils.toString(executeToVariable(source, language, scraper), null);
+    }
+
+    public static Variable executeToVariable(String source, ScriptingLanguage language, Scraper scraper) {
         if (source == null) {
-            return source;
+            return null;
         }
 
-        StringBuilder result = new StringBuilder();
-
         int startIndex = source.indexOf(VAR_START);
+
+        if (startIndex < 0) {
+            return new NodeVariable(source);
+        }
+
+        final List<Object> result = new ArrayList<Object>();
         int endIndex = -1;
 
-        while (startIndex >= 0 && startIndex < source.length()) {
-            result.append(source.substring(endIndex + 1, startIndex));
+        while (0 <= startIndex && startIndex < source.length()) {
+            if (endIndex + 1 < startIndex) {
+                result.add(source.substring(endIndex + 1, startIndex));
+            }
             endIndex = source.indexOf(VAR_END, startIndex);
 
             if (endIndex > startIndex) {
@@ -69,16 +87,19 @@ public class BaseTemplater {
                         evaluate(scraper.getContext());
 
                 if (resultObj != null) {
-                    result.append(resultObj.toString());
+                    result.add(resultObj);
                 }
             }
 
             startIndex = source.indexOf(VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1));
         }
 
-        result.append(source.substring(endIndex + 1));
+        if (endIndex + 1 < source.length()) {
+            result.add(source.substring(endIndex + 1));
+        }
 
-        return result.toString();
+        return CommonUtil.createVariable(result.size() == 1 ? result.get(0) : StringUtils.join(result, null));
+
     }
 
 }

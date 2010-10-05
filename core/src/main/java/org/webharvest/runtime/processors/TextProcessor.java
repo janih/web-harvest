@@ -55,11 +55,11 @@ public class TextProcessor extends BaseProcessor<TextDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String charset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
+        String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();
         }
-        String delimiter = BaseTemplater.execute(elementDef.getDelimiter(), null, scraper);
+        String delimiter = BaseTemplater.evaluateToString(elementDef.getDelimiter(), null, scraper);
         if (delimiter == null) {
             delimiter = "\n";
         }

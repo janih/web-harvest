@@ -60,7 +60,7 @@ public class ScriptProcessor extends BaseProcessor<ScriptDef> {
         // For backward compatibility with ver.2b1 only!
         final String returnExpression = elementDef.getReturnExpression();
         if (returnExpression != null) {
-            sourceCode += ("; " + BaseTemplater.execute(returnExpression, null, scraper));
+            sourceCode += ("; " + BaseTemplater.evaluateToString(returnExpression, null, scraper));
         }
 
         return CommonUtil.createVariable(
@@ -68,7 +68,7 @@ public class ScriptProcessor extends BaseProcessor<ScriptDef> {
                         getEngine(new ScriptSource(
                                 sourceCode,
                                 ScriptingLanguage.recognize(
-                                        BaseTemplater.execute(elementDef.getLanguage(), null, scraper)))).
+                                        BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)))).
                         evaluate(context));
     }
 

@@ -111,7 +111,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
 
         int runningLevel = scraper.getRunningLevel();
 
-        String id = (this.elementDef != null) ? BaseTemplater.execute(this.elementDef.getId(), null, scraper) : null;
+        String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, scraper) : null;
         String idDesc = id != null ? "[ID=" + id + "] " : "";
         String indent = CommonUtil.replicate("    ", runningLevel - 1);
 
@@ -156,7 +156,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
     }
 
     protected void debug(BaseElementDef elementDef, Scraper scraper, Variable variable) {
-        String id = (elementDef != null) ? BaseTemplater.execute(elementDef.getId(), null, scraper) : null;
+        String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper) : null;
 
         if (scraper.isDebugMode() && id != null) {
             if (variable != null) {

@@ -61,9 +61,9 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        final String index = BaseTemplater.execute(elementDef.getIndex(), null, scraper);
-        final String maxLoopsString = BaseTemplater.execute(elementDef.getMaxLoops(), null, scraper);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getEmpty(), null, scraper), false);
+        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
+        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
 
         final List<Object> resultList = new ArrayList<Object>();
 
@@ -76,7 +76,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
                     context.setVar(index, new NodeVariable(String.valueOf(i)));
                 }
 
-                String condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
+                String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
 
                 setProperty("Condition", condition);
                 setProperty("Index", index);
@@ -97,7 +97,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
                         context.setVar(index, new NodeVariable(String.valueOf(i)));
                     }
 
-                    condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
+                    condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
                 }
             }
         }, true);

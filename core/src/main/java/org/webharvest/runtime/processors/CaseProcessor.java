@@ -60,7 +60,7 @@ public class CaseProcessor extends BaseProcessor<CaseDef> {
 
         if (ifDefs != null) {
             for (IfDef ifDef : ifDefs) {
-                String condition = BaseTemplater.execute(ifDef.getCondition(), null, scraper);
+                String condition = BaseTemplater.evaluateToString(ifDef.getCondition(), null, scraper);
                 if (CommonUtil.isBooleanTrue(condition)) {
                     Variable ifResult = new BodyProcessor(ifDef).run(scraper, context);
                     debug(ifDef, scraper, ifResult);

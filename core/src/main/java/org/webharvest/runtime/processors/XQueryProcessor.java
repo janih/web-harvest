@@ -109,8 +109,8 @@ public class XQueryProcessor extends BaseProcessor<XQueryDef> {
 
             // define external parameters
             for (XQueryExternalParamDef externalParamDef : externalParamDefs) {
-                String externalParamName = BaseTemplater.execute(externalParamDef.getName(), null, scraper);
-                String externalParamType = BaseTemplater.execute(externalParamDef.getType(), null, scraper);
+                String externalParamName = BaseTemplater.evaluateToString(externalParamDef.getName(), null, scraper);
+                String externalParamType = BaseTemplater.evaluateToString(externalParamDef.getType(), null, scraper);
                 if (externalParamType == null) {
                     externalParamType = DEFAULT_PARAM_TYPE;
                 }

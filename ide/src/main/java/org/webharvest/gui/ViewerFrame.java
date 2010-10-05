@@ -175,7 +175,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                     protected void execute(final Object value) {
                         if (value != null) {
                             try {
-                                ViewerFrame.this.value = BaseTemplater.execute("${" + value + "}", null, scraper);
+                                ViewerFrame.this.value = BaseTemplater.evaluateToString("${" + value + "}", null, scraper);
                             } catch (ScriptException e) {
                                 ViewerFrame.this.value = "Error evaluating \"" + value + "\"!";
                             }

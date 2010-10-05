@@ -51,7 +51,7 @@ import java.util.Map;
 @SuppressWarnings({"UnusedDeclaration"})
 public abstract class WebHarvestPlugin extends BaseProcessor {
 
-    private Map attributes;
+    private Map<String, String> attributes;
 
     public WebHarvestPlugin() {
         super();
@@ -197,7 +197,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     /**
      * @return Map of attributes of this plugin
      */
-    protected Map getAttributes() {
+    protected Map<String, String> getAttributes() {
         return attributes;
     }
 
@@ -207,8 +207,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
     protected String evaluateAttribute(String attName, Scraper scraper) {
-        final String attValue = (String) attributes.get(attName);
-        return BaseTemplater.execute(attValue, null, scraper);
+        return BaseTemplater.evaluateToString(attributes.get(attName), null, scraper);
     }
 
     /**

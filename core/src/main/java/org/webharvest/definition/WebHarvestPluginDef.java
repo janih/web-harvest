@@ -1,16 +1,16 @@
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.*;
 import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Definition of all plugin processors.
  */
 public class WebHarvestPluginDef extends BaseElementDef {
 
-	private Map attributes;
+    private Map<String, String> attributes;
     private Class pluginClass;
     private String name;
 
@@ -27,7 +27,7 @@ public class WebHarvestPluginDef extends BaseElementDef {
         this.name = name;
     }
 
-    public Map getAttributes() {
+    public Map<String, String> getAttributes() {
         return attributes;
     }
 
@@ -48,5 +48,5 @@ public class WebHarvestPluginDef extends BaseElementDef {
     public String getShortElementName() {
         return name != null ? name.toLowerCase() : "unknown plugin";
     }
-    
+
 }

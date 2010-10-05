@@ -69,19 +69,19 @@ public class FileProcessor extends BaseProcessor<FileDef> {
     public Variable execute(Scraper scraper, ScraperContext context) {
         String workingDir = scraper.getWorkingDir();
 
-        String action = BaseTemplater.execute(elementDef.getAction(), null, scraper);
-        String filePath = BaseTemplater.execute(elementDef.getPath(), null, scraper);
-        String type = BaseTemplater.execute(elementDef.getType(), null, scraper);
-        String charset = BaseTemplater.execute(elementDef.getCharset(), null, scraper);
+        String action = BaseTemplater.evaluateToString(elementDef.getAction(), null, scraper);
+        String filePath = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);
+        String type = BaseTemplater.evaluateToString(elementDef.getType(), null, scraper);
+        String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
-        String listFilter = BaseTemplater.execute(elementDef.getListFilter(), null, scraper);
-        String listFiles = BaseTemplater.execute(elementDef.getListFiles(), null, scraper);
+        String listFilter = BaseTemplater.evaluateToString(elementDef.getListFilter(), null, scraper);
+        String listFiles = BaseTemplater.evaluateToString(elementDef.getListFiles(), null, scraper);
         boolean isListFiles = CommonUtil.getBooleanValue(listFiles, true);
-        String listDirs = BaseTemplater.execute(elementDef.getListDirs(), null, scraper);
+        String listDirs = BaseTemplater.evaluateToString(elementDef.getListDirs(), null, scraper);
         boolean isListDirs = CommonUtil.getBooleanValue(listDirs, true);
-        String listRecursive = BaseTemplater.execute(elementDef.getListRecursive(), null, scraper);
+        String listRecursive = BaseTemplater.evaluateToString(elementDef.getListRecursive(), null, scraper);
         boolean isListRecursive = CommonUtil.getBooleanValue(listRecursive, false);
 
         this.setProperty("Action", action);

@@ -63,11 +63,11 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        final String item = BaseTemplater.execute(elementDef.getItem(), null, scraper);
-        final String index = BaseTemplater.execute(elementDef.getIndex(), null, scraper);
-        final String maxLoopsString = BaseTemplater.execute(elementDef.getMaxloops(), null, scraper);
-        final String filter = BaseTemplater.execute(elementDef.getFilter(), null, scraper);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.execute(elementDef.getEmpty(), null, scraper), false);
+        final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, scraper);
+        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
+        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, scraper);
+        final String filter = BaseTemplater.evaluateToString(elementDef.getFilter(), null, scraper);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
 
         this.setProperty("Item", item);
         this.setProperty("Index", index);

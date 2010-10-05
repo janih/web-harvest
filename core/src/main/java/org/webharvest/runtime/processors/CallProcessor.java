@@ -59,7 +59,7 @@ public class CallProcessor extends BaseProcessor<CallDef> {
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) {
-        String functionName = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);

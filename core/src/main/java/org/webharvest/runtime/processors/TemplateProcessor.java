@@ -55,9 +55,9 @@ public class TemplateProcessor extends BaseProcessor<TemplateDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        return new NodeVariable(BaseTemplater.execute(
+        return new NodeVariable(BaseTemplater.evaluateToString(
                 getBodyTextContent(elementDef, scraper, context).toString(),
-                ScriptingLanguage.recognize(BaseTemplater.execute(elementDef.getLanguage(), null, scraper)),
+                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)),
                 scraper));
     }
 

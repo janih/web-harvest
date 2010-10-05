@@ -54,11 +54,11 @@ public class HttpParamProcessor extends BaseProcessor<HttpParamDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
-        String isFileStr = BaseTemplater.execute(elementDef.getIsfile(), null, scraper);
+        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
+        String isFileStr = BaseTemplater.evaluateToString(elementDef.getIsfile(), null, scraper);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);
-        String fileName = BaseTemplater.execute(elementDef.getFilename(), null, scraper);
-        String contentType = BaseTemplater.execute(elementDef.getContenttype(), null, scraper);
+        String fileName = BaseTemplater.evaluateToString(elementDef.getFilename(), null, scraper);
+        String contentType = BaseTemplater.evaluateToString(elementDef.getContenttype(), null, scraper);
         Variable value = new BodyProcessor(elementDef).execute(scraper, context);
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();

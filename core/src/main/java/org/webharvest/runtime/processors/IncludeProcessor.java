@@ -64,7 +64,7 @@ public class IncludeProcessor extends BaseProcessor<IncludeDef> {
     public Variable execute(Scraper scraper, ScraperContext context) {
         boolean isUrl = false;
 
-        String path = BaseTemplater.execute(elementDef.getPath(), null, scraper);
+        String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);
 
         this.setProperty("Path", path);
 

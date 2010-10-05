@@ -53,7 +53,7 @@ public class HttpHeaderProcessor extends BaseProcessor<HttpHeaderDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         Variable value = getBodyTextContent(elementDef, scraper, context);
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();

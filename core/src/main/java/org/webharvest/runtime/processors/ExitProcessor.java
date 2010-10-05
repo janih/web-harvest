@@ -18,13 +18,13 @@ public class ExitProcessor extends BaseProcessor<ExitDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String condition = BaseTemplater.execute(elementDef.getCondition(), null, scraper);
+        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
         if (condition == null || "".equals(condition)) {
             condition = "true";
         }
 
         if (CommonUtil.isBooleanTrue(condition)) {
-            String message = BaseTemplater.execute(elementDef.getMessage(), null, scraper);
+            String message = BaseTemplater.evaluateToString(elementDef.getMessage(), null, scraper);
             if (message == null) {
                 message = "";
             }

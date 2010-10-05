@@ -52,7 +52,7 @@ public class CallParamProcessor extends BaseProcessor<CallParamDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) {
-        String name = BaseTemplater.execute(elementDef.getName(), null, scraper);
+        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         Variable variable = new BodyProcessor(elementDef).execute(scraper, context);
 
         scraper.addFunctionParam(name, variable);

@@ -72,7 +72,7 @@ public class ListVariable extends Variable implements Iterable {
 
     public String toString() {
         if (cachedStringRepresentation == null) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (Variable var : list) {
                 final String value = var.toString();
                 if (value.length() != 0) {
@@ -91,7 +91,7 @@ public class ListVariable extends Variable implements Iterable {
         StringBuffer buffer = new StringBuffer();
 
         for (Variable var : list) {
-            String value = var.toString(charset);
+            final String value = var.toString(charset);
             if (value.length() != 0) {
                 if (buffer.length() != 0) {
                     buffer.append(delimiter);
