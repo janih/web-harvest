@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -71,8 +72,8 @@ public class ScraperContextTest {
 
     @Test
     public void testSetVar() throws Exception {
-        context.setVar("x", dummyVar);
-        context.setVar("y", dummyVar);
+        context.setLocalVar("x", dummyVar);
+        context.setLocalVar("y", dummyVar);
         assertSame(dummyVar, context.getVar("x"));
         assertSame(dummyVar, context.getVar("y"));
 
@@ -80,16 +81,47 @@ public class ScraperContextTest {
         context.setVar("y", Arrays.asList(1, 2, 3));
         assertReflectionEquals(new NodeVariable("test"), context.getVar("x"));
         assertReflectionEquals(new ListVariable(Arrays.asList(1, 2, 3)), context.getVar("y"));
-
-        assertNull(context.getVar("non-existing"));
     }
 
     @Test
-    public void testRemoveVar() throws Exception {
-        assertNull(context.removeVar("non-existing"));
-        context.setVar("x", dummyVar);
-        assertSame(dummyVar, context.removeVar("x"));
-        assertNull(context.getVar("x"));
+    public void testContainsVar() throws Exception {
+        context.setLocalVar("x", dummyVar);
+        context.setLocalVar("null", null);
+        assertTrue(context.containsVar("x"));
+        assertFalse(context.containsVar("not existing"));
+        assertSame(EmptyVariable.INSTANCE, context.getVar("null"));
+    }
+
+    @Test
+    public void testReplaceExistingVar() throws Exception {
+        context.setLocalVar("x", new NodeVariable("old val"));
+        context.replaceExistingVar("x", dummyVar);
+        assertSame(dummyVar, context.getVar("x"));
+    }
+
+    @Test
+    public void testReplaceExistingVar_setNull() throws Exception {
+        context.setLocalVar("x", new NodeVariable("old val"));
+        context.replaceExistingVar("x", null);
+        assertSame(EmptyVariable.INSTANCE, context.getVar("x"));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testReplaceExistingVar_noSuchVariable() throws Exception {
+        context.replaceExistingVar("not existing", dummyVar);
+    }
+
+    @Test
+    public void testReplaceExistingVar_inSubContext() throws Exception {
+        context.setLocalVar("x", new NodeVariable("old val"));
+        context.executeWithinNewContext(new Runnable() {
+            @Override
+            public void run() {
+                context.replaceExistingVar("x", dummyVar);
+                assertSame(dummyVar, context.getVar("x"));
+            }
+        }, false);
+        assertSame(dummyVar, context.getVar("x"));
     }
 
     @Test
@@ -98,8 +130,8 @@ public class ScraperContextTest {
 
         context.setVar("z", "zzz");
         context.setVar("x", "will be overwritten");
-        context.setVar("x", dummyVar);
-        context.setVar("y", dummyVar);
+        context.setLocalVar("x", dummyVar);
+        context.setLocalVar("y", dummyVar);
 
         assertReflectionEquals(Arrays.asList(
                 new KeyValuePair<Variable>("x", dummyVar),
@@ -127,17 +159,11 @@ public class ScraperContextTest {
                             @Override
                             public void run() {
                                 context.setVar("x", "b");
-                                context.setVar("zzz", dummyVar);
-                                context.setVar("local", dummyVar);
-
-                                assertReflectionEquals(dummyVar, context.removeVar("local"));
-                                assertReflectionEquals(dummyVar, context.removeVar("zzz"));
-                                assertNull(context.removeVar("zzz")); // upper level var
-                                assertNull(context.removeVar("y")); // upper level var
 
                                 assertReflectionEquals(new NodeVariable("b"), context.getVar("x"));
                                 assertReflectionEquals(new NodeVariable(2), context.getVar("y"));
                                 assertReflectionEquals(new NodeVariable("zzz"), context.getVar("z"));
+
                                 assertReflectionEquals(Arrays.asList(
                                         new KeyValuePair<Variable>("x", new NodeVariable("b")),
                                         new KeyValuePair<Variable>("y", new NodeVariable(2)),
@@ -196,13 +222,6 @@ public class ScraperContextTest {
                             @Override
                             public void run() {
                                 context.setVar_compat2b1("x", new NodeVariable("b"));
-                                context.setVar_compat2b1("zzz", dummyVar);
-                                context.setVar_compat2b1("local", dummyVar);
-
-                                assertReflectionEquals(dummyVar, context.removeVar("local"));
-                                assertReflectionEquals(dummyVar, context.removeVar("zzz"));
-                                assertNull(context.removeVar("zzz")); // upper level var
-                                assertNull(context.removeVar("y")); // upper level var
 
                                 assertReflectionEquals(new NodeVariable("b"), context.getVar("x"));
                                 assertReflectionEquals(new NodeVariable(2), context.getVar("y"));
@@ -261,12 +280,12 @@ public class ScraperContextTest {
 
     @Test
     public void testSetVar_compat2b1_insideLoop_caseB() throws Exception {
-        context.setVar("a", new NodeVariable(1));
+        context.setLocalVar("a", new NodeVariable(1));
 
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                context.setVar("a", new NodeVariable(2));
+                context.setLocalVar("a", new NodeVariable(2));
                 context.setVar_compat2b1("a", new NodeVariable(3));
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
             }
@@ -277,7 +296,7 @@ public class ScraperContextTest {
 
     @Test
     public void testSetVar_compat2b1_insideLoop_caseC() throws Exception {
-        context.setVar("a", new NodeVariable(1));
+        context.setLocalVar("a", new NodeVariable(1));
 
         context.executeWithinNewContext(new Runnable() {
             @Override
@@ -295,7 +314,7 @@ public class ScraperContextTest {
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                context.setVar("a", new NodeVariable(1));
+                context.setLocalVar("a", new NodeVariable(1));
                 context.setVar_compat2b1("a", new NodeVariable(2));
                 assertReflectionEquals(new NodeVariable(1), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
             }
@@ -306,7 +325,7 @@ public class ScraperContextTest {
 
     @Test
     public void testSetVar_compat2b1_insideLoop_caseE() throws Exception {
-        context.setVar("a", new NodeVariable(1));
+        context.setLocalVar("a", new NodeVariable(1));
 
         context.executeWithinNewContext(new Runnable() {
             @Override

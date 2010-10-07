@@ -36,19 +36,20 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.exception.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.utils.*;
+import org.webharvest.exception.ConfigurationException;
+import org.webharvest.exception.ErrMsg;
+import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.*;
+import org.webharvest.utils.ClassLoaderUtil;
+import org.webharvest.utils.CommonUtil;
 
 import java.util.*;
-import java.lang.reflect.Constructor;
-
-import org.webharvest.runtime.processors.plugins.*;
 
 /**
  * Class contains information and logic to validate and crate definition classes for
  * parsed xml nodes from Web-Harvest configurations.
- * 
+ *
  * @author Vladimir Nikic
  */
 public class DefinitionResolver {
@@ -59,53 +60,55 @@ public class DefinitionResolver {
     private static Map<String, String> externalPlugins = new LinkedHashMap<String, String>();
 
     // map of external plugin dependances
-    private static Map<String, Class[]> externalPluginDependaces = new HashMap<String, Class[]>(); 
+    private static Map<String, Class[]> externalPluginDependaces = new HashMap<String, Class[]>();
 
     // defines all valid elements of Web-Harvest configuration file
+
     static {
         String htmlToXmlAtts = "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars," +
-                               "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
-                               "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
-                               "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts";
-        elementInfos.put( "config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id") );
-        elementInfos.put( "empty", new ElementInfo("empty", EmptyDef.class, null, "id") );
-        elementInfos.put( "text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter") );
-        elementInfos.put( "file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive") );
-        elementInfos.put( "var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite") );
-        elementInfos.put( "var", new ElementInfo("var", VarDef.class, "", "id,!name") );
-        elementInfos.put( "http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,multipart,charset,username,password,cookie-policy") );
-        elementInfos.put( "http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype") );
-        elementInfos.put( "http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name") );
-        elementInfos.put( "html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, htmlToXmlAtts) );
-        elementInfos.put( "regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq") );
-        elementInfos.put( "regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id") );
-        elementInfos.put( "regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id") );
-        elementInfos.put( "regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id") );
-        elementInfos.put( "xpath", new ElementInfo("xpath", XPathDef.class, null, "id,!expression") );
-        elementInfos.put( "xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id") );
-        elementInfos.put( "xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id") );
-        elementInfos.put( "xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id") );
-        elementInfos.put( "xslt", new ElementInfo("xslt", XsltDef.class, "!xml,!stylesheet", "id") );
-        elementInfos.put( "xml", new ElementInfo("xml", BaseElementDef.class, null, "id") );
-        elementInfos.put( "stylesheet", new ElementInfo("stylesheet", BaseElementDef.class, null, "id") );
-        elementInfos.put( "template", new ElementInfo("template", TemplateDef.class, null, "id,language") );
-        elementInfos.put( "case", new ElementInfo("case", CaseDef.class, "!if,else", "id") );
-        elementInfos.put( "if", new ElementInfo("if", BaseElementDef.class, null, "!condition,id") );
-        elementInfos.put( "else", new ElementInfo("else", BaseElementDef.class, null, "id") );
-        elementInfos.put( "loop", new ElementInfo("loop", LoopDef.class, "!list,!body", "id,item,index,maxloops,filter,empty") );
-        elementInfos.put( "list", new ElementInfo("list", BaseElementDef.class, null, "id") );
-        elementInfos.put( "body", new ElementInfo("body", BaseElementDef.class, null, "id") );
-        elementInfos.put( "while", new ElementInfo("while", WhileDef.class, null, "id,!condition,index,maxloops,empty") );
-        elementInfos.put( "function", new ElementInfo("function", FunctionDef.class, null, "id,!name") );
-        elementInfos.put( "return", new ElementInfo("return", ReturnDef.class, null, "id") );
-        elementInfos.put( "call", new ElementInfo("call", CallDef.class, null, "id,!name") );
-        elementInfos.put( "call-param", new ElementInfo("call-param", CallParamDef.class, null, "id,!name") );
-        elementInfos.put( "include", new ElementInfo("include", IncludeDef.class, "", "id,!path") );
-        elementInfos.put( "try", new ElementInfo("try", TryDef.class, "!body,!catch", "id") );
-        elementInfos.put( "catch", new ElementInfo("catch", BaseElementDef.class, null, "id") );
-        elementInfos.put( "script", new ElementInfo("script", ScriptDef.class, null, "id,language,return") );
-        elementInfos.put( "exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message") );
+                "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
+                "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
+                "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts";
+        elementInfos.put("config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id"));
+        elementInfos.put("empty", new ElementInfo("empty", EmptyDef.class, null, "id"));
+        elementInfos.put("text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter"));
+        elementInfos.put("file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive"));
+        elementInfos.put("var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite"));
+        elementInfos.put("var", new ElementInfo("var", VarDef.class, "", "id,!name"));
+        elementInfos.put("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,multipart,charset,username,password,cookie-policy"));
+        elementInfos.put("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
+        elementInfos.put("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
+        elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, htmlToXmlAtts));
+        elementInfos.put("regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq"));
+        elementInfos.put("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
+        elementInfos.put("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
+        elementInfos.put("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
+        elementInfos.put("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,!expression"));
+        elementInfos.put("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
+        elementInfos.put("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
+        elementInfos.put("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
+        elementInfos.put("xslt", new ElementInfo("xslt", XsltDef.class, "!xml,!stylesheet", "id"));
+        elementInfos.put("xml", new ElementInfo("xml", BaseElementDef.class, null, "id"));
+        elementInfos.put("stylesheet", new ElementInfo("stylesheet", BaseElementDef.class, null, "id"));
+        elementInfos.put("template", new ElementInfo("template", TemplateDef.class, null, "id,language"));
+        elementInfos.put("case", new ElementInfo("case", CaseDef.class, "!if,else", "id"));
+        elementInfos.put("if", new ElementInfo("if", BaseElementDef.class, null, "!condition,id"));
+        elementInfos.put("else", new ElementInfo("else", BaseElementDef.class, null, "id"));
+        elementInfos.put("loop", new ElementInfo("loop", LoopDef.class, "!list,!body", "id,item,index,maxloops,filter,empty"));
+        elementInfos.put("list", new ElementInfo("list", BaseElementDef.class, null, "id"));
+        elementInfos.put("body", new ElementInfo("body", BaseElementDef.class, null, "id"));
+        elementInfos.put("while", new ElementInfo("while", WhileDef.class, null, "id,!condition,index,maxloops,empty"));
+        elementInfos.put("function", new ElementInfo("function", FunctionDef.class, null, "id,!name"));
+        elementInfos.put("return", new ElementInfo("return", ReturnDef.class, null, "id"));
+        elementInfos.put("call", new ElementInfo("call", CallDef.class, null, "id,!name"));
+        elementInfos.put("call-param", new ElementInfo("call-param", CallParamDef.class, null, "id,!name"));
+        elementInfos.put("include", new ElementInfo("include", IncludeDef.class, "", "id,!path"));
+        elementInfos.put("try", new ElementInfo("try", TryDef.class, "!body,!catch", "id"));
+        elementInfos.put("catch", new ElementInfo("catch", BaseElementDef.class, null, "id"));
+        elementInfos.put("script", new ElementInfo("script", ScriptDef.class, null, "id,language,return"));
+        elementInfos.put("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
 
+        registerPlugin(SetVarPlugin.class, true);
         registerPlugin(DatabasePlugin.class, true);
         registerPlugin(JsonToXmlPlugin.class, true);
         registerPlugin(XmlToJsonPlugin.class, true);
@@ -119,12 +122,12 @@ public class DefinitionResolver {
         String fullClassName = pluginClass != null ? pluginClass.getName() : "null";
         try {
             Object pluginObj = pluginClass.newInstance();
-            if ( !(pluginObj instanceof WebHarvestPlugin) ) {
+            if (!(pluginObj instanceof WebHarvestPlugin)) {
                 throw new PluginException("Plugin class \"" + fullClassName + "\" does not extend WebHarvestPlugin class!");
             }
             WebHarvestPlugin plugin = (WebHarvestPlugin) pluginObj;
             String pluginName = plugin.getName();
-            if ( !CommonUtil.isValidXmlIdentifier(pluginName) ) {
+            if (!CommonUtil.isValidXmlIdentifier(pluginName)) {
                 throw new PluginException("Plugin class \"" + fullClassName + "\" does not define valid name!");
             }
             pluginName = pluginName.toLowerCase();
@@ -145,7 +148,7 @@ public class DefinitionResolver {
 
             Class[] subprocessorClasses = plugin.getDependantProcessors();
             if (subprocessorClasses != null) {
-                for (Class subClass: subprocessorClasses) {
+                for (Class subClass : subprocessorClasses) {
                     registerPlugin(subClass, isInternalPlugin);
                 }
             }
@@ -157,7 +160,7 @@ public class DefinitionResolver {
     public static void registerPlugin(Class pluginClass) throws PluginException {
         registerPlugin(pluginClass, false);
     }
-    
+
     public static void registerPlugin(String fullClassName) throws PluginException {
         Class pluginClass = ClassLoaderUtil.getPluginClass(fullClassName);
         registerPlugin(pluginClass, false);
@@ -171,7 +174,7 @@ public class DefinitionResolver {
 
     public static void unregisterPlugin(String className) {
         // only external plugins can be unregistered
-        if ( isPluginRegistered(className)) {
+        if (isPluginRegistered(className)) {
             String pluginName = externalPlugins.get(className);
             elementInfos.remove(pluginName);
             externalPlugins.remove(className);
@@ -180,7 +183,7 @@ public class DefinitionResolver {
             Class[] dependantClasses = externalPluginDependaces.get(pluginName);
             externalPluginDependaces.remove(pluginName);
             if (dependantClasses != null) {
-                for (Class c: dependantClasses) {
+                for (Class c : dependantClasses) {
                     unregisterPlugin(c);
                 }
             }
@@ -209,7 +212,7 @@ public class DefinitionResolver {
     /**
      * @param name
      * @return Instance of ElementInfo class for the specified element name,
-     *         or null if no element is defined. 
+     *         or null if no element is defined.
      */
     public static ElementInfo getElementInfo(String name) {
         return elementInfos.get(name);
@@ -218,14 +221,15 @@ public class DefinitionResolver {
     /**
      * Creates proper element definition instance based on given xml node
      * from input configuration.
+     *
      * @param node
      * @return Instance of IElementDef, or exception is thrown if cannot find
      *         appropriate element definition.
      */
     public static IElementDef createElementDefinition(XmlNode node) {
-    	String nodeName = node.getName();
+        final String nodeName = node.getName();
 
-        ElementInfo elementInfo = getElementInfo(nodeName);
+        final ElementInfo elementInfo = getElementInfo(nodeName);
         if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == BaseElementDef.class) {
             throw new ConfigurationException("Unexpected configuration element: " + nodeName + "!");
         }
@@ -234,12 +238,11 @@ public class DefinitionResolver {
 
         Class elementClass = elementInfo.getDefinitionClass();
         try {
-            Constructor constructor = elementClass.getConstructor( new Class[] {XmlNode.class} );
-            IElementDef elementDef = (IElementDef) constructor.newInstance(new Object[]{node});
+            final IElementDef elementDef = (IElementDef) elementClass.getConstructor(new Class[]{XmlNode.class}).newInstance(node);
             if (elementDef instanceof WebHarvestPluginDef) {
                 WebHarvestPluginDef pluginDef = (WebHarvestPluginDef) elementDef;
-                pluginDef.setPluginClass( elementInfo.getPluginClass() );
-                pluginDef.setPluginName( elementInfo.getName() );
+                pluginDef.setPluginClass(elementInfo.getPluginClass());
+                pluginDef.setPluginName(elementInfo.getName());
             }
             return elementDef;
         } catch (Exception e) {
@@ -255,6 +258,7 @@ public class DefinitionResolver {
     /**
      * Validates specified xml node with appropriate element info instance.
      * If validation fails, an runtime exception is thrown.
+     *
      * @param node
      */
     public static void validate(XmlNode node) {
@@ -262,56 +266,48 @@ public class DefinitionResolver {
             return;
         }
 
-        String nodeName = node.getName().toLowerCase();
-        ElementInfo elementInfo = getElementInfo(nodeName);
+        final ElementInfo elementInfo = getElementInfo(node.getName().toLowerCase());
 
         if (elementInfo == null) {
             return;
         }
-        
-        Set tags = elementInfo.getTagsSet();
-        Set requiredTags = elementInfo.getRequiredTagsSet();
-        boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
-        Set allTagNameSet = elementInfos.keySet();
 
         // checks if tag contains all required subelements
-        Iterator requiredTagsIterator = requiredTags.iterator();
-        while (requiredTagsIterator.hasNext()) {
-            String tag = (String) requiredTagsIterator.next();
-            if ( node.getElement(tag) == null ) {
-                throw new ConfigurationException( ErrMsg.missingTag(node.getName(), tag) );
+        for (String tag : elementInfo.getRequiredTagsSet()) {
+            if (node.getElement(tag) == null) {
+                throw new ConfigurationException(ErrMsg.missingTag(node.getName(), tag));
             }
         }
+
+        final boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
+        final Set allTagNameSet = elementInfos.keySet();
+        final Set tags = elementInfo.getTagsSet();
 
         // check if element contains only allowed subelements
-        Iterator subtagsIterator = node.keySet().iterator();
-        while (subtagsIterator.hasNext()) {
-            String tagName = ((String) subtagsIterator.next()).toLowerCase();
-            if ( (!areAllTagsAllowed && !tags.contains(tagName)) || (areAllTagsAllowed && !allTagNameSet.contains(tagName)) ) {
-                throw new ConfigurationException( ErrMsg.invalidTag(node.getName(), tagName) );
+        for (String key : node.keySet()) {
+            final String tagName = key.toLowerCase();
+            if ((!areAllTagsAllowed && !tags.contains(tagName)) || (areAllTagsAllowed && !allTagNameSet.contains(tagName))) {
+                throw new ConfigurationException(ErrMsg.invalidTag(node.getName(), tagName));
             }
         }
 
-        Set atts = elementInfo.getAttsSet();
-        Set requiredAtts = elementInfo.getRequiredAttsSet();
 
         // checks if tag contains all required subelements
-        Iterator requiredAttsIterator = requiredAtts.iterator();
-        while (requiredAttsIterator.hasNext()) {
-            String att = (String) requiredAttsIterator.next();
-            if ( node.getAttribute(att) == null ) {
-                throw new ConfigurationException( ErrMsg.missingAttribute(node.getName(), att) );
+        for (String att : elementInfo.getRequiredAttsSet()) {
+            if (node.getAttribute(att) == null) {
+                throw new ConfigurationException(ErrMsg.missingAttribute(node.getName(), att));
             }
         }
 
+        final Set<String> atts = elementInfo.getAttsSet();
+
         // check if element contains only allowed attributes
-        Map attributes = node.getAttributes();
+        final Map<String, String> attributes = node.getAttributes();
         if (attributes != null) {
-            Iterator it = attributes.keySet().iterator();
-            while (it.hasNext()) {
-                String attName = ((String) it.next()).toLowerCase();
-                if ( !atts.contains(attName) ) {
-                    throw new ConfigurationException( ErrMsg.invalidAttribute(node.getName(), attName) );
+            for (String key : attributes.keySet()) {
+                final String attName = key.toLowerCase();
+                if (!atts.contains(attName)) {
+                    throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
                 }
             }
         }

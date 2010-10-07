@@ -104,21 +104,21 @@ public class VarDefProcessorTest {
 
     @Test
     public void testExecute_reassigning_overwriteDefault() throws Exception {
-        context.setVar("x", new NodeVariable("existing"));
+        context.setLocalVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x'>123</var-def>");
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteTrue() throws Exception {
-        context.setVar("x", new NodeVariable("existing"));
+        context.setLocalVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x' overwrite='true'>123</var-def>");
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteFalse() throws Exception {
-        context.setVar("x", new NodeVariable("existing"));
+        context.setLocalVar("x", new NodeVariable("existing"));
         invoke("<var-def name='x' overwrite='false'>123</var-def>");
         assertReflectionEquals(new NodeVariable("existing"), context.getVar("x"));
     }

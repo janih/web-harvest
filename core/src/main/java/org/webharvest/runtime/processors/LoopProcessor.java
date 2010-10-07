@@ -94,12 +94,12 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
 
                         // define current value of item variable
                         if (item != null && !"".equals(item)) {
-                            context.setVar(item, currElement);
+                            context.setLocalVar(item, currElement);
                         }
 
                         // define current value of index variable
                         if (index != null && !"".equals(index)) {
-                            context.setVar(index, new NodeVariable(String.valueOf(i)));
+                            context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
                         }
 
                         // execute the loop body

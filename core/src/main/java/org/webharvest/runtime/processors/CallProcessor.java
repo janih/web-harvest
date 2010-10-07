@@ -78,7 +78,7 @@ public class CallProcessor extends BaseProcessor<CallDef> {
             @Override
             public void run() {
                 for (Map.Entry<String, Variable> entry : scraper.getFunctionParams().entrySet()) {
-                    context.setVar(entry.getKey(), entry.getValue());
+                    context.setLocalVar(entry.getKey(), entry.getValue());
                 }
 
                 // adds this runtime info to the running functions stack

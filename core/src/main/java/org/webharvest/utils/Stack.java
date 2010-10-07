@@ -54,6 +54,10 @@ public class Stack<T> {
         return list.removeLast();
     }
 
+    public T replaceTop(T value) {
+        return list.set(list.size() - 1, value);
+    }
+
     public T peek() {
         return list.getLast();
     }
@@ -69,5 +73,4 @@ public class Stack<T> {
     public List<T> getList() {
         return list;
     }
-
 }

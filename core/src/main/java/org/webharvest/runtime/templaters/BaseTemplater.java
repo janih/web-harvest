@@ -36,11 +36,11 @@
 */
 package org.webharvest.runtime.templaters;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -58,12 +58,13 @@ public class BaseTemplater {
     public static String VAR_END = "}";
 
     public static String evaluateToString(String source, ScriptingLanguage language, Scraper scraper) {
-        return ObjectUtils.toString(executeToVariable(source, language, scraper), null);
+        final Variable result = executeToVariable(source, language, scraper);
+        return result.isEmpty() ? null : result.toString();
     }
 
     public static Variable executeToVariable(String source, ScriptingLanguage language, Scraper scraper) {
         if (source == null) {
-            return null;
+            return EmptyVariable.INSTANCE;
         }
 
         int startIndex = source.indexOf(VAR_START);

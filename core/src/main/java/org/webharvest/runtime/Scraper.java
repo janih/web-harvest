@@ -122,8 +122,8 @@ public class Scraper {
         this.httpClientManager = new HttpClientManager();
 
         this.context = new ScraperContext();
-        context.setVar("sys", new InternalVariable(new SystemUtilities(this)));
-        context.setVar("http", new InternalVariable(httpClientManager.getHttpInfo()));
+        context.setLocalVar("sys", new InternalVariable(new SystemUtilities(this)));
+        context.setLocalVar("http", new InternalVariable(httpClientManager.getHttpInfo()));
 
         this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage());
     }
@@ -137,7 +137,7 @@ public class Scraper {
      * @param value
      */
     public void addVariableToContext(String name, Object value) {
-        this.context.setVar(name, CommonUtil.createVariable(value));
+        this.context.setLocalVar(name, CommonUtil.createVariable(value));
     }
 
     /**
@@ -148,7 +148,7 @@ public class Scraper {
     public void addVariablesToContext(Map<String, Object> map) {
         if (map != null) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                this.context.setVar(entry.getKey(), CommonUtil.createVariable(entry.getValue()));
+                this.context.setLocalVar(entry.getKey(), CommonUtil.createVariable(entry.getValue()));
             }
         }
     }

@@ -49,6 +49,6 @@ import org.webharvest.utils.CommonUtil;
 public class SetContextVar {
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {
-        ScraperContextHolder.getCurrentContext().setVar(name, CommonUtil.createVariable(value));
+        ScraperContextHolder.getCurrentContext().setLocalVar(name, CommonUtil.createVariable(value));
     }
 }

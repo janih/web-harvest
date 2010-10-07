@@ -38,7 +38,10 @@ package org.webharvest.runtime;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang.ObjectUtils;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.Assert;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
@@ -60,11 +63,11 @@ public class ScraperContext implements DynamicScopeContext {
 
     @SuppressWarnings({"UnusedDeclaration"})
     public void setVar(String name, Object value) {
-        setVar(name, CommonUtil.createVariable(value));
+        setLocalVar(name, CommonUtil.createVariable(value));
     }
 
     @Override
-    public void setVar(String name, Variable variable) {
+    public void setLocalVar(String name, Variable variable) {
         Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         final Set<String> localVariableNames = variablesNamesStack.peek();
 
@@ -77,7 +80,15 @@ public class ScraperContext implements DynamicScopeContext {
         } else {
             localVariableNames.add(name);
         }
-        variableValueStack.push(variable);
+        variableValueStack.push((Variable) ObjectUtils.defaultIfNull(variable, EmptyVariable.INSTANCE));
+    }
+
+    @Override
+    @SuppressWarnings({"ConstantConditions"})
+    public Variable replaceExistingVar(String name, Variable variable) {
+        final Stack<Variable> variableValueStack = centralReferenceTable.get(name);
+        Assert.isFalse(variableValueStack == null || variableValueStack.isEmpty(), "Variable {0} does not exist", name);
+        return variableValueStack.replaceTop((Variable) ObjectUtils.defaultIfNull(variable, EmptyVariable.INSTANCE));
     }
 
     /**
@@ -92,27 +103,15 @@ public class ScraperContext implements DynamicScopeContext {
         setVar(varName, value);
     }
 
-    /**
-     * Removes variable from the local context.
-     * This method is kept for the backward compatibility only.
-     *
-     * @param varName
-     * @return removed variable or null
-     * @deprecated use {@link #removeVar(String)}
-     */
-    @Deprecated
-    public Variable remove(String varName) {
-        return removeVar(varName);
-    }
-
-    public Variable removeVar(String varName) {
-        return (variablesNamesStack.peek().remove(varName)) ? removeVarFromCRT(varName) : null;
-    }
-
     @Override
     public Variable getVar(String name) {
         final Stack<Variable> stack = centralReferenceTable.get(name);
         return (stack == null) ? null : stack.peek();
+    }
+
+    @Override
+    public boolean containsVar(String name) {
+        return getVar(name) != null;
     }
 
     @Override
@@ -168,7 +167,7 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     public void setVar_compat2b1(String name, Variable var) {
         if (!loopBodyScope_compat2b1.peek()) {
-            setVar(name, var);
+            setLocalVar(name, var);
             return;
         }
 
@@ -179,6 +178,10 @@ public class ScraperContext implements DynamicScopeContext {
         Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         final Set<String> localVariableNames = variablesNamesStack.peek();
         final Set<String> prevVariableNames = variablesNamesStack.getList().get(variablesNamesStack.size() - 2);
+
+        if (var == null) {
+            var = EmptyVariable.INSTANCE;
+        }
 
         if (variableValueStack == null) {
             // Case A - new variable for the whole stack

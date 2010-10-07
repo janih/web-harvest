@@ -73,7 +73,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
 
                 // define first value of index variable
                 if (index != null && !"".equals(index)) {
-                    context.setVar(index, new NodeVariable(String.valueOf(i)));
+                    context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
                 }
 
                 String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
@@ -94,7 +94,7 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
                     i++;
                     // define current value of index variable
                     if (index != null && !"".equals(index)) {
-                        context.setVar(index, new NodeVariable(String.valueOf(i)));
+                        context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
                     }
 
                     condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);

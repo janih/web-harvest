@@ -65,6 +65,25 @@ public class StackTest {
     }
 
     @Test
+    public void testReplaceTop() throws Exception {
+        stack.push("a");
+        stack.push("b");
+        stack.replaceTop("c");
+
+        assertArrayEquals(new String[]{"a", "c"}, stack.getList().toArray());
+        stack.replaceTop("d");
+
+        stack.pop();
+        stack.replaceTop("e");
+        assertArrayEquals(new String[]{"e"}, stack.getList().toArray());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testReplaceTop_emptyStack() throws Exception {
+        stack.replaceTop("a");
+    }
+
+    @Test
     public void testPop() throws Exception {
         stack.push("a");
         stack.push("b");
