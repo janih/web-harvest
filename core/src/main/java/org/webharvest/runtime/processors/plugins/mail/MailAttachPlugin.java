@@ -1,4 +1,4 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.mail;
 
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;

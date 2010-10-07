@@ -1,11 +1,14 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.zip;
 
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
-import java.io.*;
-import java.util.zip.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipOutputStream;
 
 /**
  * ZIP processor

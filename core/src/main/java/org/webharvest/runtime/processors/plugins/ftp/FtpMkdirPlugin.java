@@ -1,4 +1,4 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.webharvest.runtime.Scraper;
@@ -11,12 +11,12 @@ import org.webharvest.utils.CommonUtil;
 import java.io.IOException;
 
 /**
- * Ftp Del plugin - can be used only inside ftp plugin for deleting file on remote directory.
+ * Ftp Mkdir plugin - can be used only inside ftp plugin for creating directory on remote directory.
  */
-public class FtpDelPlugin extends WebHarvestPlugin {
+public class FtpMkdirPlugin extends WebHarvestPlugin {
 
     public String getName() {
-        return "ftp-del";
+        return "ftp-mkdir";
     }
 
     public Variable executePlugin(Scraper scraper, ScraperContext context) {
@@ -29,15 +29,15 @@ public class FtpDelPlugin extends WebHarvestPlugin {
             setProperty("Path", path);
 
             try {
-                boolean succ = ftpClient.deleteFile(path);
+                boolean succ = ftpClient.makeDirectory(path);
                 if (!succ) {
-                    throw new FtpPluginException("Cannot delete file \"" + path + "\" on FTP server!");
+                    throw new FtpPluginException("Cannot create directory \"" + path + "\" on FTP server!");
                 }
             } catch (IOException e) {
                 throw new FtpPluginException(e);
             }
         } else {
-            throw new FtpPluginException("Cannot use ftp del plugin out of ftp plugin context!");
+            throw new FtpPluginException("Cannot use ftp mkdir plugin out of ftp plugin context!");
         }
 
         return EmptyVariable.INSTANCE;
@@ -54,5 +54,5 @@ public class FtpDelPlugin extends WebHarvestPlugin {
     public boolean hasBody() {
         return false;
     }
-    
+
 }

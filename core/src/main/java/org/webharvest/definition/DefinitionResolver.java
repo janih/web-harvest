@@ -40,7 +40,14 @@ import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.processors.plugins.*;
+import org.webharvest.runtime.processors.plugins.JsonToXmlPlugin;
+import org.webharvest.runtime.processors.plugins.SetVarPlugin;
+import org.webharvest.runtime.processors.plugins.TokenizePlugin;
+import org.webharvest.runtime.processors.plugins.XmlToJsonPlugin;
+import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
+import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
+import org.webharvest.runtime.processors.plugins.mail.MailPlugin;
+import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 

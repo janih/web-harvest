@@ -1,4 +1,4 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.db;
 
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;

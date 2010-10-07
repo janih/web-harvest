@@ -1,6 +1,6 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.zip;
 
-import org.webharvest.exception.*;
+import org.webharvest.exception.BaseException;
 
 /**
  * Runtime exception for ZipPlugin

@@ -1,22 +1,23 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Ftp Mkdir plugin - can be used only inside ftp plugin for creating directory on remote directory.
+ * Ftp Get plugin - can be used only inside ftp plugin for retrieving file from remote directory.
  */
-public class FtpMkdirPlugin extends WebHarvestPlugin {
+public class FtpGetPlugin extends WebHarvestPlugin {
 
     public String getName() {
-        return "ftp-mkdir";
+        return "ftp-get";
     }
 
     public Variable executePlugin(Scraper scraper, ScraperContext context) {
@@ -29,18 +30,20 @@ public class FtpMkdirPlugin extends WebHarvestPlugin {
             setProperty("Path", path);
 
             try {
-                boolean succ = ftpClient.makeDirectory(path);
+                ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+                boolean succ = ftpClient.retrieveFile(path, byteOutputStream);
+                byteOutputStream.close();
                 if (!succ) {
-                    throw new FtpPluginException("Cannot create directory \"" + path + "\" on FTP server!");
+                    throw new FtpPluginException("Cannot retrieve file \"" + path + "\" from FTP server!");
                 }
+                byte[] bytes = byteOutputStream.toByteArray();
+                return new NodeVariable(bytes);
             } catch (IOException e) {
                 throw new FtpPluginException(e);
             }
         } else {
-            throw new FtpPluginException("Cannot use ftp mkdir plugin out of ftp plugin context!");
+            throw new FtpPluginException("Cannot use ftp get plugin out of ftp plugin context!");
         }
-
-        return EmptyVariable.INSTANCE;
     }
 
     public String[] getValidAttributes() {
@@ -54,5 +57,4 @@ public class FtpMkdirPlugin extends WebHarvestPlugin {
     public boolean hasBody() {
         return false;
     }
-
 }

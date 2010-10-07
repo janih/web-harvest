@@ -1,12 +1,15 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.ftp;
 
-import org.apache.commons.net.ftp.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * FTP processor

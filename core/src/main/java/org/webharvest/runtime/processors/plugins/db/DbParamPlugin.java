@@ -1,10 +1,14 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.db;
 
-import org.webharvest.exception.*;
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * DB param plugin - can be used only inside database plugin.

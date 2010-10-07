@@ -1,4 +1,4 @@
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.zip;
 
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
