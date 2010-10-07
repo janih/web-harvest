@@ -36,48 +36,44 @@
  subject line.
  */
 
-package org.webharvest.utils;
+package org.webharvest.runtime.processors.plugins;
+
+import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.Variable;
 
 import java.text.MessageFormat;
 
-/**
- * Created by IntelliJ IDEA.
- * User: awajda
- * Date: Sep 23, 2010
- * Time: 10:46:47 PM
- */
-@SuppressWarnings({"UnusedDeclaration"})
-public class Assert {
+public class GetVarPlugin extends WebHarvestPlugin {
 
-    public static void isNull(Object obj) {
-        isNull(obj, "Expected null reference, but was {0}", obj);
-    }
+    private static final String ATTR_VAR = "var";
 
-    public static void isNull(Object obj, String messagePattern, Object... args) {
-        isTrue(obj == null, messagePattern, args);
-    }
+    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+        final String varName = evaluateAttribute(ATTR_VAR, scraper);
 
-    public static void notNull(Object obj) {
-        notNull(obj, "Should not be null");
-    }
+        final Variable value = context.getVar(varName);
 
-    public static void notNull(Object obj, String messagePattern, Object... args) {
-        isTrue(obj != null, messagePattern, args);
-    }
-
-    public static void isTrue(boolean bool, String messagePattern, Object... args) {
-        if (!bool) {
-            throw new IllegalArgumentException(MessageFormat.format(messagePattern, args));
+        if (value == null) {
+            throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", varName));
         }
+
+        this.setProperty("Var", varName);
+
+        return value;
     }
 
-    public static void isFalse(boolean bool, String messagePattern, Object... args) {
-        if (bool) {
-            throw new IllegalArgumentException(MessageFormat.format(messagePattern, args));
-        }
+    public String getName() {
+        return "get";
     }
 
-    public static IllegalStateException shouldNeverHappen(Throwable th) {
-        throw new IllegalStateException("This should NEVER happen", th);
+    public String[] getValidAttributes() {
+        return getRequiredAttributes();
+    }
+
+    @Override
+    public String[] getRequiredAttributes() {
+        return new String[]{ATTR_VAR};
     }
 }

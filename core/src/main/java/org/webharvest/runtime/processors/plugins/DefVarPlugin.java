@@ -44,19 +44,15 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Support for database operations.
  */
-public class SetVarPlugin extends AbstractValiableHandlerPlugin {
+public class DefVarPlugin extends AbstractValiableHandlerPlugin {
 
-    public SetVarPlugin() {
-        super("set");
+    public DefVarPlugin() {
+        super("def");
     }
 
     @Override
     protected void doExecute(ScraperContext context, String varName, Variable value) {
-        if (context.containsVar(varName)) {
-            context.replaceExistingVar(varName, value);
-        } else {
-            context.setLocalVar(varName, value);
-        }
+        context.setLocalVar(varName, value);
     }
 
 }

@@ -40,14 +40,12 @@ import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.processors.plugins.JsonToXmlPlugin;
-import org.webharvest.runtime.processors.plugins.SetVarPlugin;
-import org.webharvest.runtime.processors.plugins.TokenizePlugin;
-import org.webharvest.runtime.processors.plugins.XmlToJsonPlugin;
+import org.webharvest.runtime.processors.plugins.*;
 import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
 import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
 import org.webharvest.runtime.processors.plugins.mail.MailPlugin;
 import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
+import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 
@@ -59,6 +57,7 @@ import java.util.*;
  *
  * @author Vladimir Nikic
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class DefinitionResolver {
 
     private static Map<String, ElementInfo> elementInfos = new TreeMap<String, ElementInfo>();
@@ -116,6 +115,8 @@ public class DefinitionResolver {
         elementInfos.put("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
 
         registerPlugin(SetVarPlugin.class, true);
+        registerPlugin(DefVarPlugin.class, true);
+        registerPlugin(GetVarPlugin.class, true);
         registerPlugin(DatabasePlugin.class, true);
         registerPlugin(JsonToXmlPlugin.class, true);
         registerPlugin(XmlToJsonPlugin.class, true);
@@ -126,16 +127,16 @@ public class DefinitionResolver {
     }
 
     private static void registerPlugin(Class pluginClass, boolean isInternalPlugin) {
-        String fullClassName = pluginClass != null ? pluginClass.getName() : "null";
+        Assert.notNull(pluginClass);
         try {
-            Object pluginObj = pluginClass.newInstance();
+            final Object pluginObj = pluginClass.newInstance();
             if (!(pluginObj instanceof WebHarvestPlugin)) {
-                throw new PluginException("Plugin class \"" + fullClassName + "\" does not extend WebHarvestPlugin class!");
+                throw new PluginException("Plugin class \"" + pluginClass.getName() + "\" does not extend WebHarvestPlugin class!");
             }
-            WebHarvestPlugin plugin = (WebHarvestPlugin) pluginObj;
+            final WebHarvestPlugin plugin = (WebHarvestPlugin) pluginObj;
             String pluginName = plugin.getName();
             if (!CommonUtil.isValidXmlIdentifier(pluginName)) {
-                throw new PluginException("Plugin class \"" + fullClassName + "\" does not define valid name!");
+                throw new PluginException("Plugin class \"" + pluginClass.getName() + "\" does not define valid name!");
             }
             pluginName = pluginName.toLowerCase();
 
@@ -143,9 +144,14 @@ public class DefinitionResolver {
                 throw new PluginException("Plugin named \"" + pluginName + "\" is already registered!");
             }
 
-            String subtags = plugin.getTagDesc();
-            String atts = plugin.getAttributeDesc();
-            ElementInfo elementInfo = new ElementInfo(pluginName, pluginClass, isInternalPlugin, WebHarvestPluginDef.class, subtags, atts);
+            final ElementInfo elementInfo = new ElementInfo(
+                    pluginName,
+                    pluginClass,
+                    isInternalPlugin,
+                    WebHarvestPluginDef.class,
+                    plugin.getTagDesc(),
+                    plugin.getAttributeDesc());
+
             elementInfo.setPlugin(plugin);
             elementInfos.put(pluginName, elementInfo);
             if (!isInternalPlugin) {
@@ -153,14 +159,11 @@ public class DefinitionResolver {
             }
             externalPluginDependaces.put(pluginName, plugin.getDependantProcessors());
 
-            Class[] subprocessorClasses = plugin.getDependantProcessors();
-            if (subprocessorClasses != null) {
-                for (Class subClass : subprocessorClasses) {
-                    registerPlugin(subClass, isInternalPlugin);
-                }
+            for (Class subClass : plugin.getDependantProcessors()) {
+                registerPlugin(subClass, isInternalPlugin);
             }
         } catch (Exception e) {
-            throw new PluginException("Error instantiating plugin class \"" + fullClassName + "\": " + e.getMessage(), e);
+            throw new PluginException("Error instantiating plugin class \"" + pluginClass.getName() + "\": " + e.getMessage(), e);
         }
     }
 

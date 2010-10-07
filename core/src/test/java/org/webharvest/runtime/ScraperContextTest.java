@@ -106,7 +106,7 @@ public class ScraperContextTest {
         assertSame(EmptyVariable.INSTANCE, context.getVar("x"));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testReplaceExistingVar_noSuchVariable() throws Exception {
         context.replaceExistingVar("not existing", dummyVar);
     }

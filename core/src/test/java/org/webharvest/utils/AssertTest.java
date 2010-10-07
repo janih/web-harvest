@@ -58,12 +58,12 @@ public class AssertTest {
         isNull(null, "msg");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsNull_Fail() throws Exception {
         isNull(DUMMY);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsNull_Fail_withMsg() throws Exception {
         isNull(DUMMY, "msg");
     }
@@ -74,12 +74,12 @@ public class AssertTest {
         notNull(DUMMY, "msg");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testNotNull_Fail() throws Exception {
         notNull(null);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testNotNull_Fail_withMsg() throws Exception {
         notNull(null, "msg");
     }
@@ -89,7 +89,7 @@ public class AssertTest {
         isTrue(true, "msg");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsTrue_Fail() throws Exception {
         isTrue(false, "msg");
     }
@@ -99,7 +99,7 @@ public class AssertTest {
         isFalse(false, "msg");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIsFalse_Fail() throws Exception {
         isFalse(true, "msg");
     }

@@ -51,11 +51,9 @@ import java.util.Map;
 @SuppressWarnings({"UnusedDeclaration"})
 public abstract class WebHarvestPlugin extends BaseProcessor {
 
-    private Map<String, String> attributes;
+    private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
 
-    public WebHarvestPlugin() {
-        super();
-    }
+    private Map<String, String> attributes;
 
     /**
      * Defines name of the processor. Should be valid identifier.
@@ -111,7 +109,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
      * @return Array of subprocessor classes
      */
     public Class[] getDependantProcessors() {
-        return null;
+        return EMPTY_CLASS_ARRAY;
     }
 
     /**

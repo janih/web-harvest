@@ -36,48 +36,54 @@
  subject line.
  */
 
-package org.webharvest.utils;
+package org.webharvest.runtime.processors.plugins;
 
-import java.text.MessageFormat;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.Variable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: awajda
- * Date: Sep 23, 2010
- * Time: 10:46:47 PM
- */
-@SuppressWarnings({"UnusedDeclaration"})
-public class Assert {
+abstract class AbstractValiableHandlerPlugin extends WebHarvestPlugin {
 
-    public static void isNull(Object obj) {
-        isNull(obj, "Expected null reference, but was {0}", obj);
+    private static final String ATTR_VAR = "var";
+    private static final String ATTR_VALUE = "value";
+
+    private final String name;
+
+    protected AbstractValiableHandlerPlugin(String name) {
+        this.name = name;
     }
 
-    public static void isNull(Object obj, String messagePattern, Object... args) {
-        isTrue(obj == null, messagePattern, args);
-    }
+    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+        final String varName = evaluateAttribute(ATTR_VAR, scraper);
 
-    public static void notNull(Object obj) {
-        notNull(obj, "Should not be null");
-    }
+        Variable value = BaseTemplater.executeToVariable(getAttributes().get(ATTR_VALUE), null, scraper);
 
-    public static void notNull(Object obj, String messagePattern, Object... args) {
-        isTrue(obj != null, messagePattern, args);
-    }
-
-    public static void isTrue(boolean bool, String messagePattern, Object... args) {
-        if (!bool) {
-            throw new IllegalArgumentException(MessageFormat.format(messagePattern, args));
+        if (value.isEmpty()) {
+            value = executeBody(scraper, context);
         }
+
+        doExecute(context, varName, value);
+
+        this.setProperty("\"" + varName + "\"", value);
+
+        return EmptyVariable.INSTANCE;
     }
 
-    public static void isFalse(boolean bool, String messagePattern, Object... args) {
-        if (bool) {
-            throw new IllegalArgumentException(MessageFormat.format(messagePattern, args));
-        }
+    protected abstract void doExecute(ScraperContext context, String varName, Variable value);
+
+    public String getName() {
+        return name;
     }
 
-    public static IllegalStateException shouldNeverHappen(Throwable th) {
-        throw new IllegalStateException("This should NEVER happen", th);
+    public String[] getValidAttributes() {
+        return new String[]{ATTR_VAR, ATTR_VALUE};
+    }
+
+    @Override
+    public String[] getRequiredAttributes() {
+        return new String[]{ATTR_VAR};
     }
 }

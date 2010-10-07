@@ -45,7 +45,10 @@ import org.webharvest.runtime.variables.Variable;
 
 /**
  * Variable definition read processor.
+ *
+ * @deprecated Use <get> or <value-of> instead
  */
+@Deprecated
 public class VarProcessor extends BaseProcessor<VarDef> {
 
     public VarProcessor(VarDef varDef) {
