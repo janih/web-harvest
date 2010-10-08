@@ -41,6 +41,8 @@ package org.webharvest.runtime.scripting.impl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.variables.InternalVariable;
+import org.webharvest.utils.SystemUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,11 +56,35 @@ public class JavascriptScriptEngineTest {
 
     @Test
     public void testEvaluate() {
-        context.setVar("x", 2);
-        context.setVar("y", 5);
-        Assert.assertEquals(7.0, new JavascriptScriptEngine(
-                "function f(a, b) {return a + b} f(parseInt(x), parseInt(y))").
-                evaluate(context));
+        context.setLocalVar("internal", new InternalVariable(new SystemUtilities(null)));
+        context.setLocalVar("x", 2);
+        context.setLocalVar("y", 5);
+        context.setLocalVar("z", "old");
+        context.setLocalVar("w", "old");
+
+        context.executeWithinNewContext(new Runnable() {
+            @Override
+            public void run() {
+                Assert.assertEquals(7.0, new JavascriptScriptEngine("" +
+                        "function f(a, b) {return a + b};" +
+                        "k = 'foo';" +
+                        "z = 'new';" +
+                        "var w = 'new';" +
+                        "f(parseInt(x), parseInt(y))").
+                        evaluate(context));
+
+                Assert.assertEquals(2, context.getVar("x").getWrappedObject());
+                Assert.assertEquals(5, context.getVar("y").getWrappedObject());
+                Assert.assertEquals("foo", context.getVar("k").getWrappedObject());
+                Assert.assertEquals("new", context.getVar("z").getWrappedObject());
+                Assert.assertEquals("new", context.getVar("w").getWrappedObject());
+                Assert.assertFalse(context.containsVar("f"));
+            }
+        }, false);
+
+        Assert.assertFalse(context.containsVar("k"));
+        Assert.assertEquals("new", context.getVar("z").getWrappedObject());
+        Assert.assertSame(InternalVariable.class, context.getVar("internal").getClass());
     }
 
 }

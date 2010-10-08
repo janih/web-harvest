@@ -36,9 +36,13 @@
 */
 package org.webharvest.runtime.scripting.impl;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
 import org.mozilla.javascript.*;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.utils.Assert;
+import org.webharvest.utils.KeyValuePair;
 
 /**
  * javascript scripting engine based on Rhino.
@@ -68,7 +72,7 @@ public class JavascriptScriptEngine extends ScriptEngine {
     }
 
     @Override
-    protected void setVariable(String name, Object value) {
+    protected void setEngineVariable(String name, Object value) {
         ScriptableObject.putProperty(jsScope, name, Context.javaToJS(value, jsScope));
     }
 
@@ -76,6 +80,28 @@ public class JavascriptScriptEngine extends ScriptEngine {
     protected Object doEvaluate() {
         final Object result = jsScript.exec(jsContext, jsScope);
         return (result instanceof Wrapper) ? ((Wrapper) result).unwrap() : result;
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    protected Iterable<KeyValuePair<Object>> getEngineVariables() {
+        return IteratorUtils.toList(
+                IteratorUtils.filteredIterator(
+                        IteratorUtils.transformedIterator(
+                                IteratorUtils.arrayIterator(jsScope.getIds()),
+                                new Transformer() {
+                                    @Override
+                                    public Object transform(Object input) {
+                                        final String varName = (String) input;
+                                        return new KeyValuePair(varName, Context.jsToJava(jsScope.get(varName, jsScope), Object.class));
+                                    }
+                                }),
+                        new Predicate() {
+                            @Override
+                            public boolean evaluate(Object object) {
+                                return !(((KeyValuePair) object).getValue().getClass().getName().startsWith("org.mozilla.javascript.gen."));
+                            }
+                        }));
     }
 
     @Override

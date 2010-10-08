@@ -44,10 +44,8 @@ import net.sf.saxon.type.Type;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.VariableException;
-import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.ListVariable;
-import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.web.HttpInfo;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.stream.StreamResult;
@@ -568,6 +566,9 @@ public class CommonUtil {
             return new ListVariable(new ArrayList((Collection) value));
         } else if (value instanceof Object[]) {
             return new ListVariable(Arrays.asList((Object[]) value));
+        } else if (value instanceof SystemUtilities
+                || value instanceof HttpInfo) {
+            return new InternalVariable(value);
         } else {
             return new NodeVariable(value);
         }

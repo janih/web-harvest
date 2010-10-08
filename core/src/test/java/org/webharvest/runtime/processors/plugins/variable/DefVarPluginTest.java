@@ -84,7 +84,6 @@ public class DefVarPluginTest {
 
         contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
         contextMock.assertNotInvoked().getVar(null);
-        contextMock.assertNotInvoked().containsVar(null);
     }
 
     @Test
@@ -99,7 +98,6 @@ public class DefVarPluginTest {
 
         contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
         contextMock.assertNotInvoked().getVar(null);
-        contextMock.assertNotInvoked().containsVar(null);
     }
 
     @Test

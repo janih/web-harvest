@@ -77,8 +77,8 @@ public class ScraperContextTest {
         assertSame(dummyVar, context.getVar("x"));
         assertSame(dummyVar, context.getVar("y"));
 
-        context.setVar("x", "test");
-        context.setVar("y", Arrays.asList(1, 2, 3));
+        context.setLocalVar("x", "test");
+        context.setLocalVar("y", Arrays.asList(1, 2, 3));
         assertReflectionEquals(new NodeVariable("test"), context.getVar("x"));
         assertReflectionEquals(new ListVariable(Arrays.asList(1, 2, 3)), context.getVar("y"));
     }
@@ -128,8 +128,8 @@ public class ScraperContextTest {
     public void testIterator() throws Exception {
         assertFalse(context.iterator().hasNext());
 
-        context.setVar("z", "zzz");
-        context.setVar("x", "will be overwritten");
+        context.setLocalVar("z", "zzz");
+        context.setLocalVar("x", "will be overwritten");
         context.setLocalVar("x", dummyVar);
         context.setLocalVar("y", dummyVar);
 
@@ -142,23 +142,23 @@ public class ScraperContextTest {
 
     @Test
     public void testExecuteWithinNewContext() throws Exception {
-        context.setVar("x", "a");
-        context.setVar("y", 1);
+        context.setLocalVar("x", "a");
+        context.setLocalVar("y", 1);
 
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                context.setVar("y", 2);
+                context.setLocalVar("y", 2);
 
                 context.executeWithinNewContext(new Runnable() {
                     @Override
                     public void run() {
-                        context.setVar("z", "zzz");
+                        context.setLocalVar("z", "zzz");
 
                         context.executeWithinNewContext(new Runnable() {
                             @Override
                             public void run() {
-                                context.setVar("x", "b");
+                                context.setLocalVar("x", "b");
 
                                 assertReflectionEquals(new NodeVariable("b"), context.getVar("x"));
                                 assertReflectionEquals(new NodeVariable(2), context.getVar("y"));

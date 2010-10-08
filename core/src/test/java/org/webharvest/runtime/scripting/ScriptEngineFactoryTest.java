@@ -105,12 +105,12 @@ public class ScriptEngineFactoryTest {
         System.out.print(MessageFormat.format("{0}: {1} cycles", StringUtils.rightPad(lang.name(), 10), count));
 
         final ScraperContext context = new ScraperContext();
-        context.setVar("x", 2);
+        context.setLocalVar("x", 2);
 
         final StopWatch watch = new StopWatch();
         watch.start();
         for (int i = 0; i < count; i++) {
-            context.setVar("y", i);
+            context.setLocalVar("y", i);
             Assert.assertEquals(2 * i, ((Number) factory.getEngine(new ScriptSource(code, lang)).evaluate(context)).intValue());
         }
         watch.stop();

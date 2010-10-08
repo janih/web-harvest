@@ -62,7 +62,7 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public void setVar(String name, Object value) {
+    public void setLocalVar(String name, Object value) {
         setLocalVar(name, CommonUtil.createVariable(value));
     }
 
@@ -96,11 +96,11 @@ public class ScraperContext implements DynamicScopeContext {
      * This method is kept for the backward compatibility only.
      *
      * @param varName
-     * @deprecated use {@link #setVar(String, Object)}
+     * @deprecated use {@link #setLocalVar(String, Object)}
      */
     @Deprecated
     public void put(String varName, Object value) {
-        setVar(varName, value);
+        setLocalVar(varName, value);
     }
 
     @Override

@@ -37,9 +37,13 @@
 package org.webharvest.runtime.scripting.impl;
 
 import bsh.*;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.utils.Assert;
+import org.webharvest.utils.KeyValuePair;
 
 /**
  * BeanShell scripting engine.
@@ -69,7 +73,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
     }
 
     @Override
-    protected void setVariable(String name, Object value) {
+    protected void setEngineVariable(String name, Object value) {
         try {
             bshNameSpace.setVariable(name, value, false);
         } catch (UtilEvalError e) {
@@ -85,6 +89,33 @@ public class BeanShellScriptEngine extends ScriptEngine {
         } catch (EvalError e) {
             throw new ScriptException("Error during script execution: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    protected Iterable<KeyValuePair<Object>> getEngineVariables() {
+        return IteratorUtils.toList(
+                IteratorUtils.filteredIterator(
+                        IteratorUtils.transformedIterator(
+                                IteratorUtils.arrayIterator(bshNameSpace.getVariableNames()),
+                                new Transformer() {
+                                    @Override
+                                    public KeyValuePair transform(Object input) {
+                                        final String varName = (String) input;
+                                        try {
+                                            return new KeyValuePair(varName, bshNameSpace.getVariable(varName));
+                                        } catch (UtilEvalError e) {
+                                            throw new ScriptException(e);
+                                        }
+                                    }
+                                }),
+                        new Predicate() {
+                            @Override
+                            public boolean evaluate(Object object) {
+                                return !(((KeyValuePair) object).getValue() instanceof bsh.XThis);
+                            }
+                        }
+                ));
     }
 
     @Override

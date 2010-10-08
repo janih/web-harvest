@@ -39,8 +39,13 @@ package org.webharvest.runtime.scripting.impl;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Transformer;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.utils.Assert;
+import org.webharvest.utils.KeyValuePair;
+
+import java.util.Map;
 
 /**
  * Groovy scripting engine.
@@ -68,13 +73,27 @@ public class GroovyScriptEngine extends ScriptEngine {
     }
 
     @Override
-    protected void setVariable(String name, Object value) {
+    protected void setEngineVariable(String name, Object value) {
         grvBinding.setVariable(name, value);
     }
 
     protected Object doEvaluate() {
         grvScript.setBinding(grvBinding);
         return grvScript.run();
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    protected Iterable<KeyValuePair<Object>> getEngineVariables() {
+        return IteratorUtils.toList(IteratorUtils.transformedIterator(
+                grvBinding.getVariables().entrySet().iterator(),
+                new Transformer() {
+                    @Override
+                    public Object transform(Object input) {
+                        final Map.Entry<String, Object> entry = (Map.Entry<String, Object>) input;
+                        return new KeyValuePair(entry.getKey(), entry.getValue());
+                    }
+                }));
     }
 
     @Override
