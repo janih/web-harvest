@@ -36,50 +36,40 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.variable;
 
+import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
-abstract class AbstractValiableHandlerPlugin extends WebHarvestPlugin {
+import java.text.MessageFormat;
+
+public class GetVarPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
-    private static final String ATTR_VALUE = "value";
-
-    private final String name;
-
-    protected AbstractValiableHandlerPlugin(String name) {
-        this.name = name;
-    }
 
     public Variable executePlugin(Scraper scraper, ScraperContext context) {
-        final String varName = evaluateAttribute(ATTR_VAR, scraper);
+        final String varName = getAttributes().get(ATTR_VAR);
 
-        Variable value = BaseTemplater.executeToVariable(getAttributes().get(ATTR_VALUE), null, scraper);
+        final Variable value = context.getVar(varName);
 
-        if (value.isEmpty()) {
-            value = executeBody(scraper, context);
+        if (value == null) {
+            throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", varName));
         }
 
-        doExecute(context, varName, value);
+        this.setProperty("Var", varName);
 
-        this.setProperty("\"" + varName + "\"", value);
-
-        return EmptyVariable.INSTANCE;
+        return value;
     }
 
-    protected abstract void doExecute(ScraperContext context, String varName, Variable value);
-
     public String getName() {
-        return name;
+        return "get";
     }
 
     public String[] getValidAttributes() {
-        return new String[]{ATTR_VAR, ATTR_VALUE};
+        return getRequiredAttributes();
     }
 
     @Override

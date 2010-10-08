@@ -48,6 +48,7 @@ import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.web.HttpClientManager;

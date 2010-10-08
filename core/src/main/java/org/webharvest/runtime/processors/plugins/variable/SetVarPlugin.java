@@ -36,7 +36,7 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors.plugins;
+package org.webharvest.runtime.processors.plugins.variable;
 
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.Variable;
@@ -44,15 +44,19 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Support for database operations.
  */
-public class DefVarPlugin extends AbstractValiableHandlerPlugin {
+public class SetVarPlugin extends AbstractVariableModifierPlugin {
 
-    public DefVarPlugin() {
-        super("def");
+    public SetVarPlugin() {
+        super("set");
     }
 
     @Override
     protected void doExecute(ScraperContext context, String varName, Variable value) {
-        context.setLocalVar(varName, value);
+        if (context.containsVar(varName)) {
+            context.replaceExistingVar(varName, value);
+        } else {
+            context.setLocalVar(varName, value);
+        }
     }
 
 }

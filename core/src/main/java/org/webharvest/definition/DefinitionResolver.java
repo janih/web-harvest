@@ -40,10 +40,16 @@ import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.processors.plugins.*;
+import org.webharvest.runtime.processors.plugins.JsonToXmlPlugin;
+import org.webharvest.runtime.processors.plugins.TokenizePlugin;
+import org.webharvest.runtime.processors.plugins.ValueOfPlugin;
+import org.webharvest.runtime.processors.plugins.XmlToJsonPlugin;
 import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
 import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
 import org.webharvest.runtime.processors.plugins.mail.MailPlugin;
+import org.webharvest.runtime.processors.plugins.variable.DefVarPlugin;
+import org.webharvest.runtime.processors.plugins.variable.GetVarPlugin;
+import org.webharvest.runtime.processors.plugins.variable.SetVarPlugin;
 import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
@@ -71,10 +77,6 @@ public class DefinitionResolver {
     // defines all valid elements of Web-Harvest configuration file
 
     static {
-        String htmlToXmlAtts = "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars," +
-                "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
-                "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
-                "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts";
         elementInfos.put("config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id"));
         elementInfos.put("empty", new ElementInfo("empty", EmptyDef.class, null, "id"));
         elementInfos.put("text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter"));
@@ -84,7 +86,11 @@ public class DefinitionResolver {
         elementInfos.put("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,multipart,charset,username,password,cookie-policy"));
         elementInfos.put("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
         elementInfos.put("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
-        elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, htmlToXmlAtts));
+        elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +
+                "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars," +
+                "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
+                "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
+                "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts"));
         elementInfos.put("regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq"));
         elementInfos.put("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
         elementInfos.put("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
@@ -117,6 +123,7 @@ public class DefinitionResolver {
         registerPlugin(SetVarPlugin.class, true);
         registerPlugin(DefVarPlugin.class, true);
         registerPlugin(GetVarPlugin.class, true);
+        registerPlugin(ValueOfPlugin.class, true);
         registerPlugin(DatabasePlugin.class, true);
         registerPlugin(JsonToXmlPlugin.class, true);
         registerPlugin(XmlToJsonPlugin.class, true);

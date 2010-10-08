@@ -38,42 +38,19 @@
 
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.exception.VariableException;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
+import org.unitils.util.ReflectionUtils;
+import org.webharvest.definition.WebHarvestPluginDef;
+import org.webharvest.definition.XmlNode;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.variables.Variable;
+import org.xml.sax.InputSource;
 
-import java.text.MessageFormat;
+import java.io.StringReader;
 
-public class GetVarPlugin extends WebHarvestPlugin {
+public class PluginTestUtils {
 
-    private static final String ATTR_VAR = "var";
-
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
-        final String varName = evaluateAttribute(ATTR_VAR, scraper);
-
-        final Variable value = context.getVar(varName);
-
-        if (value == null) {
-            throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", varName));
-        }
-
-        this.setProperty("Var", varName);
-
-        return value;
-    }
-
-    public String getName() {
-        return "get";
-    }
-
-    public String[] getValidAttributes() {
-        return getRequiredAttributes();
-    }
-
-    @Override
-    public String[] getRequiredAttributes() {
-        return new String[]{ATTR_VAR};
+    public static WebHarvestPlugin createPlugin(String xml, Class<? extends WebHarvestPlugin> clazz) {
+        final WebHarvestPlugin plugin = ReflectionUtils.createInstanceOfType(clazz, true);
+        plugin.setDef(new WebHarvestPluginDef(XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+        return plugin;
     }
 }

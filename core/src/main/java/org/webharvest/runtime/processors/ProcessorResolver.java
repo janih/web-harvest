@@ -37,6 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.*;
+import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
+import org.webharvest.runtime.processors.deprecated.VarProcessor;
 
 public class ProcessorResolver {
 
