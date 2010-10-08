@@ -76,13 +76,17 @@ public class TreeNodeInfo {
         icons.put(CallDef.class, ResourceManager.getIcon("resources/icons/call.gif"));
         icons.put(CaseDef.class, ResourceManager.getIcon("resources/icons/case.gif"));
         icons.put(TryDef.class, ResourceManager.getIcon("resources/icons/try.gif"));
+
         icons.put("database", ResourceManager.getIcon("resources/icons/database.gif"));
         icons.put("xml-to-json", ResourceManager.getIcon("resources/icons/xmltojson.gif"));
         icons.put("json-to-xml", ResourceManager.getIcon("resources/icons/jsontoxml.gif"));
+
         icons.put("mail", ResourceManager.getIcon("resources/icons/mail.gif"));
         icons.put("mail-attach", ResourceManager.getIcon("resources/icons/mailattach.gif"));
+
         icons.put("zip", ResourceManager.getIcon("resources/icons/zip.gif"));
         icons.put("zip-entry", ResourceManager.getIcon("resources/icons/zipentry.gif"));
+
         icons.put("ftp", ResourceManager.getIcon("resources/icons/ftp.gif"));
         icons.put("ftp-del", ResourceManager.getIcon("resources/icons/ftp.gif"));
         icons.put("ftp-get", ResourceManager.getIcon("resources/icons/ftp.gif"));
@@ -90,6 +94,11 @@ public class TreeNodeInfo {
         icons.put("ftp-put", ResourceManager.getIcon("resources/icons/ftp.gif"));
         icons.put("ftp-mkdir", ResourceManager.getIcon("resources/icons/ftp.gif"));
         icons.put("ftp-rmdir", ResourceManager.getIcon("resources/icons/ftp.gif"));
+
+        icons.put("def", ResourceManager.getIcon("resources/icons/vardef.gif"));
+        icons.put("set", ResourceManager.getIcon("resources/icons/vardef.gif"));
+        icons.put("get", ResourceManager.getIcon("resources/icons/var.gif"));
+        icons.put("value-of", ResourceManager.getIcon("resources/icons/var.gif"));
     }
 
     private DefaultMutableTreeNode node;
@@ -121,7 +130,7 @@ public class TreeNodeInfo {
         } else {
             result = icons.get(this.elementDef.getClass());
             if (result == null && elementDef instanceof WebHarvestPluginDef) {
-                result = icons.get( ((WebHarvestPluginDef)elementDef).getShortElementName() );
+                result = icons.get(elementDef.getShortElementName());
                 if (result == null) {
                     result = ResourceManager.getIcon("resources/icons/plugin.gif");
                 }
@@ -140,8 +149,8 @@ public class TreeNodeInfo {
         }
 
         String result = this.elementDef.getShortElementName();
-        if ( this.executionCount > 0 ) {
-            result +=  " [" + this.executionCount + "]";
+        if (this.executionCount > 0) {
+            result += " [" + this.executionCount + "]";
         }
         return result;
     }
@@ -185,5 +194,5 @@ public class TreeNodeInfo {
     public void addSynchronizedView(ViewerFrame viewerFrame) {
         this.synchronizedViews.add(viewerFrame);
     }
-    
+
 }
