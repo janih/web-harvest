@@ -36,11 +36,12 @@
 */
 package org.webharvest.runtime.variables;
 
-import org.webharvest.exception.*;
+import org.webharvest.exception.VariableException;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.io.*;
 
 /**
  * Node variable - Single node wrapper.
@@ -79,7 +80,7 @@ public class NodeVariable extends Variable {
 
     public byte[] toBinary() {
         if (data == null) {
-            return new byte[] {};
+            return new byte[]{};
         } else if (data instanceof byte[]) {
             return (byte[]) data;
         } else {
@@ -100,16 +101,16 @@ public class NodeVariable extends Variable {
     }
 
     public List toList() {
-        List list = new ArrayList();
-        if (!isEmpty()) {
-        	list.add(this);
-        }
-
-        return list;
+        return (isEmpty()) ? Collections.EMPTY_LIST
+                : (data instanceof Iterable) ? new ListVariable((Iterable) data).toList()
+                : (data instanceof Object[]) ? new ListVariable(Arrays.asList(data)).toList()
+                : Arrays.asList(this);
     }
 
     public boolean isEmpty() {
-        return (data == null) || ( "".equals(toString()) );
+        return data == null
+                || data instanceof CharSequence
+                && ((CharSequence) data).length() == 0;
     }
 
     public Object getWrappedObject() {

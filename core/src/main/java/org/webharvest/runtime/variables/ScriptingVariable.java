@@ -38,54 +38,19 @@
 
 package org.webharvest.runtime.variables;
 
-import java.util.List;
-
 /**
+ * This variables are unwrapped when passing into script engines
+ * and preserve the mutable collections in the original state when passing over Scraper
+ * <p/>
  * Created by IntelliJ IDEA.
  * User: awajda
  * Date: Sep 20, 2010
  * Time: 9:45:58 PM
  */
-public class InternalVariable extends Variable {
+public class ScriptingVariable extends NodeVariable {
 
-    private Object wrappedObject;
-
-    public InternalVariable(Object wrappedObject) {
-        this.wrappedObject = wrappedObject;
+    public ScriptingVariable(Object wrappedObject) {
+        super(wrappedObject);
     }
 
-    @Override
-    public Object getWrappedObject() {
-        return wrappedObject;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(wrappedObject);
-    }
-
-    @Override
-    public byte[] toBinary() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public byte[] toBinary(String charset) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString(String charset) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List toList() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        throw new UnsupportedOperationException();
-    }
 }

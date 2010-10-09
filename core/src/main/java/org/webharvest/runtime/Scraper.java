@@ -47,7 +47,7 @@ import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.InternalVariable;
+import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.ClassLoaderUtil;
@@ -122,8 +122,8 @@ public class Scraper {
         this.httpClientManager = new HttpClientManager();
 
         this.context = new ScraperContext();
-        context.setLocalVar("sys", new InternalVariable(new SystemUtilities(this)));
-        context.setLocalVar("http", new InternalVariable(httpClientManager.getHttpInfo()));
+        context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
+        context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
 
         this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage());
     }

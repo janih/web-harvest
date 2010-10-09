@@ -3,57 +3,45 @@
 <config charset="UTF-8">
 
     <!-- set initial page -->
-    <var-def name="home">http://web-harvest.sourceforge.net/index.php</var-def>
+    <def var="home" value="http://web-harvest.sourceforge.net/index.php"/>
 
     <!-- define script functions and variables -->
     <script><![CDATA[
-        /* checks if specified URL is valid for download */
-        boolean isValidUrl(String url) {
-            String urlSmall = url.toLowerCase();
-            return urlSmall.startsWith("http://web-harvest.sourceforge.net/") && urlSmall.endsWith(".php");
-        }
-
-        /* create filename based on specified URL */
-        String makeFilename(String url) {
-            return url.replaceAll("http://|https://|file://", "");
-        }
-
         /* set of unvisited URLs */
         Set unvisited = new HashSet();
         unvisited.add(home);
 
-        /* pushes to web-harvest context initial set of unvisited pages */
-        SetContextVar("unvisitedVar", unvisited);
-
         /* set of visited URLs */
         Set visited = new HashSet();
+
+        Set newLinks = null;
     ]]></script>
 
     <!-- loop while there are any unvisited links -->
-    <while condition="${unvisitedVar.toList().size() != 0}">
+    <while condition="${unvisited.size() != 0}">
         <loop item="currUrl">
-            <list><var name="unvisitedVar"/></list>
+            <list>
+                <get var="unvisited"/>
+            </list>
             <body>
                 <empty>
-                    <var-def name="content">
+                    <def var="content">
                         <html-to-xml>
                             <http url="${currUrl}"/>
                         </html-to-xml>
-                    </var-def>
+                    </def>
 
-                    <script><![CDATA[
-                        currentFullUrl = sys.fullUrl(home, currUrl);
-                    ]]></script>
+                    <script>currentFullUrl = sys.fullUrl(home, currUrl)</script>
 
                     <!--  saves downloaded page -->
-                    <file action="write" path="spider/${makeFilename(currentFullUrl)}.html">
-                        <var name="content"/>
+                    <file action="write" path='spider/${currentFullUrl.replaceAll("http://|https://|file://", "")}.html'>
+                        <get var="content"/>
                     </file>
 
                     <!-- adds current URL to the list of visited -->
                     <script><![CDATA[
                         visited.add(sys.fullUrl(home, currUrl));
-                        Set newLinks = new HashSet();
+                        newLinks = new HashSet();
                         print(currUrl);
                     ]]></script>
 
@@ -61,13 +49,18 @@
                     <loop item="currLink">
                         <list>
                             <xpath expression="//a/@href">
-                                <var name="content"/>
+                                <get var="content"/>
                             </xpath>
                         </list>
                         <body>
                             <script><![CDATA[
+                                /* checks if specified URL is valid for download */
+                                boolean isValidUrl(String url) {
+                                    String urlSmall = url.toLowerCase();
+                                    return urlSmall.startsWith("http://web-harvest.sourceforge.net/") && urlSmall.endsWith(".php");
+                                }
                                 String fullLink = sys.fullUrl(home, currLink);
-                                if ( isValidUrl(fullLink.toString()) && !visited.contains(fullLink) && !unvisitedVar.toList().contains(fullLink) ) {
+                                if ( isValidUrl(fullLink.toString()) && !visited.contains(fullLink) && !unvisited.contains(fullLink) ) {
                                     newLinks.add(fullLink);
                                 }
                             ]]></script>
@@ -78,9 +71,7 @@
         </loop>
 
         <!-- unvisited link are now all the collected new links from downloaded pages  -->
-        <script><![CDATA[
-             SetContextVar("unvisitedVar", newLinks);
-        ]]></script>
+        <script>unvisited = newLinks</script>
     </while>
 
 </config>

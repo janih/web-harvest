@@ -563,12 +563,12 @@ public class CommonUtil {
         } else if (value == null || value instanceof String && StringUtils.isEmpty((String) value)) {
             return EmptyVariable.INSTANCE;
         } else if (value instanceof Collection) {
-            return new ListVariable(new ArrayList((Collection) value));
+            return new ListVariable((Collection) value);
         } else if (value instanceof Object[]) {
             return new ListVariable(Arrays.asList((Object[]) value));
         } else if (value instanceof SystemUtilities
                 || value instanceof HttpInfo) {
-            return new InternalVariable(value);
+            return new ScriptingVariable(value);
         } else {
             return new NodeVariable(value);
         }

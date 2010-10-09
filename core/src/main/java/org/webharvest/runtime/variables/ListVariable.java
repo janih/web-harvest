@@ -57,7 +57,7 @@ public class ListVariable extends Variable implements Iterable {
         this.list = new ArrayList<Variable>();
     }
 
-    public ListVariable(List list) {
+    public ListVariable(Iterable list) {
         this.list = new ArrayList<Variable>();
 
         if (list != null) {

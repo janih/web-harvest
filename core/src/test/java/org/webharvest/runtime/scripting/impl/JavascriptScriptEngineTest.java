@@ -38,11 +38,15 @@
 
 package org.webharvest.runtime.scripting.impl;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.variables.InternalVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.ScriptingVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.SystemUtilities;
+
+import static org.junit.Assert.*;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,37 +58,55 @@ public class JavascriptScriptEngineTest {
 
     private ScraperContext context = new ScraperContext();
 
+    final Variable x = new NodeVariable(2);
+    final Variable y = new NodeVariable(5);
+
     @Test
     public void testEvaluate() {
-        context.setLocalVar("internal", new InternalVariable(new SystemUtilities(null)));
-        context.setLocalVar("x", 2);
-        context.setLocalVar("y", 5);
+        context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(null)));
+        context.setLocalVar("x", x);
+        context.setLocalVar("y", y);
         context.setLocalVar("z", "old");
         context.setLocalVar("w", "old");
 
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(7.0, new JavascriptScriptEngine("" +
+                assertEquals(7.0, new JavascriptScriptEngine("" +
                         "function f(a, b) {return a + b};" +
-                        "k = 'foo';" +
+                        "k = 'foo' + sys.space + 'bar';" +
                         "z = 'new';" +
                         "var w = 'new';" +
                         "f(parseInt(x), parseInt(y))").
                         evaluate(context));
 
-                Assert.assertEquals(2, context.getVar("x").getWrappedObject());
-                Assert.assertEquals(5, context.getVar("y").getWrappedObject());
-                Assert.assertEquals("foo", context.getVar("k").getWrappedObject());
-                Assert.assertEquals("new", context.getVar("z").getWrappedObject());
-                Assert.assertEquals("new", context.getVar("w").getWrappedObject());
-                Assert.assertFalse(context.containsVar("f"));
+                // 'x' and 'y' should remain untouched
+                assertSame(x, context.getVar("x"));
+                assertSame(y, context.getVar("y"));
+
+                // new variable 'k' is defined in the local scope
+                assertReflectionEquals(new ScriptingVariable("foo bar"), context.getVar("k"));
+
+                // 'z' and 'w' are reassigned with new values in their original scope
+                assertReflectionEquals(new ScriptingVariable("new"), context.getVar("z"));
+                assertReflectionEquals(new ScriptingVariable("new"), context.getVar("w"));
+
+                // function 'f' doesn't propagated out of the script
+                assertFalse(context.containsVar("f"));
             }
         }, false);
 
-        Assert.assertFalse(context.containsVar("k"));
-        Assert.assertEquals("new", context.getVar("z").getWrappedObject());
-        Assert.assertSame(InternalVariable.class, context.getVar("internal").getClass());
+        // 'k' is out of scope
+        assertFalse(context.containsVar("k"));
+
+        // 'z' and 'w' have been reassigned in this scope
+        assertReflectionEquals(new ScriptingVariable("new"), context.getVar("z"));
+        assertReflectionEquals(new ScriptingVariable("new"), context.getVar("w"));
+
+        // Scripting variables are of the same type while passing over
+        assertReflectionEquals(
+                new ScriptingVariable(new SystemUtilities(null)),
+                context.getVar("sys"));
     }
 
 }

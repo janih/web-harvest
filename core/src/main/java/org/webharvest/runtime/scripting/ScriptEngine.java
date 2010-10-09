@@ -37,9 +37,8 @@
 package org.webharvest.runtime.scripting;
 
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.variables.InternalVariable;
+import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 
 /**
@@ -55,7 +54,7 @@ public abstract class ScriptEngine {
             for (KeyValuePair<Variable> pair : context) {
                 final Variable value = pair.getValue();
                 //todo: why not just unwrap every variable?
-                setEngineVariable(pair.getKey(), (value instanceof InternalVariable)
+                setEngineVariable(pair.getKey(), (value instanceof ScriptingVariable)
                         ? value.getWrappedObject()
                         : value);
             }
@@ -64,11 +63,13 @@ public abstract class ScriptEngine {
 
             for (KeyValuePair<Object> pair : getEngineVariables()) {
                 final String varName = pair.getKey();
-                final Variable value = CommonUtil.createVariable(pair.getValue());
+                final Variable variable = (pair.getValue() instanceof Variable)
+                        ? (Variable) pair.getValue()
+                        : new ScriptingVariable(pair.getValue());
                 if (context.containsVar(varName)) {
-                    context.replaceExistingVar(varName, value);
+                    context.replaceExistingVar(varName, variable);
                 } else {
-                    context.setLocalVar(varName, value);
+                    context.setLocalVar(varName, variable);
                 }
             }
 
