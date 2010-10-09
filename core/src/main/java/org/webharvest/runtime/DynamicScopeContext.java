@@ -55,7 +55,6 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     void executeWithinNewContext(Runnable runnable, boolean loopBody_compat2b1);
 
-    @SuppressWarnings({"ConstantConditions"})
     Variable replaceExistingVar(String name, Variable variable);
 
     boolean containsVar(String name);
