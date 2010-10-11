@@ -36,7 +36,7 @@
  subject line.
  */
 
-package org.webharvest.runtime.scripting.impl;
+package org.webharvest.runtime.scripting;
 
 import bsh.CallStack;
 import bsh.Interpreter;
