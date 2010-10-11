@@ -36,6 +36,7 @@
 */
 package org.webharvest.runtime.processors.deprecated;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.webharvest.definition.VarDefDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -74,7 +75,7 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
         this.setProperty("\"" + name + "\"", var);
         this.setProperty("Overwrite", toOverwrite);
 
-        return EmptyVariable.INSTANCE;
+        return (Variable) ObjectUtils.defaultIfNull(context.getVar(name), EmptyVariable.INSTANCE);
     }
 
 }

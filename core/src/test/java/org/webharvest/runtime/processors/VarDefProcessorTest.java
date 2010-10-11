@@ -38,7 +38,6 @@
 
 package org.webharvest.runtime.processors;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,8 +48,8 @@ import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
-import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
 
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -79,48 +78,47 @@ public class VarDefProcessorTest {
         context = new ScraperContext();
     }
 
-    private void invoke(String varDefXml) {
-        Assert.assertSame(EmptyVariable.INSTANCE,
-                ProcessorTestUtils.<VarDefProcessor>processor(varDefXml).
-                        execute(scraperMock.getMock(), context));
+    private Variable invoke(String varDefXml) {
+        return ProcessorTestUtils.<VarDefProcessor>processor(varDefXml).
+                execute(scraperMock.getMock(), context);
     }
 
     @Test
     public void testExecute_newVar_overwriteDefault() throws Exception {
-        invoke("<var-def name='x'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("123"), invoke("<var-def name='x'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_newVar_overwriteTrue() throws Exception {
-        invoke("<var-def name='x' overwrite='true'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("123"), invoke("<var-def name='x' overwrite='true'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_newVar_overwriteFalse() throws Exception {
-        invoke("<var-def name='x' overwrite='false'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("123"), invoke("<var-def name='x' overwrite='false'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteDefault() throws Exception {
         context.setLocalVar("x", new NodeVariable("existing"));
-        invoke("<var-def name='x'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("123"), invoke("<var-def name='x'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteTrue() throws Exception {
         context.setLocalVar("x", new NodeVariable("existing"));
-        invoke("<var-def name='x' overwrite='true'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("123"), invoke("<var-def name='x' overwrite='true'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("123"), context.getVar("x"));
     }
 
     @Test
     public void testExecute_reassigning_overwriteFalse() throws Exception {
         context.setLocalVar("x", new NodeVariable("existing"));
-        invoke("<var-def name='x' overwrite='false'>123</var-def>");
+        assertReflectionEquals(new NodeVariable("existing"), invoke("<var-def name='x' overwrite='false'>123</var-def>"));
         assertReflectionEquals(new NodeVariable("existing"), context.getVar("x"));
     }
 }
