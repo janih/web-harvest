@@ -68,7 +68,7 @@ public class XmlParser extends DefaultHandler {
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             parserFactory.setValidating(false);
-            parserFactory.setNamespaceAware(false);
+            parserFactory.setNamespaceAware(true);
 
             SAXParser parser = parserFactory.newSAXParser();
 

@@ -47,7 +47,7 @@ public class XmlNode extends HashMap<String, Object> {
 
     protected static final Logger log = LoggerFactory.getLogger(XmlNode.class);
 
-    private static final boolean IGNORE_NAMESPACE = true;
+    private static final boolean IGNORE_NAMESPACE = false;
     private static final boolean IGNORE_CASE = true;
 
     // node name - corresponds to xml tag name
