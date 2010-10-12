@@ -36,6 +36,10 @@
 */
 package org.webharvest.runtime.processors;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.query.DynamicQueryContext;
+import net.sf.saxon.query.StaticQueryContext;
+import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
 import org.webharvest.definition.XPathDef;
 import org.webharvest.exception.ScraperXPathException;
@@ -43,8 +47,15 @@ import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.XmlUtil;
+
+import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * XQuery processor.
@@ -58,13 +69,48 @@ public class XPathProcessor extends BaseProcessor<XPathDef> {
     public Variable execute(Scraper scraper, ScraperContext context) {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
         String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);
-        this.setProperty("Expression", expression);
+        if (expression != null) {
+            this.setProperty("Expression", expression);
+        }
+
+        Map<String, String> varMap = elementDef.getVariableMap();
+        Map<String, String> evaluatedVarMap = new HashMap<String, String>();
+        for ( Map.Entry<String, String> attEntry: varMap.entrySet() ) {
+            String varName = attEntry.getKey();
+            String varValue = BaseTemplater.evaluateToString(attEntry.getValue(), null, scraper);
+            evaluatedVarMap.put(varName, varValue);
+            this.setProperty(varName, varValue);
+        }
+
+        String xpathExpression = null;
 
         try {
             RuntimeConfig runtimeConfig = scraper.getRuntimeConfig();
-            return XmlUtil.evaluateXPath(expression, xml.toString(), runtimeConfig);
+            StaticQueryContext sqc = runtimeConfig.getStaticQueryContext();
+            Configuration config = sqc.getConfiguration();
+
+            DynamicQueryContext dynamicContext = new DynamicQueryContext(config);
+            StringReader reader = new StringReader(xml.toString());
+
+            dynamicContext.setContextItem(sqc.buildDocument(new StreamSource(reader)));
+
+            for ( Map.Entry<String, String> attEntry: evaluatedVarMap.entrySet() ) {
+                String varName = attEntry.getKey();
+                xpathExpression = attEntry.getValue();
+                XQueryExpression exp = runtimeConfig.getXQueryExpressionPool().getCompiledExpression(xpathExpression);
+                ListVariable xpathResult = XmlUtil.createListOfXmlNodes(exp, dynamicContext);
+                context.setLocalVar(varName, xpathResult);
+            }
+
+            if (expression != null) {
+                xpathExpression = expression;
+                XQueryExpression exp = runtimeConfig.getXQueryExpressionPool().getCompiledExpression(xpathExpression);
+                return XmlUtil.createListOfXmlNodes(exp, dynamicContext);
+            } else {
+                return EmptyVariable.INSTANCE;
+            }
         } catch (XPathException e) {
-            throw new ScraperXPathException("Error parsing XPath expression (XPath = [" + expression + "])!", e);
+            throw new ScraperXPathException("Error parsing XPath expression (XPath = [" + xpathExpression + "])!", e);
         }
     }
 

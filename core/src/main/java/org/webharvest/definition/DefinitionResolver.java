@@ -95,7 +95,7 @@ public class DefinitionResolver {
         elementInfos.put("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
         elementInfos.put("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
         elementInfos.put("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
-        elementInfos.put("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,!expression"));
+        elementInfos.put("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,expression,var\\:.*"));
         elementInfos.put("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
         elementInfos.put("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
         elementInfos.put("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
@@ -324,7 +324,17 @@ public class DefinitionResolver {
             for (String key : attributes.keySet()) {
                 final String attName = key.toLowerCase();
                 if (!atts.contains(attName)) {
-                    throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
+                    boolean ok = false;
+                    // try to match current attribute name against allowed attributes as regular expression patterns
+                    for (String att: atts) {
+                        if (attName.matches(att)) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                    if (!ok) {
+                        throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
+                    }
                 }
             }
         }

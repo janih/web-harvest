@@ -36,21 +36,42 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.exception.ConfigurationException;
+import org.webharvest.utils.KeyValuePair;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Definition of XPath processor.
  */
 public class XPathDef extends BaseElementDef {
 
     private String expression;
+    private Map<String, String> variableMap = new HashMap<String, String>();
 
     public XPathDef(XmlNode xmlNode) {
         super(xmlNode);
 
         this.expression = xmlNode.getAttribute("expression");
+        for (Map.Entry<String, String> attEntry: xmlNode.getAttributes().entrySet()) {
+            String key = attEntry.getKey();
+            if (key.startsWith("var:")) {
+                variableMap.put( key.substring(4), attEntry.getValue() );
+            }
+        }
+
+        if (this.expression == null && variableMap.size() == 0) {
+            throw new ConfigurationException("XPath requires \"expression\" or at least one \"var:varname\" attribute!");
+        }
     }
 
     public String getExpression() {
         return expression;
+    }
+
+    public Map<String, String> getVariableMap() {
+        return variableMap;
     }
 
     public String getShortElementName() {
