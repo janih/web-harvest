@@ -50,9 +50,8 @@ import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.utils.KeyValuePair;
 
-import static java.util.Arrays.asList;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
@@ -62,52 +61,39 @@ public class DefVarPluginTest {
     @Dummy
     Logger logger;
 
-    Mock<ScraperContext> contextMock;
+    ScraperContext context = new ScraperContext();
     Mock<Scraper> scraperMock;
 
     @Before
     public void before() {
         scraperMock.returns(logger).getLogger();
-        scraperMock.returns(contextMock.getMock()).getContext();
+        scraperMock.returns(context).getContext();
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test
     public void testExecutePlugin_valueAsAttr() throws Exception {
-        contextMock.returns(
-                asList(new KeyValuePair("name", new NodeVariable("World"))).iterator()).
-                iterator();
-
+        context.setLocalVar("name", new NodeVariable("World"));
         createPlugin(
                 "<def var='greetings' value='Hello, ${name}!'/>",
-                DefVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
-
-        contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
-        contextMock.assertNotInvoked().getVar(null);
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("Hello, World!"), context.getVar("greetings"));
     }
 
     @Test
     public void testExecutePlugin_valueAsBody() throws Exception {
-        contextMock.returns(
-                asList(new KeyValuePair("name", new NodeVariable("World"))).iterator()).
-                iterator();
-
+        context.setLocalVar("name", new NodeVariable("World"));
         createPlugin(
                 "<def var='greetings'><template>Hello, ${name}!</template></def>",
-                DefVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
-
-        contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
-        contextMock.assertNotInvoked().getVar(null);
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("Hello, World!"), context.getVar("greetings"));
     }
 
     @Test
     public void testExecutePlugin_bodyIgnoredWhenAttrSpecified() throws Exception {
         createPlugin(
                 "<def var='x' value='actual'>ignored</def>",
-                DefVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
-
-        contextMock.assertInvoked().setLocalVar("x", new NodeVariable("actual"));
-        contextMock.assertNotInvoked().getVar(null);
-        contextMock.assertNotInvoked().containsVar(null);
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("actual"), context.getVar("x"));
     }
 }

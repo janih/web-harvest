@@ -38,6 +38,8 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -49,6 +51,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
     private static final String ATTR_VALUE = "value";
+    private static final String ATTR_DEFAULT = "default";
 
     private final String name;
 
@@ -58,11 +61,25 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(Scraper scraper, ScraperContext context) {
         final String varName = getAttributes().get(ATTR_VAR);
+        final String valueExpr = getAttributes().get(ATTR_VALUE);
+        final String defaultExpr = getAttributes().get(ATTR_DEFAULT);
 
-        Variable value = BaseTemplater.executeToVariable(getAttributes().get(ATTR_VALUE), null, scraper);
+        Variable value = BaseTemplater.executeToVariable(valueExpr, null, scraper);
 
         if (value.isEmpty()) {
+            // value is either unspecified or evaluates to empty.
+            // Try to evaluate the body to get the value
             value = executeBody(scraper, context);
+        }
+
+        if (value.isEmpty() && StringUtils.isEmpty(valueExpr) && StringUtils.isNotEmpty(defaultExpr)) {
+            // Handle syntactic sugar: <def/set var="x" default="expr"/>  ::=  <def/set var="x" value="${x}" default="expr"/>
+            value = (Variable) ObjectUtils.defaultIfNull(context.getVar(varName), EmptyVariable.INSTANCE);
+        }
+
+        if (value.isEmpty()) {
+            // we tried our utmost but the value is still empty, so it's time to apply default
+            value = BaseTemplater.executeToVariable(defaultExpr, null, scraper);
         }
 
         doExecute(context, varName, value);
@@ -79,7 +96,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
     }
 
     public String[] getValidAttributes() {
-        return new String[]{ATTR_VAR, ATTR_VALUE};
+        return new String[]{ATTR_VAR, ATTR_VALUE, ATTR_DEFAULT};
     }
 
     @Override
