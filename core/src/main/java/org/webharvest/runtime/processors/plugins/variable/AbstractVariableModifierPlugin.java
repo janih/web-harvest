@@ -47,11 +47,16 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_DEFAULT = "default";
+
+    private static final Pattern identifierExprPattern = Pattern.compile("\\$\\{\\s*(\\w*)\\s*\\}");
 
     private final String name;
 
@@ -64,7 +69,16 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
         final String valueExpr = getAttributes().get(ATTR_VALUE);
         final String defaultExpr = getAttributes().get(ATTR_DEFAULT);
 
-        Variable value = BaseTemplater.executeToVariable(valueExpr, null, scraper);
+        Variable value;
+
+        if (StringUtils.isNotEmpty(valueExpr)) {
+            final Matcher matcher = identifierExprPattern.matcher(valueExpr);
+            value = matcher.matches()
+                    ? (Variable) ObjectUtils.defaultIfNull(context.getVar(matcher.group()), EmptyVariable.INSTANCE)
+                    : BaseTemplater.executeToVariable(valueExpr, null, scraper);
+        } else {
+            value = EmptyVariable.INSTANCE;
+        }
 
         if (value.isEmpty()) {
             // value is either unspecified or evaluates to empty.
