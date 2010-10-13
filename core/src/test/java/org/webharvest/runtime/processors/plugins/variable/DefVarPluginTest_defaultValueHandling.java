@@ -38,6 +38,7 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import groovy.lang.MissingPropertyException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,6 +79,18 @@ public class DefVarPluginTest_defaultValueHandling {
                 "<def var='x' value='${notExistingVar}' default='zzz'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("zzz"), context.getVar("x"));
+    }
+
+    @Test(expected = MissingPropertyException.class)
+    public void testExecutePlugin_default_notResolvedVarInConcatenation() throws Exception {
+        createPlugin("<def var='x' value='a ${x} b' default='zzz'/>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+    }
+
+    @Test(expected = MissingPropertyException.class)
+    public void testExecutePlugin_default_notResolvedVarInExpression() throws Exception {
+        createPlugin("<def var='x' value='${x+1}' default='zzz'/>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
     @Test

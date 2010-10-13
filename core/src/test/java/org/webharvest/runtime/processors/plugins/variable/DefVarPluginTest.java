@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
@@ -69,6 +70,12 @@ public class DefVarPluginTest {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
+    }
+
+    @Test(expected = VariableException.class)
+    public void testExecutePlugin_notExistingValue() throws Exception {
+        createPlugin("<def var='x' value='${notExistingVar}'/>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
     @Test

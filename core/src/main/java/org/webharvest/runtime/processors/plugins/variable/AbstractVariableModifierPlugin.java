@@ -40,6 +40,7 @@ package org.webharvest.runtime.processors.plugins.variable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -47,6 +48,7 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,13 +73,23 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
         Variable value;
 
-        if (StringUtils.isNotEmpty(valueExpr)) {
-            final Matcher matcher = identifierExprPattern.matcher(valueExpr);
-            value = matcher.matches()
-                    ? (Variable) ObjectUtils.defaultIfNull(context.getVar(matcher.group()), EmptyVariable.INSTANCE)
-                    : BaseTemplater.executeToVariable(valueExpr, null, scraper);
-        } else {
+        if (StringUtils.isEmpty(valueExpr)) {
+            // Let's treat empty value expression as empty value.
             value = EmptyVariable.INSTANCE;
+        } else {
+            final Matcher matcher = identifierExprPattern.matcher(valueExpr);
+            if (matcher.matches()) {
+                // expression is like "${identifier}", so we can omit evaluation process and simply look up that variable in the context
+                value = context.getVar(matcher.group());
+                if (value == null && StringUtils.isNotEmpty(defaultExpr)) {
+                    // variable is not defined, but since 'default' attr is specified we can handle this
+                    value = EmptyVariable.INSTANCE;
+                } else {
+                    throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", varName));
+                }
+            } else {
+                value = BaseTemplater.executeToVariable(valueExpr, null, scraper);
+            }
         }
 
         if (value.isEmpty()) {
