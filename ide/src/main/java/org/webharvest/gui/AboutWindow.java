@@ -56,11 +56,11 @@ public class AboutWindow extends JWindow implements HyperlinkListener {
         try {
             URL aboutUrl = ResourceManager.getAboutUrl();
             String content = CommonUtil.readStringFromUrl(aboutUrl);
-            content = content.replaceAll("#program.version#", ApplicationInfo.WEB_HARVEST_VERSION);
-            content = content.replaceAll("#program.date#", ApplicationInfo.WEB_HARVEST_DATE);
-            content = content.replaceAll("#java.version#", System.getProperty("java.version"));
-            content = content.replaceAll("#java.vendor#", System.getProperty("java.vendor"));
-            content = content.replaceAll("#year#", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+            content = content.replace("#program.version#", ApplicationInfo.WEB_HARVEST_VERSION);
+            content = content.replace("#program.date#", ApplicationInfo.WEB_HARVEST_DATE);
+            content = content.replace("#java.version#", System.getProperty("java.version"));
+            content = content.replace("#java.vendor#", System.getProperty("java.vendor"));
+            content = content.replace("#year#", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
             ((HTMLDocument) htmlPane.getDocument()).setBase(ResourceManager.getAboutUrl());
             htmlPane.setText(content);
         } catch (IOException e) {

@@ -488,8 +488,7 @@ public class CommonUtil {
 
         int i = 0;
 
-        for (int j = 0; (i < byteArray.length) && (j = fileinputstream.read(byteArray, i, byteArray.length - i)) >= 0; i += j) {
-            ;
+        for (int j; (i < byteArray.length) && (j = fileinputstream.read(byteArray, i, byteArray.length - i)) >= 0; i += j) {
         }
 
         if (i < byteArray.length) {
@@ -551,7 +550,7 @@ public class CommonUtil {
 
     /**
      * Creates appropriate AbstractVariable instance for the specified object.
-     * For colleactions and arrays ListVariable instance is returned,
+     * For collections and arrays ListVariable instance is returned,
      * for null it is an EmptyVariable, and for others it is NodeVariable
      * that wraps specified object.
      *
@@ -559,7 +558,9 @@ public class CommonUtil {
      */
     public static Variable createVariable(Object value) {
         if (value instanceof Variable) {
-            return (Variable) value;
+            return (EmptyVariable.INSTANCE == value || ((Variable) value).isEmpty())
+                    ? EmptyVariable.INSTANCE
+                    : (Variable) value;
         } else if (value == null || value instanceof String && StringUtils.isEmpty((String) value)) {
             return EmptyVariable.INSTANCE;
         } else if (value instanceof Collection) {
