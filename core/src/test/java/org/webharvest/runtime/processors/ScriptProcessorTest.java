@@ -74,7 +74,7 @@ public class ScriptProcessorTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext();
+        context = new ScraperContext(scraperMock.getMock());
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(new HttpClientManager()).getHttpClientManager();
         scraperMock.returns(context).getContext();

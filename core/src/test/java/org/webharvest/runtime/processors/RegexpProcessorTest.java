@@ -69,7 +69,7 @@ public class RegexpProcessorTest extends UnitilsTestNG {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(new HttpClientManager()).getHttpClientManager();
 
-        context = new ScraperContext();
+        context = new ScraperContext(scraperMock.getMock());
     }
 
     @Test

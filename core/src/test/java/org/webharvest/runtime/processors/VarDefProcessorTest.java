@@ -73,7 +73,7 @@ public class VarDefProcessorTest extends UnitilsTestNG {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(new HttpClientManager()).getHttpClientManager();
 
-        context = new ScraperContext();
+        context = new ScraperContext(scraperMock.getMock());
     }
 
     private Variable invoke(String varDefXml) {

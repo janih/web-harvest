@@ -39,6 +39,9 @@
 package org.webharvest.runtime.scripting.impl;
 
 import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
+import org.unitils.mock.annotation.Dummy;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
@@ -54,15 +57,19 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * Date: Sep 26, 2010
  * Time: 10:41:09 PM
  */
-public class JavascriptScriptEngineTest {
+public class JavascriptScriptEngineTest extends UnitilsTestNG {
 
-    private ScraperContext context = new ScraperContext();
+    @Dummy
+    Scraper scraper;
+
+    private ScraperContext context;
 
     final Variable x = new NodeVariable(2);
     final Variable y = new NodeVariable(5);
 
     @Test
     public void testEvaluate() {
+        context = new ScraperContext(scraper);
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(null)));
         context.setLocalVar("x", x);
         context.setLocalVar("y", y);

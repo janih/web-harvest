@@ -39,6 +39,7 @@ package org.webharvest.runtime;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
+import org.slf4j.Logger;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.Assert;
@@ -54,11 +55,14 @@ import java.util.*;
  */
 public class ScraperContext implements DynamicScopeContext {
 
+    public final Logger log;
+
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
     private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
-    public ScraperContext() {
+    public ScraperContext(Scraper scraper) {
         variablesNamesStack.push(new HashSet<String>());
+        log = scraper.getLogger();
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -101,6 +105,7 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     public void put(String varName, Object value) {
         setLocalVar(varName, value);
+        log.warn("DEPRECATED METHOD INVOCATION: " + getClass().getName() + ".put(String, Object)");
     }
 
     @Override

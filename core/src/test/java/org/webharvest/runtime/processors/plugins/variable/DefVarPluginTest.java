@@ -60,11 +60,13 @@ public class DefVarPluginTest extends UnitilsTestNG {
     @Dummy
     Logger logger;
 
-    ScraperContext context = new ScraperContext();
+    ScraperContext context;
     Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
+        context = new ScraperContext(scraperMock.getMock());
+
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, context)).getScriptEngineFactory();

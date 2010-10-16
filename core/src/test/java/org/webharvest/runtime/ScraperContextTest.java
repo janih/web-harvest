@@ -69,9 +69,12 @@ public class ScraperContextTest extends UnitilsTestNG {
     @Dummy
     private Variable dummyVar;
 
+    @Dummy
+    Scraper scraper;
+
     @BeforeMethod
     public void before() {
-        context = new ScraperContext();
+        context = new ScraperContext(scraper);
     }
 
     @Test

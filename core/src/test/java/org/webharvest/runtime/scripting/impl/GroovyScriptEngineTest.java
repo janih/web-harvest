@@ -39,7 +39,11 @@
 package org.webharvest.runtime.scripting.impl;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
+import org.unitils.mock.annotation.Dummy;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
@@ -56,12 +60,20 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * Date: Sep 26, 2010
  * Time: 10:52:46 PM
  */
-public class GroovyScriptEngineTest {
+public class GroovyScriptEngineTest extends UnitilsTestNG {
 
-    private ScraperContext context = new ScraperContext();
+    @Dummy
+    Scraper scraper;
+
+    private ScraperContext context;
 
     final Variable x = new NodeVariable(2);
     final Variable y = new NodeVariable(5);
+
+    @BeforeMethod
+    public void before() {
+        context = new ScraperContext(scraper);
+    }
 
     @Test
     public void testEvaluate() {

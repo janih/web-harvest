@@ -56,6 +56,10 @@ public class SetContextVar {
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {
         ((ScraperContext) ScraperContextHolder.getCurrentContext()).
+                log.warn("SetContextVar is DEPRECATED! No need to use it anymore. " +
+                "All variables defined on the top level of the script block are propagated to the scraper context automatically.");
+
+        ((ScraperContext) ScraperContextHolder.getCurrentContext()).
                 setVar_compat2b1(name, CommonUtil.createVariable(value));
     }
 }

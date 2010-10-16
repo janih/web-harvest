@@ -42,6 +42,9 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
+import org.unitils.mock.annotation.Dummy;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -59,15 +62,19 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * Date: Sep 26, 2010
  * Time: 10:50:12 PM
  */
-public class BeanShellScriptEngineTest {
+public class BeanShellScriptEngineTest extends UnitilsTestNG {
 
-    private ScraperContext context = new ScraperContext();
+    @Dummy
+    Scraper scraper;
+
+    private ScraperContext context;
 
     final Variable x = new NodeVariable(2);
     final Variable y = new NodeVariable(5);
 
     @BeforeMethod
     public void before() {
+        context = new ScraperContext(scraper);
         ScraperContextHolder.init(context);
         context.setLocalVar(BeanShellScriptEngine.BeanShellDelegate.class.getName(),
                 new NodeVariable(new BeanShellScriptEngine.BeanShellDelegate()));

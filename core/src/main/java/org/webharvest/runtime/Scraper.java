@@ -121,7 +121,7 @@ public class Scraper {
 
         this.httpClientManager = new HttpClientManager();
 
-        this.context = new ScraperContext();
+        this.context = new ScraperContext(this);
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
         context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
 

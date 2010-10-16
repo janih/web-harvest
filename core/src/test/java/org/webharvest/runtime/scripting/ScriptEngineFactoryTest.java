@@ -46,7 +46,10 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
+import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
@@ -65,16 +68,20 @@ import static org.webharvest.runtime.scripting.ScriptingLanguage.*;
  * Date: Sep 26, 2010
  * Time: 7:24:56 PM
  */
-public class ScriptEngineFactoryTest {
+public class ScriptEngineFactoryTest extends UnitilsTestNG {
 
     final Logger log = LoggerFactory.getLogger(getClass());
 
-    DynamicScopeContext context = new ScraperContext();
+    @Dummy
+    Scraper scraper;
+
+    DynamicScopeContext context;
 
     ScriptEngineFactory factory;
 
     @BeforeMethod
     public void before() {
+        context = new ScraperContext(scraper);
         ScraperContextHolder.init(context);
         factory = new ScriptEngineFactory(null, context);
     }
@@ -132,7 +139,7 @@ public class ScriptEngineFactoryTest {
 
         msg.append(MessageFormat.format("{0}: {1} cycles", StringUtils.rightPad(lang.name(), 10), count));
 
-        final ScraperContext context = new ScraperContext();
+        final ScraperContext context = new ScraperContext(scraper);
         context.setLocalVar("x", 2);
 
         final StopWatch watch = new StopWatch();
