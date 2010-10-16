@@ -38,11 +38,10 @@
 
 package org.webharvest.runtime.processors.plugins;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.reflectionassert.ReflectionAssert;
@@ -60,8 +59,7 @@ import static java.util.Arrays.asList;
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class ValueOfPluginTest {
+public class ValueOfPluginTest extends UnitilsTestNG {
 
     @Dummy
     Logger logger;
@@ -69,11 +67,11 @@ public class ValueOfPluginTest {
     Mock<ScraperContext> contextMock;
     Mock<Scraper> scraperMock;
 
-    @Before
+    @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, contextMock.getMock())).getScriptEngineFactory();
     }
 
     @Test

@@ -38,11 +38,10 @@
 
 package org.webharvest.runtime.processors;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
@@ -63,8 +62,7 @@ import static org.webharvest.runtime.scripting.ScriptingLanguage.GROOVY;
  * Date: Sep 27, 2010
  * Time: 12:14:12 AM
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class ScriptProcessorTest {
+public class ScriptProcessorTest extends UnitilsTestNG {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
@@ -74,7 +72,7 @@ public class ScriptProcessorTest {
     @Dummy
     Logger logger;
 
-    @Before
+    @BeforeMethod
     public void before() {
         context = new ScraperContext();
         scraperMock.returns(logger).getLogger();

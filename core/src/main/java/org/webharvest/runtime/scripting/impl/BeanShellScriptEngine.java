@@ -36,13 +36,16 @@
 */
 package org.webharvest.runtime.scripting.impl;
 
-import bsh.*;
+import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.NameSpace;
+import bsh.UtilEvalError;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.webharvest.exception.ScriptException;
+import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.scripting.ScriptEngine;
-import org.webharvest.utils.Assert;
 import org.webharvest.utils.KeyValuePair;
 
 /**
@@ -50,32 +53,37 @@ import org.webharvest.utils.KeyValuePair;
  */
 public class BeanShellScriptEngine extends ScriptEngine {
 
-    final private Interpreter bshInterpreter;
-    final private BshClassManager bshClassManager;
+    public static class BeanShellDelegate {
+
+        final private NameSpace nameSpace;
+        final private Interpreter interpreter;
+
+        public BeanShellDelegate() {
+            interpreter = new Interpreter();
+            nameSpace = interpreter.getNameSpace();
+            nameSpace.importCommands("org.webharvest.runtime.scripting");
+        }
+    }
 
     private String sourceCode;
-
-    private transient NameSpace bshNameSpace;
+    private transient BeanShellDelegate bsh;
 
     public BeanShellScriptEngine(String sourceCode) {
-        bshInterpreter = new Interpreter();
-        bshClassManager = bshInterpreter.getNameSpace().getClassManager();
-
         // BeanShell does not support pre-compiled scripts
         this.sourceCode = sourceCode;
+        this.bsh = (BeanShellDelegate) ScraperContextHolder.getCurrentContext().
+                getVar(BeanShellDelegate.class.getName()).getWrappedObject();
     }
 
     @Override
     protected void beforeEvaluation() {
-        Assert.isNull(bshNameSpace);
-        bshNameSpace = new NameSpace(bshClassManager, "WebHarvest");
-        bshNameSpace.importCommands("org.webharvest.runtime.scripting");
+        // do nothing
     }
 
     @Override
     protected void setEngineVariable(String name, Object value) {
         try {
-            bshNameSpace.setVariable(name, value, false);
+            bsh.nameSpace.setVariable(name, value, false);
         } catch (UtilEvalError e) {
             throw new ScriptException("Cannot set variable in scripter: " + e.getMessage(), e);
         }
@@ -84,8 +92,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
     @Override
     protected Object doEvaluate() {
         try {
-            bshInterpreter.setNameSpace(bshNameSpace);
-            return bshInterpreter.eval(sourceCode);
+            return bsh.interpreter.eval(sourceCode);
         } catch (EvalError e) {
             throw new ScriptException("Error during script execution: " + e.getMessage(), e);
         }
@@ -97,15 +104,17 @@ public class BeanShellScriptEngine extends ScriptEngine {
         return IteratorUtils.toList(
                 IteratorUtils.filteredIterator(
                         IteratorUtils.transformedIterator(
-                                IteratorUtils.arrayIterator(bshNameSpace.getVariableNames()),
+                                IteratorUtils.arrayIterator(bsh.nameSpace.getVariableNames()),
                                 new Transformer() {
                                     @Override
                                     public KeyValuePair transform(Object input) {
                                         final String varName = (String) input;
                                         try {
-                                            return new KeyValuePair(varName, bshNameSpace.getVariable(varName));
+                                            return new KeyValuePair(varName, bsh.nameSpace.getVariable(varName));
                                         } catch (UtilEvalError e) {
                                             throw new ScriptException(e);
+                                        } finally {
+                                            bsh.nameSpace.unsetVariable(varName);
                                         }
                                     }
                                 }),
@@ -120,8 +129,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
 
     @Override
     protected void afterEvaluation() {
-        bshNameSpace = null;
-        bshInterpreter.setNameSpace(null);
+        // do nothing
     }
 
 }

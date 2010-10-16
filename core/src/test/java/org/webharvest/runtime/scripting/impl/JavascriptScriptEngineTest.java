@@ -38,14 +38,14 @@
 
 package org.webharvest.runtime.scripting.impl;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.SystemUtilities;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**

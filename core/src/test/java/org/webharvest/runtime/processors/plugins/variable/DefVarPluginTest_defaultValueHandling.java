@@ -39,11 +39,10 @@
 package org.webharvest.runtime.processors.plugins.variable;
 
 import groovy.lang.MissingPropertyException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
@@ -57,20 +56,20 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class DefVarPluginTest_defaultValueHandling {
+public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
 
     @Dummy
     Logger logger;
 
-    ScraperContext context = new ScraperContext();
+    ScraperContext context;
     Mock<Scraper> scraperMock;
 
-    @Before
+    @BeforeMethod
     public void before() {
+        context = new ScraperContext();
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, context)).getScriptEngineFactory();
     }
 
     @Test
@@ -81,13 +80,13 @@ public class DefVarPluginTest_defaultValueHandling {
         assertReflectionEquals(new NodeVariable("zzz"), context.getVar("x"));
     }
 
-    @Test(expected = MissingPropertyException.class)
+    @Test(expectedExceptions = MissingPropertyException.class)
     public void testExecutePlugin_default_notResolvedVarInConcatenation() throws Exception {
         createPlugin("<def var='x' value='a ${x} b' default='zzz'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
-    @Test(expected = MissingPropertyException.class)
+    @Test(expectedExceptions = MissingPropertyException.class)
     public void testExecutePlugin_default_notResolvedVarInExpression() throws Exception {
         createPlugin("<def var='x' value='${x+1}' default='zzz'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);

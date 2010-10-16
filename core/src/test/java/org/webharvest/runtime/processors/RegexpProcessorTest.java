@@ -38,12 +38,11 @@
 
 package org.webharvest.runtime.processors;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
@@ -57,8 +56,7 @@ import org.webharvest.runtime.web.HttpClientManager;
  * Time: 10:53:40 PM
  */
 
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class RegexpProcessorTest {
+public class RegexpProcessorTest extends UnitilsTestNG {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
@@ -66,7 +64,7 @@ public class RegexpProcessorTest {
     @Dummy
     Logger logger;
 
-    @Before
+    @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(new HttpClientManager()).getHttpClientManager();

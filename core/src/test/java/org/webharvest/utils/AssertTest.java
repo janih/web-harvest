@@ -38,7 +38,7 @@
 
 package org.webharvest.utils;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.webharvest.utils.Assert.*;
 
@@ -58,12 +58,12 @@ public class AssertTest {
         isNull(null, "msg");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testIsNull_Fail() throws Exception {
         isNull(DUMMY);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testIsNull_Fail_withMsg() throws Exception {
         isNull(DUMMY, "msg");
     }
@@ -74,12 +74,12 @@ public class AssertTest {
         notNull(DUMMY, "msg");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testNotNull_Fail() throws Exception {
         notNull(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testNotNull_Fail_withMsg() throws Exception {
         notNull(null, "msg");
     }
@@ -89,7 +89,7 @@ public class AssertTest {
         isTrue(true, "msg");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testIsTrue_Fail() throws Exception {
         isTrue(false, "msg");
     }
@@ -99,12 +99,12 @@ public class AssertTest {
         isFalse(false, "msg");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testIsFalse_Fail() throws Exception {
         isFalse(true, "msg");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expectedExceptions = IllegalStateException.class)
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
     public void testShouldNeverHappen() throws Exception {
         shouldNeverHappen(null);

@@ -125,7 +125,7 @@ public class Scraper {
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
         context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
 
-        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage());
+        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage(), context);
     }
 
     /**

@@ -39,9 +39,8 @@
 package org.webharvest.runtime.processors.plugins.variable;
 
 import junit.framework.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.exception.VariableException;
@@ -51,8 +50,7 @@ import org.webharvest.runtime.variables.NodeVariable;
 
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class GetVarPluginTest {
+public class GetVarPluginTest extends UnitilsTestNG {
 
     Mock<ScraperContext> contextMock;
 
@@ -87,7 +85,7 @@ public class GetVarPluginTest {
         contextMock.assertInvoked().getVar("${not evaluated}");
     }
 
-    @Test(expected = VariableException.class)
+    @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notDefined() throws Exception {
         createPlugin("<get var='not defined'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock());
     }

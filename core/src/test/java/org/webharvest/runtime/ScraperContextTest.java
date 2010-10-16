@@ -39,9 +39,9 @@
 package org.webharvest.runtime;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -52,7 +52,7 @@ import org.webharvest.utils.KeyValuePair;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 
@@ -62,13 +62,17 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
  * Date: Sep 22, 2010
  * Time: 12:43:00 AM
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class ScraperContextTest {
+public class ScraperContextTest extends UnitilsTestNG {
 
-    ScraperContext context = new ScraperContext();
+    ScraperContext context;
 
     @Dummy
     private Variable dummyVar;
+
+    @BeforeMethod
+    public void before() {
+        context = new ScraperContext();
+    }
 
     @Test
     public void testSetVar() throws Exception {
@@ -106,7 +110,7 @@ public class ScraperContextTest {
         assertSame(EmptyVariable.INSTANCE, context.getVar("x"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testReplaceExistingVar_noSuchVariable() throws Exception {
         context.replaceExistingVar("not existing", dummyVar);
     }

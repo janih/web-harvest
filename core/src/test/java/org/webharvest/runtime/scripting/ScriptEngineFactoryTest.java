@@ -40,9 +40,15 @@ package org.webharvest.runtime.scripting;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
-import org.junit.Assert;
-import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
 import org.webharvest.runtime.scripting.impl.GroovyScriptEngine;
 import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
@@ -59,7 +65,22 @@ import static org.webharvest.runtime.scripting.ScriptingLanguage.*;
  */
 public class ScriptEngineFactoryTest {
 
-    ScriptEngineFactory factory = new ScriptEngineFactory(null);
+    final Logger log = LoggerFactory.getLogger(getClass());
+
+    DynamicScopeContext context = new ScraperContext();
+
+    ScriptEngineFactory factory;
+
+    @BeforeMethod
+    public void before() {
+        ScraperContextHolder.init(context);
+        factory = new ScriptEngineFactory(null, context);
+    }
+
+    @AfterMethod
+    public void after() {
+        ScraperContextHolder.clear();
+    }
 
     @Test
     public void testGetEngine() {
@@ -70,9 +91,9 @@ public class ScriptEngineFactoryTest {
 
     @Test
     public void testGetEngine_defaultLanguage() {
-        Assert.assertSame(GroovyScriptEngine.class, new ScriptEngineFactory(GROOVY).getEngine(new ScriptSource("dummy", null)).getClass());
-        Assert.assertSame(BeanShellScriptEngine.class, new ScriptEngineFactory(BEANSHELL).getEngine(new ScriptSource("dummy", null)).getClass());
-        Assert.assertSame(JavascriptScriptEngine.class, new ScriptEngineFactory(JAVASCRIPT).getEngine(new ScriptSource("dummy", null)).getClass());
+        Assert.assertSame(GroovyScriptEngine.class, new ScriptEngineFactory(GROOVY, context).getEngine(new ScriptSource("dummy", null)).getClass());
+        Assert.assertSame(BeanShellScriptEngine.class, new ScriptEngineFactory(BEANSHELL, context).getEngine(new ScriptSource("dummy", null)).getClass());
+        Assert.assertSame(JavascriptScriptEngine.class, new ScriptEngineFactory(JAVASCRIPT, context).getEngine(new ScriptSource("dummy", null)).getClass());
     }
 
     @Test
@@ -97,12 +118,17 @@ public class ScriptEngineFactoryTest {
     @Test
     public void bulkTest() {
         runBulkTest(10000, "def f = {a, b -> a * b}; f(x.toInt(), y.toInt())", GROOVY);
+
         runBulkTest(10000, "function f(a, b) {return a * b} f(parseInt(x), parseInt(y))", JAVASCRIPT);
-        runBulkTest(10000, "int f(int a, int b) {return a * b;} f(x.getWrappedObject(), y.getWrappedObject())", BEANSHELL);
+
+        factory.getEngine(new ScriptSource("int f(int a, int b) {return a * b;}", BEANSHELL)).evaluate(context);
+        runBulkTest(10000, "f(x.getWrappedObject(), y.getWrappedObject())", BEANSHELL);
     }
 
     private void runBulkTest(int count, String code, ScriptingLanguage lang) {
-        System.out.print(MessageFormat.format("{0}: {1} cycles", StringUtils.rightPad(lang.name(), 10), count));
+        StringBuilder msg = new StringBuilder();
+
+        msg.append(MessageFormat.format("{0}: {1} cycles", StringUtils.rightPad(lang.name(), 10), count));
 
         final ScraperContext context = new ScraperContext();
         context.setLocalVar("x", 2);
@@ -115,6 +141,8 @@ public class ScriptEngineFactoryTest {
         }
         watch.stop();
 
-        System.out.println(MessageFormat.format("\t=> {0}", watch.toString()));
+        msg.append(MessageFormat.format("\t=> {0}", watch.toString()));
+
+        log.info(msg.toString());
     }
 }

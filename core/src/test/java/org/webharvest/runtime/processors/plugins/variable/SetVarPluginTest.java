@@ -38,11 +38,10 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
@@ -56,8 +55,7 @@ import static java.util.Arrays.asList;
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class SetVarPluginTest {
+public class SetVarPluginTest extends UnitilsTestNG {
 
     @Dummy
     Logger logger;
@@ -65,11 +63,11 @@ public class SetVarPluginTest {
     Mock<ScraperContext> contextMock;
     Mock<Scraper> scraperMock;
 
-    @Before
+    @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, contextMock.getMock())).getScriptEngineFactory();
     }
 
     @Test
@@ -119,6 +117,6 @@ public class SetVarPluginTest {
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
 
         contextMock.assertInvoked().replaceExistingVar("x", new NodeVariable("new"));
-        contextMock.assertNotInvoked().setLocalVar(null, null);
+        contextMock.assertNotInvoked().setLocalVar("x", null);
     }
 }

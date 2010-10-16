@@ -39,9 +39,9 @@
 package org.webharvest.runtime.variables;
 
 import groovy.lang.GroovyShell;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
@@ -55,7 +55,7 @@ public class ListVariable_GroovySupport_Test {
 
     private GroovyShell shell = new GroovyShell();
 
-    @Before
+    @BeforeMethod
     public void before() {
         shell.setVariable("list", new ListVariable(Arrays.asList(2, 3, 4)));
     }

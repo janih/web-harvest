@@ -38,11 +38,10 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.exception.VariableException;
@@ -56,8 +55,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class DefVarPluginTest {
+public class DefVarPluginTest extends UnitilsTestNG {
 
     @Dummy
     Logger logger;
@@ -65,14 +63,14 @@ public class DefVarPluginTest {
     ScraperContext context = new ScraperContext();
     Mock<Scraper> scraperMock;
 
-    @Before
+    @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, context)).getScriptEngineFactory();
     }
 
-    @Test(expected = VariableException.class)
+    @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notExistingValue() throws Exception {
         createPlugin("<def var='x' value='${notExistingVar}'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);

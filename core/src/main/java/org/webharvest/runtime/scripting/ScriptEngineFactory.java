@@ -40,6 +40,9 @@ package org.webharvest.runtime.scripting;
 
 import org.webharvest.exception.ScriptEngineException;
 import org.webharvest.exception.ScriptException;
+import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
+import org.webharvest.runtime.variables.NodeVariable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -59,7 +62,7 @@ public class ScriptEngineFactory {
 
     private Map<ScriptingLanguage, Map<String, ScriptEngine>> engineCachePerLanguage;
 
-    public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage) {
+    public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage, DynamicScopeContext context) {
         this.defaultScriptingLanguage = defaultScriptingLanguage;
         this.engineCachePerLanguage = new HashMap<ScriptingLanguage, Map<String, ScriptEngine>>();
 
@@ -67,6 +70,10 @@ public class ScriptEngineFactory {
         for (ScriptingLanguage language : ScriptingLanguage.values()) {
             engineCachePerLanguage.put(language, new HashMap<String, ScriptEngine>());
         }
+
+        // todo: for backward compat only. Think about better way to reuse methods and functions between scripts.
+        context.setLocalVar(BeanShellScriptEngine.BeanShellDelegate.class.getName(),
+                new NodeVariable(new BeanShellScriptEngine.BeanShellDelegate()));
     }
 
     public ScriptEngine getEngine(ScriptSource scriptSource) {

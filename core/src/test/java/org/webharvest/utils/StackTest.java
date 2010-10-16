@@ -38,11 +38,13 @@
 
 package org.webharvest.utils;
 
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,7 +54,12 @@ import static org.junit.Assert.*;
  */
 public class StackTest {
 
-    Stack<String> stack = new Stack<String>();
+    Stack<String> stack;
+
+    @BeforeMethod
+    public void before() {
+        stack = new Stack<String>();
+    }
 
     @Test
     public void testPush() throws Exception {
@@ -61,7 +68,7 @@ public class StackTest {
         stack.push("b"); // duplicate should be allowed
         stack.push("c");
 
-        assertArrayEquals(new String[]{"a", "b", "b", "c"}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{"a", "b", "b", "c"}, stack.getList().toArray());
     }
 
     @Test
@@ -70,15 +77,15 @@ public class StackTest {
         stack.push("b");
         stack.replaceTop("c");
 
-        assertArrayEquals(new String[]{"a", "c"}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{"a", "c"}, stack.getList().toArray());
         stack.replaceTop("d");
 
         stack.pop();
         stack.replaceTop("e");
-        assertArrayEquals(new String[]{"e"}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{"e"}, stack.getList().toArray());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void testReplaceTop_emptyStack() throws Exception {
         stack.replaceTop("a");
     }
@@ -90,14 +97,14 @@ public class StackTest {
         stack.push("c");
 
         stack.pop();
-        assertArrayEquals(new String[]{"a", "b"}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{"a", "b"}, stack.getList().toArray());
         stack.pop();
-        assertArrayEquals(new String[]{"a"}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{"a"}, stack.getList().toArray());
         stack.pop();
-        assertArrayEquals(new String[]{}, stack.getList().toArray());
+        ReflectionAssert.assertReflectionEquals(new String[]{}, stack.getList().toArray());
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expectedExceptions = NoSuchElementException.class)
     public void testPop_emptyStack() throws Exception {
         stack.pop();
     }
@@ -121,7 +128,7 @@ public class StackTest {
         assertEquals("a", stack.peek());
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expectedExceptions = NoSuchElementException.class)
     public void testPeek_emptyStack() throws Exception {
         stack.peek();
     }

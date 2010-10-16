@@ -38,16 +38,19 @@
 
 package org.webharvest.runtime.scripting.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.SystemUtilities;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertSame;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
@@ -62,6 +65,18 @@ public class BeanShellScriptEngineTest {
 
     final Variable x = new NodeVariable(2);
     final Variable y = new NodeVariable(5);
+
+    @BeforeMethod
+    public void before() {
+        ScraperContextHolder.init(context);
+        context.setLocalVar(BeanShellScriptEngine.BeanShellDelegate.class.getName(),
+                new NodeVariable(new BeanShellScriptEngine.BeanShellDelegate()));
+    }
+
+    @AfterMethod
+    public void after() {
+        ScraperContextHolder.clear();
+    }
 
     @Test
     public void testEvaluate() {

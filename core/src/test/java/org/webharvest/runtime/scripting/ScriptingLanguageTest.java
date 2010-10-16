@@ -38,8 +38,8 @@
 
 package org.webharvest.runtime.scripting;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Created by IntelliJ IDEA.
