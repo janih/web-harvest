@@ -62,17 +62,17 @@ public class ListVariable_GroovySupport_Test {
 
     @Test
     public void testFor() {
-        Assert.assertEquals(9, shell.evaluate("def sum=0; for (e in list) sum+=e.toInt(); sum"));
+        Assert.assertEquals(shell.evaluate("def sum=0; for (e in list) sum+=e.toInt(); sum"), 9);
     }
 
     @Test
     public void testEach() {
-        Assert.assertEquals(9, shell.evaluate("def sum=0; list.each {sum+=it.toInt()}; sum"));
+        Assert.assertEquals(shell.evaluate("def sum=0; list.each {sum+=it.toInt()}; sum"), 9);
     }
 
     @Test
     public void testEachWithIndex() {
-        Assert.assertEquals(12, shell.evaluate("def sum=0; list.eachWithIndex {e, i -> sum+=e.toInt() + i}; sum"));
+        Assert.assertEquals(shell.evaluate("def sum=0; list.eachWithIndex {e, i -> sum+=e.toInt() + i}; sum"), 12);
     }
 
 }

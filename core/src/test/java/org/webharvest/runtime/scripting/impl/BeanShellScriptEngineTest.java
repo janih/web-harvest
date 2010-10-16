@@ -89,17 +89,17 @@ public class BeanShellScriptEngineTest {
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(7, new BeanShellScriptEngine("" +
+                Assert.assertEquals(new BeanShellScriptEngine("" +
                         "int f(int a, int b) {return a + b;}\n" +
                         "k = \"foo\" + sys.space + \"bar\";" +
                         "z = \"new\";" +
                         "String w = \"new\";" +
                         "f(x.getWrappedObject(), y.getWrappedObject())").
-                        evaluate(context));
+                        evaluate(context), 7);
 
                 // 'x' and 'y' should remain untouched
-                assertSame(x, context.getVar("x"));
-                assertSame(y, context.getVar("y"));
+                assertSame(context.getVar("x"), x);
+                assertSame(context.getVar("y"), y);
 
                 // new variable 'k' is defined in the local scope
                 assertReflectionEquals(new ScriptingVariable("foo bar"), context.getVar("k"));

@@ -74,17 +74,17 @@ public class GroovyScriptEngineTest {
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(7, new GroovyScriptEngine("" +
+                Assert.assertEquals(new GroovyScriptEngine("" +
                         "def f = {a, b -> a + b};" +
                         "k = 'foo' + sys.space + 'bar';" +
                         "z = 'new';" +
                         "def w = 'new';" +
                         "f(x.toInt(), y.toInt())").
-                        evaluate(context));
+                        evaluate(context), 7);
 
                 // 'x' and 'y' should remain untouched
-                assertSame(x, context.getVar("x"));
-                assertSame(y, context.getVar("y"));
+                assertSame(context.getVar("x"), x);
+                assertSame(context.getVar("y"), y);
 
                 // new variable 'k' is defined in the local scope
                 assertReflectionEquals(new ScriptingVariable("foo bar"), context.getVar("k"));

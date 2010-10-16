@@ -112,20 +112,20 @@ public class StackTest {
     @Test
     public void testPeek() throws Exception {
         stack.push("a");
-        assertEquals("a", stack.peek());
+        assertEquals(stack.peek(), "a");
 
         stack.push("b");
-        assertEquals("b", stack.peek());
+        assertEquals(stack.peek(), "b");
 
         stack.push("c");
-        assertEquals("c", stack.peek());
-        assertEquals("c", stack.peek()); // repeatable operation
+        assertEquals(stack.peek(), "c");
+        assertEquals(stack.peek(), "c");
 
         stack.pop();
-        assertEquals("b", stack.peek());
+        assertEquals(stack.peek(), "b");
 
         stack.pop();
-        assertEquals("a", stack.peek());
+        assertEquals(stack.peek(), "a");
     }
 
     @Test(expectedExceptions = NoSuchElementException.class)
@@ -144,14 +144,14 @@ public class StackTest {
 
     @Test
     public void testSize() throws Exception {
-        assertEquals(0, stack.size());
+        assertEquals(stack.size(), 0);
         stack.push("a");
-        assertEquals(1, stack.size());
+        assertEquals(stack.size(), 1);
         stack.push("b");
-        assertEquals(2, stack.size());
+        assertEquals(stack.size(), 2);
         stack.pop();
-        assertEquals(1, stack.size());
+        assertEquals(stack.size(), 1);
         stack.pop();
-        assertEquals(0, stack.size());
+        assertEquals(stack.size(), 0);
     }
 }

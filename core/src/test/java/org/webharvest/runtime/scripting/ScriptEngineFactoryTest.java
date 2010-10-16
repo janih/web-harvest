@@ -55,6 +55,8 @@ import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
 
 import java.text.MessageFormat;
 
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertSame;
 import static org.webharvest.runtime.scripting.ScriptingLanguage.*;
 
 /**
@@ -84,16 +86,16 @@ public class ScriptEngineFactoryTest {
 
     @Test
     public void testGetEngine() {
-        Assert.assertSame(BeanShellScriptEngine.class, factory.getEngine(new ScriptSource("dummy", BEANSHELL)).getClass());
-        Assert.assertSame(JavascriptScriptEngine.class, factory.getEngine(new ScriptSource("dummy", JAVASCRIPT)).getClass());
-        Assert.assertSame(GroovyScriptEngine.class, factory.getEngine(new ScriptSource("dummy", GROOVY)).getClass());
+        assertSame(factory.getEngine(new ScriptSource("dummy", BEANSHELL)).getClass(), BeanShellScriptEngine.class);
+        assertSame(factory.getEngine(new ScriptSource("dummy", JAVASCRIPT)).getClass(), JavascriptScriptEngine.class);
+        assertSame(factory.getEngine(new ScriptSource("dummy", GROOVY)).getClass(), GroovyScriptEngine.class);
     }
 
     @Test
     public void testGetEngine_defaultLanguage() {
-        Assert.assertSame(GroovyScriptEngine.class, new ScriptEngineFactory(GROOVY, context).getEngine(new ScriptSource("dummy", null)).getClass());
-        Assert.assertSame(BeanShellScriptEngine.class, new ScriptEngineFactory(BEANSHELL, context).getEngine(new ScriptSource("dummy", null)).getClass());
-        Assert.assertSame(JavascriptScriptEngine.class, new ScriptEngineFactory(JAVASCRIPT, context).getEngine(new ScriptSource("dummy", null)).getClass());
+        assertSame(new ScriptEngineFactory(GROOVY, context).getEngine(new ScriptSource("dummy", null)).getClass(), GroovyScriptEngine.class);
+        assertSame(new ScriptEngineFactory(BEANSHELL, context).getEngine(new ScriptSource("dummy", null)).getClass(), BeanShellScriptEngine.class);
+        assertSame(new ScriptEngineFactory(JAVASCRIPT, context).getEngine(new ScriptSource("dummy", null)).getClass(), JavascriptScriptEngine.class);
     }
 
     @Test
@@ -104,25 +106,25 @@ public class ScriptEngineFactoryTest {
         final ScriptEngine bshEngine2 = factory.getEngine(new ScriptSource("dummy2", BEANSHELL));
         final ScriptEngine jsEngine2 = factory.getEngine(new ScriptSource("dummy2", JAVASCRIPT));
 
-        Assert.assertNotSame(bshEngine1, jsEngine1);
-        Assert.assertNotSame(bshEngine2, jsEngine2);
-        Assert.assertNotSame(bshEngine1, bshEngine2);
-        Assert.assertNotSame(jsEngine1, jsEngine2);
+        assertNotSame(jsEngine1, bshEngine1);
+        assertNotSame(jsEngine2, bshEngine2);
+        assertNotSame(bshEngine2, bshEngine1);
+        assertNotSame(jsEngine2, jsEngine1);
 
-        Assert.assertSame(bshEngine1, factory.getEngine(new ScriptSource("dummy1", BEANSHELL)));
-        Assert.assertSame(jsEngine1, factory.getEngine(new ScriptSource("dummy1", JAVASCRIPT)));
-        Assert.assertSame(bshEngine2, factory.getEngine(new ScriptSource("dummy2", BEANSHELL)));
-        Assert.assertSame(jsEngine2, factory.getEngine(new ScriptSource("dummy2", JAVASCRIPT)));
+        assertSame(factory.getEngine(new ScriptSource("dummy1", BEANSHELL)), bshEngine1);
+        assertSame(factory.getEngine(new ScriptSource("dummy1", JAVASCRIPT)), jsEngine1);
+        assertSame(factory.getEngine(new ScriptSource("dummy2", BEANSHELL)), bshEngine2);
+        assertSame(factory.getEngine(new ScriptSource("dummy2", JAVASCRIPT)), jsEngine2);
     }
 
     @Test
     public void bulkTest() {
-        runBulkTest(10000, "def f = {a, b -> a * b}; f(x.toInt(), y.toInt())", GROOVY);
+        runBulkTest(2000, "def f = {a, b -> a * b}; f(x.toInt(), y.toInt())", GROOVY);
 
-        runBulkTest(10000, "function f(a, b) {return a * b} f(parseInt(x), parseInt(y))", JAVASCRIPT);
+        runBulkTest(2000, "function f(a, b) {return a * b} f(parseInt(x), parseInt(y))", JAVASCRIPT);
 
         factory.getEngine(new ScriptSource("int f(int a, int b) {return a * b;}", BEANSHELL)).evaluate(context);
-        runBulkTest(10000, "f(x.getWrappedObject(), y.getWrappedObject())", BEANSHELL);
+        runBulkTest(2000, "f(x.getWrappedObject(), y.getWrappedObject())", BEANSHELL);
     }
 
     private void runBulkTest(int count, String code, ScriptingLanguage lang) {
@@ -137,7 +139,7 @@ public class ScriptEngineFactoryTest {
         watch.start();
         for (int i = 0; i < count; i++) {
             context.setLocalVar("y", i);
-            Assert.assertEquals(2 * i, ((Number) factory.getEngine(new ScriptSource(code, lang)).evaluate(context)).intValue());
+            Assert.assertEquals((Object) ((Number) factory.getEngine(new ScriptSource(code, lang)).evaluate(context)).intValue(), 2 * i);
         }
         watch.stop();
 

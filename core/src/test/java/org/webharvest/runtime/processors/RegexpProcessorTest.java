@@ -74,86 +74,76 @@ public class RegexpProcessorTest extends UnitilsTestNG {
 
     @Test
     public void testExecute_full() throws Exception {
-        Assert.assertEquals(
-                "[111][222][333]",
-                ProcessorTestUtils.<RegexpProcessor>processor("" +
-                        "<regexp>" +
-                        "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
-                        "  <regexp-source>a111b222c333</regexp-source>" +
-                        "  <regexp-result>" +
-                        "    [<var name='_1'/>]" +
-                        "    [<var name='_2'/>]" +
-                        "    [<var name='_3'/>]" +
-                        "  </regexp-result>" +
-                        "</regexp>").
-                        execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""));
+        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp>" +
+                "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
+                "  <regexp-source>a111b222c333</regexp-source>" +
+                "  <regexp-result>" +
+                "    [<var name='_1'/>]" +
+                "    [<var name='_2'/>]" +
+                "    [<var name='_3'/>]" +
+                "  </regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][222][333]");
     }
 
     @Test
     public void testExecute_empty() throws Exception {
-        Assert.assertEquals(
-                "", // <regexp-result> is not evaluated
-                ProcessorTestUtils.<RegexpProcessor>processor("" +
-                        "<regexp>" +
-                        "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
-                        "  <regexp-source></regexp-source>" +
-                        "  <regexp-result>" +
-                        "    [<var name='_1'/>]" +
-                        "    [<var name='_2'/>]" +
-                        "    [<var name='_3'/>]" +
-                        "  </regexp-result>" +
-                        "</regexp>").
-                        execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""));
+        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp>" +
+                "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
+                "  <regexp-source></regexp-source>" +
+                "  <regexp-result>" +
+                "    [<var name='_1'/>]" +
+                "    [<var name='_2'/>]" +
+                "    [<var name='_3'/>]" +
+                "  </regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "");
     }
 
     @Test
     public void testExecute_1st_part_absent() throws Exception {
-        Assert.assertEquals(
-                "[][222][333]",
-                ProcessorTestUtils.<RegexpProcessor>processor("" +
-                        "<regexp>" +
-                        "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
-                        "  <regexp-source>b222c333</regexp-source>" +
-                        "  <regexp-result>" +
-                        "    [<var name='_1'/>]" +
-                        "    [<var name='_2'/>]" +
-                        "    [<var name='_3'/>]" +
-                        "  </regexp-result>" +
-                        "</regexp>").
-                        execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""));
+        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp>" +
+                "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
+                "  <regexp-source>b222c333</regexp-source>" +
+                "  <regexp-result>" +
+                "    [<var name='_1'/>]" +
+                "    [<var name='_2'/>]" +
+                "    [<var name='_3'/>]" +
+                "  </regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[][222][333]");
     }
 
     @Test
     public void testExecute_2nd_part_absent() throws Exception {
-        Assert.assertEquals(
-                "[111][][333]",
-                ProcessorTestUtils.<RegexpProcessor>processor("" +
-                        "<regexp>" +
-                        "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
-                        "  <regexp-source>a111c333</regexp-source>" +
-                        "  <regexp-result>" +
-                        "    [<var name='_1'/>]" +
-                        "    [<var name='_2'/>]" +
-                        "    [<var name='_3'/>]" +
-                        "  </regexp-result>" +
-                        "</regexp>").
-                        execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""));
+        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp>" +
+                "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
+                "  <regexp-source>a111c333</regexp-source>" +
+                "  <regexp-result>" +
+                "    [<var name='_1'/>]" +
+                "    [<var name='_2'/>]" +
+                "    [<var name='_3'/>]" +
+                "  </regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][][333]");
     }
 
     @Test
     public void testExecute_3rd_part_absent() throws Exception {
-        Assert.assertEquals(
-                "[111][222][]",
-                ProcessorTestUtils.<RegexpProcessor>processor("" +
-                        "<regexp>" +
-                        "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
-                        "  <regexp-source>a111b222</regexp-source>" +
-                        "  <regexp-result>" +
-                        "    [<var name='_1'/>]" +
-                        "    [<var name='_2'/>]" +
-                        "    [<var name='_3'/>]" +
-                        "  </regexp-result>" +
-                        "</regexp>").
-                        execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""));
+        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp>" +
+                "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
+                "  <regexp-source>a111b222</regexp-source>" +
+                "  <regexp-result>" +
+                "    [<var name='_1'/>]" +
+                "    [<var name='_2'/>]" +
+                "    [<var name='_3'/>]" +
+                "  </regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][222][]");
     }
 }

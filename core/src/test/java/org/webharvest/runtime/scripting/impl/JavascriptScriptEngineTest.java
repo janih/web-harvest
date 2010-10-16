@@ -72,17 +72,17 @@ public class JavascriptScriptEngineTest {
         context.executeWithinNewContext(new Runnable() {
             @Override
             public void run() {
-                assertEquals(7.0, new JavascriptScriptEngine("" +
+                assertEquals(new JavascriptScriptEngine("" +
                         "function f(a, b) {return a + b};" +
                         "k = 'foo' + sys.space + 'bar';" +
                         "z = 'new';" +
                         "var w = 'new';" +
                         "f(parseInt(x), parseInt(y))").
-                        evaluate(context));
+                        evaluate(context), 7.0);
 
                 // 'x' and 'y' should remain untouched
-                assertSame(x, context.getVar("x"));
-                assertSame(y, context.getVar("y"));
+                assertSame(context.getVar("x"), x);
+                assertSame(context.getVar("y"), y);
 
                 // new variable 'k' is defined in the local scope
                 assertReflectionEquals(new ScriptingVariable("foo bar"), context.getVar("k"));

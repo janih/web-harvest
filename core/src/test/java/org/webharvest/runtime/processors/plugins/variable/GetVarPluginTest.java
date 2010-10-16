@@ -38,7 +38,7 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
-import junit.framework.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
@@ -69,8 +69,9 @@ public class GetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_null() throws Exception {
         contextMock.returns(EmptyVariable.INSTANCE).getVar("empty");
 
-        Assert.assertSame(EmptyVariable.INSTANCE,
-                createPlugin("<get var='empty'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()));
+        Assert.assertSame(
+                createPlugin("<get var='empty'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
+                EmptyVariable.INSTANCE);
 
         contextMock.assertInvoked().getVar("empty");
     }
@@ -79,8 +80,9 @@ public class GetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_templateAsVarName() throws Exception {
         contextMock.returns(EmptyVariable.INSTANCE).getVar("${not evaluated}");
 
-        Assert.assertSame(EmptyVariable.INSTANCE,
-                createPlugin("<get var='${not evaluated}'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()));
+        Assert.assertSame(
+                createPlugin("<get var='${not evaluated}'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
+                EmptyVariable.INSTANCE);
 
         contextMock.assertInvoked().getVar("${not evaluated}");
     }

@@ -38,8 +38,10 @@
 
 package org.webharvest.runtime.scripting;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,24 +53,24 @@ public class ScriptingLanguageTest {
 
     @Test
     public void testRecognize_ok() {
-        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" beanshell "));
-        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" BEANSHELL "));
-        Assert.assertSame(ScriptingLanguage.BEANSHELL, ScriptingLanguage.recognize(" BeAnShElL "));
+        assertSame(ScriptingLanguage.recognize(" beanshell "), ScriptingLanguage.BEANSHELL);
+        assertSame(ScriptingLanguage.recognize(" BEANSHELL "), ScriptingLanguage.BEANSHELL);
+        assertSame(ScriptingLanguage.recognize(" BeAnShElL "), ScriptingLanguage.BEANSHELL);
 
-        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" javascript "));
-        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" JAVASCRIPT "));
-        Assert.assertSame(ScriptingLanguage.JAVASCRIPT, ScriptingLanguage.recognize(" jAvAsCrIpT "));
+        assertSame(ScriptingLanguage.recognize(" javascript "), ScriptingLanguage.JAVASCRIPT);
+        assertSame(ScriptingLanguage.recognize(" JAVASCRIPT "), ScriptingLanguage.JAVASCRIPT);
+        assertSame(ScriptingLanguage.recognize(" jAvAsCrIpT "), ScriptingLanguage.JAVASCRIPT);
 
-        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" groovy "));
-        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" GROOVY "));
-        Assert.assertSame(ScriptingLanguage.GROOVY, ScriptingLanguage.recognize(" GrOOvY "));
+        assertSame(ScriptingLanguage.recognize(" groovy "), ScriptingLanguage.GROOVY);
+        assertSame(ScriptingLanguage.recognize(" GROOVY "), ScriptingLanguage.GROOVY);
+        assertSame(ScriptingLanguage.recognize(" GrOOvY "), ScriptingLanguage.GROOVY);
     }
 
     @Test
     public void testRecognize_fail() {
-        Assert.assertNull(ScriptingLanguage.recognize(null));
-        Assert.assertNull(ScriptingLanguage.recognize(""));
-        Assert.assertNull(ScriptingLanguage.recognize(" "));
-        Assert.assertNull(ScriptingLanguage.recognize("obviously wrong language"));
+        assertNull(ScriptingLanguage.recognize(null));
+        assertNull(ScriptingLanguage.recognize(""));
+        assertNull(ScriptingLanguage.recognize(" "));
+        assertNull(ScriptingLanguage.recognize("obviously wrong language"));
     }
 }

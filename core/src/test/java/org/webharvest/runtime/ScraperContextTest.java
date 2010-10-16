@@ -78,8 +78,8 @@ public class ScraperContextTest extends UnitilsTestNG {
     public void testSetVar() throws Exception {
         context.setLocalVar("x", dummyVar);
         context.setLocalVar("y", dummyVar);
-        assertSame(dummyVar, context.getVar("x"));
-        assertSame(dummyVar, context.getVar("y"));
+        assertSame(context.getVar("x"), dummyVar);
+        assertSame(context.getVar("y"), dummyVar);
 
         context.setLocalVar("x", "test");
         context.setLocalVar("y", Arrays.asList(1, 2, 3));
@@ -93,21 +93,21 @@ public class ScraperContextTest extends UnitilsTestNG {
         context.setLocalVar("null", null);
         assertTrue(context.containsVar("x"));
         assertFalse(context.containsVar("not existing"));
-        assertSame(EmptyVariable.INSTANCE, context.getVar("null"));
+        assertSame(context.getVar("null"), EmptyVariable.INSTANCE);
     }
 
     @Test
     public void testReplaceExistingVar() throws Exception {
         context.setLocalVar("x", new NodeVariable("old val"));
         context.replaceExistingVar("x", dummyVar);
-        assertSame(dummyVar, context.getVar("x"));
+        assertSame(context.getVar("x"), dummyVar);
     }
 
     @Test
     public void testReplaceExistingVar_setNull() throws Exception {
         context.setLocalVar("x", new NodeVariable("old val"));
         context.replaceExistingVar("x", null);
-        assertSame(EmptyVariable.INSTANCE, context.getVar("x"));
+        assertSame(context.getVar("x"), EmptyVariable.INSTANCE);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -122,10 +122,10 @@ public class ScraperContextTest extends UnitilsTestNG {
             @Override
             public void run() {
                 context.replaceExistingVar("x", dummyVar);
-                assertSame(dummyVar, context.getVar("x"));
+                assertSame(context.getVar("x"), dummyVar);
             }
         }, false);
-        assertSame(dummyVar, context.getVar("x"));
+        assertSame(context.getVar("x"), dummyVar);
     }
 
     @Test
