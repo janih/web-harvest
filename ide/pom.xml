@@ -65,6 +65,8 @@
                 </executions>
                 <configuration>
                     <artifactItems/>
+                    <includeScope>compile</includeScope>
+                    <includeScope>runtime</includeScope>
                     <outputDirectory>${build.outputDirectory}</outputDirectory>
                 </configuration>
             </plugin>
