@@ -37,6 +37,7 @@
 package org.webharvest.runtime;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,9 @@ import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
 
 import java.util.*;
+
+import static org.apache.commons.collections.IteratorUtils.filteredIterator;
+import static org.apache.commons.collections.IteratorUtils.toList;
 
 /**
  * Context of scraper execution. All the variables created during
@@ -170,19 +174,44 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     @Deprecated
-    public void setVar_compat2b1(String name, Variable var) {
+    public void setVar_compat2b1(final String name, Variable var) {
         if (!loopBodyScope_compat2b1.peek()) {
             setLocalVar(name, var);
             return;
         }
 
-        // Inside loops <var-def> used to operate with the parent scope
-        // (the one of the loop itself instead of the loop body's scope)
+        // Inside loops <var-def> used to operate with the loop outside scope
         // and so do we below.
 
         Stack<Variable> variableValueStack = centralReferenceTable.get(name);
-        final Set<String> localVariableNames = variablesNamesStack.peek();
-        final Set<String> prevVariableNames = variablesNamesStack.getList().get(variablesNamesStack.size() - 2);
+
+        final int enclosedLoopsCount = toList(filteredIterator(
+                ((LinkedList) loopBodyScope_compat2b1.getList()).descendingIterator(),
+                new Predicate() {
+                    private boolean gapNotReached = true;
+
+                    @Override
+                    public boolean evaluate(Object item) {
+                        return (gapNotReached &= ((Boolean) item));
+                    }
+                }
+        )).size();
+
+        final int valuesInsideLoopsCount = toList(filteredIterator(
+                ((LinkedList) variablesNamesStack.getList()).descendingIterator(),
+                new Predicate() {
+                    private int i = enclosedLoopsCount;
+
+                    @Override
+                    public boolean evaluate(Object item) {
+                        return (i-- > 0 && ((Set) item).contains(name));
+                    }
+                }
+        )).size();
+
+
+        final Set<String> loopOutsideVariableNames = variablesNamesStack.getList().
+                get(variablesNamesStack.size() - enclosedLoopsCount - 1);
 
         if (var == null) {
             var = EmptyVariable.INSTANCE;
@@ -190,38 +219,33 @@ public class ScraperContext implements DynamicScopeContext {
 
         if (variableValueStack == null) {
             // Case A - new variable for the whole stack
-            // [-]...[-][-]
+            // [-]...[-]L_[-]
             //        v
-            // [-]...[+][-]
+            // [-]...[+]L_[-]
             variableValueStack = new Stack<Variable>();
             centralReferenceTable.put(name, variableValueStack);
-            prevVariableNames.add(name);
+            loopOutsideVariableNames.add(name);
             variableValueStack.push(var);
-        } else if (prevVariableNames.contains(name) && localVariableNames.contains(name)) {
-            // Case B - variable is defined in both the parent and the local scopes
-            // [?]...[1][+]
+        } else if (loopOutsideVariableNames.contains(name)) {
+            // Case B - variable is defined in both the loop outside and the local scopes
+            // Case C - variable is defined in the loop outside scope but local
+            // [?]...[1]L_[?]
             //        v
-            // [?]...[2][+]
-            variableValueStack.getList().set(variableValueStack.size() - 2, var);
-        } else if (prevVariableNames.contains(name)) {
-            // Case C - variable is defined in the parent scope but local
-            // [?]...[1][-]
+            // [?]...[2]L_[?]
+            variableValueStack.getList().set(variableValueStack.size() - valuesInsideLoopsCount - 1, var);
+        } else if (variablesNamesStack.peek().contains(name)) {
+            // Case D - variable is defined in the local scope but loop outside
+            // [?]...[-]L_[+]
             //        v
-            // [?]...[2][-]
-            variableValueStack.getList().set(variableValueStack.size() - 1, var);
-        } else if (localVariableNames.contains(name)) {
-            // Case D - variable is defined in the parent local scope but parent
-            // [?]...[-][+]
-            //        v
-            // [?]...[+][+]
-            prevVariableNames.add(name);
-            variableValueStack.getList().add(variableValueStack.size() - 1, var);
+            // [?]...[+]L_[+]
+            loopOutsideVariableNames.add(name);
+            variableValueStack.getList().add(variableValueStack.size() - valuesInsideLoopsCount, var);
         } else {
-            // Case E - variable is NOT defined in the parent or local scopes, but defined somewhere earlier.
-            // [+]...[-][-]
+            // Case E - variable is NOT defined in the loop outside or local scopes, but defined somewhere earlier.
+            // [+]...[-]L_[-]
             //        v
-            // [+]...[+][-]
-            prevVariableNames.add(name);
+            // [+]...[+]L_[-]
+            loopOutsideVariableNames.add(name);
             variableValueStack.push(var);
         }
     }
