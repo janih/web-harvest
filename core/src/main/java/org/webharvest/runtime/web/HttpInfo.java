@@ -38,16 +38,17 @@
 package org.webharvest.runtime.web;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.webharvest.utils.*;
+import org.webharvest.utils.KeyValuePair;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class offers access to HTTP client and response details to the user. 
  */
 public class HttpInfo {
 
-    public HttpClient client;
+    public final HttpClient client;
     
     public long contentLength = 0;
     public String charset = "";
