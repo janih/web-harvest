@@ -37,6 +37,7 @@
 package org.webharvest.definition;
 
 import org.webharvest.exception.ConfigurationException;
+import org.webharvest.utils.Constants;
 import org.webharvest.utils.KeyValuePair;
 
 import java.util.HashMap;
@@ -54,15 +55,12 @@ public class XPathDef extends BaseElementDef {
         super(xmlNode);
 
         this.expression = xmlNode.getAttribute("expression");
-        for (Map.Entry<String, String> attEntry: xmlNode.getAttributes().entrySet()) {
-            String key = attEntry.getKey();
-            if (key.startsWith("var:")) {
-                variableMap.put( key.substring(4), attEntry.getValue() );
-            }
+        for (Map.Entry<String, String> attEntry: xmlNode.getAttributes(Constants.VAR_URI).entrySet()) {
+            variableMap.put( attEntry.getKey(), attEntry.getValue() );
         }
 
         if (this.expression == null && variableMap.size() == 0) {
-            throw new ConfigurationException("XPath requires \"expression\" or at least one \"var:varname\" attribute!");
+            throw new ConfigurationException("XPath requires \"expression\" or at least one variable-based attribute!");
         }
     }
 

@@ -39,6 +39,8 @@ package org.webharvest.definition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.exception.ParserException;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.Constants;
 import org.webharvest.utils.Stack;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -105,7 +107,7 @@ public class XmlParser extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         XmlNode currNode = getCurrentNode();
-        XmlNode newNode = new XmlNode(qName, currNode);
+        XmlNode newNode = new XmlNode(localName, CommonUtil.isEmptyString(uri) ? Constants.CORE_URI : uri, currNode);
         newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());
         elementStack.push(newNode);
 
@@ -115,7 +117,8 @@ public class XmlParser extends DefaultHandler {
 
         int attrsCount = attributes.getLength();
         for (int i = 0; i < attrsCount; i++) {
-            newNode.addAttribute(attributes.getQName(i), attributes.getValue(i));
+            String attUri = attributes.getURI(i);
+            newNode.addAttribute(attributes.getLocalName(i), CommonUtil.isEmptyString(attUri) ? Constants.CORE_URI : attUri, attributes.getValue(i));
         }
     }
 

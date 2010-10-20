@@ -47,17 +47,17 @@ public class XmlNode extends HashMap<String, Object> {
 
     protected static final Logger log = LoggerFactory.getLogger(XmlNode.class);
 
-    private static final boolean IGNORE_NAMESPACE = false;
-    private static final boolean IGNORE_CASE = true;
-
     // node name - corresponds to xml tag name
     private String name;
+
+    // namespace of the node
+    private String uri;
 
     // parent element
     private XmlNode parent;
 
-    // map of attributes
-    private Map<String, String> attributes = new HashMap<String, String>();
+    // map of attributes - for each uri key value is map of atribute name-value pairs
+    private Map<String,  Map<String, String>> attributes = new HashMap<String,  Map<String, String>>();
 
     // all subelements in the form of linear list
     private List<Serializable> elementList = new ArrayList<Serializable>();
@@ -88,12 +88,14 @@ public class XmlNode extends HashMap<String, Object> {
      * parent element.
      *
      * @param name
+     * @param uri
      * @param parent
      */
-    protected XmlNode(String name, XmlNode parent) {
+    protected XmlNode(String name, String uri, XmlNode parent) {
         super();
 
-        this.name = adaptName(name);
+        this.name = name;
+        this.uri = uri;
         this.parent = parent;
 
         if (parent != null) {
@@ -102,32 +104,17 @@ public class XmlNode extends HashMap<String, Object> {
     }
 
     /**
-     * According to settings of this object changes element/attribute
-     * names to be namespace/case insensitive.
-     *
-     * @param s
-     * @return String
-     */
-    private String adaptName(String s) {
-        if (IGNORE_NAMESPACE) {
-            int index = s.indexOf(':');
-            if (index >= 0) {
-                s = s.substring(index + 1);
-            }
-        }
-
-        if (IGNORE_CASE) {
-            s = s.toLowerCase();
-        }
-
-        return s;
-    }
-
-    /**
      * @return Node name.
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return Uri.
+     */
+    public String getUri() {
+        return uri;
     }
 
     /**
@@ -190,9 +177,7 @@ public class XmlNode extends HashMap<String, Object> {
             return null;
         }
 
-        if (IGNORE_CASE) {
-            key = ((String) key).toLowerCase();
-        }
+        key = ((String) key).toLowerCase();
 
         String sKey = (String) key;
 
@@ -205,7 +190,7 @@ public class XmlNode extends HashMap<String, Object> {
         } else if (this.containsKey(key)) {
             return super.get(key);
         } else {
-            return attributes.get(key);
+            return getAttribute(sKey);
         }
     }
 
@@ -217,18 +202,51 @@ public class XmlNode extends HashMap<String, Object> {
      * Adds new attribute with specified name and value.
      *
      * @param name
+     * @param uri
      * @param value
      */
-    public void addAttribute(String name, String value) {
-        attributes.put(adaptName(name), value);
+    public void addAttribute(String name, String uri, String value) {
+        Map<String, String> attsForUri = attributes.get(uri);
+        if (attsForUri == null) {
+            attsForUri = new HashMap<String, String>();
+            attributes.put(uri, attsForUri);
+        }
+
+        attsForUri.put(name, value);
+    }
+
+    public Map<String, String> getAttributes(String uri) {
+        Map<String, String> attsForUri = attributes.get(uri);
+        return attsForUri != null ? attsForUri : new HashMap<String, String>();
     }
 
     public Map<String, String> getAttributes() {
-        return this.attributes;
+        return getAttributes(uri);
+    }
+
+    public List<XmlAttribute> getAllAttributes() {
+        List<XmlAttribute> all = new ArrayList<XmlAttribute>();
+        for (Map.Entry<String, Map<String, String>> entry: attributes.entrySet()) {
+            String currAttUri = entry.getKey();
+            Map<String, String> atts = entry.getValue();
+            if (atts != null) {
+                for (Map.Entry<String, String> att: atts.entrySet()) {
+                    String currAttName = att.getKey();
+                    String currAttValue = att.getValue();
+                    all.add(new XmlAttribute(currAttName, currAttUri, currAttValue));
+                }
+            }
+        }
+        return all;
+    }
+
+    public String getAttribute(String uri, String attName) {
+        Map<String, String> attsForUri = attributes.get(uri);
+        return attsForUri != null ? attsForUri.get(attName) : null;
     }
 
     public String getAttribute(String attName) {
-        return this.attributes.get(attName);
+        return getAttribute(uri, attName);
     }
 
     /**

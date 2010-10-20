@@ -54,6 +54,7 @@ import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.Constants;
 
 import java.util.*;
 
@@ -95,7 +96,9 @@ public class DefinitionResolver {
         elementInfos.put("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
         elementInfos.put("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
         elementInfos.put("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
-        elementInfos.put("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,expression,var\\:.*"));
+        ElementInfo xPathElementInfo = new ElementInfo("xpath", XPathDef.class, null, "id,expression");
+        xPathElementInfo.getNsAttsSet().add(Constants.VAR_URI);
+        elementInfos.put("xpath", xPathElementInfo);
         elementInfos.put("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
         elementInfos.put("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
         elementInfos.put("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
@@ -319,22 +322,12 @@ public class DefinitionResolver {
         final Set<String> atts = elementInfo.getAttsSet();
 
         // check if element contains only allowed attributes
-        final Map<String, String> attributes = node.getAttributes();
-        if (attributes != null) {
-            for (String key : attributes.keySet()) {
-                final String attName = key.toLowerCase();
-                if (!atts.contains(attName)) {
-                    boolean ok = false;
-                    // try to match current attribute name against allowed attributes as regular expression patterns
-                    for (String att: atts) {
-                        if (attName.matches(att)) {
-                            ok = true;
-                            break;
-                        }
-                    }
-                    if (!ok) {
-                        throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
-                    }
+        for (XmlAttribute att : node.getAllAttributes()) {
+            String attUri = att.getUri();
+            String attName = att.getName();
+            if ( !atts.contains(attName) || !Constants.CORE_URI.equals(attUri) ) {
+                if ( !elementInfo.getNsAttsSet().contains(attUri) ) {
+                    throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
                 }
             }
         }

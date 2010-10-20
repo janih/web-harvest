@@ -61,6 +61,9 @@ public class ElementInfo {
     private Set<String> attsSet = new TreeSet<String>();
     private Set<String> requiredAttsSet = new TreeSet<String>();
 
+    // denotes any attribute belonging to specif namespace
+    private Set<String> nsAttsSet = new TreeSet<String>();
+
     private boolean allTagsAllowed;
 
     // pluging instance for this element, if element represents Web-Harvest plugin
@@ -152,6 +155,10 @@ public class ElementInfo {
 
     public Set<String> getRequiredAttsSet() {
         return requiredAttsSet;
+    }
+
+    public Set<String> getNsAttsSet() {
+        return nsAttsSet;
     }
 
     public Set<String> getRequiredTagsSet() {

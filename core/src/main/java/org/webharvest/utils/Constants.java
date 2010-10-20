@@ -46,4 +46,9 @@ public class Constants {
     // size of splitter pane dividers
     public static final int SPLITTER_WIDTH = 7;
 
+    // uris to identify xml namespaces of the Web-Harvest language
+    public static final String CORE_URI = "http://web-harvest.sourceforge.net/wh-core.xsd";
+    public static final String VAR_URI = "http://web-harvest.sourceforge.net/wh-var.xsd";
+    public static final String PARAM_URI = "http://web-harvest.sourceforge.net/wh-param.xsd";
+
 }
