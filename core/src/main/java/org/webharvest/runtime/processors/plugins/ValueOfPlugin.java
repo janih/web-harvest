@@ -66,4 +66,10 @@ public class ValueOfPlugin extends WebHarvestPlugin {
     public String[] getRequiredAttributes() {
         return new String[]{ATTR_EXPRESSION};
     }
+
+    @Override
+    public boolean hasBody() {
+        return false;
+    }
+
 }

@@ -76,4 +76,10 @@ public class GetVarPlugin extends WebHarvestPlugin {
     public String[] getRequiredAttributes() {
         return new String[]{ATTR_VAR};
     }
+
+    @Override
+    public boolean hasBody() {
+        return false;
+    }
+    
 }
