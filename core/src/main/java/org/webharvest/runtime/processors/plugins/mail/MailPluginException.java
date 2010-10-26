@@ -7,9 +7,6 @@ import org.webharvest.exception.BaseException;
  */
 public class MailPluginException extends BaseException {
 
-    public MailPluginException() {
-    }
-
     public MailPluginException(String message) {
         super(message);
     }

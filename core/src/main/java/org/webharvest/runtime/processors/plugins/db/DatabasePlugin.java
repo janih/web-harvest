@@ -34,7 +34,7 @@ public class DatabasePlugin extends WebHarvestPlugin {
         return "database";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         String jdbc = evaluateAttribute("jdbcclass", scraper);
         String connection = evaluateAttribute("connection", scraper);
         String username = evaluateAttribute("username", scraper);

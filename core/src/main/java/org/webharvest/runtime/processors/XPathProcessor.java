@@ -66,7 +66,7 @@ public class XPathProcessor extends BaseProcessor<XPathDef> {
         super(xpathDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
         String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);
         if (expression != null) {

@@ -49,8 +49,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
 
 
 public class XmlParser extends DefaultHandler {
@@ -78,7 +80,12 @@ public class XmlParser extends DefaultHandler {
             parser.parse(in, handler);
 
             log.info("XML parsed in " + (System.currentTimeMillis() - startTime) + "ms.");
-        } catch (Exception e) {
+
+        } catch (IOException e) {
+            throw new ParserException(e.getMessage(), e);
+        } catch (ParserConfigurationException e) {
+            throw new ParserException(e.getMessage(), e);
+        } catch (SAXException e) {
             throw new ParserException(e.getMessage(), e);
         }
 

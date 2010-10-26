@@ -54,7 +54,7 @@ public class TemplateProcessor extends BaseProcessor<TemplateDef> {
         super(templateDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         return new NodeVariable(BaseTemplater.evaluateToString(
                 getBodyTextContent(elementDef, scraper, context).toString(),
                 ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)),

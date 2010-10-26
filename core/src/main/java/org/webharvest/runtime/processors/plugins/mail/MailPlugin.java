@@ -34,7 +34,7 @@ public class MailPlugin extends WebHarvestPlugin {
         return "mail";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         email = null;
         
         boolean isHtml = "html".equalsIgnoreCase(evaluateAttribute("type", scraper));

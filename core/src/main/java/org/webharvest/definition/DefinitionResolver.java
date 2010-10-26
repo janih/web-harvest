@@ -53,6 +53,7 @@ import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -170,7 +171,9 @@ public class DefinitionResolver {
             for (Class subClass : plugin.getDependantProcessors()) {
                 registerPlugin(subClass, isInternalPlugin);
             }
-        } catch (Exception e) {
+        } catch (InstantiationException e) {
+            throw new PluginException("Error instantiating plugin class \"" + pluginClass.getName() + "\": " + e.getMessage(), e);
+        } catch (IllegalAccessException e) {
             throw new PluginException("Error instantiating plugin class \"" + pluginClass.getName() + "\": " + e.getMessage(), e);
         }
     }
@@ -263,13 +266,14 @@ public class DefinitionResolver {
                 pluginDef.setPluginName(elementInfo.getName());
             }
             return elementDef;
-        } catch (Exception e) {
-            if (e instanceof ConfigurationException) {
-                throw (ConfigurationException) e;
-            } else if (e.getCause() instanceof ConfigurationException) {
-                throw (ConfigurationException) e.getCause();
-            }
-            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!");
+        } catch (NoSuchMethodException e) {
+            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+        } catch (InvocationTargetException e) {
+            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+        } catch (InstantiationException e) {
+            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+        } catch (IllegalAccessException e) {
+            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
         }
     }
 

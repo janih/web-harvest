@@ -37,7 +37,9 @@ public class WebHarvestPluginDef extends BaseElementDef {
                 WebHarvestPlugin plugin = (WebHarvestPlugin) pluginClass.newInstance();
                 plugin.setDef(this);
                 return plugin;
-            } catch (Exception e) {
+            } catch (InstantiationException e) {
+                throw new PluginException(e);
+            } catch (IllegalAccessException e) {
                 throw new PluginException(e);
             }
         }

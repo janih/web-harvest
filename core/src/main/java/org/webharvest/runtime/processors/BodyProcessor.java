@@ -17,7 +17,7 @@ public class BodyProcessor extends BaseProcessor<BaseElementDef> {
         super(elementDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         final IElementDef[] defs = elementDef.getOperationDefs();
 
         if (defs.length == 0) {

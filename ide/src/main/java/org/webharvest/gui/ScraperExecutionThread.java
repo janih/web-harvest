@@ -57,8 +57,11 @@ public class ScraperExecutionThread extends Thread {
         try {
             TextAreaAppender.setCurrentLogArea(logTextArea);
             scraper.execute();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             scraper.informListenersAboutError(e);
+        } catch (InterruptedException e) {
+            scraper.getLogger().warn(e.getMessage(), e);
+            // dying...
         }
     }
 

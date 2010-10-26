@@ -19,7 +19,7 @@ public class DbParamPlugin extends WebHarvestPlugin {
         return "db-param";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         BaseProcessor processor = scraper.getRunningProcessorOfType(DatabasePlugin.class);
         if (processor != null) {
             DatabasePlugin databasePlugin = (DatabasePlugin) processor;

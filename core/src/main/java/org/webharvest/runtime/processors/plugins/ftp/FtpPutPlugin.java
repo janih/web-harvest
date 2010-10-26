@@ -23,7 +23,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
         return "ftp-put";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         FtpPlugin ftpPlugin = (FtpPlugin) scraper.getRunningProcessorOfType(FtpPlugin.class);
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();

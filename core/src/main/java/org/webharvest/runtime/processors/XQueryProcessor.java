@@ -91,7 +91,7 @@ public class XQueryProcessor extends BaseProcessor<XQueryDef> {
         super(xqueryDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         BaseElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
         debug(xqueryElementDef, scraper, xq);

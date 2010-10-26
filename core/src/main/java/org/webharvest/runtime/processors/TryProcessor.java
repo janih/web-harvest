@@ -52,7 +52,7 @@ public class TryProcessor extends BaseProcessor<TryDef> {
         super(tryDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         try {
             BaseElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor(tryBodyDef).run(scraper, context);

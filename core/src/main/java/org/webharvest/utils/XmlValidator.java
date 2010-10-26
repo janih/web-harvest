@@ -1,19 +1,21 @@
 package org.webharvest.utils;
 
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.StringReader;
+import java.io.IOException;
 
 /**
  * @author: Vladimir Nikic
  * Date: May 9, 2007
  */
 public class XmlValidator extends DefaultHandler {
-    
+
     int lineNumber, columnNumber;
     private Exception exception;
 
@@ -33,15 +35,18 @@ public class XmlValidator extends DefaultHandler {
             this.columnNumber = 0;
 
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             this.exception = e;
-            if (e instanceof SAXParseException) {
-                SAXParseException saxException = (SAXParseException) e;
-                this.lineNumber = saxException.getLineNumber();
-                this.columnNumber = saxException.getColumnNumber();
-            }
-            return false;
+        } catch (ParserConfigurationException e) {
+            this.exception = e;
+        } catch (SAXParseException e) {
+            this.exception = e;
+            this.lineNumber = e.getLineNumber();
+            this.columnNumber = e.getColumnNumber();
+        } catch (SAXException e) {
+            this.exception = e;
         }
+        return false;
     }
 
     public Exception getException() {
@@ -55,5 +60,5 @@ public class XmlValidator extends DefaultHandler {
     public int getLineNumber() {
         return lineNumber;
     }
-    
+
 }

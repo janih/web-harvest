@@ -55,7 +55,7 @@ public class CaseProcessor extends BaseProcessor<CaseDef> {
         super(caseDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         IfDef[] ifDefs = elementDef.getIfDefs();
 
         if (ifDefs != null) {

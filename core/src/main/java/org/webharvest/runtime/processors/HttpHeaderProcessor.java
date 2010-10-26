@@ -52,7 +52,7 @@ public class HttpHeaderProcessor extends BaseProcessor<HttpHeaderDef> {
         super(httpHeaderDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         Variable value = getBodyTextContent(elementDef, scraper, context);
 

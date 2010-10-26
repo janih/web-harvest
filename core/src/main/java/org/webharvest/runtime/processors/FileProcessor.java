@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * File processor.
@@ -66,7 +67,7 @@ public class FileProcessor extends BaseProcessor<FileDef> {
         super(fileDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String workingDir = scraper.getWorkingDir();
 
         String action = BaseTemplater.evaluateToString(elementDef.getAction(), null, scraper);
@@ -130,7 +131,7 @@ public class FileProcessor extends BaseProcessor<FileDef> {
      * Writing content to the specified file.
      * If parameter "append" is true, then append content, otherwise write
      */
-    private Variable executeFileWrite(boolean append, Scraper scraper, ScraperContext context, String fullPath, String type, String charset) {
+    private Variable executeFileWrite(boolean append, Scraper scraper, ScraperContext context, String fullPath, String type, String charset) throws InterruptedException {
         Variable result;
 
         try {
@@ -255,7 +256,7 @@ public class FileProcessor extends BaseProcessor<FileDef> {
                 }
                 try {
                     pattern = Pattern.compile(buffer.toString());
-                } catch (Exception e) {
+                } catch (PatternSyntaxException e) {
                     pattern = Pattern.compile("");
                 }
             }

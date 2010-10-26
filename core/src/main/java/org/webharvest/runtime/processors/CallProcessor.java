@@ -46,6 +46,7 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Function call processor.
@@ -58,7 +59,7 @@ public class CallProcessor extends BaseProcessor<CallDef> {
         super(callDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
@@ -73,10 +74,10 @@ public class CallProcessor extends BaseProcessor<CallDef> {
         // executes body of call processor
         new BodyProcessor(elementDef).execute(scraper, context);
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
 
             @Override
-            public void run() {
+            public Object call() throws InterruptedException {
                 for (Map.Entry<String, Variable> entry : scraper.getFunctionParams().entrySet()) {
                     context.setLocalVar(entry.getKey(), entry.getValue());
                 }
@@ -86,7 +87,7 @@ public class CallProcessor extends BaseProcessor<CallDef> {
                 try {
                     // executes body of function using new context
                     new BodyProcessor(functionDef).execute(scraper, context);
-
+                    return null;
                 } finally {
                     // remove running function from the stack
                     scraper.removeRunningFunction();

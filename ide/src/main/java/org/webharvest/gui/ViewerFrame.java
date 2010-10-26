@@ -47,13 +47,16 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.*;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Map;
@@ -455,7 +458,11 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                 String prettyXml = XmlUtil.prettyPrintXml(xmlText);
                 this.xmlPane.setText(prettyXml);
                 this.xmlPane.setCaretPosition(0);
-            } catch (Exception e) {
+            } catch (ParserConfigurationException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
+            } catch (SAXException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
             }
         }

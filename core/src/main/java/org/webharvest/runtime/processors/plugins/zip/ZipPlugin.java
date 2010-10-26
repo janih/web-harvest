@@ -21,7 +21,7 @@ public class ZipPlugin extends WebHarvestPlugin {
         return "zip";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         zipOutStream = new ZipOutputStream(byteArrayOutputStream);
         executeBody(scraper, context);

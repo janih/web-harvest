@@ -54,7 +54,7 @@ public class ScriptProcessor extends BaseProcessor<ScriptDef> {
         super(scriptDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
 
         // For backward compatibility with ver.2b1 only!

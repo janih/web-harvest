@@ -50,6 +50,7 @@ import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +63,7 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
         super(regexpDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
 
         BaseElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
@@ -115,8 +116,8 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
 
         List bodyList = source.toList();
         for (final Object currVar : bodyList) {
-            context.executeWithinNewContext(new Runnable() {
-                public void run() {
+            context.executeWithinNewContext(new Callable() {
+                public Object call() throws InterruptedException {
                     String text = currVar.toString();
 
                     Matcher matcher = pattern.matcher(text);
@@ -153,6 +154,8 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
                         matcher.appendTail(buffer);
                         resultList.add(new NodeVariable(buffer.toString()));
                     }
+
+                    return null;
                 }
             }, true);
         }

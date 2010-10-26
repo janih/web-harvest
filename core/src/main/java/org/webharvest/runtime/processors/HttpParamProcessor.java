@@ -53,7 +53,7 @@ public class HttpParamProcessor extends BaseProcessor<HttpParamDef> {
         super(httpParamDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         String isFileStr = BaseTemplater.evaluateToString(elementDef.getIsfile(), null, scraper);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);

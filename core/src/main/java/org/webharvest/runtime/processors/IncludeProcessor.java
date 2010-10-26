@@ -61,7 +61,7 @@ public class IncludeProcessor extends BaseProcessor<IncludeDef> {
         super(includeDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         boolean isUrl = false;
 
         String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);

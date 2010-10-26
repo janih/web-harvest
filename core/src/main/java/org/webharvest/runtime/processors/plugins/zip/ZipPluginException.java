@@ -7,9 +7,6 @@ import org.webharvest.exception.BaseException;
  */
 public class ZipPluginException extends BaseException {
 
-    public ZipPluginException() {
-    }
-
     public ZipPluginException(String message) {
         super(message);
     }

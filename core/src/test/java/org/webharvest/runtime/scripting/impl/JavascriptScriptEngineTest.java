@@ -48,6 +48,8 @@ import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.SystemUtilities;
 
+import java.util.concurrent.Callable;
+
 import static org.testng.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
@@ -68,7 +70,7 @@ public class JavascriptScriptEngineTest extends UnitilsTestNG {
     final Variable y = new NodeVariable(5);
 
     @Test
-    public void testEvaluate() {
+    public void testEvaluate() throws InterruptedException {
         context = new ScraperContext(scraper);
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(null)));
         context.setLocalVar("x", x);
@@ -76,9 +78,9 @@ public class JavascriptScriptEngineTest extends UnitilsTestNG {
         context.setLocalVar("z", "old");
         context.setLocalVar("w", "old");
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 assertEquals(new JavascriptScriptEngine("" +
                         "function f(a, b) {return a + b};" +
                         "k = 'foo' + sys.space + 'bar';" +
@@ -100,6 +102,8 @@ public class JavascriptScriptEngineTest extends UnitilsTestNG {
 
                 // function 'f' doesn't propagated out of the script
                 assertFalse(context.containsVar("f"));
+
+                return null;
             }
         }, false);
 

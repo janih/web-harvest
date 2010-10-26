@@ -38,7 +38,8 @@ package org.webharvest.gui;
 
 import org.webharvest.definition.XmlNode;
 import org.webharvest.definition.XmlParser;
-import org.webharvest.gui.component.*;
+import org.webharvest.gui.component.ProportionalSplitPane;
+import org.webharvest.gui.component.WHScrollPane;
 import org.webharvest.utils.CommonUtil;
 import org.xml.sax.InputSource;
 
@@ -52,11 +53,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Frame that contains Web-Harvest help.
+ *
  * @author: Vladimir Nikic
  * Date: May 8, 2007
  */
@@ -65,6 +69,7 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
     private static final Dimension HELP_FRAME_DIMENSION = new Dimension(750, 500);
 
     private class TopicInfo {
+
         private String id;
         private String title;
         private int subtopicCount;
@@ -82,7 +87,6 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
 
     private JEditorPane htmlPane;
     private JTree tree;
-    private DefaultMutableTreeNode topNode;
     private DefaultTreeModel treeModel;
 
     /**
@@ -90,15 +94,15 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
      */
     public HelpFrame() {
         setTitle("Web-Harvest Help");
-        setIconImage( ((ImageIcon) ResourceManager.HELP32_ICON).getImage() );
+        setIconImage(((ImageIcon) ResourceManager.HELP32_ICON).getImage());
 
-        this.topNode = new DefaultMutableTreeNode();
-        this.treeModel = new DefaultTreeModel(this.topNode);
+        final DefaultMutableTreeNode topNode = new DefaultMutableTreeNode();
+        this.treeModel = new DefaultTreeModel(topNode);
         try {
-            String helpContent = CommonUtil.readStringFromUrl( ResourceManager.getHelpContentUrl() );
-            XmlNode xmlNode = XmlParser.parse( new InputSource(new StringReader(helpContent)) );
+            String helpContent = CommonUtil.readStringFromUrl(ResourceManager.getHelpContentUrl());
+            XmlNode xmlNode = XmlParser.parse(new InputSource(new StringReader(helpContent)));
             createNodes(topNode, xmlNode);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             GuiUtils.showErrorMessage("Error reading help content!");
         }
@@ -106,16 +110,16 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
         tree = new JTree(topNode);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        tree.setBorder( new EmptyBorder(5, 5, 5, 5) );
+        tree.setBorder(new EmptyBorder(5, 5, 5, 5));
         tree.setCellRenderer(new DefaultTreeCellRenderer() {
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 if (value instanceof DefaultMutableTreeNode) {
                     DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) value;
-                    Object userObject =  defaultMutableTreeNode.getUserObject();
+                    Object userObject = defaultMutableTreeNode.getUserObject();
                     if (userObject instanceof TopicInfo) {
                         TopicInfo topicInfo = (TopicInfo) userObject;
-                        renderer.setIcon( topicInfo.subtopicCount == 0 ? ResourceManager.HELPTOPIC_ICON : ResourceManager.HELPDIR_ICON );
+                        renderer.setIcon(topicInfo.subtopicCount == 0 ? ResourceManager.HELPTOPIC_ICON : ResourceManager.HELPDIR_ICON);
                     }
                 }
                 return renderer;
@@ -126,7 +130,7 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
         htmlPane = new JEditorPane();
         htmlPane.setEditable(false);
         htmlPane.setContentType("text/html");
-        htmlPane.setEditorKit( new HTMLEditorKit() );
+        htmlPane.setEditorKit(new HTMLEditorKit());
         htmlPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         JSplitPane splitPane = new ProportionalSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -152,13 +156,13 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
             Object topicsObject = xmlNode.getElement("topic");
             if (topicsObject instanceof java.util.List) {
                 java.util.List subtopics = (java.util.List) topicsObject;
-                for (int i = 0; i < subtopics.size(); i++) {
-                    XmlNode xmlSubNode = (XmlNode) subtopics.get(i);
+                for (Object subtopic : subtopics) {
+                    XmlNode xmlSubNode = (XmlNode) subtopic;
 
                     String id = xmlSubNode.getAttribute("id");
                     String title = xmlSubNode.getAttribute("title");
                     Object subs = xmlSubNode.getElement("topic");
-                    int subtopicCount = subs instanceof java.util.List ? ((java.util.List)subs).size() : 0;
+                    int subtopicCount = subs instanceof java.util.List ? ((List) subs).size() : 0;
 
                     TopicInfo topicInfo = new TopicInfo(id, title, subtopicCount);
                     DefaultMutableTreeNode node = new DefaultMutableTreeNode(topicInfo);
@@ -180,7 +184,7 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
             return;
         }
 
-        Object userObject =  node.getUserObject();
+        Object userObject = node.getUserObject();
         if (userObject instanceof TopicInfo) {
             TopicInfo topicInfo = (TopicInfo) userObject;
             try {
@@ -195,12 +199,12 @@ public class HelpFrame extends JFrame implements TreeSelectionListener {
                 }
                 String content = CommonUtil.readStringFromUrl(helpFileUrl);
                 content = "<html><body style=\"font-family:Verdana,Tahoma;font-size:10px;\">" +
-                          "<h2>" + topicInfo.title + "</h2>" +
-                          content + "</body></html>";
-                ((HTMLDocument)htmlPane.getDocument()).setBase(helpFileUrl);
+                        "<h2>" + topicInfo.title + "</h2>" +
+                        content + "</body></html>";
+                ((HTMLDocument) htmlPane.getDocument()).setBase(helpFileUrl);
                 htmlPane.setText(content);
                 htmlPane.setCaretPosition(0);
-            } catch (Exception e1) {
+            } catch (IOException e1) {
                 htmlPane.setText("<div style='color:#FF0000;font-family:Verdana,Tahoma;font-size:10px;'>Cannot read help for \"" + topicInfo.title + "\"!</div>");
             }
         }

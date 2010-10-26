@@ -51,7 +51,7 @@ public class ReturnProcessor extends BaseProcessor<ReturnDef> {
         super(returnDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         CallProcessor callProcessor = scraper.getRunningFunction();
 
         if (callProcessor != null) {

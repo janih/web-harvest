@@ -57,7 +57,7 @@ public class HtmlToXmlProcessor extends BaseProcessor<HtmlToXmlDef> {
         super(htmlToXmlDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         Variable body = getBodyTextContent(elementDef, scraper, context);
 
         HtmlCleaner cleaner = new HtmlCleaner();

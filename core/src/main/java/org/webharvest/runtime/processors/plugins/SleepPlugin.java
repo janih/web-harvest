@@ -48,16 +48,12 @@ public class SleepPlugin extends WebHarvestPlugin {
 
     private static final String MILLISECONDS_ATT_NAME = "milliseconds";
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
-        int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, scraper);
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+        final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, scraper);
         setProperty("Milliseconds", millis);
         if (millis > 0) {
             synchronized (this) {
-                try {
-                    wait(millis);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                wait(millis);
             }
         }
         return EmptyVariable.INSTANCE;

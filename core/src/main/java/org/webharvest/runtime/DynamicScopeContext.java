@@ -41,6 +41,8 @@ package org.webharvest.runtime;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
+import java.util.concurrent.Callable;
+
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
@@ -53,7 +55,7 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     void setLocalVar(String key, Variable value);
 
-    void executeWithinNewContext(Runnable runnable, boolean loopBody_compat2b1);
+    <R> R executeWithinNewContext(Callable<R> callable, boolean loopBody_compat2b1) throws InterruptedException;
 
     Variable replaceExistingVar(String name, Variable variable);
 

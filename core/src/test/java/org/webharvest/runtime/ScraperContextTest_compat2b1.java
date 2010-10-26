@@ -49,6 +49,7 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
 import static org.testng.Assert.assertNull;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -80,19 +81,19 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
         context.setVar_compat2b1("x", new NodeVariable("a"));
         context.setVar_compat2b1("y", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() throws InterruptedException {
                 context.setVar_compat2b1("y", new NodeVariable(2));
 
-                context.executeWithinNewContext(new Runnable() {
+                context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() throws InterruptedException {
                         context.setVar_compat2b1("z", new NodeVariable("zzz"));
 
-                        context.executeWithinNewContext(new Runnable() {
+                        context.executeWithinNewContext(new Callable<Object>() {
                             @Override
-                            public void run() {
+                            public Object call() {
                                 context.setVar_compat2b1("x", new NodeVariable("b"));
 
                                 assertReflectionEquals(new NodeVariable("b"), context.getVar("x"));
@@ -103,7 +104,7 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
                                         new KeyValuePair<Variable>("y", new NodeVariable(2)),
                                         new KeyValuePair<Variable>("z", new NodeVariable("zzz"))
                                 ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
-
+                                return null;
                             }
                         }, false);
 
@@ -115,6 +116,7 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
                                 new KeyValuePair<Variable>("y", new NodeVariable(2)),
                                 new KeyValuePair<Variable>("z", new NodeVariable("zzz"))
                         ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
+                        return null;
                     }
                 }, false);
 
@@ -125,6 +127,7 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
                         new KeyValuePair<Variable>("x", new NodeVariable("a")),
                         new KeyValuePair<Variable>("y", new NodeVariable(2))
                 ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
+                return null;
             }
         }, false);
 
@@ -139,11 +142,12 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
 
     @Test
     public void testSetVar_compat2b1_insideLoop_caseA() throws Exception {
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 context.setVar_compat2b1("a", new NodeVariable(2));
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                return null;
             }
         }, true);
 
@@ -154,12 +158,13 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideLoop_caseB() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 context.setLocalVar("a", new NodeVariable(2));
                 context.setVar_compat2b1("a", new NodeVariable(3));
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
+                return null;
             }
         }, true);
 
@@ -170,11 +175,12 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideLoop_caseC() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 context.setVar_compat2b1("a", new NodeVariable(2));
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                return null;
             }
         }, true);
 
@@ -183,12 +189,13 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
 
     @Test
     public void testSetVar_compat2b1_insideLoop_caseD() throws Exception {
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 context.setLocalVar("a", new NodeVariable(1));
                 context.setVar_compat2b1("a", new NodeVariable(2));
                 assertReflectionEquals(new NodeVariable(1), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
+                return null;
             }
         }, true);
 
@@ -199,17 +206,19 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideLoop_caseE() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() {
                         context.setVar_compat2b1("a", new NodeVariable(2));
                         assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                        return null;
                     }
                 }, true);
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                return null;
             }
         }, false);
 
@@ -218,14 +227,15 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
 
     @Test
     public void testSetVar_compat2b1_insideMultipleLoops_caseA() throws Exception {
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                return context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() {
                         context.setVar_compat2b1("a", new NodeVariable(2));
                         assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                        return null;
                     }
                 }, true);
             }
@@ -238,15 +248,16 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideMultipleLoops_caseB() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                return context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() {
                         context.setLocalVar("a", new NodeVariable(2));
                         context.setVar_compat2b1("a", new NodeVariable(3));
                         assertReflectionEquals(new NodeVariable(2), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
+                        return null;
                     }
                 }, true);
             }
@@ -259,14 +270,15 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideMultipleLoops_caseC() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                return context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() {
                         context.setVar_compat2b1("a", new NodeVariable(2));
                         assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                        return null;
                     }
                 }, true);
             }
@@ -277,15 +289,16 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
 
     @Test
     public void testSetVar_compat2b1_insideMultipleLoops_caseD() throws Exception {
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                return context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() {
                         context.setLocalVar("a", new NodeVariable(1));
                         context.setVar_compat2b1("a", new NodeVariable(2));
                         assertReflectionEquals(new NodeVariable(1), context.getVar("a")); //mixing <def> and <var-def> leads to confusing results !!!
+                        return null;
                     }
                 }, true);
             }
@@ -298,22 +311,24 @@ public class ScraperContextTest_compat2b1 extends UnitilsTestNG {
     public void testSetVar_compat2b1_insideMultipleLoops_caseE() throws Exception {
         context.setLocalVar("a", new NodeVariable(1));
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
-                context.executeWithinNewContext(new Runnable() {
+            public Object call() throws InterruptedException {
+                context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
-                        context.executeWithinNewContext(new Runnable() {
+                    public Object call() throws InterruptedException {
+                        return context.executeWithinNewContext(new Callable<Object>() {
                             @Override
-                            public void run() {
+                            public Object call() {
                                 context.setVar_compat2b1("a", new NodeVariable(2));
                                 assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                                return null;
                             }
                         }, true);
                     }
                 }, true);
                 assertReflectionEquals(new NodeVariable(2), context.getVar("a"));
+                return null;
             }
         }, false);
 

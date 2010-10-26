@@ -19,7 +19,7 @@ public class XmlToJsonPlugin extends WebHarvestPlugin {
         return "xml-to-json";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         Variable body = executeBody(scraper, context);
         try {
             JSONObject jsonObject = XML.toJSONObject(body.toString());

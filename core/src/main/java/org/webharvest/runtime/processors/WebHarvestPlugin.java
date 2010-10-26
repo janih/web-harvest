@@ -125,7 +125,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
         return true;
     }
 
-    public final Variable execute(Scraper scraper, ScraperContext context) {
+    public final Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         // pre processing
         final Variable variable = executePlugin(scraper, context);
         // post processing
@@ -139,9 +139,9 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
      *
      * @param scraper
      * @param context
-     * @return Instance of variable as result of xecution.
+     * @return Instance of variable as result of execution.
      */
-    public abstract Variable executePlugin(Scraper scraper, ScraperContext context);
+    public abstract Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException;
 
     public String getTagDesc() {
         if (!hasBody()) {
@@ -245,7 +245,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
      * @param context
      * @return Instance of Variable
      */
-    protected Variable executeBody(Scraper scraper, ScraperContext context) {
+    protected Variable executeBody(Scraper scraper, ScraperContext context) throws InterruptedException {
         return new BodyProcessor(elementDef).execute(scraper, context);
     }
 

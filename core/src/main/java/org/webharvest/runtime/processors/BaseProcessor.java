@@ -61,7 +61,7 @@ import java.util.Map;
  */
 abstract public class BaseProcessor<TDef extends BaseElementDef> {
 
-    abstract public Variable execute(Scraper scraper, ScraperContext context);
+    abstract public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException;
 
     protected TDef elementDef;
     private Map properties = new LinkedHashMap();
@@ -81,7 +81,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
     /**
      * Wrapper for the execute method. Adds controlling and logging logic.
      */
-    public Variable run(Scraper scraper, ScraperContext context) {
+    public Variable run(final Scraper scraper, ScraperContext context) throws InterruptedException {
         int scraperStatus = scraper.getStatus();
 
         if (scraperStatus == Scraper.STATUS_STOPPED || scraperStatus == Scraper.STATUS_EXIT) {
@@ -90,16 +90,13 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
 
         if (scraperStatus == Scraper.STATUS_PAUSED) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
-            try {
-                synchronized (scraper) {
-                    if (scraper.getLogger().isInfoEnabled()) {
-                        scraper.getLogger().info("Execution paused [" + dateFormatter.format(new Date()) + "].");
-                    }
-                    scraper.wait();
+            synchronized (scraper) {
+                if (scraper.getLogger().isInfoEnabled()) {
+                    scraper.getLogger().info("Execution paused [" + dateFormatter.format(new Date()) + "].");
                 }
-            } catch (InterruptedException e) {
-                scraper.getLogger().warn(e.getMessage(), e);
+                scraper.wait();
             }
+
 
             scraper.continueExecution();
             if (scraper.getLogger().isInfoEnabled()) {
@@ -166,7 +163,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
     }
 
     protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context,
-                                          boolean registerExecution, KeyValuePair properties[]) {
+                                          boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef == null) {
             return null;
         } else if (elementDef.hasOperations()) {
@@ -183,11 +180,11 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context, boolean registerExecution) {
+    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context, boolean registerExecution) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context) {
+    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, false);
     }
 

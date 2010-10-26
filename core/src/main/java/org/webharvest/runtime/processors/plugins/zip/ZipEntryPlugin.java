@@ -23,7 +23,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
         return "zip-entry";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         ZipPlugin zipPlugin = (ZipPlugin) scraper.getRunningProcessorOfType(ZipPlugin.class);
         if (zipPlugin != null) {
             String name = evaluateAttribute("name", scraper);

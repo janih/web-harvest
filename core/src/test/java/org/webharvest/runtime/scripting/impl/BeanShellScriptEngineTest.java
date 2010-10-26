@@ -52,6 +52,8 @@ import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.SystemUtilities;
 
+import java.util.concurrent.Callable;
+
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertSame;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -86,16 +88,16 @@ public class BeanShellScriptEngineTest extends UnitilsTestNG {
     }
 
     @Test
-    public void testEvaluate() {
+    public void testEvaluate() throws InterruptedException {
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(null)));
         context.setLocalVar("x", x);
         context.setLocalVar("y", y);
         context.setLocalVar("z", "old");
         context.setLocalVar("w", "old");
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 Assert.assertEquals(new BeanShellScriptEngine("" +
                         "int f(int a, int b) {return a + b;}\n" +
                         "k = \"foo\" + sys.space + \"bar\";" +
@@ -117,6 +119,8 @@ public class BeanShellScriptEngineTest extends UnitilsTestNG {
 
                 // function 'f' doesn't propagated out of the script
                 assertFalse(context.containsVar("f"));
+
+                return null;
             }
         }, false);
 

@@ -80,7 +80,7 @@ public class CommandLine {
         return getArgValue(args, false);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Map<String, String> params = getArgValue(args);
 
         if (params.size() == 0) {

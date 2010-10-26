@@ -218,6 +218,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                             }
                         }
                     } catch (BadLocationException e1) {
+                        //todo: swallow exception?
                     }
                     xmlPane.requestFocus();
                 }
@@ -501,17 +502,10 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             setScraperConfiguration(scraperConfiguration);
 
             ide.setTabIcon(this, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            String errorMessage = e.getMessage();
-
-            StringWriter writer = new StringWriter();
-            e.printStackTrace(new PrintWriter(writer));
-            logger.error(errorMessage + "\n" + writer.getBuffer().toString());
-
+        } catch (RuntimeException e) {
+            logger.error(e.getMessage(), e);
             ide.setTabIcon(this, ResourceManager.SMALL_ERROR_ICON);
-            GuiUtils.showErrorMessage(errorMessage);
+            GuiUtils.showErrorMessage(e.getMessage());
             return false;
         }
 
@@ -818,6 +812,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                     this.xmlPane.setCaretPosition(startIndex >= 0 ? startIndex : 0);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
+                    //todo: swallow exception?
                 }
 
                 return lineNumber;

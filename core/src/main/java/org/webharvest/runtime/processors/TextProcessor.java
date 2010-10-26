@@ -54,7 +54,7 @@ public class TextProcessor extends BaseProcessor<TextDef> {
         super(textDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();

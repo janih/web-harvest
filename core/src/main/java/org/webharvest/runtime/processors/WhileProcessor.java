@@ -50,6 +50,7 @@ import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Conditional processor.
@@ -60,15 +61,14 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
         super(whileDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
         final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
 
-        final List<Object> resultList = new ArrayList<Object>();
-
-        context.executeWithinNewContext(new Runnable() {
-            public void run() {
+        return context.executeWithinNewContext(new Callable<Variable>() {
+            public Variable call() throws InterruptedException {
+                final List<Object> resultList = new ArrayList<Object>();
                 int i = 1;
 
                 // define first value of index variable
@@ -99,10 +99,10 @@ public class WhileProcessor extends BaseProcessor<WhileDef> {
 
                     condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
                 }
+
+                return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
             }
         }, true);
-
-        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
     }
 
 }

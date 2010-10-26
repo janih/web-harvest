@@ -144,7 +144,7 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
                 ((HTMLDocument) htmlPane.getDocument()).setBase(ResourceManager.getWelcomeUrl());
                 htmlPane.setText(htmlPaneContent);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // do nothing - there is probably no file
             //System.out.println("Error reading welcome addon from the site: " + e.getMessage());
         }

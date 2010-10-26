@@ -1,9 +1,12 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
-import org.webharvest.utils.*;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Support for database operations.
@@ -14,7 +17,7 @@ public class TokenizePlugin extends WebHarvestPlugin {
         return "tokenize";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         String delimiters = evaluateAttribute("delimiters", scraper);
         if ( delimiters == null || "".equals(delimiters) ) {
             delimiters = "\n\r";

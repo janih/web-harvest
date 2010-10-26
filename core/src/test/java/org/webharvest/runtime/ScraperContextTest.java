@@ -51,6 +51,7 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
 import static org.testng.Assert.*;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
@@ -121,11 +122,12 @@ public class ScraperContextTest extends UnitilsTestNG {
     @Test
     public void testReplaceExistingVar_inSubContext() throws Exception {
         context.setLocalVar("x", new NodeVariable("old val"));
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() {
                 context.replaceExistingVar("x", dummyVar);
                 assertSame(context.getVar("x"), dummyVar);
+                return null;
             }
         }, false);
         assertSame(context.getVar("x"), dummyVar);
@@ -152,19 +154,19 @@ public class ScraperContextTest extends UnitilsTestNG {
         context.setLocalVar("x", "a");
         context.setLocalVar("y", 1);
 
-        context.executeWithinNewContext(new Runnable() {
+        context.executeWithinNewContext(new Callable<Object>() {
             @Override
-            public void run() {
+            public Object call() throws InterruptedException {
                 context.setLocalVar("y", 2);
 
-                context.executeWithinNewContext(new Runnable() {
+                context.executeWithinNewContext(new Callable<Object>() {
                     @Override
-                    public void run() {
+                    public Object call() throws InterruptedException {
                         context.setLocalVar("z", "zzz");
 
-                        context.executeWithinNewContext(new Runnable() {
+                        context.executeWithinNewContext(new Callable<Object>() {
                             @Override
-                            public void run() {
+                            public Object call() {
                                 context.setLocalVar("x", "b");
 
                                 assertReflectionEquals(new NodeVariable("b"), context.getVar("x"));
@@ -176,7 +178,7 @@ public class ScraperContextTest extends UnitilsTestNG {
                                         new KeyValuePair<Variable>("y", new NodeVariable(2)),
                                         new KeyValuePair<Variable>("z", new NodeVariable("zzz"))
                                 ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
-
+                                return null;
                             }
                         }, false);
 
@@ -188,6 +190,8 @@ public class ScraperContextTest extends UnitilsTestNG {
                                 new KeyValuePair<Variable>("y", new NodeVariable(2)),
                                 new KeyValuePair<Variable>("z", new NodeVariable("zzz"))
                         ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
+
+                        return null;
                     }
                 }, false);
 
@@ -198,6 +202,8 @@ public class ScraperContextTest extends UnitilsTestNG {
                         new KeyValuePair<Variable>("x", new NodeVariable("a")),
                         new KeyValuePair<Variable>("y", new NodeVariable(2))
                 ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
+
+                return null;
             }
         }, false);
 

@@ -50,6 +50,7 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +63,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
         super(loopDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) {
+    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
         final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, scraper);
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, scraper);
@@ -79,42 +80,42 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
         Variable loopValue = new BodyProcessor(loopValueDef).run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
-        final List<Object> resultList = new ArrayList<Object>();
 
         final List list = loopValue != null ? loopValue.toList() : null;
-        if (list != null) {
-            context.executeWithinNewContext(new Runnable() {
-                public void run() {
-                    List filteredList = filter != null ? createFilteredList(list, filter) : list;
-                    Iterator it = filteredList.iterator();
+        return (list == null)
+                ? EmptyVariable.INSTANCE
+                : context.executeWithinNewContext(
+                new Callable<Variable>() {
+                    public Variable call() throws InterruptedException {
+                        final List<Object> resultList = new ArrayList<Object>();
+                        List filteredList = filter != null ? createFilteredList(list, filter) : list;
+                        Iterator it = filteredList.iterator();
 
-                    final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
-                    for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
-                        Variable currElement = (Variable) it.next();
+                        final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+                        for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
+                            Variable currElement = (Variable) it.next();
 
-                        // define current value of item variable
-                        if (item != null && !"".equals(item)) {
-                            context.setLocalVar(item, currElement);
+                            // define current value of item variable
+                            if (item != null && !"".equals(item)) {
+                                context.setLocalVar(item, currElement);
+                            }
+
+                            // define current value of index variable
+                            if (index != null && !"".equals(index)) {
+                                context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
+                            }
+
+                            // execute the loop body
+                            BaseElementDef bodyDef = elementDef.getLoopBodyDef();
+                            Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
+                            debug(bodyDef, scraper, loopResult);
+                            if (!isEmpty) {
+                                resultList.addAll(loopResult.toList());
+                            }
                         }
-
-                        // define current value of index variable
-                        if (index != null && !"".equals(index)) {
-                            context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
-                        }
-
-                        // execute the loop body
-                        BaseElementDef bodyDef = elementDef.getLoopBodyDef();
-                        Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
-                        debug(bodyDef, scraper, loopResult);
-                        if (!isEmpty) {
-                            resultList.addAll(loopResult.toList());
-                        }
+                        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
                     }
-                }
-            }, true);
-        }
-
-        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
+                }, true);
     }
 
     /**

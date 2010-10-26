@@ -153,7 +153,7 @@ public class Scraper {
         }
     }
 
-    public Variable execute(List<IElementDef> ops) {
+    public Variable execute(List<IElementDef> ops) throws InterruptedException {
         this.setStatus(STATUS_RUNNING);
 
         // inform al listeners that execution is just about to start
@@ -175,7 +175,7 @@ public class Scraper {
         return EmptyVariable.INSTANCE;
     }
 
-    public void execute() {
+    public void execute() throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
         try {
@@ -325,8 +325,13 @@ public class Scraper {
                 dbPool.put(poolKey, conn);
             }
             return conn;
-        }
-        catch (Exception e) {
+        } catch (ClassNotFoundException e) {
+            throw new DatabaseException(e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        } catch (InstantiationException e) {
+            throw new DatabaseException(e);
+        } catch (IllegalAccessException e) {
             throw new DatabaseException(e);
         }
     }

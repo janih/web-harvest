@@ -22,7 +22,7 @@ public class FtpPlugin extends WebHarvestPlugin {
         return "ftp";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         String server = CommonUtil.nvl(evaluateAttribute("server", scraper), "");
         int port = evaluateAttributeAsInteger("port", 21, scraper);
         String username = CommonUtil.nvl(evaluateAttribute("username", scraper), "");
@@ -62,13 +62,14 @@ public class FtpPlugin extends WebHarvestPlugin {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
             return executeBody(scraper, scraper.getContext());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new FtpPluginException(e);
         } finally {
             if (ftpClient.isConnected()) {
                 try {
                     ftpClient.disconnect();
                 } catch (IOException ioe) {
+                    scraper.getLogger().warn(ioe.getMessage(), ioe);
                 }
             }
             ftpClient = null;

@@ -51,7 +51,7 @@ public class CallParamProcessor extends BaseProcessor<CallParamDef> {
         super(callParamDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         Variable variable = new BodyProcessor(elementDef).execute(scraper, context);
 

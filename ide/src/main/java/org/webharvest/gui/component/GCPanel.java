@@ -42,8 +42,8 @@ import org.webharvest.gui.ResourceManager;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author: Vladimir Nikic
@@ -53,28 +53,27 @@ public class GCPanel extends JPanel {
 
     private static final Dimension PERCENT_LABEL_DIMENSION = new Dimension(80, 20);
     private static final Dimension GC_BUTTON_DIMENSION = new Dimension(20, 20);
-    
+
     private PercentLabel percentLabel;
 
     private class MemoryCheckThread extends Thread {
+
         public void run() {
             while (true) {
-                refresh();
-            }
-        }
-
-        private synchronized void refresh() {
-            percentLabel.setText( getUsageString() );
-            percentLabel.repaint();
-            try {
-                sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                percentLabel.setText(getUsageString());
+                percentLabel.repaint();
+                try {
+                    sleep(500);
+                } catch (InterruptedException e) {
+                    // stop doing whatever we've been doing and die resignedly
+                    break;
+                }
             }
         }
     }
 
     private class PercentLabel extends JLabel {
+
         public PercentLabel() {
             this.setBackground(Color.white);
             this.setText(getUsageString());
@@ -120,24 +119,24 @@ public class GCPanel extends JPanel {
     }
 
     private long getFreeMemory() {
-        return Runtime.getRuntime().freeMemory() / (1024*1024);
+        return Runtime.getRuntime().freeMemory() / (1024 * 1024);
     }
 
     private long getTotalMemory() {
-        return Runtime.getRuntime().totalMemory() / (1024*1024);
+        return Runtime.getRuntime().totalMemory() / (1024 * 1024);
     }
 
     private double getPercentOfUsedMemory() {
         long total = getTotalMemory();
         long used = total - getFreeMemory();
-        return total > 0 ? ((double)used)/total : 1d;
+        return total > 0 ? ((double) used) / total : 1d;
     }
 
     private String getUsageString() {
         long total = getTotalMemory();
         long used = total - getFreeMemory();
 
-        return used + "M of " + total + "M"; 
+        return used + "M of " + total + "M";
     }
 
 }

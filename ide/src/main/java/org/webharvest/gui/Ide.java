@@ -41,16 +41,17 @@ package org.webharvest.gui;
  * Date: Apr 17, 2007
  */
 
+import org.webharvest.gui.component.FixedSizeButton;
+import org.webharvest.gui.component.GCPanel;
+import org.webharvest.gui.component.MenuElements;
+import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.gui.component.*;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -97,11 +98,12 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     private static final String COMMAND_HOMEPAGE = "homepage";
     private static final String COMMAND_HELP = "help";
 
-    {
+    static {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.err.println("Couldn't use system look and feel.");
+            System.err.println("Couldn't use system look and feel: " + UIManager.getSystemLookAndFeelClassName());
+            throw new RuntimeException(e);
         }
     }
 
@@ -201,7 +203,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
             ConfigDocument configDocument = currenConfigPanel.getConfigDocument();
             if (configDocument != null) {
                 boolean canceled = false;
-                
+
                 int status = currenConfigPanel.getScraperStatus();
                 if (status == Scraper.STATUS_RUNNING || status == Scraper.STATUS_PAUSED) {
                     canceled = GuiUtils.showWarningQuestionBox("Configuration \"" + configDocument.getName() + "\" is still running!\nAre you sure you want to exit Web-Harvest?", false) != JOptionPane.YES_OPTION;
@@ -223,7 +225,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         }
 
         this.tabbedPane.remove(tabIndex);
-        
+
         if ( this.tabbedPane.getTabCount() == 0 ) {
             openWelcomeScreen();
         }
@@ -251,7 +253,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     private void defineToolbarButton(String text, String command, Icon icon, Container container) {
         defineToolbarButton(text, command, icon, container, null);
     }
-    
+
     private void defineToolbarButton(String text, String command, Icon icon, Container container, final String label) {
         JButton button = new FixedSizeButton(label, icon, 24, 24);
         button.setActionCommand(command);
@@ -509,7 +511,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     }
 
     /**
-     * Defines menu bar. 
+     * Defines menu bar.
      * @return JMEnuBar instance.
      */
     private JMenuBar defineMenuBar() {
@@ -651,8 +653,8 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     public void updateGUI() {
         ConfigPanel configPanel = getActiveConfigPanel();
 
-        setCommandEnabled(COMMAND_SAVE, configPanel != null); 
-        setCommandEnabled(COMMAND_SAVEAS, configPanel != null); 
+        setCommandEnabled(COMMAND_SAVE, configPanel != null);
+        setCommandEnabled(COMMAND_SAVEAS, configPanel != null);
         setCommandEnabled(COMMAND_REFRESH, configPanel != null &&
                                            configPanel.getScraperStatus() != Scraper.STATUS_RUNNING &&
                                            configPanel.getScraperStatus() != Scraper.STATUS_PAUSED);
@@ -663,7 +665,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         setCommandEnabled(COMMAND_RUNPARAMS, configPanel != null);
 
         setCommandEnabled(COMMAND_UNDO, configPanel != null);
-        setCommandEnabled(COMMAND_REDO, configPanel != null); 
+        setCommandEnabled(COMMAND_REDO, configPanel != null);
 
         boolean hasSelection = configPanel != null && configPanel.getXmlPane().hasSelection();
 
@@ -676,7 +678,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
 
         int tabCount = tabbedPane.getTabCount();
         setCommandEnabled(COMMAND_NEXTTAB, tabCount > 1);
-        setCommandEnabled(COMMAND_PREVTAB, tabbedPane.getTabCount() > 1); 
+        setCommandEnabled(COMMAND_PREVTAB, tabbedPane.getTabCount() > 1);
 
         String textToFind = findReplaceDialog.getSearchText();
         setCommandEnabled(COMMAND_FIND, configPanel != null);
@@ -886,7 +888,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
             String filename = cmd.substring(7);
             addTab(new File(filename));
         }
-        
+
         this.updateGUI();
     }
 
@@ -904,7 +906,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     public void stateChanged(ChangeEvent event) {
         Object source = event.getSource();
         if (source == this.tabbedPane) {
-            updateGUI(); 
+            updateGUI();
         }
     }
 

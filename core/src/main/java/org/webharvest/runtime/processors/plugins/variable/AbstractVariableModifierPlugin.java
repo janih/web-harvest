@@ -66,7 +66,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
         this.name = name;
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         final String varName = getAttributes().get(ATTR_VAR);
         final String valueExpr = getAttributes().get(ATTR_VALUE);
         final String defaultExpr = getAttributes().get(ATTR_DEFAULT);

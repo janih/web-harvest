@@ -25,7 +25,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
         return "mail-attach";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         BaseProcessor processor = scraper.getRunningProcessorOfType(MailPlugin.class);
         if (processor != null) {
             MailPlugin mailPlugin = (MailPlugin) processor;

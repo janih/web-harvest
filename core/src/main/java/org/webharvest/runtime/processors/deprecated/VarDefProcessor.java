@@ -59,7 +59,7 @@ public class VarDefProcessor extends BaseProcessor<VarDefDef> {
         super(varDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         scraper.getLogger().warn("<var-def> is DEPRECATED! Use <def> or <set> instead.");
 
         final Variable var = new BodyProcessor(elementDef).execute(scraper, context);

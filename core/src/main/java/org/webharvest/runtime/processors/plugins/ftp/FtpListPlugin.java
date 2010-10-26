@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Ftp List plugin - can be used only inside ftp plugin for listing file in working remote directory.
@@ -49,7 +50,7 @@ public class FtpListPlugin extends WebHarvestPlugin {
                 }
                 try {
                     pattern = Pattern.compile( buffer.toString() );
-                } catch (Exception e) {
+                } catch (PatternSyntaxException e) {
                     pattern = Pattern.compile("");
                 }
             }

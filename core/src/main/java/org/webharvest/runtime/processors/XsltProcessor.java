@@ -59,7 +59,7 @@ public class XsltProcessor extends BaseProcessor<XsltDef> {
         super(xsltDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         final BaseElementDef xsltElementDef = elementDef.getXmlDef();
         Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
         debug(xsltElementDef, scraper, xmlStr);

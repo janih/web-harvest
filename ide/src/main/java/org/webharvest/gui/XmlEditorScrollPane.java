@@ -38,16 +38,14 @@
 package org.webharvest.gui;
 
 import org.bounce.text.ScrollableEditorPanel;
-import org.webharvest.gui.component.*;
+import org.webharvest.gui.component.WHScrollPane;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 /**
  * Scroll pane that contains XML xmlTextPane and line numbers at left border
@@ -58,6 +56,7 @@ public class XmlEditorScrollPane extends WHScrollPane {
      * Panel used for optionally displying line numbers.
      */
     private class LineNumberPanel extends JPanel {
+
         private final Color BORDER_COLOR = new Color(128, 128, 128);
         private final Color NUMBER_COLOR = new Color(128, 128, 128);
 
@@ -70,7 +69,7 @@ public class XmlEditorScrollPane extends WHScrollPane {
                     int lineHeight = getFontMetrics(font).getHeight();
                     BreakpointCollection breakpoints = xmlTextPane.getBreakpoints();
                     int lineNumber = y / lineHeight;
-                    if ( breakpoints.isThereBreakpoint(lineNumber) ) {
+                    if (breakpoints.isThereBreakpoint(lineNumber)) {
                         breakpoints.removeBreakpoint(lineNumber);
                     } else {
                         breakpoints.addBreakpoint(new BreakpointInfo(lineNumber));
@@ -93,7 +92,7 @@ public class XmlEditorScrollPane extends WHScrollPane {
             Rectangle2D rect = fm.getStringBounds(lastValue, getGraphics());
 
             int width = 22 + (int) rect.getWidth();
-            
+
             return new Dimension(width, editorHeight);
         }
 
@@ -122,7 +121,7 @@ public class XmlEditorScrollPane extends WHScrollPane {
             BreakpointCollection breakpoints = xmlTextPane.getBreakpoints();
             for (int i = 0; i < breakpoints.size(); i++) {
                 BreakpointInfo breakpoint = (BreakpointInfo) breakpoints.get(i);
-                y = (breakpoint.getLineNumber() + 1)* lineHeight;
+                y = (breakpoint.getLineNumber() + 1) * lineHeight;
                 if (y < maxHeight) {
                     g.drawImage(ResourceManager.BREAKPOINT_IMAGE, width - 14, y - 10, this);
                 }
@@ -134,14 +133,14 @@ public class XmlEditorScrollPane extends WHScrollPane {
         }
 
         private int calculateTextHeight() {
-            int maxHeight = 0;
             int lastOffset = xmlTextPane.getDocument().getEndPosition().getOffset();
             try {
-                maxHeight = (int) (xmlTextPane.modelToView(lastOffset).getMaxY());
-            } catch (Exception e) {
-                maxHeight = 0;
+                return (int) (xmlTextPane.modelToView(lastOffset).getMaxY());
+            } catch (RuntimeException e) {
+                return 0;
+            } catch (BadLocationException e) {
+                return 0;
             }
-            return maxHeight;
         }
     }
 
@@ -151,11 +150,12 @@ public class XmlEditorScrollPane extends WHScrollPane {
 
     /**
      * Constructor.
+     *
      * @param showLineNumbers
      * @param editor
      */
     public XmlEditorScrollPane(XmlTextPane editor, boolean showLineNumbers) {
-        super( new ScrollableEditorPanel(editor) );
+        super(new ScrollableEditorPanel(editor));
         this.xmlTextPane = editor;
         this.lineNumberPanel = new LineNumberPanel();
         this.showLineNumbers = showLineNumbers;

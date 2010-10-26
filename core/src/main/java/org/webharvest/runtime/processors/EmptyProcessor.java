@@ -51,7 +51,7 @@ public class EmptyProcessor extends BaseProcessor<EmptyDef> {
         super(emptyDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         new BodyProcessor(elementDef).execute(scraper, context);
 
         return EmptyVariable.INSTANCE;

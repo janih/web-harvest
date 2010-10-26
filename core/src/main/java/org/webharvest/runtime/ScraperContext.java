@@ -49,6 +49,7 @@ import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static org.apache.commons.collections.IteratorUtils.filteredIterator;
 import static org.apache.commons.collections.IteratorUtils.toList;
@@ -136,11 +137,18 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     @Override
-    public void executeWithinNewContext(Runnable runnable, boolean loopBody_compat2b1) {
+    public <R> R executeWithinNewContext(Callable<R> callable, boolean loopBody_compat2b1) throws InterruptedException {
         try {
             variablesNamesStack.push(new HashSet<String>());
             loopBodyScope_compat2b1.push(loopBody_compat2b1);
-            runnable.run();
+            return callable.call();
+
+        } catch (InterruptedException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             loopBodyScope_compat2b1.pop();
             for (String varName : variablesNamesStack.pop()) {
