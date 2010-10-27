@@ -179,13 +179,4 @@ public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
 
-    @Test
-    public void testExecutePlugin_default_syntacticSugar_bodyIsEmpty_varIs() throws Exception {
-        context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
-                "<def var='x' default='${zzz}'><empty/></def>",
-                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
-        assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
-    }
-
 }
