@@ -86,7 +86,7 @@ public class JavascriptScriptEngineTest extends UnitilsTestNG {
                         "k = 'foo' + sys.space + 'bar';" +
                         "z = 'new';" +
                         "var w = 'new';" +
-                        "f(parseInt(x), parseInt(y))").
+                        "f(parseInt(x), parseInt(y))", null).
                         evaluate(context), 7.0);
 
                 // 'x' and 'y' should remain untouched

@@ -42,6 +42,7 @@ import groovy.lang.Script;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.KeyValuePair;
 
@@ -62,7 +63,8 @@ public class GroovyScriptEngine extends ScriptEngine {
 
     private transient Binding grvBinding;
 
-    public GroovyScriptEngine(String sourceCode) {
+    public GroovyScriptEngine(String sourceCode, ScriptEngineFactory factory) {
+        super(factory);
         grvScript = new GroovyShell().parse(sourceCode, generateScriptName());
     }
 

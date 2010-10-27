@@ -43,7 +43,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
@@ -51,7 +50,6 @@ import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.ScraperContextHolder;
 import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
 import org.webharvest.runtime.scripting.impl.GroovyScriptEngine;
 import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
@@ -82,13 +80,7 @@ public class ScriptEngineFactoryTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         context = new ScraperContext(scraper);
-        ScraperContextHolder.init(context);
-        factory = new ScriptEngineFactory(null, context);
-    }
-
-    @AfterMethod
-    public void after() {
-        ScraperContextHolder.clear();
+        factory = new ScriptEngineFactory(null, scraper);
     }
 
     @Test
@@ -100,9 +92,9 @@ public class ScriptEngineFactoryTest extends UnitilsTestNG {
 
     @Test
     public void testGetEngine_defaultLanguage() {
-        assertSame(new ScriptEngineFactory(GROOVY, context).getEngine(new ScriptSource("dummy", null)).getClass(), GroovyScriptEngine.class);
-        assertSame(new ScriptEngineFactory(BEANSHELL, context).getEngine(new ScriptSource("dummy", null)).getClass(), BeanShellScriptEngine.class);
-        assertSame(new ScriptEngineFactory(JAVASCRIPT, context).getEngine(new ScriptSource("dummy", null)).getClass(), JavascriptScriptEngine.class);
+        assertSame(new ScriptEngineFactory(GROOVY, scraper).getEngine(new ScriptSource("dummy", null)).getClass(), GroovyScriptEngine.class);
+        assertSame(new ScriptEngineFactory(BEANSHELL, scraper).getEngine(new ScriptSource("dummy", null)).getClass(), BeanShellScriptEngine.class);
+        assertSame(new ScriptEngineFactory(JAVASCRIPT, scraper).getEngine(new ScriptSource("dummy", null)).getClass(), JavascriptScriptEngine.class);
     }
 
     @Test

@@ -93,7 +93,7 @@ public class GroovyScriptEngineTest extends UnitilsTestNG {
                         "k = 'foo' + sys.space + 'bar';" +
                         "z = 'new';" +
                         "def w = 'new';" +
-                        "f(x.toInt(), y.toInt())").
+                        "f(x.toInt(), y.toInt())", null).
                         evaluate(context), 7);
 
                 // 'x' and 'y' should remain untouched

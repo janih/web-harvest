@@ -44,8 +44,10 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.ScraperContextHolder;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
+import org.webharvest.runtime.scripting.SetContextVar;
 import org.webharvest.utils.KeyValuePair;
 
 /**
@@ -58,21 +60,25 @@ public class BeanShellScriptEngine extends ScriptEngine {
         final private NameSpace nameSpace;
         final private Interpreter interpreter;
 
-        public BeanShellDelegate() {
+        public BeanShellDelegate(Scraper scraper) {
             interpreter = new Interpreter();
             nameSpace = interpreter.getNameSpace();
             nameSpace.importCommands("org.webharvest.runtime.scripting");
+            
+            try {
+                nameSpace.setVariable(SetContextVar.SCRAPER_VAR_NAME, scraper, false);
+            } catch (UtilEvalError e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private String sourceCode;
-    private transient BeanShellDelegate bsh;
 
-    public BeanShellScriptEngine(String sourceCode) {
+    public BeanShellScriptEngine(String sourceCode, ScriptEngineFactory factory) {
+        super(factory);
         // BeanShell does not support pre-compiled scripts
         this.sourceCode = sourceCode;
-        this.bsh = (BeanShellDelegate) ScraperContextHolder.getCurrentContext().
-                getVar(BeanShellDelegate.class.getName()).getWrappedObject();
     }
 
     @Override
@@ -83,7 +89,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
     @Override
     protected void setEngineVariable(String name, Object value) {
         try {
-            bsh.nameSpace.setVariable(name, value, false);
+            factory.bsh.nameSpace.setVariable(name, value, false);
         } catch (UtilEvalError e) {
             throw new ScriptException("Cannot set variable in scripter: " + e.getMessage(), e);
         }
@@ -92,7 +98,7 @@ public class BeanShellScriptEngine extends ScriptEngine {
     @Override
     protected Object doEvaluate() {
         try {
-            return bsh.interpreter.eval(sourceCode);
+            return factory.bsh.interpreter.eval(sourceCode);
         } catch (EvalError e) {
             throw new ScriptException("Error during script execution: " + e.getMessage(), e);
         }
@@ -104,17 +110,17 @@ public class BeanShellScriptEngine extends ScriptEngine {
         return IteratorUtils.toList(
                 IteratorUtils.filteredIterator(
                         IteratorUtils.transformedIterator(
-                                IteratorUtils.arrayIterator(bsh.nameSpace.getVariableNames()),
+                                IteratorUtils.arrayIterator(factory.bsh.nameSpace.getVariableNames()),
                                 new Transformer() {
                                     @Override
                                     public KeyValuePair transform(Object input) {
                                         final String varName = (String) input;
                                         try {
-                                            return new KeyValuePair(varName, bsh.nameSpace.getVariable(varName));
+                                            return new KeyValuePair(varName, factory.bsh.nameSpace.getVariable(varName));
                                         } catch (UtilEvalError e) {
                                             throw new ScriptException(e);
                                         } finally {
-                                            bsh.nameSpace.unsetVariable(varName);
+                                            factory.bsh.nameSpace.unsetVariable(varName);
                                         }
                                     }
                                 }),

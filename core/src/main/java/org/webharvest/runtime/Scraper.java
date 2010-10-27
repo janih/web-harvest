@@ -125,7 +125,7 @@ public class Scraper {
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
         context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
 
-        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage(), context);
+        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage(), this);
     }
 
     /**
@@ -178,12 +178,7 @@ public class Scraper {
     public void execute() throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        try {
-            ScraperContextHolder.init(context);
-            execute(configuration.getOperations());
-        } finally {
-            ScraperContextHolder.clear();
-        }
+        execute(configuration.getOperations());
 
         if (this.status == STATUS_RUNNING) {
             this.setStatus(STATUS_FINISHED);

@@ -40,8 +40,8 @@ package org.webharvest.runtime.scripting;
 
 import bsh.CallStack;
 import bsh.Interpreter;
-import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.ScraperContextHolder;
+import bsh.UtilEvalError;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.utils.CommonUtil;
 
 /**
@@ -54,12 +54,13 @@ import org.webharvest.utils.CommonUtil;
 @Deprecated
 public class SetContextVar {
 
-    public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) {
-        ((ScraperContext) ScraperContextHolder.getCurrentContext()).
-                log.warn("SetContextVar is DEPRECATED! No need to use it anymore. " +
+    public static final String SCRAPER_VAR_NAME = "__" + Scraper.class.getName().replace(".", "_");
+
+    public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) throws UtilEvalError {
+        final Scraper scraper = (Scraper) interpreter.getNameSpace().getVariable(SCRAPER_VAR_NAME);
+        scraper.getLogger().warn("SetContextVar is DEPRECATED! No need to use it anymore. " +
                 "All variables defined on the top level of the script block are propagated to the scraper context automatically.");
 
-        ((ScraperContext) ScraperContextHolder.getCurrentContext()).
-                setVar_compat2b1(name, CommonUtil.createVariable(value));
+        scraper.getContext().setVar_compat2b1(name, CommonUtil.createVariable(value));
     }
 }

@@ -39,14 +39,13 @@
 package org.webharvest.runtime.scripting.impl;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.ScraperContextHolder;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -77,14 +76,6 @@ public class BeanShellScriptEngineTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         context = new ScraperContext(scraper);
-        ScraperContextHolder.init(context);
-        context.setLocalVar(BeanShellScriptEngine.BeanShellDelegate.class.getName(),
-                new NodeVariable(new BeanShellScriptEngine.BeanShellDelegate()));
-    }
-
-    @AfterMethod
-    public void after() {
-        ScraperContextHolder.clear();
     }
 
     @Test
@@ -103,7 +94,7 @@ public class BeanShellScriptEngineTest extends UnitilsTestNG {
                         "k = \"foo\" + sys.space + \"bar\";" +
                         "z = \"new\";" +
                         "String w = \"new\";" +
-                        "f(x.getWrappedObject(), y.getWrappedObject())").
+                        "f(x.getWrappedObject(), y.getWrappedObject())", new ScriptEngineFactory(null, scraper)).
                         evaluate(context), 7);
 
                 // 'x' and 'y' should remain untouched

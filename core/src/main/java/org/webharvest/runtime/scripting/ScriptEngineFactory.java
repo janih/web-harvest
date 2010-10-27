@@ -40,9 +40,8 @@ package org.webharvest.runtime.scripting;
 
 import org.webharvest.exception.ScriptEngineException;
 import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
-import org.webharvest.runtime.variables.NodeVariable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -58,12 +57,17 @@ import static org.apache.commons.lang.ObjectUtils.defaultIfNull;
  */
 public class ScriptEngineFactory {
 
-    private ScriptingLanguage defaultScriptingLanguage;
+    private final ScriptingLanguage defaultScriptingLanguage;
+    private final Scraper scraper;
 
     private Map<ScriptingLanguage, Map<String, ScriptEngine>> engineCachePerLanguage;
 
-    public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage, DynamicScopeContext context) {
+    // todo: for backward compat only. Think about better way to reuse methods and functions between scripts.
+    public final BeanShellScriptEngine.BeanShellDelegate bsh;
+
+    public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage, Scraper scraper) {
         this.defaultScriptingLanguage = defaultScriptingLanguage;
+        this.scraper = scraper;
         this.engineCachePerLanguage = new HashMap<ScriptingLanguage, Map<String, ScriptEngine>>();
 
         // initialize cache for each language
@@ -71,9 +75,7 @@ public class ScriptEngineFactory {
             engineCachePerLanguage.put(language, new HashMap<String, ScriptEngine>());
         }
 
-        // todo: for backward compat only. Think about better way to reuse methods and functions between scripts.
-        context.setLocalVar(BeanShellScriptEngine.BeanShellDelegate.class.getName(),
-                new NodeVariable(new BeanShellScriptEngine.BeanShellDelegate()));
+        bsh = new BeanShellScriptEngine.BeanShellDelegate(scraper);
     }
 
     public ScriptEngine getEngine(ScriptSource scriptSource) {
@@ -92,8 +94,8 @@ public class ScriptEngineFactory {
     private ScriptEngine createEngine(ScriptSource scriptSource) {
         try {
             return getLanguageNotNull(scriptSource.getLanguage()).engineClass.
-                    getConstructor(String.class).
-                    newInstance(scriptSource.getSourceCode());
+                    getConstructor(String.class, ScriptEngineFactory.class).
+                    newInstance(scriptSource.getSourceCode(), this);
         } catch (InstantiationException e) {
             throw new ScriptEngineException(e);
         } catch (IllegalAccessException e) {
@@ -111,5 +113,9 @@ public class ScriptEngineFactory {
 
     private ScriptingLanguage getLanguageNotNull(ScriptingLanguage language) {
         return (ScriptingLanguage) defaultIfNull(language, defaultScriptingLanguage);
+    }
+
+    public Scraper getScraper() {
+        return scraper;
     }
 }

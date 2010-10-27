@@ -71,7 +71,7 @@ public class ValueOfPluginTest extends UnitilsTestNG {
     public void before() {
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, contextMock.getMock())).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
     }
 
     @Test

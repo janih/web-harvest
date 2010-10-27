@@ -41,6 +41,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.mozilla.javascript.*;
 import org.webharvest.runtime.scripting.ScriptEngine;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.KeyValuePair;
 
@@ -54,7 +55,8 @@ public class JavascriptScriptEngine extends ScriptEngine {
     private transient Context jsContext;
     private transient ScriptableObject jsScope;
 
-    public JavascriptScriptEngine(final String sourceCode) {
+    public JavascriptScriptEngine(final String sourceCode, ScriptEngineFactory factory) {
+        super(factory);
         jsScript = (Script) ContextFactory.getGlobal().call(new ContextAction() {
             @Override
             public Object run(Context cx) {

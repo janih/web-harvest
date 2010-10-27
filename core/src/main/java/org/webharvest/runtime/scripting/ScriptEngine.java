@@ -46,6 +46,12 @@ import org.webharvest.utils.KeyValuePair;
  */
 public abstract class ScriptEngine {
 
+    protected final ScriptEngineFactory factory;
+
+    protected ScriptEngine(ScriptEngineFactory factory) {
+        this.factory = factory;
+    }
+
     public Object evaluate(DynamicScopeContext context) {
         try {
             beforeEvaluation();

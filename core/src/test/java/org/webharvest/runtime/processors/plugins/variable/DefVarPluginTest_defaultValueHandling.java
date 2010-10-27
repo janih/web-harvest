@@ -69,7 +69,7 @@ public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
         context = new ScraperContext(scraperMock.getMock());
         scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, context)).getScriptEngineFactory();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
     }
 
     @Test
