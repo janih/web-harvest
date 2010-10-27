@@ -103,6 +103,27 @@ public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
     }
 
     @Test
+    public void testExecutePlugin_default_emptyValue_varNotEmpty() throws Exception {
+        context.setLocalVar("empty", EmptyVariable.INSTANCE);
+        context.setLocalVar("zzz", new NodeVariable("default value"));
+        context.setLocalVar("x", new NodeVariable("some value"));
+        createPlugin(
+                "<def var='x' value='${empty}' default='${zzz}'/>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
+    }
+
+    @Test
+    public void testExecutePlugin_default_emptyBody_varNotEmpty() throws Exception {
+        context.setLocalVar("zzz", new NodeVariable("default value"));
+        context.setLocalVar("x", new NodeVariable("some value"));
+        createPlugin(
+                "<def var='x' default='${zzz}'><empty/></def>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
+    }
+
+    @Test
     public void testExecutePlugin_default_emptyValueAttribute() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
         createPlugin(
@@ -151,6 +172,15 @@ public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
 
     @Test
     public void testExecutePlugin_default_syntacticSugar_bodyIsEmpty() throws Exception {
+        context.setLocalVar("zzz", new NodeVariable("default value"));
+        createPlugin(
+                "<def var='x' default='${zzz}'><empty/></def>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
+    }
+
+    @Test
+    public void testExecutePlugin_default_syntacticSugar_bodyIsEmpty_varIs() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
         createPlugin(
                 "<def var='x' default='${zzz}'><empty/></def>",

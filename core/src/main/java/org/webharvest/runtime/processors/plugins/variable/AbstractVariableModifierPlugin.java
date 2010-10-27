@@ -98,7 +98,12 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
             value = executeBody(scraper, context);
         }
 
-        if (value.isEmpty() && StringUtils.isEmpty(valueExpr) && StringUtils.isNotEmpty(defaultExpr)) {
+        if (value.isEmpty()
+                && StringUtils.isEmpty(valueExpr)
+                && StringUtils.isEmpty(elementDef.getBodyText())
+                && !elementDef.hasOperations()
+                && StringUtils.isNotEmpty(defaultExpr)
+                ) {
             // Handle syntactic sugar: <def/set var="x" default="expr"/>  ::=  <def/set var="x" value="${x}" default="expr"/>
             value = (Variable) ObjectUtils.defaultIfNull(context.getVar(varName), EmptyVariable.INSTANCE);
         }
