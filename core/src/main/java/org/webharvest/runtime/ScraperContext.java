@@ -40,7 +40,9 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.Assert;
@@ -51,6 +53,7 @@ import org.webharvest.utils.Stack;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static java.text.MessageFormat.format;
 import static org.apache.commons.collections.IteratorUtils.filteredIterator;
 import static org.apache.commons.collections.IteratorUtils.toList;
 
@@ -77,6 +80,7 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Override
     public void setLocalVar(String name, Variable variable) {
+        checkIdentifier(name);
         Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         final Set<String> localVariableNames = variablesNamesStack.peek();
 
@@ -95,6 +99,7 @@ public class ScraperContext implements DynamicScopeContext {
     @Override
     @SuppressWarnings({"ConstantConditions"})
     public Variable replaceExistingVar(String name, Variable variable) {
+        checkIdentifier(name);
         final Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         Assert.isFalse(variableValueStack == null || variableValueStack.isEmpty(), "Variable {0} does not exist", name);
         return variableValueStack.replaceTop((Variable) ObjectUtils.defaultIfNull(variable, EmptyVariable.INSTANCE));
@@ -115,6 +120,7 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Override
     public Variable getVar(String name) {
+        checkIdentifier(name);
         final Stack<Variable> stack = centralReferenceTable.get(name);
         return (stack == null) ? null : stack.peek();
     }
@@ -158,6 +164,7 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     private Variable removeVarFromCRT(String varName) {
+        checkIdentifier(varName);
         final Stack<Variable> stack = centralReferenceTable.get(varName);
         try {
             return stack.pop();
@@ -165,6 +172,12 @@ public class ScraperContext implements DynamicScopeContext {
             if (stack.isEmpty()) {
                 centralReferenceTable.remove(varName);
             }
+        }
+    }
+
+    private void checkIdentifier(String identifier) {
+        if (StringUtils.isBlank(identifier)) {
+            throw new VariableException(format("Invalid identifier ''{0}''", identifier));
         }
     }
 
@@ -183,6 +196,7 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Deprecated
     public void setVar_compat2b1(final String name, Variable var) {
+        checkIdentifier(name);
         if (!loopBodyScope_compat2b1.peek()) {
             setLocalVar(name, var);
             return;
