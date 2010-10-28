@@ -58,11 +58,11 @@ public class BaseTemplater {
     public static String VAR_END = "}";
 
     public static String evaluateToString(String source, ScriptingLanguage language, Scraper scraper) {
-        final Variable result = executeToVariable(source, language, scraper);
+        final Variable result = evaluateToVariable(source, language, scraper);
         return result.isEmpty() ? null : result.toString();
     }
 
-    public static Variable executeToVariable(String source, ScriptingLanguage language, Scraper scraper) {
+    public static Variable evaluateToVariable(String source, ScriptingLanguage language, Scraper scraper) {
         if (source == null) {
             return EmptyVariable.INSTANCE;
         }

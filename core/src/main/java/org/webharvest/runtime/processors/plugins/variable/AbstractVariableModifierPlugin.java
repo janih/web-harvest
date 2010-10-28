@@ -92,7 +92,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
                     }
                 }
             } else {
-                value = BaseTemplater.executeToVariable(valueExpr, null, scraper);
+                value = BaseTemplater.evaluateToVariable(valueExpr, null, scraper);
             }
         }
 
@@ -114,7 +114,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
         if (value.isEmpty()) {
             // we tried our utmost but the value is still empty, so it's time to apply default
-            value = BaseTemplater.executeToVariable(defaultExpr, null, scraper);
+            value = BaseTemplater.evaluateToVariable(defaultExpr, null, scraper);
         }
 
         doExecute(context, varName, value);
