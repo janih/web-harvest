@@ -49,7 +49,6 @@ import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
@@ -57,7 +56,10 @@ import org.webharvest.utils.XmlUtil;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * XQuery processor.
@@ -124,13 +126,12 @@ public class XQueryProcessor extends BaseProcessor<XQueryDef> {
                     BodyProcessor bodyProcessor = new BodyProcessor(externalParamDef);
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
-                    ListVariable listVar = (ListVariable) bodyProcessor.run(scraper, context);
-                    debug(externalParamDef, scraper, listVar);
+                    Variable variable = bodyProcessor.run(scraper, context);
+                    debug(externalParamDef, scraper, variable);
 
-                    Iterator it = listVar.toList().iterator();
                     List<Object> paramList = new ArrayList<Object>();
-                    while (it.hasNext()) {
-                        Variable currVar = (Variable) it.next();
+                    for (Object o : variable.toList()) {
+                        Variable currVar = (Variable) o;
                         paramList.add(castSimpleValue(externalParamType, currVar, sqc));
                     }
 
