@@ -80,12 +80,16 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
             final Matcher matcher = identifierExprPattern.matcher(valueExpr);
             if (matcher.matches()) {
                 // expression is like "${identifier}", so we can omit evaluation process and simply look up that variable in the context
-                value = context.getVar(matcher.group());
-                if (value == null && StringUtils.isNotEmpty(defaultExpr)) {
-                    // variable is not defined, but since 'default' attr is specified we can handle this
-                    value = EmptyVariable.INSTANCE;
-                } else {
-                    throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", varName));
+                final String identifier = matcher.group(1);
+                value = context.getVar(identifier);
+                if (value == null) {
+                    // variable 'identifier' is not defined...
+                    if (StringUtils.isNotEmpty(defaultExpr)) {
+                        //... but since 'default' attr is specified it's Ok
+                        value = EmptyVariable.INSTANCE;
+                    } else {
+                        throw new VariableException(MessageFormat.format("Variable ''{0}'' is not defined!", identifier));
+                    }
                 }
             } else {
                 value = BaseTemplater.executeToVariable(valueExpr, null, scraper);

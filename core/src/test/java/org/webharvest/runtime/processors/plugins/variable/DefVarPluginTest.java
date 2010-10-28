@@ -72,6 +72,14 @@ public class DefVarPluginTest extends UnitilsTestNG {
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
     }
 
+    @Test
+    public void testExecutePlugin_existingValue() throws Exception {
+        context.setLocalVar("some", new NodeVariable(123));
+        createPlugin("<def var='x' value='${some}'/>",
+                DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+        assertReflectionEquals(new NodeVariable(123), context.getVar("x"));
+    }
+
     @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notExistingValue() throws Exception {
         createPlugin("<def var='x' value='${notExistingVar}'/>",
