@@ -52,9 +52,7 @@ public class SleepPlugin extends WebHarvestPlugin {
         final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, scraper);
         setProperty("Milliseconds", millis);
         if (millis > 0) {
-            synchronized (this) {
-                wait(millis);
-            }
+            Thread.sleep(millis);
         }
         return EmptyVariable.INSTANCE;
     }
