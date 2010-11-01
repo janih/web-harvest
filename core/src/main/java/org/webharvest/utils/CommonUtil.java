@@ -517,7 +517,10 @@ public class CommonUtil {
             return false;
         }
         link = link.trim().toLowerCase();
-        return link.startsWith("http://") || link.startsWith("https://") || link.startsWith("file://");
+        return link.startsWith("http://") ||
+                link.startsWith("https://") ||
+                link.startsWith("file://") ||
+                link.startsWith("jar:");
     }
 
     /**
