@@ -85,16 +85,11 @@ public class XmlUtil {
      */
     public static ListVariable createListOfXmlNodes(XQueryExpression exp, DynamicQueryContext dynamicContext) throws XPathException {
         final SequenceIterator iter = exp.iterator(dynamicContext);
+        final ListVariable listVariable = new ListVariable();
 
-        ListVariable listVariable = new ListVariable();
-        while (true) {
-            Item item = iter.next();
-            if (item == null) {
-                break;
-            }
-
-            XmlNodeWrapper value = new XmlNodeWrapper(item);
-            listVariable.addVariable(new NodeVariable(value));
+        for (Item item = iter.next(); item != null; item = iter.next()) {
+            listVariable.addVariable(new NodeVariable(
+                    new XmlNodeWrapper(item, exp.getExecutable().getDefaultOutputProperties())));
         }
 
         return listVariable;

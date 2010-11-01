@@ -60,6 +60,13 @@ import java.util.*;
  */
 public class CommonUtil {
 
+    private static final Properties DEFAULT_OUTPUT_PROPERTIES = new Properties();
+
+    static {
+        DEFAULT_OUTPUT_PROPERTIES.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        DEFAULT_OUTPUT_PROPERTIES.setProperty(OutputKeys.INDENT, "yes");
+    }
+
     /**
      * Contains pair of intger values
      */
@@ -389,13 +396,14 @@ public class CommonUtil {
     /**
      * Serializes item after XPath or XQuery processor execution using Saxon.
      */
-    public static String serializeItem(Item item) throws XPathException {
+    public static String serializeItem(Item item, Properties outputProperties) throws XPathException {
         if (item instanceof NodeInfo) {
             int type = ((NodeInfo) item).getNodeKind();
             if (type == Type.DOCUMENT || type == Type.ELEMENT) {
-                Properties props = new Properties();
-                props.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                props.setProperty(OutputKeys.INDENT, "yes");
+
+
+                final Properties props = new Properties(DEFAULT_OUTPUT_PROPERTIES);
+                props.putAll(outputProperties);
 
                 StringWriter stringWriter = new java.io.StringWriter();
                 QueryResult.serialize((NodeInfo) item, new StreamResult(stringWriter), props);
