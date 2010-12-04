@@ -95,6 +95,7 @@
 					<xs:attribute name="usecdata"/>
 					<xs:attribute name="specialentities"/>
 					<xs:attribute name="unicodechars"/>
+					<xs:attribute name="nbsp-to-sp"/>
 					<xs:attribute name="omitunknowntags"/>
 					<xs:attribute name="treatunknowntagsascontent"/>
 					<xs:attribute name="omitdeprtags"/>

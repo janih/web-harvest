@@ -9,9 +9,9 @@
 <h3>Syntax</h3>
 <div>
 <pre>&lt;html-to-xml outputtype="..." advancedxmlescape="..." usecdata="..."
-             specialentities="..." unicodechars="..." omitunknowntags="..."
-             treatunknowntagsascontent="..." omitdeprtags="..."
-             treatdeprtagsascontent="..." omitcomments="..."
+             specialentities="..." unicodechars="..." nbsp-to-sp="..."
+             omitunknowntags="..." treatunknowntagsascontent="..."
+             omitdeprtags="..." treatdeprtagsascontent="..." omitcomments="..."
              omithtmlenvelope="..." allowmultiwordattributes="..."
              allowhtmlinsideattributes="..." namespacesaware="..."
              prunetags="..."&gt;
@@ -78,6 +78,15 @@
                 If true, HTML characters represented by
                 their codes in form &amp;#XXXX; are replaced with real unicode
                 characters (i.e. &amp;#1078; is replaces with &#1078;).
+            </td>
+        </tr>
+        <tr>
+            <td>nbsp-to-sp</td>
+            <td>no</td>
+            <td>false</td>
+            <td>
+                If true, all occurrences of the <em>Non-breaking space</em> character (&amp;nbsp;, &amp;x#A0;)
+                will be replaced by a normal space character (&amp;x#20;).
             </td>
         </tr>
         <tr>

@@ -46,6 +46,7 @@ public class HtmlToXmlDef extends BaseElementDef {
     private String useCdataForScriptAndStyle;
     private String translateSpecialEntities;
     private String recognizeUnicodeChars;
+    private String replaceNbspWithSp;
     private String omitUnknownTags;
     private String treatUnknownTagsAsContent;
     private String omitDeprecatedTags;
@@ -69,6 +70,7 @@ public class HtmlToXmlDef extends BaseElementDef {
         this.useCdataForScriptAndStyle = xmlNode.getAttribute("usecdata");
         this.translateSpecialEntities = xmlNode.getAttribute("specialentities");
         this.recognizeUnicodeChars = xmlNode.getAttribute("unicodechars");
+        this.replaceNbspWithSp = xmlNode.getAttribute("nbsp-to-sp");
         this.omitUnknownTags = xmlNode.getAttribute("omitunknowntags");
         this.treatUnknownTagsAsContent = xmlNode.getAttribute("treatunknowntagsascontent");
         this.omitDeprecatedTags = xmlNode.getAttribute("omitdeprtags");
@@ -107,6 +109,10 @@ public class HtmlToXmlDef extends BaseElementDef {
 
     public String getRecognizeUnicodeChars() {
         return recognizeUnicodeChars;
+    }
+
+    public String getReplaceNbspWithSp() {
+        return replaceNbspWithSp;
     }
 
     public String getOmitUnknownTags() {
@@ -164,5 +170,5 @@ public class HtmlToXmlDef extends BaseElementDef {
     public String getBooleanAtts() {
         return booleanAtts;
     }
-    
+
 }

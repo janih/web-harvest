@@ -36,6 +36,7 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.htmlcleaner.*;
 import org.webharvest.definition.HtmlToXmlDef;
 import org.webharvest.exception.ParserException;
@@ -82,6 +83,8 @@ public class HtmlToXmlProcessor extends BaseProcessor<HtmlToXmlDef> {
         if (recognizeUnicodeChars != null) {
             properties.setRecognizeUnicodeChars(CommonUtil.isBooleanTrue(recognizeUnicodeChars));
         }
+
+        final String replaceNbspWithSp = BaseTemplater.evaluateToString(elementDef.getReplaceNbspWithSp(), null, scraper);
 
         final String omitUnknownTags = BaseTemplater.evaluateToString(elementDef.getOmitUnknownTags(), null, scraper);
         if (omitUnknownTags != null) {
@@ -158,20 +161,24 @@ public class HtmlToXmlProcessor extends BaseProcessor<HtmlToXmlDef> {
         String outputType = BaseTemplater.evaluateToString(elementDef.getOutputType(), null, scraper);
 
         try {
-            TagNode node = cleaner.clean(body.toString());
-            String result;
-
+            XmlSerializer xmlSerializer;
             if ("simple".equalsIgnoreCase(outputType)) {
-                result = new SimpleXmlSerializer(properties).getXmlAsString(node);
+                xmlSerializer = new SimpleXmlSerializer(properties);
             } else if ("pretty".equalsIgnoreCase(outputType)) {
-                result = new PrettyXmlSerializer(properties).getXmlAsString(node);
+                xmlSerializer = new PrettyXmlSerializer(properties);
             } else if ("browser-compact".equalsIgnoreCase(outputType)) {
-                result = new BrowserCompactXmlSerializer(properties).getXmlAsString(node);
+                xmlSerializer = new BrowserCompactXmlSerializer(properties);
             } else {
-                result = new CompactXmlSerializer(properties).getXmlAsString(node);
+                xmlSerializer = new CompactXmlSerializer(properties);
             }
 
-            return new NodeVariable(result);
+            final String xmlAsString = xmlSerializer.getAsString(cleaner.clean(body.toString()));
+
+            return new NodeVariable(
+                    BooleanUtils.toBoolean(replaceNbspWithSp)
+                            ? xmlAsString.replace('\u00A0', ' ')
+                            : xmlAsString);
+
         } catch (IOException e) {
             throw new ParserException(e);
         }

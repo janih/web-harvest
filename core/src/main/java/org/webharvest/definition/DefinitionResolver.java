@@ -86,7 +86,7 @@ public class DefinitionResolver {
         elementInfos.put("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
         elementInfos.put("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
         elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +
-                "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars," +
+                "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars,nbsp-to-sp," +
                 "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
                 "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
                 "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts"));
