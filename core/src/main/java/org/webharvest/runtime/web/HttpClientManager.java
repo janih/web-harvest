@@ -44,9 +44,11 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.*;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.BooleanUtils;
+import org.slf4j.Logger;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -57,6 +59,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * HTTP client functionality.
@@ -70,31 +74,35 @@ public class HttpClientManager {
         Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), 443));
     }
 
-    private HttpClient client;
+    private final Logger logger;
+    private final HttpClient client;
+    private final HttpInfo httpInfo;
 
-    private HttpInfo httpInfo;
+    public HttpClientManager(Logger logger) {
+        this.logger = logger;
+        this.client = new HttpClient();
+        this.httpInfo = new HttpInfo(client);
 
-    /**
-     * Constructor.
-     */
-    public HttpClientManager() {
-        client = new HttpClient();
-        httpInfo = new HttpInfo(client);
-
-        HttpClientParams clientParams = new HttpClientParams();
+        final HttpClientParams clientParams = new HttpClientParams();
         clientParams.setBooleanParameter("http.protocol.allow-circular-redirects", true);
-        client.setParams(clientParams);
+        this.client.setParams(clientParams);
     }
 
     public void setCookiePolicy(String cookiePolicy) {
         if ("browser".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+            // http://hc.apache.org/httpclient-3.x/cookies.html
+            client.getParams().setParameter(HttpMethodParams.SINGLE_COOKIE_HEADER, Boolean.TRUE);
+
         } else if ("ignore".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+
         } else if ("netscape".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.NETSCAPE);
+
         } else if ("rfc_2109".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+
         } else {
             client.getParams().setCookiePolicy(CookiePolicy.DEFAULT);
         }
@@ -121,7 +129,7 @@ public class HttpClientManager {
 
 
     /**
-     * Defines user credintials for the HTTP proxy server
+     * Defines user credentials for the HTTP proxy server
      *
      * @param username
      * @param password
@@ -143,7 +151,7 @@ public class HttpClientManager {
             String username,
             String password,
             Map<String, HttpParamInfo> params,
-            Map headers) {
+            Map headers, int retryAttempts, long retryDelay, double retryDelayFactor) throws InterruptedException {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
@@ -204,19 +212,47 @@ public class HttpClientManager {
         }
 
         try {
-            method = executeFollowingRedirects(method, url, followRedirects);
-
-            final HttpResponseWrapper httpResponseWrapper = new HttpResponseWrapper(method);
-
-            // updates HTTP info with response's details
-            this.httpInfo.setResponse(httpResponseWrapper);
-
-            return httpResponseWrapper;
-        } catch (IOException e) {
-            throw new org.webharvest.exception.HttpException("IO error during HTTP execution for URL: " + url, e);
+            return doExecute(url, method, followRedirects, retryAttempts, retryDelay, retryDelayFactor);
         } finally {
             method.releaseConnection();
         }
+    }
+
+    private HttpResponseWrapper doExecute(String url, HttpMethodBase method, Boolean followRedirects,
+                                          int retryAttempts, long retryDelay, double retryDelayFactor) throws InterruptedException {
+        int attemptsRemain = retryAttempts;
+        do {
+            boolean wasException = false;
+            try {
+                method = executeFollowingRedirects(method, url, followRedirects);
+            } catch (IOException e) {
+                if (attemptsRemain == 0) {
+                    throw new org.webharvest.exception.HttpException("IO error during HTTP execution for URL: " + url, e);
+                }
+                wasException = true;
+            }
+            if (!wasException
+                    && method.getStatusCode() != HttpStatus.SC_BAD_GATEWAY
+                    && method.getStatusCode() != HttpStatus.SC_SERVICE_UNAVAILABLE
+                    && method.getStatusCode() != HttpStatus.SC_GATEWAY_TIMEOUT
+                    && method.getStatusCode() != 509 /*Bandwidth Limit Exceeded (Apache bw/limited extension)*/) {
+                // success.
+                break;
+            }
+            if (attemptsRemain == 0) {
+                throw new org.webharvest.exception.HttpException("HTTP Status: " + method.getStatusCode() + ", Url: " + url);
+            }
+            final long delayBeforeRetry = (long) (retryDelay * (Math.pow(retryDelayFactor, retryAttempts - attemptsRemain)));
+            logger.warn("HTTP Status: {}; URL: [{}]; Waiting for {} second(s) before retrying (attempt {} of {})...", new Object[]{
+                    method.getStatusCode(), url, MILLISECONDS.toSeconds(delayBeforeRetry), retryAttempts - attemptsRemain + 1, retryAttempts});
+            Thread.sleep(delayBeforeRetry);
+            attemptsRemain--;
+        } while (true);
+
+        final HttpResponseWrapper httpResponseWrapper = new HttpResponseWrapper(method);
+        // updates HTTP info with response's details
+        this.httpInfo.setResponse(httpResponseWrapper);
+        return httpResponseWrapper;
     }
 
     private HttpMethodBase executeFollowingRedirects(HttpMethodBase method, String url, Boolean followRedirects) throws IOException {

@@ -82,7 +82,7 @@ public class DefinitionResolver {
         elementInfos.put("file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive"));
         elementInfos.put("var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite"));
         elementInfos.put("var", new ElementInfo("var", VarDef.class, "", "id,!name"));
-        elementInfos.put("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,multipart,charset,username,password,cookie-policy"));
+        elementInfos.put("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy"));
         elementInfos.put("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
         elementInfos.put("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
         elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +

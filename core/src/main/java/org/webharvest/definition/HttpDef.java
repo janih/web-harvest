@@ -38,7 +38,7 @@ package org.webharvest.definition;
 
 import org.webharvest.utils.CommonUtil;
 
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Definition of HTTP processor.
@@ -48,6 +48,10 @@ public class HttpDef extends BaseElementDef {
     public static final String DEFAULT_METHOD = "get";
     public static final String DEFAULT_MULTIPART = "false";
 
+    private static final String DEFAULT_RETRY_ATTEMPTS = Integer.toString(5);
+    private static final String DEFAULT_RETRY_DELAY = Long.toString(TimeUnit.SECONDS.toMillis(10));
+    private static final String DEFAULT_RETRY_DELAY_FACTOR = Double.toString(2);
+
     private String method;
     private String multipart;
     private String url;
@@ -56,6 +60,10 @@ public class HttpDef extends BaseElementDef {
     private String password;
     private String cookiePolicy;
     private String followRedirects;
+
+    private String retryAttempts;
+    private String retryDelay;
+    private String retryDelayFactor;
 
     public HttpDef(XmlNode xmlNode) {
         super(xmlNode);
@@ -68,6 +76,10 @@ public class HttpDef extends BaseElementDef {
         this.password = xmlNode.getAttribute("password");
         this.cookiePolicy = xmlNode.getAttribute("cookie-policy");
         this.followRedirects = xmlNode.getAttribute("follow-redirects");
+
+        this.retryAttempts = CommonUtil.nvl(xmlNode.getAttribute("retry-attempts"), DEFAULT_RETRY_ATTEMPTS);
+        this.retryDelay = CommonUtil.nvl(xmlNode.getAttribute("retry-delay"), DEFAULT_RETRY_DELAY);
+        this.retryDelayFactor = CommonUtil.nvl(xmlNode.getAttribute("retry-delay-factor"), DEFAULT_RETRY_DELAY_FACTOR);
     }
 
     public String getMethod() {
@@ -106,4 +118,15 @@ public class HttpDef extends BaseElementDef {
         return "http";
     }
 
+    public String getRetryAttempts() {
+        return retryAttempts;
+    }
+
+    public String getRetryDelay() {
+        return retryDelay;
+    }
+
+    public String getRetryDelayFactor() {
+        return retryDelayFactor;
+    }
 }

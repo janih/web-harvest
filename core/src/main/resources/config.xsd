@@ -70,6 +70,9 @@
 					<xs:attribute name="username"/>
 					<xs:attribute name="password"/>
 					<xs:attribute name="cookie-policy"/>
+					<xs:attribute name="retry-attempts"/>
+					<xs:attribute name="retry-delay"/>
+					<xs:attribute name="retry-delay-factor"/>
 					<xs:attribute name="id"/>
 				</xs:complexType>
 			</xs:element>

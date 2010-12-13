@@ -67,7 +67,7 @@ public class RegexpProcessorTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
-        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
+        scraperMock.returns(new HttpClientManager(logger)).getHttpClientManager();
 
         context = new ScraperContext(scraperMock.getMock());
     }

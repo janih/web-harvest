@@ -66,7 +66,7 @@ import java.util.*;
 @SuppressWarnings({"UnusedDeclaration"})
 public class Scraper {
 
-    private static Logger logger = LoggerFactory.getLogger(Scraper.class);
+    private static final Logger logger = LoggerFactory.getLogger(Scraper.class);
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_RUNNING = 1;
@@ -119,7 +119,7 @@ public class Scraper {
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
 
-        this.httpClientManager = new HttpClientManager();
+        this.httpClientManager = new HttpClientManager(logger);
 
         this.context = new ScraperContext(this);
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));

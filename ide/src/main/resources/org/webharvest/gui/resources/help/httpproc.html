@@ -94,6 +94,34 @@
                 Sets whether or not the HTTP method should automatically follow HTTP redirects (status code 302, etc.)
             </td>
         </tr>
+        <tr>
+            <td>retry-attempts</td>
+            <td>no</td>
+            <td>5</td>
+            <td>
+                How many retries should Web-Harvest attempt to get a meaningful response from the server.
+                "Meaningful" means any valid response excepts: <em>502 (Bad Gateway)</em>, <em>503 (Service Unavailable)</em>,
+                <em>504 (Gateway Timeout)</em> and <em>509 (Bandwidth Limit Exceeded)</em>
+            </td>
+        </tr>
+        <tr>
+            <td>retry-delay</td>
+            <td>no</td>
+            <td>10 seconds</td>
+            <td>
+                Delay in milliseconds before retrying.
+            </td>
+        </tr>
+        <tr>
+            <td>retry-delay-factor</td>
+            <td>no</td>
+            <td>2</td>
+            <td>
+                Multiplier for <em>retry-delay</em> value which is subsequently applied to it for each subsequent execution attempt.
+                For example, if <em>retry-delay</em> equals 10 sec and <em>retry-delay-factor</em> equals 2,
+                Web-Harvest will wait for 10 seconds before 1st retry, 20 seconds before 2nd, 40 before 3rd, 80 before 4th and so on.
+            </td>
+        </tr>
     </table>
 </div>
 

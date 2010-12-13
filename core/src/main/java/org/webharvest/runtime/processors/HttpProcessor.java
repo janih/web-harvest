@@ -86,11 +86,17 @@ public class HttpProcessor extends BaseProcessor<HttpDef> {
         final String password = BaseTemplater.evaluateToString(elementDef.getPassword(), null, scraper);
         final String cookiePolicy = BaseTemplater.evaluateToString(elementDef.getCookiePolicy(), null, scraper);
 
+        final int retryAttempts = BaseTemplater.evaluateToVariable(elementDef.getRetryAttempts(), null, scraper).toInt();
+        final long retryDelay = BaseTemplater.evaluateToVariable(elementDef.getRetryDelay(), null, scraper).toLong();
+        final double retryDelayFactor = BaseTemplater.evaluateToVariable(elementDef.getRetryDelayFactor(), null, scraper).toDouble();
+
         String charset = specifiedCharset;
 
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
+
+        final String encodedUrl = CommonUtil.encodeUrl(url, charset);
 
         // executes body of HTTP processor
         new BodyProcessor(elementDef).execute(scraper, context);
@@ -98,7 +104,9 @@ public class HttpProcessor extends BaseProcessor<HttpDef> {
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);
 
-        final HttpResponseWrapper res = manager.execute(method, followRedirects, isMultipart, url, charset, username, password, httpParams, httpHeaderMap);
+        final HttpResponseWrapper res = manager.execute(
+                method, followRedirects, isMultipart, encodedUrl, charset, username, password,
+                httpParams, httpHeaderMap, retryAttempts, retryDelay, retryDelayFactor);
 
         scraper.removeRunningHttpProcessor();
 
