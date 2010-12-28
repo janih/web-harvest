@@ -37,6 +37,7 @@
 package org.webharvest.runtime.variables;
 
 import org.webharvest.exception.VariableException;
+import org.webharvest.utils.XmlNodeWrapper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -109,8 +110,8 @@ public class NodeVariable extends Variable {
 
     public boolean isEmpty() {
         return data == null
-                || data instanceof CharSequence
-                && ((CharSequence) data).length() == 0;
+                || data instanceof XmlNodeWrapper && ((XmlNodeWrapper) data).isEmpty()
+                || data instanceof CharSequence && ((CharSequence) data).length() == 0;
     }
 
     public Object getWrappedObject() {

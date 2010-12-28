@@ -2,6 +2,7 @@ package org.webharvest.utils;
 
 import net.sf.saxon.om.Item;
 import net.sf.saxon.trans.XPathException;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.ScraperXQueryException;
 
 import java.util.Properties;
@@ -32,5 +33,9 @@ public class XmlNodeWrapper {
         }
 
         return stringValue;
+    }
+
+    public boolean isEmpty() {
+        return StringUtils.isEmpty(item.getStringValue());
     }
 }
