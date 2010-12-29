@@ -22,7 +22,7 @@ public class XmlNodeWrapper {
         this.outputProperties = properties;
     }
 
-    public String toString() {
+    private String asString() {
         if (stringValue == null) {
             try {
                 stringValue = CommonUtil.serializeItem(item, outputProperties);
@@ -36,6 +36,10 @@ public class XmlNodeWrapper {
     }
 
     public boolean isEmpty() {
-        return StringUtils.isEmpty(item.getStringValue());
+        return StringUtils.isEmpty(asString());
+    }
+
+    public String toString() {
+        return asString();
     }
 }
