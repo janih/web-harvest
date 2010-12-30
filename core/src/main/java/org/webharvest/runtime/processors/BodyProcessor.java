@@ -29,7 +29,10 @@ public class BodyProcessor extends BaseProcessor<BaseElementDef> {
 
         final ListVariable result = new ListVariable();
         for (IElementDef def : defs) {
-            result.addVariable(ProcessorResolver.createProcessor(def).run(scraper, context));
+            final Variable variable = ProcessorResolver.createProcessor(def).run(scraper, context);
+            if (!variable.isEmpty()) {
+                result.addVariable(variable);
+            }
         }
         return result;
     }
