@@ -220,7 +220,9 @@ public class HttpClientManager {
 
     private HttpResponseWrapper doExecute(String url, HttpMethodBase method, Boolean followRedirects,
                                           int retryAttempts, long retryDelay, double retryDelayFactor) throws InterruptedException {
+
         int attemptsRemain = retryAttempts;
+
         do {
             boolean wasException = false;
             try {
@@ -230,7 +232,9 @@ public class HttpClientManager {
                     throw new org.webharvest.exception.HttpException("IO error during HTTP execution for URL: " + url, e);
                 }
                 wasException = true;
+                logger.warn("Exception occurred during executing HTTP method {}: {}", method.getName(), e.getMessage());
             }
+
             if (!wasException
                     && method.getStatusCode() != HttpStatus.SC_BAD_GATEWAY
                     && method.getStatusCode() != HttpStatus.SC_SERVICE_UNAVAILABLE
@@ -242,9 +246,12 @@ public class HttpClientManager {
             if (attemptsRemain == 0) {
                 throw new org.webharvest.exception.HttpException("HTTP Status: " + method.getStatusCode() + ", Url: " + url);
             }
+
             final long delayBeforeRetry = (long) (retryDelay * (Math.pow(retryDelayFactor, retryAttempts - attemptsRemain)));
+
             logger.warn("HTTP Status: {}; URL: [{}]; Waiting for {} second(s) before retrying (attempt {} of {})...", new Object[]{
-                    method.getStatusCode(), url, MILLISECONDS.toSeconds(delayBeforeRetry), retryAttempts - attemptsRemain + 1, retryAttempts});
+                    method.getStatusLine(), url, MILLISECONDS.toSeconds(delayBeforeRetry), retryAttempts - attemptsRemain + 1, retryAttempts});
+
             Thread.sleep(delayBeforeRetry);
             attemptsRemain--;
         } while (true);
