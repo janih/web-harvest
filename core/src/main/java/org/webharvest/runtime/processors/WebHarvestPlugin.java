@@ -41,6 +41,7 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.Assert;
 import org.webharvest.utils.CommonUtil;
 
 import java.util.Map;
@@ -128,6 +129,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     public final Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
         // pre processing
         final Variable variable = executePlugin(scraper, context);
+        Assert.notNull(variable, "Plugin {0} returned 'null' instead of 'empty'", getClass().getName());
         // post processing
         return variable;
     }
