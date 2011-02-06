@@ -50,6 +50,7 @@ import org.webharvest.runtime.web.HttpInfo;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -516,11 +517,12 @@ public class CommonUtil {
         if (link == null) {
             return false;
         }
-        link = link.trim().toLowerCase();
-        return link.startsWith("http://") ||
-                link.startsWith("https://") ||
-                link.startsWith("file://") ||
-                link.startsWith("jar:");
+        try {
+            new URL(link);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     /**
