@@ -150,6 +150,7 @@ public class ScraperContext implements DynamicScopeContext {
             return callable.call();
 
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw e;
         } catch (RuntimeException e) {
             throw e;

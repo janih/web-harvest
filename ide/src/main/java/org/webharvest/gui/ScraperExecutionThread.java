@@ -59,9 +59,6 @@ public class ScraperExecutionThread extends Thread {
             scraper.execute();
         } catch (RuntimeException e) {
             scraper.informListenersAboutError(e);
-        } catch (InterruptedException e) {
-            scraper.getLogger().warn(e.getMessage(), e);
-            // dying...
         }
     }
 

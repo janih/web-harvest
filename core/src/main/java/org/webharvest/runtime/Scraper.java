@@ -104,7 +104,7 @@ public class Scraper {
 
     private List<ScraperRuntimeListener> scraperRuntimeListeners = new LinkedList<ScraperRuntimeListener>();
 
-    private int status = STATUS_READY;
+    private volatile int status = STATUS_READY;
 
     private String message = null;
 
@@ -153,7 +153,7 @@ public class Scraper {
         }
     }
 
-    public Variable execute(List<IElementDef> ops) throws InterruptedException {
+    public Variable execute(List<IElementDef> ops) {
         this.setStatus(STATUS_RUNNING);
 
         // inform al listeners that execution is just about to start
@@ -168,6 +168,9 @@ public class Scraper {
                     processor.run(this, context);
                 }
             }
+        } catch (InterruptedException e) {
+            setStatus(STATUS_STOPPED);
+            Thread.currentThread().interrupt();
         } finally {
             releaseDBConnections();
         }
@@ -175,7 +178,7 @@ public class Scraper {
         return EmptyVariable.INSTANCE;
     }
 
-    public void execute() throws InterruptedException {
+    public void execute() {
         long startTime = System.currentTimeMillis();
 
         execute(configuration.getOperations());
@@ -420,7 +423,8 @@ public class Scraper {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    throw new DatabaseException(e);
+                    // There is nothing we can do with this.
+                    // We must ignore this exception to let the rest connections in the pool to get a chance to be released.
                 }
             }
         }

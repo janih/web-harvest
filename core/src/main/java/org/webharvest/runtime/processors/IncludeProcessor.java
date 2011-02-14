@@ -90,6 +90,9 @@ public class IncludeProcessor extends BaseProcessor<IncludeDef> {
         try {
             includedConfig = isUrl ? new ScraperConfiguration(new URL(fullPath)) : new ScraperConfiguration(fullPath);
             scraper.execute(includedConfig.getOperations());
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
             return EmptyVariable.INSTANCE;
         } catch (FileNotFoundException e) {
             throw new FileException("Cannot include configuration file " + fullPath, e);

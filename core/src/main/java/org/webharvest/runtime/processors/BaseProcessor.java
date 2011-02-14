@@ -88,6 +88,10 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
             return EmptyVariable.INSTANCE;
         }
 
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
         if (scraperStatus == Scraper.STATUS_PAUSED) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
             synchronized (scraper) {
