@@ -37,7 +37,6 @@
 package org.webharvest.utils;
 
 import net.sf.saxon.trans.XPathException;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.ScraperXPathException;
 import org.webharvest.runtime.Scraper;
@@ -197,6 +196,10 @@ public class SystemUtilities {
 
     public String getWorkingDir() {
         return scraper.getWorkingDir();
+    }
+
+    public String getCurrentDir() {
+        return scraper.getConfiguration().getSourceFile().getParentFile().getAbsolutePath();
     }
 
 }
