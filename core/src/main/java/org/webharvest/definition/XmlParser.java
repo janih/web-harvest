@@ -114,7 +114,7 @@ public class XmlParser extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         XmlNode currNode = getCurrentNode();
-        XmlNode newNode = new XmlNode(localName, CommonUtil.isEmptyString(uri) ? Constants.CORE_URI : uri, currNode);
+        XmlNode newNode = new XmlNode(localName, qName, CommonUtil.isEmptyString(uri) ? Constants.CORE_URI : uri, currNode);
         newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());
         elementStack.push(newNode);
 

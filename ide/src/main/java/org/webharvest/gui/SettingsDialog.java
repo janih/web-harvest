@@ -490,8 +490,6 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     }
 
     private void undoPlugins() {
-        Map externalPlugins = DefinitionResolver.getExternalPlugins();
-
         Settings settings = ide.getSettings();
         String[] plugins = settings.getPlugins();
         Set pluginSet = new HashSet();

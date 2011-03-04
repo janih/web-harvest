@@ -352,7 +352,7 @@ public class Settings implements Serializable {
             try {
                 DefinitionResolver.registerPlugin(plugins[i]);
             } catch (PluginException e) {
-                // do nothing - try silently to register plugins
+                e.printStackTrace();
             }
         }
 

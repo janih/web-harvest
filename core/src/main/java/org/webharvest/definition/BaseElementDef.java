@@ -75,7 +75,7 @@ public class BaseElementDef implements IElementDef {
             this.lineNumber = node.getLineNumber();
             this.columnNumber = node.getColumnNumber();
 
-            this.id = (String) node.get("id");
+            this.id = node.getAttribute("id");
 
             List elementList = node.getElementList();
 

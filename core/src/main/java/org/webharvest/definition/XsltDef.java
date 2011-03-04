@@ -47,11 +47,11 @@ public class XsltDef extends BaseElementDef {
     public XsltDef(XmlNode xmlNode) {
         super(xmlNode, false);
         
-        XmlNode xmlDefNode = (XmlNode) xmlNode.get("xml[0]");
+        XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml"));
         DefinitionResolver.validate(xmlDefNode);
         xmlDef = xmlDefNode == null ? null : new BaseElementDef(xmlDefNode, "xml");
 
-        XmlNode stylesheetDefNode = (XmlNode) xmlNode.get("stylesheet[0]");
+        XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet"));
         DefinitionResolver.validate(stylesheetDefNode);
         stylesheetDef = stylesheetDefNode == null ? null : new BaseElementDef(stylesheetDefNode, "stylesheet");
     }

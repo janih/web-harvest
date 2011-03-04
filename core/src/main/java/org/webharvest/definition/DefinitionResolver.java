@@ -65,77 +65,89 @@ import java.util.*;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DefinitionResolver {
 
-    private static Map<String, ElementInfo> elementInfos = new TreeMap<String, ElementInfo>();
+    private static Map<ElementName, ElementInfo> elementInfos = new TreeMap<ElementName, ElementInfo>();
 
-    // map containing pairs (class name, plugin name) of externally registered plugins
-    private static Map<String, String> externalPlugins = new LinkedHashMap<String, String>();
+    // map containing pairs (class name, plugin element name) of externally registered plugins
+    private static Map<String, ElementName> externalPlugins = new LinkedHashMap<String, ElementName>();
 
     // map of external plugin dependances
-    private static Map<String, Class[]> externalPluginDependaces = new HashMap<String, Class[]>();
+    private static Map<ElementName, Class[]> externalPluginDependences = new HashMap<ElementName, Class[]>();
 
     // defines all valid elements of Web-Harvest configuration file
 
     static {
-        elementInfos.put("config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id"));
-        elementInfos.put("empty", new ElementInfo("empty", EmptyDef.class, null, "id"));
-        elementInfos.put("text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter"));
-        elementInfos.put("file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive"));
-        elementInfos.put("var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite"));
-        elementInfos.put("var", new ElementInfo("var", VarDef.class, "", "id,!name"));
-        elementInfos.put("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy"));
-        elementInfos.put("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
-        elementInfos.put("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
-        elementInfos.put("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +
+        registerInternalElement("config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id"));
+        registerInternalElement("empty", new ElementInfo("empty", EmptyDef.class, null, "id"));
+        registerInternalElement("text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter"));
+        registerInternalElement("file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive"));
+        registerInternalElement("var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite"));
+        registerInternalElement("var", new ElementInfo("var", VarDef.class, "", "id,!name"));
+        registerInternalElement("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy"));
+        registerInternalElement("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
+        registerInternalElement("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
+        registerInternalElement("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +
                 "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars,nbsp-to-sp," +
                 "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
                 "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
                 "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts"));
-        elementInfos.put("regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq"));
-        elementInfos.put("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
-        elementInfos.put("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
-        elementInfos.put("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
+        registerInternalElement("regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq"));
+        registerInternalElement("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
+        registerInternalElement("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
+        registerInternalElement("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
         ElementInfo xPathElementInfo = new ElementInfo("xpath", XPathDef.class, null, "id,expression");
         xPathElementInfo.getNsAttsSet().add(Constants.VAR_URI);
-        elementInfos.put("xpath", xPathElementInfo);
-        elementInfos.put("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
-        elementInfos.put("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
-        elementInfos.put("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
-        elementInfos.put("xslt", new ElementInfo("xslt", XsltDef.class, "!xml,!stylesheet", "id"));
-        elementInfos.put("xml", new ElementInfo("xml", BaseElementDef.class, null, "id"));
-        elementInfos.put("stylesheet", new ElementInfo("stylesheet", BaseElementDef.class, null, "id"));
-        elementInfos.put("template", new ElementInfo("template", TemplateDef.class, null, "id,language"));
-        elementInfos.put("case", new ElementInfo("case", CaseDef.class, "!if,else", "id"));
-        elementInfos.put("if", new ElementInfo("if", BaseElementDef.class, null, "!condition,id"));
-        elementInfos.put("else", new ElementInfo("else", BaseElementDef.class, null, "id"));
-        elementInfos.put("loop", new ElementInfo("loop", LoopDef.class, "!list,!body", "id,item,index,maxloops,filter,empty"));
-        elementInfos.put("list", new ElementInfo("list", BaseElementDef.class, null, "id"));
-        elementInfos.put("body", new ElementInfo("body", BaseElementDef.class, null, "id"));
-        elementInfos.put("while", new ElementInfo("while", WhileDef.class, null, "id,!condition,index,maxloops,empty"));
-        elementInfos.put("function", new ElementInfo("function", FunctionDef.class, null, "id,!name"));
-        elementInfos.put("return", new ElementInfo("return", ReturnDef.class, null, "id"));
-        elementInfos.put("call", new ElementInfo("call", CallDef.class, null, "id,!name"));
-        elementInfos.put("call-param", new ElementInfo("call-param", CallParamDef.class, null, "id,!name"));
-        elementInfos.put("include", new ElementInfo("include", IncludeDef.class, "", "id,!path"));
-        elementInfos.put("try", new ElementInfo("try", TryDef.class, "!body,!catch", "id"));
-        elementInfos.put("catch", new ElementInfo("catch", BaseElementDef.class, null, "id"));
-        elementInfos.put("script", new ElementInfo("script", ScriptDef.class, null, "id,language,return"));
-        elementInfos.put("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
+        registerInternalElement("xpath", xPathElementInfo);
+        registerInternalElement("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
+        registerInternalElement("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
+        registerInternalElement("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
+        registerInternalElement("xslt", new ElementInfo("xslt", XsltDef.class, "!xml,!stylesheet", "id"));
+        registerInternalElement("xml", new ElementInfo("xml", BaseElementDef.class, null, "id"));
+        registerInternalElement("stylesheet", new ElementInfo("stylesheet", BaseElementDef.class, null, "id"));
+        registerInternalElement("template", new ElementInfo("template", TemplateDef.class, null, "id,language"));
+        registerInternalElement("case", new ElementInfo("case", CaseDef.class, "!if,else", "id"));
+        registerInternalElement("if", new ElementInfo("if", BaseElementDef.class, null, "!condition,id"));
+        registerInternalElement("else", new ElementInfo("else", BaseElementDef.class, null, "id"));
+        registerInternalElement("loop", new ElementInfo("loop", LoopDef.class, "!list,!body", "id,item,index,maxloops,filter,empty"));
+        registerInternalElement("list", new ElementInfo("list", BaseElementDef.class, null, "id"));
+        registerInternalElement("body", new ElementInfo("body", BaseElementDef.class, null, "id"));
+        registerInternalElement("while", new ElementInfo("while", WhileDef.class, null, "id,!condition,index,maxloops,empty"));
+        registerInternalElement("function", new ElementInfo("function", FunctionDef.class, null, "id,!name"));
+        registerInternalElement("return", new ElementInfo("return", ReturnDef.class, null, "id"));
+        registerInternalElement("call", new ElementInfo("call", CallDef.class, null, "id,!name"));
+        registerInternalElement("call-param", new ElementInfo("call-param", CallParamDef.class, null, "id,!name"));
+        registerInternalElement("include", new ElementInfo("include", IncludeDef.class, "", "id,!path"));
+        registerInternalElement("try", new ElementInfo("try", TryDef.class, "!body,!catch", "id"));
+        registerInternalElement("catch", new ElementInfo("catch", BaseElementDef.class, null, "id"));
+        registerInternalElement("script", new ElementInfo("script", ScriptDef.class, null, "id,language,return"));
+        registerInternalElement("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
 
-        registerPlugin(SetVarPlugin.class, true);
-        registerPlugin(DefVarPlugin.class, true);
-        registerPlugin(GetVarPlugin.class, true);
-        registerPlugin(ValueOfPlugin.class, true);
-        registerPlugin(DatabasePlugin.class, true);
-        registerPlugin(JsonToXmlPlugin.class, true);
-        registerPlugin(XmlToJsonPlugin.class, true);
-        registerPlugin(MailPlugin.class, true);
-        registerPlugin(ZipPlugin.class, true);
-        registerPlugin(FtpPlugin.class, true);
-        registerPlugin(TokenizePlugin.class, true);
-        registerPlugin(SleepPlugin.class, true);
+        registerPlugin(SetVarPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(DefVarPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(GetVarPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(ValueOfPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(DatabasePlugin.class, true, Constants.CORE_URI);
+        registerPlugin(JsonToXmlPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(XmlToJsonPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(MailPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(ZipPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(FtpPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(TokenizePlugin.class, true, Constants.CORE_URI);
+        registerPlugin(SleepPlugin.class, true, Constants.CORE_URI);
+
+        registerPlugin(FrankPlugin.class, false, Constants.CORE_URI);
+        registerPlugin(DavidPlugin.class, false, "http://david.com");
     }
 
-    private static void registerPlugin(Class pluginClass, boolean isInternalPlugin) {
+    /**
+     * Register core element.
+     * @param name Name of the element corresponding to the tag name in xml configuration
+     * @param elementInfo ElementInfo instance of the element
+     */
+    private static void registerInternalElement(String name, ElementInfo elementInfo) {
+        elementInfos.put(new ElementName(name), elementInfo);
+    }
+
+    private static void registerPlugin(Class pluginClass, boolean isInternalPlugin, String uri) {
         Assert.notNull(pluginClass);
         try {
             final Object pluginObj = pluginClass.newInstance();
@@ -147,10 +159,11 @@ public class DefinitionResolver {
             if (!CommonUtil.isValidXmlIdentifier(pluginName)) {
                 throw new PluginException("Plugin class \"" + pluginClass.getName() + "\" does not define valid name!");
             }
-            pluginName = pluginName.toLowerCase();
 
-            if (elementInfos.containsKey(pluginName)) {
-                throw new PluginException("Plugin named \"" + pluginName + "\" is already registered!");
+            ElementName pluginElementName = new ElementName(pluginName, uri);
+
+            if (elementInfos.containsKey(pluginElementName)) {
+                throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
             }
 
             final ElementInfo elementInfo = new ElementInfo(
@@ -162,14 +175,14 @@ public class DefinitionResolver {
                     plugin.getAttributeDesc());
 
             elementInfo.setPlugin(plugin);
-            elementInfos.put(pluginName, elementInfo);
+            elementInfos.put(pluginElementName, elementInfo);
             if (!isInternalPlugin) {
-                externalPlugins.put(pluginClass.getName(), pluginName);
+                externalPlugins.put(pluginClass.getName(), pluginElementName);
             }
-            externalPluginDependaces.put(pluginName, plugin.getDependantProcessors());
+            externalPluginDependences.put(pluginElementName, plugin.getDependantProcessors());
 
             for (Class subClass : plugin.getDependantProcessors()) {
-                registerPlugin(subClass, isInternalPlugin);
+                registerPlugin(subClass, isInternalPlugin, uri);
             }
         } catch (InstantiationException e) {
             throw new PluginException("Error instantiating plugin class \"" + pluginClass.getName() + "\": " + e.getMessage(), e);
@@ -179,36 +192,52 @@ public class DefinitionResolver {
     }
 
     public static void registerPlugin(Class pluginClass) throws PluginException {
-        registerPlugin(pluginClass, false);
+        registerPlugin(pluginClass, false, Constants.CORE_URI);
+    }
+
+    public static void registerPlugin(Class pluginClass, String uri) throws PluginException {
+        registerPlugin(pluginClass, false, uri);
     }
 
     public static void registerPlugin(String fullClassName) throws PluginException {
+        registerPlugin(fullClassName, Constants.CORE_URI);
+    }
+
+    public static void registerPlugin(String fullClassName, String uri) throws PluginException {
         Class pluginClass = ClassLoaderUtil.getPluginClass(fullClassName);
-        registerPlugin(pluginClass, false);
+        registerPlugin(pluginClass, false, uri);
+    }
+
+    public static void unregisterPlugin(Class pluginClass, String uri) {
+        if (pluginClass != null) {
+            unregisterPlugin(pluginClass.getName(), uri);
+        }
     }
 
     public static void unregisterPlugin(Class pluginClass) {
-        if (pluginClass != null) {
-            unregisterPlugin(pluginClass.getName());
+        unregisterPlugin(pluginClass, Constants.CORE_URI);
+    }
+
+    public static void unregisterPlugin(String className, String uri) {
+        // only external plugins can be unregistered
+        if (isPluginRegistered(className)) {
+            ElementName pluginElementName = externalPlugins.get(className);
+            elementInfos.remove(pluginElementName);
+            externalPlugins.remove(className);
+
+            // unregister deependant classes as well
+            Class[] dependantClasses = externalPluginDependences.get(pluginElementName);
+            externalPluginDependences.remove(pluginElementName);
+            if (dependantClasses != null) {
+                for (Class c : dependantClasses) {
+                    unregisterPlugin(c, uri);
+                }
+            }
         }
     }
 
     public static void unregisterPlugin(String className) {
-        // only external plugins can be unregistered
-        if (isPluginRegistered(className)) {
-            String pluginName = externalPlugins.get(className);
-            elementInfos.remove(pluginName);
-            externalPlugins.remove(className);
-
-            // unregister deependant classes as well
-            Class[] dependantClasses = externalPluginDependaces.get(pluginName);
-            externalPluginDependaces.remove(pluginName);
-            if (dependantClasses != null) {
-                for (Class c : dependantClasses) {
-                    unregisterPlugin(c);
-                }
-            }
-        }
+        unregisterPlugin(className, Constants.CORE_URI);
     }
 
     public static boolean isPluginRegistered(String className) {
@@ -219,24 +248,25 @@ public class DefinitionResolver {
         return pluginClass != null && isPluginRegistered(pluginClass.getName());
     }
 
-    public static Map getExternalPlugins() {
+    public static Map<String, ElementName> getExternalPlugins() {
         return externalPlugins;
     }
 
     /**
      * @return Map of all allowed element infos.
      */
-    public static Map getElementInfos() {
+    public static Map<ElementName, ElementInfo> getElementInfos() {
         return elementInfos;
     }
 
     /**
-     * @param name
+     * @param name Name of the element
+     * @param uri URI of the element
      * @return Instance of ElementInfo class for the specified element name,
      *         or null if no element is defined.
      */
-    public static ElementInfo getElementInfo(String name) {
-        return elementInfos.get(name);
+    public static ElementInfo getElementInfo(String name, String uri) {
+        return elementInfos.get(new ElementName(name, uri));
     }
 
     /**
@@ -249,10 +279,11 @@ public class DefinitionResolver {
      */
     public static IElementDef createElementDefinition(XmlNode node) {
         final String nodeName = node.getName();
+        final String nodeUri = node.getUri();
 
-        final ElementInfo elementInfo = getElementInfo(nodeName);
+        final ElementInfo elementInfo = getElementInfo(nodeName, nodeUri);
         if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == BaseElementDef.class) {
-            throw new ConfigurationException("Unexpected configuration element: " + nodeName + "!");
+            throw new ConfigurationException("Unexpected configuration element: " + node.getQName() + "!");
         }
 
         validate(node);
@@ -288,7 +319,9 @@ public class DefinitionResolver {
             return;
         }
 
-        final ElementInfo elementInfo = getElementInfo(node.getName().toLowerCase());
+        final String uri = node.getUri();
+
+        final ElementInfo elementInfo = getElementInfo(node.getName(), uri);
 
         if (elementInfo == null) {
             return;
@@ -302,21 +335,21 @@ public class DefinitionResolver {
         }
 
         final boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
-        final Set allTagNameSet = elementInfos.keySet();
-        final Set tags = elementInfo.getTagsSet();
+        final Set<ElementName> allTagNameSet = elementInfos.keySet();
+        final Set<String> tags = elementInfo.getTagsSet();
 
         // check if element contains only allowed subelements
-        for (String key : node.keySet()) {
-            final String tagName = key.toLowerCase();
-            if ((!areAllTagsAllowed && !tags.contains(tagName)) || (areAllTagsAllowed && !allTagNameSet.contains(tagName))) {
-                throw new ConfigurationException(ErrMsg.invalidTag(node.getName(), tagName));
+        for (ElementName elementName : node.getElementNameSet()) {
+            if ( (!areAllTagsAllowed && (!tags.contains(elementName.getName()) || !uri.equals(node.getUri())) ) ||
+                 (areAllTagsAllowed && !allTagNameSet.contains(elementName))
+               ) {
+                throw new ConfigurationException(ErrMsg.invalidTag(node.getName(), elementName.toString()));
             }
         }
 
-
-        // checks if tag contains all required subelements
+        // checks if tag contains all required attributes
         for (String att : elementInfo.getRequiredAttsSet()) {
-            if (node.getAttribute(att) == null) {
+            if (node.getAttribute(uri, att) == null) {
                 throw new ConfigurationException(ErrMsg.missingAttribute(node.getName(), att));
             }
         }

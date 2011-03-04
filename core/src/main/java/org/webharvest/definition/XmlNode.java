@@ -43,18 +43,24 @@ import org.xml.sax.InputSource;
 import java.io.Serializable;
 import java.util.*;
 
-public class XmlNode extends HashMap<String, Object> {
+public class XmlNode implements Serializable {
 
     protected static final Logger log = LoggerFactory.getLogger(XmlNode.class);
 
-    // node name - corresponds to xml tag name
+    // node name - corresponds to xml local name
     private String name;
+
+    // node name - corresponds to xml qualified name
+    private String qName;
 
     // namespace of the node
     private String uri;
 
     // parent element
     private XmlNode parent;
+
+    // For each node, holds map of subnodes with the same name. Used to quickly access subnodes by name
+    private Map<ElementName, ArrayList<XmlNode>> elements = new HashMap<ElementName, ArrayList<XmlNode>>();
 
     // map of attributes - for each uri key value is map of atribute name-value pairs
     private Map<String,  Map<String, String>> attributes = new HashMap<String,  Map<String, String>>();
@@ -91,10 +97,11 @@ public class XmlNode extends HashMap<String, Object> {
      * @param uri
      * @param parent
      */
-    protected XmlNode(String name, String uri, XmlNode parent) {
+    protected XmlNode(String name, String qName, String uri, XmlNode parent) {
         super();
 
         this.name = name;
+        this.qName = qName;
         this.uri = uri;
         this.parent = parent;
 
@@ -108,6 +115,13 @@ public class XmlNode extends HashMap<String, Object> {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return Qualified name
+     */
+    public String getQName() {
+        return qName;
     }
 
     /**
@@ -129,73 +143,6 @@ public class XmlNode extends HashMap<String, Object> {
      */
     public XmlNode getParent() {
         return parent;
-    }
-
-    /**
-     * For specified serach path returns element/attribute if found,
-     * or null otherwise. Path is sequence of elements separated with
-     * some of characters: ./\[]
-     * For example: msg[0].response[0].id is trying to find in node
-     * first msg subelement and than first response subelement and then
-     * attribute id.
-     *
-     * @param key
-     * @return Resulting value which should be either XmlNode instance or string.
-     */
-    private Object getSeq(String key) {
-        StringTokenizer strTkzr = new StringTokenizer(key, "./\\[]");
-        Object currValue = this;
-        while (strTkzr.hasMoreTokens()) {
-            String currKey = strTkzr.nextToken();
-            if (currValue instanceof Map) {
-                currValue = ((Map) currValue).get(currKey);
-            } else if (currValue instanceof List) {
-                try {
-                    List list = (List) currValue;
-                    int index = Integer.parseInt(currKey);
-
-                    if (index >= 0 && index < list.size()) {
-                        currValue = list.get(index);
-                    }
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        return currValue;
-    }
-
-    /**
-     * Overridden get method - search both subelements and attributes
-     */
-    @Override
-    public Object get(Object key) {
-        if (key == null) {
-            return null;
-        }
-
-        key = ((String) key).toLowerCase();
-
-        String sKey = (String) key;
-
-        if (sKey.indexOf('/') >= 0 || sKey.indexOf('.') >= 0 || sKey.indexOf('\\') >= 0 || sKey.indexOf('[') >= 0) {
-            return getSeq(sKey);
-        }
-
-        if (sKey.equalsIgnoreCase("_value")) {
-            return getText();
-        } else if (this.containsKey(key)) {
-            return super.get(key);
-        } else {
-            return getAttribute(sKey);
-        }
-    }
-
-    public String getString(Object key) {
-        return (String) get(key);
     }
 
     /**
@@ -257,13 +204,14 @@ public class XmlNode extends HashMap<String, Object> {
     public void addElement(XmlNode elementNode) {
         flushText();
 
-        String elementName = elementNode.getName();
+        ElementName elementName = new ElementName(elementNode.getName(), elementNode.getUri());
 
-        if (!this.containsKey(elementName)) {
-            this.put(elementName, new ArrayList());
+        ArrayList<XmlNode> subnodes = elements.get(elementName);
+        if (subnodes == null) {
+            subnodes = new ArrayList<XmlNode>();
+            elements.put(elementName, subnodes);
         }
-
-        ((List) this.get(elementName)).add(elementNode);
+        subnodes.add(elementNode);
 
         elementList.add(elementNode);
     }
@@ -295,9 +243,26 @@ public class XmlNode extends HashMap<String, Object> {
         }
     }
 
+    public Set<ElementName> getElementNameSet() {
+        return elements.keySet();
+    }
 
     public Object getElement(String name) {
-        return super.get(name);
+        return elements.get(new ElementName(name));
+    }
+
+    /**
+     * @param elementName
+     * @return First subnode with the specified name if exists, null otherwise
+     */
+    public XmlNode getFirstSubnode(ElementName elementName) {
+        ArrayList<XmlNode> xmlNodes = elements.get(elementName);
+        return xmlNodes != null && xmlNodes.size() > 0 ? xmlNodes.get(0) : null;
+    }
+
+    public List<XmlNode> getSubnodes(ElementName elementName) {
+        ArrayList<XmlNode> nodes = elements.get(elementName);
+        return nodes == null ? new ArrayList<XmlNode>() : new ArrayList<XmlNode>(nodes);
     }
 
     public List<Serializable> getElementList() {

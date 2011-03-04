@@ -112,10 +112,10 @@ public class ScraperConfiguration {
         // loads configuration from input stream to the internal structure
         XmlNode node = XmlNode.getInstance(in);
 
-        this.charset = StringUtils.defaultIfEmpty(node.getString("charset"), DEFAULT_CHARSET);
+        this.charset = StringUtils.defaultIfEmpty(node.getAttribute("charset"), DEFAULT_CHARSET);
 
         this.scriptingLanguage = (ScriptingLanguage) ObjectUtils.defaultIfNull(
-                ScriptingLanguage.recognize(node.getString("scriptlang")),
+                ScriptingLanguage.recognize(node.getAttribute("scriptlang")),
                 DEFAULT_SCRIPTING_LANGUAGE);
 
         for (Object element : node.getElementList()) {

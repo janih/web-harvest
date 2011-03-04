@@ -52,11 +52,11 @@ public class LoopDef extends BaseElementDef {
     public LoopDef(XmlNode xmlNode) {
         super(xmlNode, false);
 
-        XmlNode loopValueDefNode = (XmlNode) xmlNode.get("list[0]");
+        XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list"));
         DefinitionResolver.validate(loopValueDefNode);
         this.loopValueDef = loopValueDefNode == null ? null : new BaseElementDef(loopValueDefNode, "list");
 
-        XmlNode loopBodyDefNode = (XmlNode) xmlNode.get("body[0]");
+        XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body"));
         DefinitionResolver.validate(loopBodyDefNode);
         this.loopBodyDef = loopBodyDefNode == null ? null : new BaseElementDef(loopBodyDefNode, "body");
 

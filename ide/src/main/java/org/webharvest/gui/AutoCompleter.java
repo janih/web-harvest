@@ -1,8 +1,7 @@
 package org.webharvest.gui;
 
 import org.webharvest.WHConstants;
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.ElementInfo;
+import org.webharvest.definition.*;
 import org.webharvest.gui.component.WHScrollPane;
 import org.webharvest.utils.CommonUtil;
 
@@ -104,9 +103,6 @@ public class AutoCompleter {
     // length of prefix that user already has typed
     private int prefixLength;
 
-    // allowed elements
-    private Map elementInfos;
-
     /**
      * Constructor.
      *
@@ -129,7 +125,6 @@ public class AutoCompleter {
         });
 
         this.popupMenu.setBorder(new EmptyBorder(1, 1, 1, 1));
-        this.elementInfos = DefinitionResolver.getElementInfos();
     }
 
     private void defineTagsMenu(String prefix) {
@@ -139,11 +134,9 @@ public class AutoCompleter {
 
         this.model.clear();
 
-        for (Object o : this.elementInfos.entrySet()) {
-            final Map.Entry entry = (Map.Entry) o;
-            if (prefix == null || ((String) entry.getKey()).toLowerCase().startsWith(prefix)) {
-                ElementInfo elementInfo = (ElementInfo) entry.getValue();
-                model.addElement(elementInfo.getName());
+        for (Map.Entry<ElementName, ElementInfo> entry: DefinitionResolver.getElementInfos().entrySet()) {
+            if ( prefix == null || entry.getKey().getName().startsWith(prefix) ) {
+                model.addElement(entry.getValue().getName());
             }
         }
 
@@ -166,7 +159,7 @@ public class AutoCompleter {
 
         this.model.clear();
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(elementName);
+        ElementInfo elementInfo = DefinitionResolver.getElementInfo(elementName, null);
         if (elementInfo != null) {
             for (Object attObj : elementInfo.getAttsSet()) {
                 if (attObj != null) {
@@ -182,7 +175,7 @@ public class AutoCompleter {
     private void defineAttributeValuesMenu(String tagName, String attributeName, String attValuePrefix) {
         this.model.clear();
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(tagName);
+        ElementInfo elementInfo = DefinitionResolver.getElementInfo(tagName, null);
         if (elementInfo != null) {
             String[] suggs = getAttributeValueSuggestions(elementInfo, attributeName);
             if (suggs != null) {
@@ -426,7 +419,7 @@ public class AutoCompleter {
             document.insertString(pos, "<!--  -->".substring(this.prefixLength), null);
             xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
         } else {
-            ElementInfo info = DefinitionResolver.getElementInfo(name);
+            ElementInfo info = DefinitionResolver.getElementInfo(name, null);
             if (info != null) {
                 String template = info.getTemplate(true).substring(this.prefixLength);
                 document.insertString(pos, template, null);

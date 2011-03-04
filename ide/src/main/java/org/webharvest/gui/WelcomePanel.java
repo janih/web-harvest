@@ -37,8 +37,7 @@
 package org.webharvest.gui;
 
 import org.webharvest.ApplicationInfo;
-import org.webharvest.definition.XmlNode;
-import org.webharvest.definition.XmlParser;
+import org.webharvest.definition.*;
 import org.webharvest.gui.component.WHScrollPane;
 import org.webharvest.utils.CommonUtil;
 import org.xml.sax.InputSource;
@@ -108,10 +107,14 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
         try {
             String content = CommonUtil.readStringFromUrl(new URL(ApplicationInfo.WELCOME_ADDITION_URL));
             XmlNode node = XmlParser.parse(new InputSource(new StringReader(content)));
-            String versionValue = (String) node.get("version[0].number");
-            String versionMessage = (String) node.get("version[0]._value");
-            String startValue = (String) node.get("start[0]._value");
-            String endValue = (String) node.get("end[0]._value");
+            XmlNode version = node.getFirstSubnode(new ElementName("version"));
+            XmlNode start = node.getFirstSubnode(new ElementName("start"));
+            XmlNode end = node.getFirstSubnode(new ElementName("end"));
+
+            String versionValue = version != null ? version.getAttribute("number") : null;
+            String versionMessage = version != null ? version.getText() : null;
+            String startValue = start != null ? start.getText() : null;
+            String endValue = end != null ? end.getText() : null;
 
             boolean hasStart = startValue != null && !"".equals(startValue.trim());
             boolean hasEnd = endValue != null && !"".equals(endValue.trim());

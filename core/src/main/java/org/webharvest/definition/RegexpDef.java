@@ -64,15 +64,15 @@ public class RegexpDef extends BaseElementDef {
         this.flagUnicodecase = xmlNode.getAttribute("flag-unicodecase");
         this.flagCanoneq = xmlNode.getAttribute("flag-canoneq");
 
-        XmlNode regexpPatternDefNode = (XmlNode) xmlNode.get("regexp-pattern[0]");
+        XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern"));
         DefinitionResolver.validate(regexpPatternDefNode);
         regexpPatternDef = regexpPatternDefNode == null ? null : new BaseElementDef(regexpPatternDefNode, "regexp-pattern");
         
-        XmlNode regexpSourceDefNode = (XmlNode) xmlNode.get("regexp-source[0]");
+        XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source"));
         DefinitionResolver.validate(regexpSourceDefNode);
         regexpSourceDef = regexpSourceDefNode == null ? null : new BaseElementDef(regexpSourceDefNode, "regexp-source");
         
-        XmlNode regexpResultDefNode = (XmlNode) xmlNode.get("regexp-result[0]");
+        XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result"));
         DefinitionResolver.validate(regexpResultDefNode);
         regexpResultDef = regexpResultDefNode == null ? null : new BaseElementDef(regexpResultDefNode, "regexp-result");
     }

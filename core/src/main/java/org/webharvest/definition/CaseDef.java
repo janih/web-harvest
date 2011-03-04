@@ -36,8 +36,7 @@
 */
 package org.webharvest.definition;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Definition of case processor.
@@ -50,7 +49,7 @@ public class CaseDef extends BaseElementDef {
     public CaseDef(XmlNode xmlNode) {
         super(xmlNode, false);
 
-        List ifNodesList = (List) xmlNode.get("if");
+        List<XmlNode> ifNodesList = xmlNode.getSubnodes(new ElementName("if"));
         int size = ifNodesList == null ? 0 : ifNodesList.size();
         ifDefs = new IfDef[size];
 
@@ -64,7 +63,7 @@ public class CaseDef extends BaseElementDef {
             }
         }
 
-        XmlNode elseDefNode = (XmlNode) xmlNode.get("else[0]");
+        XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else"));
         DefinitionResolver.validate(elseDefNode);
         elseDef = elseDefNode == null ? null : new BaseElementDef(elseDefNode, "else");
     }

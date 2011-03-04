@@ -51,11 +51,11 @@ public class XQueryDef extends BaseElementDef {
     public XQueryDef(XmlNode xmlNode) {
         super(xmlNode, false);
 
-        XmlNode xqDefNode = (XmlNode) xmlNode.get("xq-expression[0]");
+        XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression"));
         DefinitionResolver.validate(xqDefNode);
         xqDef = xqDefNode == null ? null : new BaseElementDef(xqDefNode, "xq-expression");
 
-        List listOfExternalParamNodes = (List) xmlNode.get("xq-param");
+        List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param"));
 
         int size = listOfExternalParamNodes == null ? 0 : listOfExternalParamNodes.size();
         externalParamDefs = new XQueryExternalParamDef[size];
