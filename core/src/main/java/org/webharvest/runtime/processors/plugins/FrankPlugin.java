@@ -22,4 +22,9 @@ public class FrankPlugin extends WebHarvestPlugin {
         };
     }
 
+    @Override
+    public String[] getValidAttributes() {
+        return new String[] {"v:*", "p:*", "deca"};
+    }
+
 }

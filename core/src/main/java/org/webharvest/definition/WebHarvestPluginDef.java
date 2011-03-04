@@ -2,6 +2,7 @@ package org.webharvest.definition;
 
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.utils.*;
 
 import java.util.Map;
 
@@ -10,13 +11,13 @@ import java.util.Map;
  */
 public class WebHarvestPluginDef extends BaseElementDef {
 
-    private Map<String, String> attributes;
+    private XmlNode xmlNode;
     private Class pluginClass;
     private String name;
 
     public WebHarvestPluginDef(XmlNode xmlNode) {
         super(xmlNode, true);
-        this.attributes = xmlNode.getAttributes();
+        this.xmlNode = xmlNode;
     }
 
     void setPluginClass(Class pluginClass) {
@@ -28,7 +29,11 @@ public class WebHarvestPluginDef extends BaseElementDef {
     }
 
     public Map<String, String> getAttributes() {
-        return attributes;
+        return getAttributes(Constants.CORE_URI);
+    }
+
+    public Map<String, String> getAttributes(String uri) {
+        return xmlNode.getAttributes(uri);
     }
 
     public WebHarvestPlugin createPlugin() {

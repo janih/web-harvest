@@ -37,6 +37,7 @@
 package org.webharvest.definition;
 
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.utils.*;
 
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -98,7 +99,11 @@ public class ElementInfo {
             StringTokenizer tokenizer = new StringTokenizer(validAtts, ",");
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken().toLowerCase();
-                if (token.startsWith("!")) {
+                if ("p:*".equals(token)) {
+                    nsAttsSet.add(Constants.PARAM_URI);
+                } else if ("v:*".equals(token)) {
+                    nsAttsSet.add(Constants.VAR_URI);
+                } else if (token.startsWith("!")) {
                     token = token.substring(1);
                     this.requiredAttsSet.add(token);
                 }

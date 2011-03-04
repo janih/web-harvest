@@ -94,9 +94,7 @@ public class DefinitionResolver {
         registerInternalElement("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
         registerInternalElement("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
         registerInternalElement("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
-        ElementInfo xPathElementInfo = new ElementInfo("xpath", XPathDef.class, null, "id,expression");
-        xPathElementInfo.getNsAttsSet().add(Constants.VAR_URI);
-        registerInternalElement("xpath", xPathElementInfo);
+        registerInternalElement("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,expression,v:*"));
         registerInternalElement("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
         registerInternalElement("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
         registerInternalElement("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
