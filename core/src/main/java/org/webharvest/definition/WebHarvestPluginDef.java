@@ -28,8 +28,12 @@ public class WebHarvestPluginDef extends BaseElementDef {
         this.name = name;
     }
 
+    public String getUri() {
+        return xmlNode.getUri();
+    }
+
     public Map<String, String> getAttributes() {
-        return getAttributes(Constants.CORE_URI);
+        return getAttributes(xmlNode.getUri());
     }
 
     public Map<String, String> getAttributes(String uri) {

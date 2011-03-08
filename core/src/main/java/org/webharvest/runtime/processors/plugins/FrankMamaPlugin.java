@@ -15,4 +15,9 @@ public class FrankMamaPlugin extends WebHarvestPlugin {
     public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
         return new NodeVariable("FRANKMAMA: " + evaluateAttribute("name", scraper));
     }
+
+    @Override
+    public String[] getValidAttributes() {
+        return new String[] {"name"};
+    }
 }

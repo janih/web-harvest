@@ -39,6 +39,8 @@ package org.webharvest.gui;
 import org.webharvest.gui.component.*;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -57,73 +59,62 @@ import java.util.*;
 public class SettingsDialog extends CommonDialog implements ChangeListener {
 
     /**
-     * Class definining elements in list of plugins. Each item has name (fully qualified class name)
-     * and optional error message telling why plugin cannot be registered.
-     */
-    private class PluginListItem {
-        String className;
-        String errorMessage;
-
-        private PluginListItem(String className, String errorMessage) {
-            this.className = className;
-            this.errorMessage = errorMessage;
-        }
-
-        private boolean isValid() {
-            return errorMessage == null;
-        }
-
-        public String toString() {
-            return className;
-        }
-    }
-
-    /**
      * List model implementation for the list of plugins.
      */
     private class PluginListModel extends DefaultListModel {
-        public void addElement(Object obj, boolean throwErrIfRegistered) {
-            SettingsDialog.PluginListItem pluginListItem = createItem(obj, throwErrIfRegistered);
-            if (pluginListItem != null) {
-                super.addElement(pluginListItem);
+        public void addElement(PluginInfo pluginInfo, boolean throwErrIfRegistered) {
+            if (addPlugin(pluginInfo, throwErrIfRegistered)) {
+                super.addElement(pluginInfo);
             }
         }
 
-        public boolean setElement(Object obj, int index) {
-            SettingsDialog.PluginListItem pluginListItem = createItem(obj, true);
-            if (pluginListItem != null) {
-                super.setElementAt(pluginListItem, index);
+        public boolean setElement(PluginInfo pluginInfo, int index) {
+            if (addPlugin(pluginInfo, true)) {
+                super.setElementAt(pluginInfo, index);
                 fireContentsChanged(this, index, index);
                 return true;
             }
             return false;
         }
 
-        private PluginListItem createItem(Object obj, boolean throwErrIfRegistered) {
-            String newClassName = obj.toString();
-            int size = getSize();
+        private boolean addPlugin(PluginInfo pluginInfo, boolean throwErrIfRegistered) {
+            final String className = pluginInfo.getClassName();
+            final String uri = pluginInfo.getUri();
+
+            if ( CommonUtil.isEmptyString(className) || CommonUtil.isEmptyString(uri) ) {
+                GuiUtils.showError(SettingsDialog.this, "Full plugin class name and namespace URI must be specified!");
+                return false;
+            }
+
             // check if it already exists in the list
+            int size = getSize();
             for (int i = 0; i < size; i++) {
-                PluginListItem item = (PluginListItem) get(i);
-                if (item != null && item.className.equals(newClassName)) {
+                PluginInfo item = (PluginInfo) get(i);
+                if (item != null && item.equals(pluginInfo)) {
                     if (SettingsDialog.this.isVisible()) {
-                        JOptionPane.showMessageDialog(SettingsDialog.this, "Plugin is already added to the list!", "Error", JOptionPane.ERROR_MESSAGE);
+                        GuiUtils.showError(SettingsDialog.this, "Plugin is already added to the list!");
                     }
-                    return null;
+                    return false;
                 }
             }
 
             String errorMessage = null;
 
-            if ( !DefinitionResolver.isPluginRegistered(newClassName) || throwErrIfRegistered ) {
+            final boolean isAlreadyRegistered = DefinitionResolver.isPluginRegistered(className);
+            if ( !isAlreadyRegistered || throwErrIfRegistered ) {
                 try {
-                    DefinitionResolver.registerPlugin(newClassName);
+                    if (isAlreadyRegistered) {
+                        DefinitionResolver.unregisterPlugin(className);
+                    }
+                    DefinitionResolver.registerPlugin(className, uri);
                 } catch (PluginException e) {
                     errorMessage = e.getMessage();
                 }
             }
 
-            return new PluginListItem(newClassName, errorMessage);            
+            pluginInfo.setErrorMessage(errorMessage);
+
+            return true;
         }
     }
 
@@ -139,7 +130,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         }
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            PluginListItem item = (PluginListItem) value;
+            PluginInfo item = (PluginInfo) value;
             if (isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
@@ -148,9 +139,9 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                 setForeground(list.getForeground());
             }
 
-            setText(item.className);
+            setText(item.getClassName());
             setIcon(item.isValid() ? ResourceManager.VALID_ICON : ResourceManager.INVALID_ICON);
-            setToolTipText(item.errorMessage);
+            setToolTipText(item.getErrorMessage());
             return this;
         }
     }
@@ -185,10 +176,13 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     private JCheckBox showFinishDialogCheckBox;
 
     private JButton pluginAddButton;
-    private JButton pluginEditButton;
+    private JButton pluginUpdateButton;
     private JButton pluginRemoveButton;
     private PluginListModel pluginListModel;
     private JList pluginsList;
+    private JTextField pluginClassNameField;
+    private JTextField pluginNamespaceUriField;
+
 
     private final JFileChooser pathChooser = new JFileChooser();
 
@@ -379,30 +373,34 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         pluginAddButton = new FixedSizeButton("Add plugin", 110, 22);
         pluginAddButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String className = new InputDialog(SettingsDialog.this, "Input", pluginInputMsg, "", 50, null).getValue();
+                String className = pluginClassNameField.getText().trim();
+                String namespaceUri = pluginNamespaceUriField.getText().trim();
+                if ( CommonUtil.isEmptyString(namespaceUri) ) {
+                    namespaceUri = Constants.CORE_URI;
+                }
                 if (className != null) {
-                    pluginListModel.addElement(className, true);
+                    pluginListModel.addElement(new PluginInfo(className, namespaceUri, null), true);
                     pluginsList.setSelectedIndex(pluginListModel.size() - 1);
                 }
             }
         });
-        pluginEditButton = new FixedSizeButton("Edit plugin", 110, 22);
-        final ActionListener editListener = new ActionListener() {
+        pluginUpdateButton = new FixedSizeButton("Update plugin", 110, 22);
+        pluginUpdateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int index = pluginsList.getSelectedIndex();
                 if (index >= 0) {
-                    String oldClassName = pluginsList.getSelectedValue().toString();
-                    String className = new InputDialog(SettingsDialog.this, "Input", pluginInputMsg, oldClassName, 50, null).getValue();
-                    if ( className != null && !className.equals(oldClassName) ) {
-                        boolean isSet = pluginListModel.setElement(className, index);
+                    PluginInfo oldPluginInfo = (PluginInfo) pluginsList.getSelectedValue();
+                    PluginInfo pluginInfo = new PluginInfo(pluginClassNameField.getText().trim(), pluginNamespaceUriField.getText().trim(), null);
+                    if ( !pluginInfo.equals(oldPluginInfo) ) {
+                        boolean isSet = pluginListModel.setElement(pluginInfo, index);
                         if (isSet) {
-                            DefinitionResolver.unregisterPlugin(oldClassName);
+                            DefinitionResolver.unregisterPlugin(oldPluginInfo.getClassName());
+                            DefinitionResolver.registerPlugin(pluginInfo.getClassName(), pluginInfo.getUri());
                         }
                     }
                 }
             }
-        };
-        pluginEditButton.addActionListener(editListener);
+        });
         pluginRemoveButton = new FixedSizeButton("Remove plugin", 110, 22);
         pluginRemoveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -417,11 +415,11 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         });
 
         pluginButtonsPanel.add(pluginAddButton);
-        pluginButtonsPanel.add(pluginEditButton);
+        pluginButtonsPanel.add(pluginUpdateButton);
         pluginButtonsPanel.add(pluginRemoveButton);
 
-        springLayout.putConstraint(SpringLayout.NORTH, pluginEditButton, 5, SpringLayout.SOUTH, pluginAddButton);
-        springLayout.putConstraint(SpringLayout.NORTH, pluginRemoveButton, 5, SpringLayout.SOUTH, pluginEditButton);
+        springLayout.putConstraint(SpringLayout.NORTH, pluginUpdateButton, 5, SpringLayout.SOUTH, pluginAddButton);
+        springLayout.putConstraint(SpringLayout.NORTH, pluginRemoveButton, 5, SpringLayout.SOUTH, pluginUpdateButton);
         
         pluginsPanel.add(pluginButtonsPanel, BorderLayout.EAST);
         JPanel pluginsListPanel = new JPanel(new BorderLayout(5, 5));
@@ -435,18 +433,22 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                 updateControls();
             }
         });
-        pluginsList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    if (pluginsList.getSelectedIndex() >= 0) {
-                        editListener.actionPerformed(null);
-                    }
-                }
-            }
-        });
 
         pluginsListPanel.add(new WHScrollPane(pluginsList), BorderLayout.CENTER);
         pluginsPanel.add(pluginsListPanel, BorderLayout.CENTER);
+
+        JPanel pluginEditPanel = new JPanel();
+        pluginEditPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
+        pluginEditPanel.setLayout(new BoxLayout(pluginEditPanel, BoxLayout.Y_AXIS));
+        final JLabel fullClassNameLabel = new JLabel("Full class name:");
+        final JLabel nsLabel = new JLabel("Namespace URI:");
+        GuiUtils.fixComponentWidths(new Component[] {fullClassNameLabel, nsLabel});
+        this.pluginClassNameField = new JTextField("", 40);
+        this.pluginNamespaceUriField = new JTextField("", 40);
+        pluginEditPanel.add(GuiUtils.createLineOfComponents(new Component[]{fullClassNameLabel, pluginClassNameField}));
+        pluginEditPanel.add(GuiUtils.createLineOfComponents(new Component[] {nsLabel, pluginNamespaceUriField}));
+
+        pluginsPanel.add(pluginEditPanel, BorderLayout.NORTH);
 
         tabbedPane.addTab("General", null, generalPanel, null);
         tabbedPane.addTab("View", null, viewPanel, null);
@@ -483,7 +485,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         showFinishDialogCheckBox.setSelected( settings.isShowFinishDialog() );
 
         pluginListModel.clear();
-        String[] plugins = settings.getPlugins();
+        PluginInfo[] plugins = settings.getPlugins();
         for (int i = 0; i < plugins.length; i++) {
             pluginListModel.addElement(plugins[i], false);
         }
@@ -491,30 +493,30 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
     private void undoPlugins() {
         Settings settings = ide.getSettings();
-        String[] plugins = settings.getPlugins();
-        Set pluginSet = new HashSet();
+        PluginInfo[] plugins = settings.getPlugins();
+        Set<PluginInfo> pluginSet = new HashSet<PluginInfo>();
         for (int i = 0; i < plugins.length; i++) {
             pluginSet.add(plugins[i]);
         }
 
-        Set listSet = new HashSet();
+        Set<PluginInfo> listSet = new HashSet<PluginInfo>();
 
         // unregister plugins registered during this settings session
         int count = pluginListModel.getSize();
         for (int i = 0; i < count; i++) {
-            PluginListItem item = (PluginListItem) pluginListModel.get(i);
-            listSet.add(item.className);
-            if ( item.isValid() && !pluginSet.contains(item.className) ) {
-                DefinitionResolver.unregisterPlugin(item.className);
+            PluginInfo item = (PluginInfo) pluginListModel.get(i);
+            listSet.add(item);
+            if ( item.isValid() && !pluginSet.contains(item) ) {
+                DefinitionResolver.unregisterPlugin(item.getClassName());
             }
         }
 
         // register plugins unregistered during this setting session
         for (int i = 0; i < plugins.length; i++) {
-            String currPlugin = plugins[i];
-            if ( !listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin) ) {
+            PluginInfo currPlugin = plugins[i];
+            if ( !listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin.getClassName()) ) {
                 try {
-                    DefinitionResolver.registerPlugin(currPlugin);
+                    DefinitionResolver.registerPlugin(currPlugin.getClassName());
                 } catch (PluginException e) {
                     ; // do nothing - ignore
                 }
@@ -562,10 +564,9 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         settings.setShowFinishDialog(this.showFinishDialogCheckBox.isSelected());
 
         int pluginCount = pluginListModel.getSize();
-        String plugins[] = new String[pluginCount];
+        PluginInfo plugins[] = new PluginInfo[pluginCount];
         for (int i = 0; i < pluginCount; i++) {
-            PluginListItem item = (PluginListItem) pluginListModel.get(i);
-            plugins[i] = item.className;
+            plugins[i] = (PluginInfo) pluginListModel.get(i);
         }
         settings.setPlugins(plugins);
 
@@ -609,8 +610,16 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         this.ntlmDomainField.setEnabled( isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled );
 
         int selectedPluginIndex = pluginsList.getSelectedIndex();
-        pluginEditButton.setEnabled( selectedPluginIndex >= 0 );
+        pluginUpdateButton.setEnabled( selectedPluginIndex >= 0 );
         pluginRemoveButton.setEnabled( selectedPluginIndex >= 0 );
+        if (selectedPluginIndex >= 0 && selectedPluginIndex < pluginListModel.getSize()) {
+            PluginInfo pluginItem = (PluginInfo) pluginListModel.get(selectedPluginIndex);
+            pluginClassNameField.setText(pluginItem.getClassName());
+            pluginNamespaceUriField.setText( CommonUtil.nvl(pluginItem.getUri(), Constants.CORE_URI) );
+        } else {
+            pluginClassNameField.setText("");
+            pluginNamespaceUriField.setText(Constants.CORE_URI);
+        }
     }
 
     public void stateChanged(ChangeEvent e) {

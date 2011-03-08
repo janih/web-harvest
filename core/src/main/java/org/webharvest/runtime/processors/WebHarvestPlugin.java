@@ -214,7 +214,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     }
 
     protected String evaluateAttribute(String attName, Scraper scraper) {
-        return evaluateAttribute(attName, Constants.CORE_URI, scraper);
+        return evaluateAttribute(attName, ((WebHarvestPluginDef)elementDef).getUri(), scraper);
     }
 
     /**

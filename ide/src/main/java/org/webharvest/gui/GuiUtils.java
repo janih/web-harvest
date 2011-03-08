@@ -63,6 +63,10 @@ public class GuiUtils {
         fileChooser.setMultiSelectionEnabled(true);
     }
 
+    public static void showError(Component where, String msg) {
+        JOptionPane.showMessageDialog(where, msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     /**
      * Displays dialog with specified error message.
      * @param msg
@@ -180,6 +184,36 @@ public class GuiUtils {
             parent = parent.getParent();
         }
         return null;
+    }
+
+    public static JPanel createLineOfComponents(Component comps[]) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+        if (comps != null) {
+            for (Component comp: comps) {
+                if (comp != null) {
+                    panel.add(comp);
+                }
+            }
+        }
+        return panel;
+    }
+
+    public static void fixComponentWidths(Component[] components) {
+    	if (components != null && components.length > 1) {
+    		int maxWidth = 0;
+    		for (Component component : components) {
+    			int width = component.getPreferredSize().width;
+    			if (maxWidth < width) {
+    				maxWidth = width;
+    			}
+			}
+
+    		for (Component component : components) {
+    			Dimension d = component.getPreferredSize();
+    			d.width = maxWidth;
+    			component.setPreferredSize(d);
+			}
+    	}
     }
 
 }

@@ -18,7 +18,7 @@ public class DavidPlugin extends WebHarvestPlugin {
 
     @Override
     public String[] getValidAttributes() {
-        return new String[] {"name"};
+        return new String[] {"name", "v:*"};
     }
 
     @Override

@@ -39,11 +39,10 @@ package org.webharvest.gui;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.Constants;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author: Vladimir Nikic
@@ -51,7 +50,8 @@ import java.util.Iterator;
  */
 public class Settings implements Serializable {
 
-    private static final String CONFIG_FILE_PATH = System.getProperty("java.io.tmpdir") + "/webharvest.config";
+    private static final String CONFIG_FILE_PATH_OLD = System.getProperty("java.io.tmpdir") + "/webharvest.config";
+    private static final String CONFIG_FILE_PATH = System.getProperty("java.io.tmpdir") + "/webharvest.properties";
     private static final int MAX_RECENT_FILES = 20;
 
     private String workingPath = System.getProperty("java.io.tmpdir");
@@ -77,7 +77,7 @@ public class Settings implements Serializable {
     private boolean isShowFinishDialog = true;
 
     // array of plugins
-    private String plugins[] = {};
+    private PluginInfo plugins[] = {};
 
     // list of recently open files
     private List recentFiles = new LinkedList();
@@ -219,12 +219,12 @@ public class Settings implements Serializable {
         isShowLineNumbersByDefault = showLineNumbersByDefault;
     }
 
-    public String[] getPlugins() {
+    public PluginInfo[] getPlugins() {
         return plugins;
     }
 
-    public void setPlugins(String[] plugins) {
-        this.plugins = plugins == null ? new String[] {} : plugins;
+    public void setPlugins(PluginInfo[] plugins) {
+        this.plugins = plugins;
     }
 
     public List getRecentFiles() {
@@ -279,42 +279,108 @@ public class Settings implements Serializable {
         }
     }
 
-    /**
-     * Serialization write.
-     * @param out
-     * @throws IOException
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        writeString(out, workingPath);
+    private Properties readProperties() {
+        Properties props = new Properties();
 
-        out.writeBoolean(isProxyEnabled);
-        writeString(out, proxyServer);
-        out.writeInt(proxyPort);
-        out.writeBoolean(isProxyAuthEnabled);
-        writeString(out, proxyUserename);
-        writeString(out, proxyPassword);
-        out.writeBoolean(isNtlmAuthEnabled);
-        writeString(out, ntlmHost);
-        writeString(out, ntlmDomain);
+        props.setProperty("workpath", String.valueOf(workingPath));
+        props.setProperty("proxyenabled", String.valueOf(isProxyEnabled));
+        props.setProperty("proxyserver", String.valueOf(proxyServer));
+        props.setProperty("proxyport", String.valueOf(proxyPort));
+        props.setProperty("proxyauthenabled", String.valueOf(isProxyAuthEnabled));
+        props.setProperty("proxyusername", String.valueOf(proxyUserename));
+        props.setProperty("proxypassword", String.valueOf(proxyPassword));
+        props.setProperty("ntlmauthenabled", String.valueOf(isNtlmAuthEnabled));
+        props.setProperty("ntlmhost", String.valueOf(ntlmHost));
+        props.setProperty("ntlmdomain", String.valueOf(ntlmDomain));
 
-        out.writeBoolean(isShowHierarchyByDefault);
-        out.writeBoolean(isShowLogByDefault);
-        out.writeBoolean(isShowLineNumbersByDefault);
-        out.writeBoolean(isDynamicConfigLocate);
+        props.setProperty("showhierarchy", String.valueOf(isShowHierarchyByDefault));
+        props.setProperty("showlog", String.valueOf(isShowLogByDefault));
+        props.setProperty("showlinenums", String.valueOf(isShowLineNumbersByDefault));
+        props.setProperty("dynlocate", String.valueOf(isDynamicConfigLocate));
+        props.setProperty("filecharset", String.valueOf(fileCharset));
+        props.setProperty("showfinish", String.valueOf(isShowFinishDialog));
 
-        writeString(out, fileCharset);
-
-        out.writeBoolean(isShowFinishDialog);
-
-        out.writeInt(plugins.length);
+        props.setProperty("plugin.count", String.valueOf(plugins.length));
         for (int i = 0; i < plugins.length; i++) {
-            writeString(out, plugins[i]);
+            props.setProperty("plugin" + i + ".class", String.valueOf(plugins[i].getClassName()));
+            props.setProperty("plugin" + i + ".uri", String.valueOf(plugins[i].getUri()));
         }
 
-        out.writeInt(recentFiles.size());
-        Iterator iterator = recentFiles.iterator();
-        while (iterator.hasNext()) {
-            writeString(out, (String) iterator.next());
+        props.setProperty("recentfiles.count", String.valueOf(recentFiles.size()));
+        for (int i = 0; i < recentFiles.size(); i++) {
+            props.setProperty("recentfile" + i, String.valueOf(recentFiles.get(i)));
+        }
+
+        return props;
+    }
+
+    private void loadFromProperties(Properties props) {
+        if (props.containsKey("workpath")) {
+            workingPath = props.getProperty("workpath");
+        }
+
+        if (props.containsKey("proxyenabled")) {
+            isProxyEnabled = CommonUtil.getBooleanValue(props.getProperty("proxyenabled"), false);
+        }
+        if (props.containsKey("proxyserver")) {
+            proxyServer = props.getProperty("proxyserver");
+        }
+        if (props.containsKey("proxyport")) {
+            proxyPort = CommonUtil.getIntValue(props.getProperty("proxyport"), 0);
+        }
+        if (props.containsKey("proxyauthenabled")) {
+            isProxyAuthEnabled = CommonUtil.getBooleanValue(props.getProperty("proxyauthenabled"), false);
+        }
+        if (props.containsKey("proxyusername")) {
+            proxyUserename = props.getProperty("proxyusername");
+        }
+        if (props.containsKey("proxypassword")) {
+            proxyPassword = props.getProperty("proxypassword");
+        }
+        if (props.containsKey("ntlmauthenabled")) {
+            isNtlmAuthEnabled = CommonUtil.getBooleanValue(props.getProperty("ntlmauthenabled"), false);
+        }
+        if (props.containsKey("ntlmhost")) {
+            ntlmHost = props.getProperty("ntlmhost");
+        }
+        if (props.containsKey("ntlmdomain")) {
+            ntlmDomain = props.getProperty("ntlmdomain");
+        }
+
+        if (props.containsKey("showhierarchy")) {
+            isShowHierarchyByDefault = CommonUtil.getBooleanValue(props.getProperty("showhierarchy"), true);
+        }
+        if (props.containsKey("showlog")) {
+            isShowLogByDefault = CommonUtil.getBooleanValue(props.getProperty("showlog"), true);
+        }
+        if (props.containsKey("showlinenums")) {
+            isShowLineNumbersByDefault = CommonUtil.getBooleanValue(props.getProperty("showlinenums"), true);
+        }
+        if (props.containsKey("dynlocate")) {
+            isDynamicConfigLocate = CommonUtil.getBooleanValue(props.getProperty("dynlocate"), false);
+        }
+        if (props.containsKey("filecharset")) {
+            fileCharset = props.getProperty("filecharset");
+        }
+        if (props.containsKey("showfinish")) {
+            isShowFinishDialog = CommonUtil.getBooleanValue(props.getProperty("showfinish"), true);
+        }
+
+        int pluginCount = CommonUtil.getIntValue(props.getProperty("plugin.count"), 0);
+        plugins = new PluginInfo[pluginCount];
+        for (int i = 0; i < pluginCount; i++) {
+            plugins[i] = new PluginInfo( props.getProperty("plugin" + i + ".class"), props.getProperty("plugin" + i + ".uri"), null ); ;
+            try {
+                DefinitionResolver.registerPlugin(plugins[i].getClassName(), plugins[i].getUri());
+            } catch (PluginException e) {
+                e.printStackTrace();
+            }
+        }
+
+        int recentFileCount = CommonUtil.getIntValue(props.getProperty("recentfiles.count"), 0);
+        recentFiles.clear();
+        for (int i = 0; i < recentFileCount; i++) {
+            recentFiles.add(props.getProperty("recentfile" + i));
         }
     }
 
@@ -323,7 +389,7 @@ public class Settings implements Serializable {
      * @param in
      * @throws IOException
      */
-    private void readObject(ObjectInputStream in) throws IOException {
+    private void readObject_old(ObjectInputStream in) throws IOException {
         workingPath = readString(in, workingPath);
 
         isProxyEnabled = readBoolean(in, isProxyEnabled);
@@ -346,11 +412,11 @@ public class Settings implements Serializable {
         isShowFinishDialog = readBoolean(in, isShowFinishDialog);
 
         int pluginsCount = readInt(in, 0);
-        plugins = new String[pluginsCount];
+        plugins = new PluginInfo[pluginsCount];
         for (int i = 0; i < pluginsCount; i++) {
-            plugins[i] = readString(in, "");
+            plugins[i] = new PluginInfo( readString(in, ""), Constants.CORE_URI, null );
             try {
-                DefinitionResolver.registerPlugin(plugins[i]);
+                DefinitionResolver.registerPlugin(plugins[i].getClassName());
             } catch (PluginException e) {
                 e.printStackTrace();
             }
@@ -365,22 +431,24 @@ public class Settings implements Serializable {
 
     private void readFromFile() throws IOException {
         File configFile = new File(CONFIG_FILE_PATH);
+        // try first to read from the properties file
         if ( configFile.exists() ) {
-            FileInputStream fis = new FileInputStream(configFile);
-	        ObjectInputStream ois = new ObjectInputStream(fis);
-            readObject(ois);
+            Properties props = new Properties();
+            props.load(new FileInputStream(CONFIG_FILE_PATH));
+            loadFromProperties(props);
+        } else {
+            // if properties file doesn't exist, try to read from old formatted binary file
+            configFile = new File(CONFIG_FILE_PATH_OLD);
+            if ( configFile.exists() ) {
+                FileInputStream fis = new FileInputStream(configFile);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                readObject_old(ois);
+            }
         }
     }
 
     public void writeToFile() throws IOException {
-        File configFile = new File(CONFIG_FILE_PATH);
-        FileOutputStream fos = new FileOutputStream(configFile);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        writeObject(oos);
-        oos.flush();
-        fos.flush();
-        oos.close();
-        fos.close();
+        readProperties().store(new FileOutputStream(CONFIG_FILE_PATH), null);
     }
 
     public void writeSilentlyToFile() {

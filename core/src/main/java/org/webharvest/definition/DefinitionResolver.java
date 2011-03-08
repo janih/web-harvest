@@ -52,6 +52,7 @@ import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
+import sun.plugin2.main.server.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -131,9 +132,6 @@ public class DefinitionResolver {
         registerPlugin(FtpPlugin.class, true, Constants.CORE_URI);
         registerPlugin(TokenizePlugin.class, true, Constants.CORE_URI);
         registerPlugin(SleepPlugin.class, true, Constants.CORE_URI);
-
-        registerPlugin(FrankPlugin.class, false, Constants.CORE_URI);
-        registerPlugin(DavidPlugin.class, false, "http://david.com");
     }
 
     /**
@@ -206,17 +204,13 @@ public class DefinitionResolver {
         registerPlugin(pluginClass, false, uri);
     }
 
-    public static void unregisterPlugin(Class pluginClass, String uri) {
+    public static void unregisterPlugin(Class pluginClass) {
         if (pluginClass != null) {
-            unregisterPlugin(pluginClass.getName(), uri);
+            unregisterPlugin(pluginClass.getName());
         }
     }
 
-    public static void unregisterPlugin(Class pluginClass) {
-        unregisterPlugin(pluginClass, Constants.CORE_URI);
-    }
-
-    public static void unregisterPlugin(String className, String uri) {
+    public static void unregisterPlugin(String className) {
         // only external plugins can be unregistered
         if (isPluginRegistered(className)) {
             ElementName pluginElementName = externalPlugins.get(className);
@@ -228,14 +222,10 @@ public class DefinitionResolver {
             externalPluginDependences.remove(pluginElementName);
             if (dependantClasses != null) {
                 for (Class c : dependantClasses) {
-                    unregisterPlugin(c, uri);
+                    unregisterPlugin(c);
                 }
             }
         }
-    }
-
-    public static void unregisterPlugin(String className) {
-        unregisterPlugin(className, Constants.CORE_URI);
     }
 
     public static boolean isPluginRegistered(String className) {
@@ -298,6 +288,10 @@ public class DefinitionResolver {
         } catch (NoSuchMethodException e) {
             throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
         } catch (InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof ConfigurationException) {
+                throw (ConfigurationException)cause;
+            }
             throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
         } catch (InstantiationException e) {
             throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
@@ -358,7 +352,7 @@ public class DefinitionResolver {
         for (XmlAttribute att : node.getAllAttributes()) {
             String attUri = att.getUri();
             String attName = att.getName();
-            if ( !atts.contains(attName) || !Constants.CORE_URI.equals(attUri) ) {
+            if ( !atts.contains(attName) || !uri.equals(attUri) ) {
                 if ( !elementInfo.getNsAttsSet().contains(attUri) ) {
                     throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
                 }
