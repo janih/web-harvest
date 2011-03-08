@@ -164,8 +164,6 @@ public class WelcomePanel extends JPanel implements HyperlinkListener {
                 ide.openConfigFromFile();
             } else if ("#settings".equalsIgnoreCase(url)) {
                 ide.defineSettings();
-            } else if ("#help".equalsIgnoreCase(url)) {
-                ide.showHelp();
             } else if (url.toLowerCase().startsWith("download:")) {
                 String exampleUrl = url.substring(9);
                 ide.openConfigFromUrl(exampleUrl);

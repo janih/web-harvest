@@ -133,8 +133,6 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     // popup menu for XML editor panes
     private JPopupMenu editorPopupMenu;
 
-    private HelpFrame helpFrame;
-
     /**
      * Constructor.
      */
@@ -626,7 +624,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         // Build the HELP menu.
         menu = new MenuElements.Menu("Help");
         menu.setMnemonic('H');
-        defineMenuItem(menu, "Help", ResourceManager.HELP_ICON, KeyEvent.VK_H, COMMAND_HELP, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        defineMenuItem(menu, "User Manual", ResourceManager.HELP_ICON, KeyEvent.VK_H, COMMAND_HELP, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         menu.addSeparator();
         defineMenuItem(menu, "Program Homepage", ResourceManager.HOMEPAGE_ICON, KeyEvent.VK_H, COMMAND_HOMEPAGE, null);
         menu.addSeparator();
@@ -798,7 +796,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         } else if ( COMMAND_EXIT.equals(cmd) ) {
             exitApplication();
         } else if ( COMMAND_HELP.equals(cmd) ) {
-            showHelp();
+            openURLInBrowser("http://web-harvest.sourceforge.net/manual.php");
         } else if ( COMMAND_UNDO.equals(cmd) ) {
             ConfigPanel activeConfigPanel = getActiveConfigPanel();
             if (activeConfigPanel != null) {
@@ -952,17 +950,6 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         } catch (Exception e) {
             GuiUtils.showErrorMessage( "Error attempting to launch web browser" + ":\n" + e.getLocalizedMessage() );
         }
-    }
-
-    /**
-     * Opens help window.
-     */
-    public void showHelp() {
-        if (helpFrame == null) {
-            helpFrame = new HelpFrame();
-            helpFrame.setLocationRelativeTo(this);
-        }
-        helpFrame.setVisible(true);
     }
 
 }
