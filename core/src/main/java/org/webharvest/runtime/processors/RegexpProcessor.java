@@ -134,7 +134,7 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
                             break;
                         }
 
-                        for (int i = 1; i <= groupCount; i++) {
+                        for (int i = 0; i <= groupCount; i++) {
                             context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
                         }
 

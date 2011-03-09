@@ -56,7 +56,7 @@ import org.webharvest.runtime.web.HttpClientManager;
  * Time: 10:53:40 PM
  */
 
-public class RegexpProcessorTest extends UnitilsTestNG {
+public class RegexpProcessor_Replace_Test extends UnitilsTestNG {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
@@ -73,77 +73,85 @@ public class RegexpProcessorTest extends UnitilsTestNG {
     }
 
     @Test
-    public void testExecute_full() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
-                "<regexp>" +
+    public void testExecute_fullMatch() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222c333</regexp-source>" +
-                "  <regexp-result>" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
-                "  </regexp-result>" +
+                "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>").
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][222][333]");
+                execute(scraperMock.getMock(), context).toString(),
+                "[a111b222c333] => [111][222][333]");
     }
 
     @Test
-    public void testExecute_empty() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
-                "<regexp>" +
+    public void testExecute_notMatch() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
+                "  <regexp-pattern>^(\\d+)$</regexp-pattern>" +
+                "  <regexp-source>xxx</regexp-source>" +
+                "  <regexp-result><![CDATA[[$0] => [$1]]]></regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString(),
+                "xxx");
+    }
+
+    @Test
+    public void testExecute_emptySource() throws Exception {
+        Assert.assertTrue(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source></regexp-source>" +
-                "  <regexp-result>" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
-                "  </regexp-result>" +
+                "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>").
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "");
+                execute(scraperMock.getMock(), context).isEmpty());
     }
 
     @Test
-    public void testExecute_1st_part_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
-                "<regexp>" +
+    public void testExecute_1st_group_absent() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>b222c333</regexp-source>" +
-                "  <regexp-result>" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
-                "  </regexp-result>" +
+                "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>").
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[][222][333]");
+                execute(scraperMock.getMock(), context).toString(),
+                "[b222c333] => [][222][333]");
     }
 
     @Test
-    public void testExecute_2nd_part_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
-                "<regexp>" +
+    public void testExecute_2nd_group_absent() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111c333</regexp-source>" +
-                "  <regexp-result>" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
-                "  </regexp-result>" +
+                "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>").
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][][333]");
+                execute(scraperMock.getMock(), context).toString(),
+                "[a111c333] => [111][][333]");
     }
 
     @Test
-    public void testExecute_3rd_part_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor("" +
-                "<regexp>" +
+    public void testExecute_3rd_group_absent() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222</regexp-source>" +
-                "  <regexp-result>" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
-                "  </regexp-result>" +
+                "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>").
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[111][222][]");
+                execute(scraperMock.getMock(), context).toString(),
+                "[a111b222] => [111][222][]");
+    }
+
+    @Test
+    public void testExecute_replaceAll() throws Exception {
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+                "<regexp replace='yes'>" +
+                "  <regexp-pattern>\\d+</regexp-pattern>" +
+                "  <regexp-source>a111b222</regexp-source>" +
+                "  <regexp-result>|</regexp-result>" +
+                "</regexp>").
+                execute(scraperMock.getMock(), context).toString(),
+                "a|b|");
     }
 }
