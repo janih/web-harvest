@@ -20,7 +20,7 @@ import java.util.Calendar;
 
 public class AboutWindow extends JWindow implements HyperlinkListener {
 
-    private static final Dimension WINDOW_DIMENSION = new Dimension(350, 280);
+    private static final Dimension WINDOW_DIMENSION = new Dimension(350, 320);
 
     // Ide instance where this dialog belongs.
     private Ide ide;
