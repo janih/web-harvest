@@ -51,7 +51,7 @@ public class GetVarPlugin extends WebHarvestPlugin {
     private static final String ATTR_VAR = "var";
 
     public Variable executePlugin(Scraper scraper, ScraperContext context) {
-        final String varName = getAttributes().get(ATTR_VAR);
+        final String varName = evaluateAttribute(ATTR_VAR, scraper);
 
         final Variable value = context.getVar(varName);
 
