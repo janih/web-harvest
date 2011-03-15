@@ -57,7 +57,7 @@ public class WebHarvestPluginDef extends BaseElementDef {
     }
 
     public String getShortElementName() {
-        return name != null ? name.toLowerCase() : "unknown plugin";
+        return xmlNode.getQName();
     }
 
 }
