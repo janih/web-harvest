@@ -38,21 +38,41 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import org.slf4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.unitils.mock.annotation.Dummy;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.KeyValuePair;
 
+import static java.util.Arrays.asList;
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 public class GetVarPluginTest extends UnitilsTestNG {
 
+    @Dummy
+    Logger logger;
+
     Mock<ScraperContext> contextMock;
+    Mock<Scraper> scraperMock;
+
+    @BeforeMethod
+    public void before() {
+        scraperMock.returns(logger).getLogger();
+        scraperMock.returns(contextMock.getMock()).getContext();
+        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
+    }
 
     @Test
     public void testExecutePlugin() throws Exception {
@@ -78,13 +98,20 @@ public class GetVarPluginTest extends UnitilsTestNG {
 
     @Test
     public void testExecutePlugin_templateAsVarName() throws Exception {
-        contextMock.returns(EmptyVariable.INSTANCE).getVar("${not evaluated}");
+        final NodeVariable v123 = new NodeVariable(123);
 
-        Assert.assertSame(
-                createPlugin("<get var='${not evaluated}'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
-                EmptyVariable.INSTANCE);
+        contextMock.
+                returns(v123).
+                getVar("x7");
+        contextMock.
+                returns(asList(new KeyValuePair<Variable>("x7", v123)).iterator()).
+                iterator();
 
-        contextMock.assertInvoked().getVar("${not evaluated}");
+        Assert.assertEquals(
+                createPlugin("<get var='x${5+2}'/>", GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()),
+                v123);
+
+        contextMock.assertInvoked().getVar("x7");
     }
 
     @Test(expectedExceptions = VariableException.class)
