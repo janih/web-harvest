@@ -48,6 +48,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -89,7 +90,7 @@ public class HttpClientManager {
     }
 
     public void setCookiePolicy(String cookiePolicy) {
-        if ("browser".equalsIgnoreCase(cookiePolicy)) {
+        if (StringUtils.isBlank(cookiePolicy) || "browser".equalsIgnoreCase(cookiePolicy)) {
             client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
             // http://hc.apache.org/httpclient-3.x/cookies.html
             client.getParams().setParameter(HttpMethodParams.SINGLE_COOKIE_HEADER, Boolean.TRUE);
@@ -104,7 +105,7 @@ public class HttpClientManager {
             client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
 
         } else {
-            client.getParams().setCookiePolicy(CookiePolicy.DEFAULT);
+            client.getParams().setCookiePolicy(cookiePolicy);
         }
     }
 
@@ -366,9 +367,7 @@ public class HttpClientManager {
         }
 
         final GetMethod method = new GetMethod(url);
-        if (followRedirects != null) {
-            method.setFollowRedirects(followRedirects);
-        }
+        method.setFollowRedirects(followRedirects);
         return method;
     }
 

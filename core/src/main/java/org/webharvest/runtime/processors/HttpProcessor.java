@@ -59,6 +59,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.webharvest.utils.CommonUtil.getBooleanValue;
+
 /**
  * Http processor.
  */
@@ -79,8 +81,8 @@ public class HttpProcessor extends BaseProcessor<HttpDef> {
 
         final String url = BaseTemplater.evaluateToString(elementDef.getUrl(), null, scraper);
         final String method = BaseTemplater.evaluateToString(elementDef.getMethod(), null, scraper);
-        final Boolean followRedirects = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFollowRedirects(), null, scraper), null);
-        final Boolean isMultipart = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getMultipart(), null, scraper), false);
+        final Boolean followRedirects = getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFollowRedirects(), null, scraper), true);
+        final Boolean isMultipart = getBooleanValue(BaseTemplater.evaluateToString(elementDef.getMultipart(), null, scraper), false);
         final String specifiedCharset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         final String username = BaseTemplater.evaluateToString(elementDef.getUsername(), null, scraper);
         final String password = BaseTemplater.evaluateToString(elementDef.getPassword(), null, scraper);
