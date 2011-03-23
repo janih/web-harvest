@@ -52,7 +52,6 @@ import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
-import sun.plugin2.main.server.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -120,18 +119,18 @@ public class DefinitionResolver {
         registerInternalElement("script", new ElementInfo("script", ScriptDef.class, null, "id,language,return"));
         registerInternalElement("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
 
-        registerPlugin(SetVarPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(DefVarPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(GetVarPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(ValueOfPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(DatabasePlugin.class, true, Constants.CORE_URI);
-        registerPlugin(JsonToXmlPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(XmlToJsonPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(MailPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(ZipPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(FtpPlugin.class, true, Constants.CORE_URI);
-        registerPlugin(TokenizePlugin.class, true, Constants.CORE_URI);
-        registerPlugin(SleepPlugin.class, true, Constants.CORE_URI);
+        registerPlugin(SetVarPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(DefVarPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(GetVarPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(ValueOfPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(DatabasePlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(JsonToXmlPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(XmlToJsonPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(MailPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(ZipPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(FtpPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(TokenizePlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(SleepPlugin.class, true, Constants.XMLNS_CORE);
     }
 
     /**
@@ -188,7 +187,7 @@ public class DefinitionResolver {
     }
 
     public static void registerPlugin(Class pluginClass) throws PluginException {
-        registerPlugin(pluginClass, false, Constants.CORE_URI);
+        registerPlugin(pluginClass, false, Constants.XMLNS_CORE);
     }
 
     public static void registerPlugin(Class pluginClass, String uri) throws PluginException {
@@ -196,7 +195,7 @@ public class DefinitionResolver {
     }
 
     public static void registerPlugin(String fullClassName) throws PluginException {
-        registerPlugin(fullClassName, Constants.CORE_URI);
+        registerPlugin(fullClassName, Constants.XMLNS_CORE);
     }
 
     public static void registerPlugin(String fullClassName, String uri) throws PluginException {

@@ -228,7 +228,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     }
 
     protected boolean evaluateAttributeAsBoolean(String attName, boolean defaultValue, Scraper scraper) {
-        return evaluateAttributeAsBoolean(attName, Constants.CORE_URI, defaultValue, scraper);
+        return evaluateAttributeAsBoolean(attName, Constants.XMLNS_CORE, defaultValue, scraper);
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     }
 
     protected int evaluateAttributeAsInteger(String attName, int defaultValue, Scraper scraper) {
-        return evaluateAttributeAsInteger(attName, Constants.CORE_URI, defaultValue, scraper);
+        return evaluateAttributeAsInteger(attName, Constants.XMLNS_CORE, defaultValue, scraper);
     }
 
     /**
@@ -256,7 +256,7 @@ public abstract class WebHarvestPlugin extends BaseProcessor {
     }
 
     protected double evaluateAttributeAsDouble(String attName, double defaultValue, Scraper scraper) {
-        return evaluateAttributeAsDouble(attName, Constants.CORE_URI, defaultValue, scraper);
+        return evaluateAttributeAsDouble(attName, Constants.XMLNS_CORE, defaultValue, scraper);
     }
 
     /**

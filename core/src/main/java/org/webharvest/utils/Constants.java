@@ -47,8 +47,9 @@ public class Constants {
     public static final int SPLITTER_WIDTH = 7;
 
     // uris to identify xml namespaces of the Web-Harvest language
-    public static final String CORE_URI = "http://web-harvest.sourceforge.net/wh-core.xsd";
-    public static final String VAR_URI = "http://web-harvest.sourceforge.net/wh-var.xsd";
-    public static final String PARAM_URI = "http://web-harvest.sourceforge.net/wh-param.xsd";
+    public static final String XMLNS_CORE_10 = "http://web-harvest.sourceforge.net/schema/1.0/config";
+    public static final String XMLNS_CORE = "http://web-harvest.sourceforge.net/schema/2.0/core";
+    public static final String XMLNS_VAR = "http://web-harvest.sourceforge.net/schema/2.0/var";
+    public static final String XMLNS_PARAM = "http://web-harvest.sourceforge.net/schema/2.0/param";
 
 }

@@ -376,7 +376,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                 String className = pluginClassNameField.getText().trim();
                 String namespaceUri = pluginNamespaceUriField.getText().trim();
                 if ( CommonUtil.isEmptyString(namespaceUri) ) {
-                    namespaceUri = Constants.CORE_URI;
+                    namespaceUri = Constants.XMLNS_CORE;
                 }
                 if (className != null) {
                     pluginListModel.addElement(new PluginInfo(className, namespaceUri, null), true);
@@ -615,10 +615,10 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         if (selectedPluginIndex >= 0 && selectedPluginIndex < pluginListModel.getSize()) {
             PluginInfo pluginItem = (PluginInfo) pluginListModel.get(selectedPluginIndex);
             pluginClassNameField.setText(pluginItem.getClassName());
-            pluginNamespaceUriField.setText( CommonUtil.nvl(pluginItem.getUri(), Constants.CORE_URI) );
+            pluginNamespaceUriField.setText( CommonUtil.nvl(pluginItem.getUri(), Constants.XMLNS_CORE) );
         } else {
             pluginClassNameField.setText("");
-            pluginNamespaceUriField.setText(Constants.CORE_URI);
+            pluginNamespaceUriField.setText(Constants.XMLNS_CORE);
         }
     }
 

@@ -15,7 +15,7 @@ public class PluginInfo {
 
     public PluginInfo(String className, String uri, String errorMessage) {
         this.className = className;
-        this.uri = CommonUtil.nvl(uri, Constants.CORE_URI);
+        this.uri = CommonUtil.nvl(uri, Constants.XMLNS_CORE);
         this.errorMessage = errorMessage;
     }
 

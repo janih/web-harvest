@@ -38,7 +38,6 @@ package org.webharvest.definition;
 
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.utils.Constants;
-import org.webharvest.utils.KeyValuePair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,8 +54,8 @@ public class XPathDef extends BaseElementDef {
         super(xmlNode);
 
         this.expression = xmlNode.getAttribute("expression");
-        for (Map.Entry<String, String> attEntry: xmlNode.getAttributes(Constants.VAR_URI).entrySet()) {
-            variableMap.put( attEntry.getKey(), attEntry.getValue() );
+        for (Map.Entry<String, String> attEntry : xmlNode.getAttributes(Constants.XMLNS_VAR).entrySet()) {
+            variableMap.put(attEntry.getKey(), attEntry.getValue());
         }
 
         if (this.expression == null && variableMap.size() == 0) {

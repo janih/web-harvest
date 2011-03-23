@@ -44,9 +44,6 @@ package org.webharvest;
  */
 public class WHConstants {
 
-    public static final String XML_NS_CORE = "http://web-harvest.sourceforge.net/schema/scraper-core-2.0.xsd";
-    public static final String XML_NS_PROPERTY = "http://web-harvest.sourceforge.net/schema/scraper-property-2.0.xsd";
-
     public static final String MIME_TYPES[] = {
             "application/x-bytecode.python",
             "application/acad",

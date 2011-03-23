@@ -100,9 +100,9 @@ public class ElementInfo {
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken().toLowerCase();
                 if ("p:*".equals(token)) {
-                    nsAttsSet.add(Constants.PARAM_URI);
+                    nsAttsSet.add(Constants.XMLNS_PARAM);
                 } else if ("v:*".equals(token)) {
-                    nsAttsSet.add(Constants.VAR_URI);
+                    nsAttsSet.add(Constants.XMLNS_VAR);
                 } else if (token.startsWith("!")) {
                     token = token.substring(1);
                     this.requiredAttsSet.add(token);

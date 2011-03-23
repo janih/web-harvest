@@ -13,13 +13,13 @@ public class ElementName implements Comparable {
     private String uri;
 
     public ElementName(String name) {
-        this(name, Constants.CORE_URI);
+        this(name, Constants.XMLNS_CORE);
     }
 
     public ElementName(String name, String uri) {
         Assert.isFalse(CommonUtil.isEmptyString(name), "Element name cannot be empty!");
         this.name = name;
-        this.uri = CommonUtil.nvl(uri, Constants.CORE_URI) ;
+        this.uri = CommonUtil.nvl(uri, Constants.XMLNS_CORE) ;
     }
 
     public String getName() {
