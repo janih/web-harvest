@@ -44,6 +44,8 @@ package org.webharvest;
  */
 public class WHConstants {
 
+    //todo: merge with org.webharvest.utils.Constants
+
     public static final String MIME_TYPES[] = {
             "application/x-bytecode.python",
             "application/acad",

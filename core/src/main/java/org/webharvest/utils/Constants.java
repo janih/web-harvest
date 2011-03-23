@@ -38,6 +38,8 @@ package org.webharvest.utils;
 
 public class Constants {
 
+    //todo: merge with org.webharvest.WHConstants
+
     public static final int DEFAULT_MAX_LOOPS = 1000000000;
 
     public static final String VALUE_PROPERTY_NAME = "[Value]";
