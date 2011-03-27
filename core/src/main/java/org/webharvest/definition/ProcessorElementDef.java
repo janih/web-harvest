@@ -34,31 +34,33 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.processors;
+package org.webharvest.definition;
 
-import org.webharvest.definition.TemplateDef;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptingLanguage;
-import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.processors.AbstractProcessor;
 
-/**
- * Template processor. Responsible for replacing marked portions of the
- * text with evaluated expressions.
- */
-public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
+public class ProcessorElementDef extends AbstractElementDef {
 
-    public TemplateProcessor(TemplateDef templateDef) {
-        super(templateDef);
+    private Class<? extends AbstractProcessor> processorClass;
+
+    protected ProcessorElementDef(Class<? extends AbstractProcessor> processorClass) {
+        this.processorClass = processorClass;
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
-        return new NodeVariable(BaseTemplater.evaluateToString(
-                getBodyTextContent(elementDef, scraper, context).toString(),
-                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)),
-                scraper));
+    protected ProcessorElementDef(XmlNode node, Class<? extends AbstractProcessor> processorClass) {
+        this(node, true, processorClass);
     }
 
+    protected ProcessorElementDef(XmlNode node, String descName) {
+        this(node, (Class<AbstractProcessor>) null);
+        this.descName = descName;
+    }
+
+    protected ProcessorElementDef(XmlNode node, boolean createBodyDefs, Class<? extends AbstractProcessor> processorClass) {
+        super(node, createBodyDefs);
+        this.processorClass = processorClass;
+    }
+
+    public Class<? extends AbstractProcessor> getProcessorClass() {
+        return processorClass;
+    }
 }

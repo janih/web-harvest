@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of function call.
  */
-public class CallDef extends BaseElementDef {
+public class CallDef extends ProcessorElementDef {
 
     private String name;
 
-    public CallDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public CallDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
 
         this.name = xmlNode.getAttribute("name");
     }

@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of HTTP header.
  */
-public class HttpHeaderDef extends BaseElementDef {
+public class HttpHeaderDef extends ProcessorElementDef {
 
     private String name;
 
-    public HttpHeaderDef(XmlNode xmlNode) {
-    	super(xmlNode);
+    public HttpHeaderDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    	super(xmlNode, processorClass);
     	
         this.name = xmlNode.getAttribute("name");
     }

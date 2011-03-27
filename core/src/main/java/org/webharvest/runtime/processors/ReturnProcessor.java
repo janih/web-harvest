@@ -45,7 +45,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Function's return value processor.
  */
-public class ReturnProcessor extends BaseProcessor<ReturnDef> {
+public class ReturnProcessor extends AbstractProcessor<ReturnDef> {
 
     public ReturnProcessor(ReturnDef returnDef) {
         super(returnDef);

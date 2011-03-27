@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.DatabaseException;
-import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
@@ -88,7 +88,7 @@ public class Scraper {
     private HttpClientManager httpClientManager;
 
     // stack of running processors
-    private transient Stack<BaseProcessor> runningProcessors = new Stack<BaseProcessor>();
+    private transient Stack<AbstractProcessor> runningProcessors = new Stack<AbstractProcessor>();
 
     // stack of running functions
     private transient Stack<CallProcessor> runningFunctions = new Stack<CallProcessor>();
@@ -163,7 +163,7 @@ public class Scraper {
 
         try {
             for (IElementDef elementDef : ops) {
-                BaseProcessor processor = ProcessorResolver.createProcessor(elementDef);
+                AbstractProcessor processor = ProcessorResolver.createProcessor(elementDef);
                 if (processor != null) {
                     processor.run(this, context);
                 }
@@ -269,7 +269,7 @@ public class Scraper {
         return logger;
     }
 
-    public BaseProcessor getRunningProcessor() {
+    public AbstractProcessor getRunningProcessor() {
         return runningProcessors.peek();
     }
 
@@ -278,8 +278,8 @@ public class Scraper {
      * @return Parent running processor of the specified running processor, or null if processor is
      *         not currently running or if it is top running processor.
      */
-    public BaseProcessor getParentRunningProcessor(BaseProcessor processor) {
-        List<BaseProcessor> runningProcessorList = runningProcessors.getList();
+    public AbstractProcessor getParentRunningProcessor(AbstractProcessor processor) {
+        List<AbstractProcessor> runningProcessorList = runningProcessors.getList();
         int index = CommonUtil.findValueInCollection(runningProcessorList, processor);
         return index > 0 ? runningProcessorList.get(index - 1) : null;
     }
@@ -288,11 +288,11 @@ public class Scraper {
      * @param processorClazz Class of enclosing running processor.
      * @return Parent running processor in the tree of specified class, or null if it doesn't exist.
      */
-    public BaseProcessor getRunningProcessorOfType(Class processorClazz) {
-        List<BaseProcessor> runningProcessorList = runningProcessors.getList();
-        ListIterator<BaseProcessor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
+    public AbstractProcessor getRunningProcessorOfType(Class processorClazz) {
+        List<AbstractProcessor> runningProcessorList = runningProcessors.getList();
+        ListIterator<AbstractProcessor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
         while (listIterator.hasPrevious()) {
-            BaseProcessor curr = listIterator.previous();
+            AbstractProcessor curr = listIterator.previous();
             if (processorClazz.equals(curr.getClass())) {
                 return curr;
             }
@@ -334,7 +334,7 @@ public class Scraper {
         }
     }
 
-    public void setExecutingProcessor(BaseProcessor processor) {
+    public void setExecutingProcessor(AbstractProcessor processor) {
         runningProcessors.push(processor);
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onNewProcessorExecution(this, processor);
@@ -345,7 +345,7 @@ public class Scraper {
         this.runningProcessors.pop();
     }
 
-    public void processorFinishedExecution(BaseProcessor processor, Map properties) {
+    public void processorFinishedExecution(AbstractProcessor processor, Map properties) {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onProcessorExecutionFinished(this, processor, properties);
         }

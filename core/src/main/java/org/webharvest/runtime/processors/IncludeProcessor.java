@@ -55,7 +55,7 @@ import java.net.URL;
 /**
  * Include processor.
  */
-public class IncludeProcessor extends BaseProcessor<IncludeDef> {
+public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
 
     public IncludeProcessor(IncludeDef includeDef) {
         super(includeDef);

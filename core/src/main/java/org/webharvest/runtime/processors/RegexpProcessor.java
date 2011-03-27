@@ -37,7 +37,7 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 /**
  * Regular expression replace processor.
  */
-public class RegexpProcessor extends BaseProcessor<RegexpDef> {
+public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
     public RegexpProcessor(RegexpDef regexpDef) {
         super(regexpDef);
@@ -65,11 +65,11 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
 
     public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
 
-        BaseElementDef patternDef = elementDef.getRegexpPatternDef();
+        ProcessorElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
         debug(patternDef, scraper, patternVar);
 
-        BaseElementDef sourceDef = elementDef.getRegexpSourceDef();
+        ProcessorElementDef sourceDef = elementDef.getRegexpSourceDef();
         Variable source = new BodyProcessor(sourceDef).run(scraper, context);
         debug(sourceDef, scraper, source);
 
@@ -138,7 +138,7 @@ public class RegexpProcessor extends BaseProcessor<RegexpDef> {
                             context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
                         }
 
-                        BaseElementDef resultDef = elementDef.getRegexpResultDef();
+                        ProcessorElementDef resultDef = elementDef.getRegexpResultDef();
                         Variable result = getBodyTextContent(resultDef, scraper, context, true);
                         debug(resultDef, scraper, result);
 

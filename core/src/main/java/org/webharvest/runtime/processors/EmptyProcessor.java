@@ -45,7 +45,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Empty processor = executes body and returns empty variable.
  */
-public class EmptyProcessor extends BaseProcessor<EmptyDef> {
+public class EmptyProcessor extends AbstractProcessor<EmptyDef> {
 
     public EmptyProcessor(EmptyDef emptyDef) {
         super(emptyDef);

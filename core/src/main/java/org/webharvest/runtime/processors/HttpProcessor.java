@@ -64,7 +64,7 @@ import static org.webharvest.utils.CommonUtil.getBooleanValue;
 /**
  * Http processor.
  */
-public class HttpProcessor extends BaseProcessor<HttpDef> {
+public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
     private static final String HTML_META_CHARSET_REGEX =
             "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')\\s*/?>)";

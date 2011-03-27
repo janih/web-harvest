@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of include element.
  */
-public class IncludeDef extends BaseElementDef {
+public class IncludeDef extends ProcessorElementDef {
 
     private String path;
 
-    public IncludeDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public IncludeDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
         this.path = xmlNode.getAttribute("path");
     }

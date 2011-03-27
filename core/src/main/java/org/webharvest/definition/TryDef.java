@@ -36,31 +36,33 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of try-catche element.
  */
-public class TryDef extends BaseElementDef {
+public class TryDef extends ProcessorElementDef {
 
-    private BaseElementDef tryBodyDef;
-    private BaseElementDef catchValueDef;
+    private ProcessorElementDef tryBodyDef;
+    private ProcessorElementDef catchValueDef;
 
-    public TryDef(XmlNode xmlNode) {
-    	super(xmlNode, false);
+    public TryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    	super(xmlNode, false, processorClass);
 
-        XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body"));
+        XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         DefinitionResolver.validate(tryBodyDefNode);
-        this.tryBodyDef = tryBodyDefNode == null ? null : new BaseElementDef(tryBodyDefNode, "body");
+        this.tryBodyDef = tryBodyDefNode == null ? null : new ProcessorElementDef(tryBodyDefNode, "body");
 
-        XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch"));
+        XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
         DefinitionResolver.validate(catchValueDefNode);
-        this.catchValueDef = catchValueDefNode == null ? null : new BaseElementDef(catchValueDefNode, "catch");
+        this.catchValueDef = catchValueDefNode == null ? null : new ProcessorElementDef(catchValueDefNode, "catch");
     }
 
-    public BaseElementDef getTryBodyDef() {
+    public ProcessorElementDef getTryBodyDef() {
         return tryBodyDef;
     }
 
-    public BaseElementDef getCatchValueDef() {
+    public ProcessorElementDef getCatchValueDef() {
         return catchValueDef;
     }
 

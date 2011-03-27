@@ -49,7 +49,7 @@ import java.util.Map;
  * Base for all user-defined plugins.
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public abstract class WebHarvestPlugin extends BaseProcessor {
+public abstract class WebHarvestPlugin extends AbstractProcessor {
 
     private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
 

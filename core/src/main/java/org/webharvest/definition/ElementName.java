@@ -1,6 +1,7 @@
 package org.webharvest.definition;
 
-import org.webharvest.utils.*;
+import org.webharvest.utils.Assert;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Name of the single element (tag in configuraton xml). It consists of the pair -
@@ -12,14 +13,10 @@ public class ElementName implements Comparable {
     private String name;
     private String uri;
 
-    public ElementName(String name) {
-        this(name, Constants.XMLNS_CORE);
-    }
-
     public ElementName(String name, String uri) {
         Assert.isFalse(CommonUtil.isEmptyString(name), "Element name cannot be empty!");
         this.name = name;
-        this.uri = CommonUtil.nvl(uri, Constants.XMLNS_CORE) ;
+        this.uri = uri;
     }
 
     public String getName() {
@@ -52,7 +49,7 @@ public class ElementName implements Comparable {
     @Override
     public int compareTo(Object o) {
         if (o instanceof ElementName) {
-            ElementName elementName = (ElementName)o;
+            ElementName elementName = (ElementName) o;
             int cmp = name.compareTo(elementName.name);
             if (cmp != 0) {
                 return cmp;

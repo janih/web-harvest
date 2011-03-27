@@ -52,7 +52,7 @@ import java.io.IOException;
 /**
  * HTML to XML processor.
  */
-public class HtmlToXmlProcessor extends BaseProcessor<HtmlToXmlDef> {
+public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
 
     public HtmlToXmlProcessor(HtmlToXmlDef htmlToXmlDef) {
         super(htmlToXmlDef);

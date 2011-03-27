@@ -36,12 +36,13 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.utils.CommonUtil;
 
 /**
  * Definition of file proessor.
  */
-public class FileDef extends BaseElementDef {
+public class FileDef extends ProcessorElementDef {
 
     private String action;
     private String path;
@@ -52,8 +53,8 @@ public class FileDef extends BaseElementDef {
     private String listDirs;
     private String listRecursive;
 
-    public FileDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public FileDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
 
         this.action = xmlNode.getAttribute("action");
         this.path = CommonUtil.adaptFilename( xmlNode.getAttribute("path") );

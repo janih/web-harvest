@@ -37,16 +37,17 @@
 package org.webharvest.definition;
 
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 /**
  * Definition of variable call.
  */
-public class VarDef extends BaseElementDef {
+public class VarDef extends ProcessorElementDef {
 
     private String name;
 
-    public VarDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public VarDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
         this.name = StringUtils.trim(xmlNode.getAttribute("name"));
     }

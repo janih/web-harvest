@@ -38,6 +38,7 @@ package org.webharvest.definition;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.processors.ConstantProcessor;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.xml.sax.InputSource;
 
@@ -110,7 +111,10 @@ public class ScraperConfiguration {
 
     private void createFromInputStream(InputSource in) {
         // loads configuration from input stream to the internal structure
-        XmlNode node = XmlNode.getInstance(in);
+        final XmlNode node = XmlNode.getInstance(in);
+
+        final String xmlns = node.getUri();
+        System.out.println("WH config URI: "+xmlns);
 
         this.charset = StringUtils.defaultIfEmpty(node.getAttribute("charset"), DEFAULT_CHARSET);
 
@@ -121,7 +125,7 @@ public class ScraperConfiguration {
         for (Object element : node.getElementList()) {
             operations.add((element instanceof XmlNode)
                     ? DefinitionResolver.createElementDefinition((XmlNode) element)
-                    : new ConstantDef(element.toString()));
+                    : new ConstantDef(element.toString(), ConstantProcessor.class));
         }
     }
 

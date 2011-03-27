@@ -1,6 +1,6 @@
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -11,9 +11,9 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Processor which executes only body and returns variables list.
  */
-public class BodyProcessor extends BaseProcessor<BaseElementDef> {
+public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
 
-    public BodyProcessor(BaseElementDef elementDef) {
+    public BodyProcessor(AbstractElementDef elementDef) {
         super(elementDef);
     }
 

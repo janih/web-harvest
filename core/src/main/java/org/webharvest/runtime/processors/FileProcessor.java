@@ -61,7 +61,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * File processor.
  */
-public class FileProcessor extends BaseProcessor<FileDef> {
+public class FileProcessor extends AbstractProcessor<FileDef> {
 
     public FileProcessor(FileDef fileDef) {
         super(fileDef);

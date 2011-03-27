@@ -47,7 +47,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Variable definition http param processor.
  */
-public class HttpParamProcessor extends BaseProcessor<HttpParamDef> {
+public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 
     public HttpParamProcessor(HttpParamDef httpParamDef) {
         super(httpParamDef);

@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of template task.
  */
-public class TemplateDef extends BaseElementDef {
+public class TemplateDef extends ProcessorElementDef {
 
     private String language;
 
-    public TemplateDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public TemplateDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
         this.language = xmlNode.getAttribute("language");
     }
 

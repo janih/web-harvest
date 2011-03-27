@@ -48,7 +48,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Script processor - executes script defined in the body.
  */
-public class ScriptProcessor extends BaseProcessor<ScriptDef> {
+public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
 
     public ScriptProcessor(ScriptDef scriptDef) {
         super(scriptDef);

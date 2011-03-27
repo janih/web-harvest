@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of user-defined function.
  */
-public class FunctionDef extends BaseElementDef {
+public class FunctionDef extends ProcessorElementDef {
 
     private String name;
 
-    public FunctionDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public FunctionDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
         
         this.name = xmlNode.getAttribute("name");
     }

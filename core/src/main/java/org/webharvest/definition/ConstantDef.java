@@ -36,16 +36,19 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of constant processor. It is not explicitly used
  * in configuaration xml, but is used internally to define static
  * (text) content. 
  */
-public class ConstantDef extends BaseElementDef {
+public class ConstantDef extends ProcessorElementDef {
 
     private String text;
 
-    public ConstantDef(String text) {
+    public ConstantDef(String text, Class<? extends AbstractProcessor> processorClass) {
+        super(processorClass);
         this.text = text;
     }
 

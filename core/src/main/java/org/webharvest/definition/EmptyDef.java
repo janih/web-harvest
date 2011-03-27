@@ -36,14 +36,16 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of empty element. Empty element just executes body and
  * returns single empty variable.
  */
-public class EmptyDef extends BaseElementDef {
+public class EmptyDef extends ProcessorElementDef {
 
-    public EmptyDef(XmlNode xmlNode) {
-    	super(xmlNode);
+    public EmptyDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    	super(xmlNode, processorClass);
     }
 
     public String getShortElementName() {

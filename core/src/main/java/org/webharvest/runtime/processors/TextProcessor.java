@@ -48,7 +48,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Text processor.
  */
-public class TextProcessor extends BaseProcessor<TextDef> {
+public class TextProcessor extends AbstractProcessor<TextDef> {
 
     public TextProcessor(TextDef textDef) {
         super(textDef);

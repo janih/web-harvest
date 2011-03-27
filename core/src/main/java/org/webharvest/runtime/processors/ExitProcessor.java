@@ -11,7 +11,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Exit processor.
  */
-public class ExitProcessor extends BaseProcessor<ExitDef> {
+public class ExitProcessor extends AbstractProcessor<ExitDef> {
 
     public ExitProcessor(ExitDef exitDef) {
         super(exitDef);

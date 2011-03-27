@@ -45,7 +45,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Constant processor.
  */
-public class ConstantProcessor extends BaseProcessor<ConstantDef> {
+public class ConstantProcessor extends AbstractProcessor<ConstantDef> {
 
     public ConstantProcessor(ConstantDef constantDef) {
         super(constantDef);

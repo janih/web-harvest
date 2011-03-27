@@ -41,7 +41,7 @@ import net.sf.saxon.query.DynamicQueryContext;
 import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.XQueryDef;
 import org.webharvest.definition.XQueryExternalParamDef;
 import org.webharvest.exception.ScraperXQueryException;
@@ -64,7 +64,7 @@ import java.util.TreeSet;
 /**
  * XQuery processor.
  */
-public class XQueryProcessor extends BaseProcessor<XQueryDef> {
+public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
 
     public static final Set<String> ALLOWED_PARAM_TYPES = new TreeSet<String>();
     public static String DEFAULT_PARAM_TYPE = "node()";
@@ -94,7 +94,7 @@ public class XQueryProcessor extends BaseProcessor<XQueryDef> {
     }
 
     public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
-        BaseElementDef xqueryElementDef = elementDef.getXqDef();
+        ProcessorElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
         debug(xqueryElementDef, scraper, xq);
 

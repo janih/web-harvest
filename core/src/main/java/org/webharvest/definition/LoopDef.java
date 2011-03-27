@@ -36,29 +36,31 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of loop processor.
  */
-public class LoopDef extends BaseElementDef {
+public class LoopDef extends ProcessorElementDef {
 
     private String maxloops;
     private String item;
     private String index;
     private String filter;
     private String empty;
-    private BaseElementDef loopValueDef;
-    private BaseElementDef loopBodyDef;
+    private ProcessorElementDef loopValueDef;
+    private ProcessorElementDef loopBodyDef;
 
-    public LoopDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public LoopDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
-        XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list"));
+        XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
         DefinitionResolver.validate(loopValueDefNode);
-        this.loopValueDef = loopValueDefNode == null ? null : new BaseElementDef(loopValueDefNode, "list");
+        this.loopValueDef = loopValueDefNode == null ? null : new ProcessorElementDef(loopValueDefNode, "list");
 
-        XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body"));
+        XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         DefinitionResolver.validate(loopBodyDefNode);
-        this.loopBodyDef = loopBodyDefNode == null ? null : new BaseElementDef(loopBodyDefNode, "body");
+        this.loopBodyDef = loopBodyDefNode == null ? null : new ProcessorElementDef(loopBodyDefNode, "body");
 
         this.maxloops = xmlNode.getAttribute("maxloops");
         this.item = xmlNode.getAttribute("item");
@@ -87,11 +89,11 @@ public class LoopDef extends BaseElementDef {
         return empty;
     }
 
-    public BaseElementDef getLoopValueDef() {
+    public ProcessorElementDef getLoopValueDef() {
         return loopValueDef;
     }
 
-    public BaseElementDef getLoopBodyDef() {
+    public ProcessorElementDef getLoopBodyDef() {
         return loopBodyDef;
     }
 

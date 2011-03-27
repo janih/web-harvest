@@ -45,7 +45,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Function definition processor.
  */
-public class FunctionProcessor extends BaseProcessor<FunctionDef> {
+public class FunctionProcessor extends AbstractProcessor<FunctionDef> {
 
     public FunctionProcessor(FunctionDef functionDef) {
         super(functionDef);

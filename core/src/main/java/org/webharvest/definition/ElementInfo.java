@@ -36,8 +36,9 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.utils.*;
+import org.webharvest.utils.Constants;
 
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -54,7 +55,8 @@ public class ElementInfo {
     private String name;
     private Class pluginClass;
     private boolean isInternalPlugin;
-    private Class definitionClass;
+    private Class<? extends IElementDef> definitionClass;
+    private Class<? extends AbstractProcessor> processorClass;
     private String validTags;
 
     private Set<String> tagsSet = new TreeSet<String>();
@@ -70,15 +72,20 @@ public class ElementInfo {
     // pluging instance for this element, if element represents Web-Harvest plugin
     private WebHarvestPlugin plugin = null;
 
-    public ElementInfo(String name, Class definitionClass, String validTags, String validAtts) {
-        this(name, null, true, definitionClass, validTags, validAtts);
+    public ElementInfo(String name,
+                       Class<? extends IElementDef> definitionClass,
+                       Class<? extends AbstractProcessor> processorClass, String validTags, String validAtts) {
+        this(name, null, true, definitionClass, validTags, validAtts, processorClass);
     }
 
-    public ElementInfo(String name, Class pluginClass, boolean isInternalPlugin, Class definitionClass, String validTags, String validAtts) {
+    public ElementInfo(String name, Class pluginClass, boolean isInternalPlugin,
+                       Class<? extends IElementDef> definitionClass,
+                       String validTags, String validAtts, Class<? extends AbstractProcessor> processorClass) {
         this.name = name;
         this.pluginClass = pluginClass;
         this.isInternalPlugin = isInternalPlugin;
         this.definitionClass = definitionClass;
+        this.processorClass = processorClass;
         this.validTags = validTags;
 
         this.allTagsAllowed = validTags == null;
@@ -142,8 +149,12 @@ public class ElementInfo {
         return isInternalPlugin;
     }
 
-    public Class getDefinitionClass() {
+    public Class<? extends IElementDef> getDefinitionClass() {
         return definitionClass;
+    }
+
+    public Class<? extends AbstractProcessor> getProcessorClass() {
+        return processorClass;
     }
 
     public String getName() {

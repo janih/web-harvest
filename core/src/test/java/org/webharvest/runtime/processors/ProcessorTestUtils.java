@@ -53,7 +53,7 @@ import java.io.StringReader;
 public final class ProcessorTestUtils {
 
     @SuppressWarnings({"unchecked"})
-    public static <T extends BaseProcessor> T processor(String xml) {
+    public static <T extends AbstractProcessor> T processor(String xml) {
         return (T) ProcessorResolver.createProcessor(
                 DefinitionResolver.createElementDefinition(
                         XmlNode.getInstance(new InputSource(new StringReader(xml)))));

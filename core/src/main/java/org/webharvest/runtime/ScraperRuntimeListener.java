@@ -1,6 +1,6 @@
 package org.webharvest.runtime;
 
-import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 import java.util.Map;
 
@@ -16,11 +16,11 @@ public interface ScraperRuntimeListener {
 
     public void onExecutionContinued(Scraper scraper);
 
-    public void onNewProcessorExecution(Scraper scraper, BaseProcessor processor);
+    public void onNewProcessorExecution(Scraper scraper, AbstractProcessor processor);
     
     public void onExecutionEnd(Scraper scraper);
 
-    public void onProcessorExecutionFinished(Scraper scraper, BaseProcessor processor, Map properties);
+    public void onProcessorExecutionFinished(Scraper scraper, AbstractProcessor processor, Map properties);
 
     public void onExecutionError(Scraper scraper, Exception e);
     

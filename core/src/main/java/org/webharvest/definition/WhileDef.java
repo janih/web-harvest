@@ -36,18 +36,20 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of while loop processor (while-empty and while-not-empty).
  */
-public class WhileDef extends BaseElementDef {
+public class WhileDef extends ProcessorElementDef {
 
 	private String condition;
     private String maxLoops;
     private String index;
     private String empty;
 
-    public WhileDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public WhileDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
         
         this.condition = xmlNode.getAttribute("condition");
         this.maxLoops = xmlNode.getAttribute("maxloops");

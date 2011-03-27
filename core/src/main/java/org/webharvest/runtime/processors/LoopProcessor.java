@@ -37,7 +37,7 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 /**
  * Loop list processor.
  */
-public class LoopProcessor extends BaseProcessor<LoopDef> {
+public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
     public LoopProcessor(LoopDef loopDef) {
         super(loopDef);
@@ -76,7 +76,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
         this.setProperty("Filter", filter);
         this.setProperty("Empty", String.valueOf(isEmpty));
 
-        BaseElementDef loopValueDef = elementDef.getLoopValueDef();
+        ProcessorElementDef loopValueDef = elementDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor(loopValueDef).run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
@@ -106,7 +106,7 @@ public class LoopProcessor extends BaseProcessor<LoopDef> {
                             }
 
                             // execute the loop body
-                            BaseElementDef bodyDef = elementDef.getLoopBodyDef();
+                            ProcessorElementDef bodyDef = elementDef.getLoopBodyDef();
                             Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
                             debug(bodyDef, scraper, loopResult);
                             if (!isEmpty) {

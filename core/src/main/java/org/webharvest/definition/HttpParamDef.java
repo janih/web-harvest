@@ -36,18 +36,20 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of HTTP parameter.
  */
-public class HttpParamDef extends BaseElementDef {
+public class HttpParamDef extends ProcessorElementDef {
 
     private String name;
     private String isfile;
     private String filename;
     private String contenttype;
 
-    public HttpParamDef(XmlNode xmlNode) {
-    	super(xmlNode);
+    public HttpParamDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    	super(xmlNode, processorClass);
     	
         this.name = xmlNode.getAttribute("name");
         this.isfile = xmlNode.getAttribute("isfile");

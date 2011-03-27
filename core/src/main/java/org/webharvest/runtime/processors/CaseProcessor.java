@@ -36,7 +36,7 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.CaseDef;
 import org.webharvest.definition.IfDef;
 import org.webharvest.runtime.Scraper;
@@ -49,7 +49,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Conditional processor.
  */
-public class CaseProcessor extends BaseProcessor<CaseDef> {
+public class CaseProcessor extends AbstractProcessor<CaseDef> {
 
     public CaseProcessor(CaseDef caseDef) {
         super(caseDef);
@@ -69,7 +69,7 @@ public class CaseProcessor extends BaseProcessor<CaseDef> {
             }
         }
 
-        BaseElementDef elseDef = elementDef.getElseDef();
+        ProcessorElementDef elseDef = elementDef.getElseDef();
         if (elseDef != null) {
             Variable elseResult = new BodyProcessor(elseDef).run(scraper, context);
             debug(elseDef, scraper, elseResult);

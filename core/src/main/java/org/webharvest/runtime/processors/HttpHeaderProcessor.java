@@ -46,7 +46,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Variable definition http header processor.
  */
-public class HttpHeaderProcessor extends BaseProcessor<HttpHeaderDef> {
+public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
 
     public HttpHeaderProcessor(HttpHeaderDef httpHeaderDef) {
         super(httpHeaderDef);

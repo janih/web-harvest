@@ -63,7 +63,7 @@ public class XmlNode implements Serializable {
     private Map<ElementName, ArrayList<XmlNode>> elements = new HashMap<ElementName, ArrayList<XmlNode>>();
 
     // map of attributes - for each uri key value is map of atribute name-value pairs
-    private Map<String,  Map<String, String>> attributes = new HashMap<String,  Map<String, String>>();
+    private Map<String, Map<String, String>> attributes = new HashMap<String, Map<String, String>>();
 
     // all subelements in the form of linear list
     private List<Serializable> elementList = new ArrayList<Serializable>();
@@ -173,11 +173,11 @@ public class XmlNode implements Serializable {
 
     public List<XmlAttribute> getAllAttributes() {
         List<XmlAttribute> all = new ArrayList<XmlAttribute>();
-        for (Map.Entry<String, Map<String, String>> entry: attributes.entrySet()) {
+        for (Map.Entry<String, Map<String, String>> entry : attributes.entrySet()) {
             String currAttUri = entry.getKey();
             Map<String, String> atts = entry.getValue();
             if (atts != null) {
-                for (Map.Entry<String, String> att: atts.entrySet()) {
+                for (Map.Entry<String, String> att : atts.entrySet()) {
                     String currAttName = att.getKey();
                     String currAttValue = att.getValue();
                     all.add(new XmlAttribute(currAttName, currAttUri, currAttValue));
@@ -248,7 +248,7 @@ public class XmlNode implements Serializable {
     }
 
     public Object getElement(String name) {
-        return elements.get(new ElementName(name));
+        return elements.get(new ElementName(name, uri));
     }
 
     /**

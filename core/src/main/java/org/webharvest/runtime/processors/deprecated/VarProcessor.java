@@ -40,7 +40,7 @@ import org.webharvest.definition.VarDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 
@@ -50,7 +50,7 @@ import org.webharvest.runtime.variables.Variable;
  * @deprecated Use <get> or <value-of> instead
  */
 @Deprecated
-public class VarProcessor extends BaseProcessor<VarDef> {
+public class VarProcessor extends AbstractProcessor<VarDef> {
 
     public VarProcessor(VarDef varDef) {
         super(varDef);

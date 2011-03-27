@@ -36,26 +36,28 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Definition of XQuery processor.
  */
-public class XQueryDef extends BaseElementDef {
+public class XQueryDef extends ProcessorElementDef {
 
-    private BaseElementDef xqDef;
+    private ProcessorElementDef xqDef;
 
     private XQueryExternalParamDef[] externalParamDefs;
 
-    public XQueryDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public XQueryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
-        XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression"));
+        XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
         DefinitionResolver.validate(xqDefNode);
-        xqDef = xqDefNode == null ? null : new BaseElementDef(xqDefNode, "xq-expression");
+        xqDef = xqDefNode == null ? null : new ProcessorElementDef(xqDefNode, "xq-expression");
 
-        List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param"));
+        List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
 
         int size = listOfExternalParamNodes == null ? 0 : listOfExternalParamNodes.size();
         externalParamDefs = new XQueryExternalParamDef[size];
@@ -66,12 +68,12 @@ public class XQueryDef extends BaseElementDef {
             while (it.hasNext()) {
                 XmlNode currParamNode =  (XmlNode) it.next();
                 DefinitionResolver.validate(currParamNode);
-                externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode);
+                externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode, getProcessorClass());
             }
         }
     }
 
-    public BaseElementDef getXqDef() {
+    public ProcessorElementDef getXqDef() {
         return xqDef;
     }
 

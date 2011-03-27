@@ -14,6 +14,7 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -23,6 +24,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -33,7 +37,27 @@ import java.io.Writer;
  */
 public class XmlUtil {
 
-    public static void prettyPrintXml(Document doc, Writer writer) throws IOException {
+    private static final ThreadLocal<DocumentBuilder> documentBuilderTL =
+            new ThreadLocal<DocumentBuilder>() {
+                @Override
+                protected DocumentBuilder initialValue() {
+                    try {
+                        return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    } catch (ParserConfigurationException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            };
+
+    private static final ThreadLocal<XPath> xPathBuilderTL =
+            new ThreadLocal<XPath>() {
+                @Override
+                protected XPath initialValue() {
+                    return XPathFactory.newInstance().newXPath();
+                }
+            };
+
+    public static void prettyPrintXml(Document doc, Writer writer) {
         try {
             final Transformer serializer = TransformerFactory.newInstance().newTransformer();
             serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -45,11 +69,28 @@ public class XmlUtil {
         }
     }
 
-    public static String prettyPrintXml(String xmlAsString) throws IOException, ParserConfigurationException, SAXException {
+    @SuppressWarnings({"unchecked"})
+    public static <T> T evaluateXPath(String xPathExpression, Document document) {
+        try {
+            return (T) xPathBuilderTL.get().evaluate(xPathExpression, document);
+        } catch (XPathExpressionException e) {
+            throw Assert.shouldNeverHappen(e);
+        }
+    }
+
+    public static Document parse(InputSource is) {
+        try {
+            return documentBuilderTL.get().parse(is);
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String prettyPrintXml(String xmlAsString) {
         final StringWriter writer = new StringWriter();
-        prettyPrintXml(DocumentBuilderFactory.newInstance().newDocumentBuilder().
-                parse(new InputSource(new StringReader(xmlAsString))),
-                writer);
+        prettyPrintXml(parse(new InputSource(new StringReader(xmlAsString))), writer);
         return writer.toString();
     }
 
@@ -94,5 +135,4 @@ public class XmlUtil {
 
         return listVariable;
     }
-
 }

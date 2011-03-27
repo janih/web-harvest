@@ -36,16 +36,18 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of XQuery external parameter.
  */
-public class XQueryExternalParamDef extends BaseElementDef {
+public class XQueryExternalParamDef extends ProcessorElementDef {
 
     private String name;
     private String type;
 
-    public XQueryExternalParamDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public XQueryExternalParamDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
         
         this.name = xmlNode.getAttribute("name");
         this.type = xmlNode.getAttribute("type");

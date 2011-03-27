@@ -36,20 +36,22 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 import java.util.*;
 
 /**
  * Definition of case processor.
  */
-public class CaseDef extends BaseElementDef {
+public class CaseDef extends ProcessorElementDef {
 
     private IfDef[] ifDefs;
-    private BaseElementDef elseDef;
+    private ProcessorElementDef elseDef;
 
-    public CaseDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public CaseDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
-        List<XmlNode> ifNodesList = xmlNode.getSubnodes(new ElementName("if"));
+        List<XmlNode> ifNodesList = xmlNode.getSubnodes(new ElementName("if", xmlNode.getUri()));
         int size = ifNodesList == null ? 0 : ifNodesList.size();
         ifDefs = new IfDef[size];
 
@@ -59,20 +61,20 @@ public class CaseDef extends BaseElementDef {
             while (it.hasNext()) {
                 XmlNode currParamNode = (XmlNode) it.next();
                 DefinitionResolver.validate(currParamNode);
-                ifDefs[index++] = new IfDef(currParamNode);
+                ifDefs[index++] = new IfDef(currParamNode, getProcessorClass());
             }
         }
 
-        XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else"));
+        XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
         DefinitionResolver.validate(elseDefNode);
-        elseDef = elseDefNode == null ? null : new BaseElementDef(elseDefNode, "else");
+        elseDef = elseDefNode == null ? null : new ProcessorElementDef(elseDefNode, "else");
     }
 
     public IfDef[] getIfDefs() {
         return ifDefs;
     }
 
-    public BaseElementDef getElseDef() {
+    public ProcessorElementDef getElseDef() {
         return elseDef;
     }
 

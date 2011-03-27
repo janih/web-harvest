@@ -60,7 +60,7 @@ import java.util.Map;
 /**
  * XQuery processor.
  */
-public class XPathProcessor extends BaseProcessor<XPathDef> {
+public class XPathProcessor extends AbstractProcessor<XPathDef> {
 
     public XPathProcessor(XPathDef xpathDef) {
         super(xpathDef);

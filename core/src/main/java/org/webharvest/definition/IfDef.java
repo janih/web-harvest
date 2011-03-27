@@ -36,15 +36,17 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of conditional processor.
  */
-public class IfDef extends BaseElementDef {
+public class IfDef extends ProcessorElementDef {
 
 	private String condition;
 
-    public IfDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public IfDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
         
         this.condition = xmlNode.getAttribute("condition");
     }

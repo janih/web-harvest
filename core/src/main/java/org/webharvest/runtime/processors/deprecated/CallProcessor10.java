@@ -34,13 +34,15 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.processors;
+package org.webharvest.runtime.processors.deprecated;
 
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.BodyProcessor;
+import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -51,15 +53,17 @@ import java.util.concurrent.Callable;
 /**
  * Function call processor.
  */
-public class CallProcessor extends AbstractProcessor<CallDef> {
+public class CallProcessor10 extends CallProcessor {
 
     private Variable functionResult = new NodeVariable("");
 
-    public CallProcessor(CallDef callDef) {
+    public CallProcessor10(CallDef callDef) {
         super(callDef);
     }
 
     public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
+        //todo: re-implement old behaviour here
+
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
@@ -83,7 +87,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                 }
 
                 // adds this runtime info to the running functions stack
-                scraper.addRunningFunction(CallProcessor.this);
+                scraper.addRunningFunction(CallProcessor10.this);
                 try {
                     // executes body of function using new context
                     new BodyProcessor(functionDef).execute(scraper, context);
@@ -97,9 +101,4 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
 
         return functionResult;
     }
-
-    public void setFunctionResult(Variable result) {
-        this.functionResult = result;
-    }
-
 }

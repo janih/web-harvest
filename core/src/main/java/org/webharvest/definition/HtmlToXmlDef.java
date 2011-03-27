@@ -36,10 +36,12 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of HTML to XML rensformation task.
  */
-public class HtmlToXmlDef extends BaseElementDef {
+public class HtmlToXmlDef extends ProcessorElementDef {
 
     private String outputType;
     private String advancedXmlEscape;
@@ -62,8 +64,8 @@ public class HtmlToXmlDef extends BaseElementDef {
     private String hyphenReplacement;
     private String booleanAtts;
 
-    public HtmlToXmlDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public HtmlToXmlDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
 
         this.outputType = xmlNode.getAttribute("outputtype");
         this.advancedXmlEscape = xmlNode.getAttribute("advancedxmlescape");

@@ -40,7 +40,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.webharvest.definition.VarDefDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.BodyProcessor;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -53,7 +53,7 @@ import org.webharvest.utils.CommonUtil;
  * @deprecated Use either DefProcessor or SetProcessor
  */
 @Deprecated
-public class VarDefProcessor extends BaseProcessor<VarDefDef> {
+public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 
     public VarDefProcessor(VarDefDef varDef) {
         super(varDef);

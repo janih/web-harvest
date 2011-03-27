@@ -36,31 +36,33 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of user-defined function.
  */
-public class XsltDef extends BaseElementDef {
+public class XsltDef extends ProcessorElementDef {
 
-	private BaseElementDef xmlDef;
-    private BaseElementDef stylesheetDef;
+	private ProcessorElementDef xmlDef;
+    private ProcessorElementDef stylesheetDef;
 
-    public XsltDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
         
-        XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml"));
+        XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
         DefinitionResolver.validate(xmlDefNode);
-        xmlDef = xmlDefNode == null ? null : new BaseElementDef(xmlDefNode, "xml");
+        xmlDef = xmlDefNode == null ? null : new ProcessorElementDef(xmlDefNode, "xml");
 
-        XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet"));
+        XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
         DefinitionResolver.validate(stylesheetDefNode);
-        stylesheetDef = stylesheetDefNode == null ? null : new BaseElementDef(stylesheetDefNode, "stylesheet");
+        stylesheetDef = stylesheetDefNode == null ? null : new ProcessorElementDef(stylesheetDefNode, "stylesheet");
     }
 
-    public BaseElementDef getStylesheetDef() {
+    public ProcessorElementDef getStylesheetDef() {
 		return stylesheetDef;
 	}
 
-	public BaseElementDef getXmlDef() {
+	public ProcessorElementDef getXmlDef() {
 		return xmlDef;
 	}
 

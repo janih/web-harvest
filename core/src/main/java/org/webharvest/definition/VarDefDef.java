@@ -37,17 +37,18 @@
 package org.webharvest.definition;
 
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 /**
  * Definition of variable.
  */
-public class VarDefDef extends BaseElementDef {
+public class VarDefDef extends ProcessorElementDef {
 
     private String name;
     private String overwrite;
 
-    public VarDefDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public VarDefDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
 
         this.name = StringUtils.trim(xmlNode.getAttribute("name"));
         this.overwrite = xmlNode.getAttribute("overwrite");

@@ -45,7 +45,7 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Variable definition http param processor.
  */
-public class CallParamProcessor extends BaseProcessor<CallParamDef> {
+public class CallParamProcessor extends AbstractProcessor<CallParamDef> {
 
     public CallParamProcessor(CallParamDef callParamDef) {
         super(callParamDef);

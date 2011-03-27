@@ -37,16 +37,13 @@
 package org.webharvest.gui;
 
 import org.apache.log4j.Logger;
-import org.webharvest.definition.BaseElementDef;
-import org.webharvest.definition.ConstantDef;
-import org.webharvest.definition.IElementDef;
-import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.definition.*;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
-import org.webharvest.runtime.processors.BaseProcessor;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.Constants;
 import org.xml.sax.InputSource;
@@ -539,8 +536,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onNewProcessorExecution(Scraper scraper, BaseProcessor processor) {
-        BaseElementDef elementDef = processor.getElementDef();
+    public void onNewProcessorExecution(Scraper scraper, AbstractProcessor processor) {
+        final AbstractElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef);
             if (nodeInfo != null) {
@@ -630,8 +627,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 //        releaseScraper();
     }
 
-    public void onProcessorExecutionFinished(Scraper scraper, BaseProcessor processor, Map properties) {
-        BaseElementDef elementDef = processor.getElementDef();
+    public void onProcessorExecutionFinished(Scraper scraper, AbstractProcessor processor, Map properties) {
+        final AbstractElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef);
             if (nodeInfo != null) {
@@ -782,7 +779,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             Object userObject = treeNode.getUserObject();
             if (userObject instanceof TreeNodeInfo) {
                 TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
-                BaseElementDef elementDef = (BaseElementDef) treeNodeInfo.getElementDef();
+                ProcessorElementDef elementDef = (ProcessorElementDef) treeNodeInfo.getElementDef();
                 int lineNumber = elementDef.getLineNumber();
                 int columnNumber = elementDef.getColumnNumber();
 

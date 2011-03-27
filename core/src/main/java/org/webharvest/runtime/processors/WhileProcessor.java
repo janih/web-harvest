@@ -55,7 +55,7 @@ import java.util.concurrent.Callable;
 /**
  * Conditional processor.
  */
-public class WhileProcessor extends BaseProcessor<WhileDef> {
+public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
     public WhileProcessor(WhileDef whileDef) {
         super(whileDef);

@@ -37,7 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.io.FileUtils;
-import org.webharvest.definition.BaseElementDef;
+import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -59,14 +60,14 @@ import java.util.Map;
  * Base processor that contains common processor logic.
  * All other processors extend this class.
  */
-abstract public class BaseProcessor<TDef extends BaseElementDef> {
+public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
 
     abstract public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException;
 
     protected TDef elementDef;
     private Map properties = new LinkedHashMap();
 
-    protected BaseProcessor() {
+    protected AbstractProcessor() {
     }
 
     /**
@@ -74,7 +75,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
      *
      * @param elementDef
      */
-    protected BaseProcessor(TDef elementDef) {
+    protected AbstractProcessor(TDef elementDef) {
         this.elementDef = elementDef;
     }
 
@@ -156,7 +157,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
         }
     }
 
-    protected void debug(BaseElementDef elementDef, Scraper scraper, Variable variable) {
+    protected void debug(ProcessorElementDef elementDef, Scraper scraper, Variable variable) {
         String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper) : null;
 
         if (scraper.isDebugMode() && id != null) {
@@ -166,7 +167,7 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context,
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef == null) {
             return null;
@@ -184,15 +185,15 @@ abstract public class BaseProcessor<TDef extends BaseElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context, boolean registerExecution) throws InterruptedException {
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context, boolean registerExecution) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(BaseElementDef elementDef, Scraper scraper, ScraperContext context) throws InterruptedException {
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, false);
     }
 
-    public BaseElementDef getElementDef() {
+    public AbstractElementDef getElementDef() {
         return elementDef;
     }
 

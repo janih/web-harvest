@@ -36,6 +36,7 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.utils.CommonUtil;
 
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Definition of HTTP processor.
  */
-public class HttpDef extends BaseElementDef {
+public class HttpDef extends ProcessorElementDef {
 
     public static final String DEFAULT_METHOD = "get";
     public static final String DEFAULT_MULTIPART = "false";
@@ -65,8 +66,8 @@ public class HttpDef extends BaseElementDef {
     private String retryDelay;
     private String retryDelayFactor;
 
-    public HttpDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public HttpDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
 
         this.method = CommonUtil.nvl(xmlNode.getAttribute("method"), DEFAULT_METHOD);
         this.multipart = CommonUtil.nvl(xmlNode.getAttribute("multipart"), DEFAULT_MULTIPART);

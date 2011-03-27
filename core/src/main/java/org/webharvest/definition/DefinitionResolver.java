@@ -39,7 +39,10 @@ package org.webharvest.definition;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
-import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.*;
+import org.webharvest.runtime.processors.deprecated.CallProcessor10;
+import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
+import org.webharvest.runtime.processors.deprecated.VarProcessor;
 import org.webharvest.runtime.processors.plugins.*;
 import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
 import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
@@ -76,48 +79,91 @@ public class DefinitionResolver {
     // defines all valid elements of Web-Harvest configuration file
 
     static {
-        registerInternalElement("config", new ElementInfo("config", BaseElementDef.class, null, "charset,scriptlang,id"));
-        registerInternalElement("empty", new ElementInfo("empty", EmptyDef.class, null, "id"));
-        registerInternalElement("text", new ElementInfo("text", TextDef.class, null, "id,charset,delimiter"));
-        registerInternalElement("file", new ElementInfo("file", FileDef.class, null, "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive"));
-        registerInternalElement("var-def", new ElementInfo("var-def", VarDefDef.class, null, "id,!name,overwrite"));
-        registerInternalElement("var", new ElementInfo("var", VarDef.class, "", "id,!name"));
-        registerInternalElement("http", new ElementInfo("http", HttpDef.class, null, "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy"));
-        registerInternalElement("http-param", new ElementInfo("http-param", HttpParamDef.class, null, "id,!name,isfile,filename,contenttype"));
-        registerInternalElement("http-header", new ElementInfo("http-header", HttpHeaderDef.class, null, "id,!name"));
-        registerInternalElement("html-to-xml", new ElementInfo("html-to-xml", HtmlToXmlDef.class, null, "" +
+        registerInternalElement("config", ProcessorElementDef.class, null, null, "charset,scriptlang,id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("empty", EmptyDef.class, EmptyProcessor.class, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("text", TextDef.class, TextProcessor.class, null, "id,charset,delimiter",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("file", FileDef.class, FileProcessor.class, null,
+                "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("var-def", VarDefDef.class, VarDefProcessor.class, null, "id,!name,overwrite",
+                Constants.XMLNS_CORE_10);
+        registerInternalElement("var", VarDef.class, VarProcessor.class, "", "id,!name",
+                Constants.XMLNS_CORE_10);
+        registerInternalElement("http", HttpDef.class, HttpProcessor.class, null,
+                "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("http-param", HttpParamDef.class, HttpParamProcessor.class, null, "id,!name,isfile,filename,contenttype",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("http-header", HttpHeaderDef.class, HttpHeaderProcessor.class, null, "id,!name",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("html-to-xml", HtmlToXmlDef.class, HtmlToXmlProcessor.class, null, "" +
                 "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars,nbsp-to-sp," +
                 "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
                 "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
-                "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts"));
-        registerInternalElement("regexp", new ElementInfo("regexp", RegexpDef.class, "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq"));
-        registerInternalElement("regexp-pattern", new ElementInfo("regexp-pattern", BaseElementDef.class, null, "id"));
-        registerInternalElement("regexp-source", new ElementInfo("regexp-source", BaseElementDef.class, null, "id"));
-        registerInternalElement("regexp-result", new ElementInfo("regexp-result", BaseElementDef.class, null, "id"));
-        registerInternalElement("xpath", new ElementInfo("xpath", XPathDef.class, null, "id,expression,v:*"));
-        registerInternalElement("xquery", new ElementInfo("xquery", XQueryDef.class, "xq-param,!xq-expression", "id"));
-        registerInternalElement("xq-param", new ElementInfo("xq-param", BaseElementDef.class, null, "!name,type,id"));
-        registerInternalElement("xq-expression", new ElementInfo("xq-expression", BaseElementDef.class, null, "id"));
-        registerInternalElement("xslt", new ElementInfo("xslt", XsltDef.class, "!xml,!stylesheet", "id"));
-        registerInternalElement("xml", new ElementInfo("xml", BaseElementDef.class, null, "id"));
-        registerInternalElement("stylesheet", new ElementInfo("stylesheet", BaseElementDef.class, null, "id"));
-        registerInternalElement("template", new ElementInfo("template", TemplateDef.class, null, "id,language"));
-        registerInternalElement("case", new ElementInfo("case", CaseDef.class, "!if,else", "id"));
-        registerInternalElement("if", new ElementInfo("if", BaseElementDef.class, null, "!condition,id"));
-        registerInternalElement("else", new ElementInfo("else", BaseElementDef.class, null, "id"));
-        registerInternalElement("loop", new ElementInfo("loop", LoopDef.class, "!list,!body", "id,item,index,maxloops,filter,empty"));
-        registerInternalElement("list", new ElementInfo("list", BaseElementDef.class, null, "id"));
-        registerInternalElement("body", new ElementInfo("body", BaseElementDef.class, null, "id"));
-        registerInternalElement("while", new ElementInfo("while", WhileDef.class, null, "id,!condition,index,maxloops,empty"));
-        registerInternalElement("function", new ElementInfo("function", FunctionDef.class, null, "id,!name"));
-        registerInternalElement("return", new ElementInfo("return", ReturnDef.class, null, "id"));
-        registerInternalElement("call", new ElementInfo("call", CallDef.class, null, "id,!name"));
-        registerInternalElement("call-param", new ElementInfo("call-param", CallParamDef.class, null, "id,!name"));
-        registerInternalElement("include", new ElementInfo("include", IncludeDef.class, "", "id,!path"));
-        registerInternalElement("try", new ElementInfo("try", TryDef.class, "!body,!catch", "id"));
-        registerInternalElement("catch", new ElementInfo("catch", BaseElementDef.class, null, "id"));
-        registerInternalElement("script", new ElementInfo("script", ScriptDef.class, null, "id,language,return"));
-        registerInternalElement("exit", new ElementInfo("exit", ExitDef.class, "", "id,condition,message"));
+                "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("regexp", RegexpDef.class, RegexpProcessor.class,
+                "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("regexp-pattern", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("regexp-source", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("regexp-result", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xpath", XPathDef.class, XPathProcessor.class, null, "id,expression,v:*",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xquery", XQueryDef.class, XQueryProcessor.class, "xq-param,!xq-expression", "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xq-param", ProcessorElementDef.class, null, null, "!name,type,id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xq-expression", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xslt", XsltDef.class, XsltProcessor.class, "!xml,!stylesheet", "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("xml", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("stylesheet", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("template", TemplateDef.class, TemplateProcessor.class, null, "id,language",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("case", CaseDef.class, CaseProcessor.class, "!if,else", "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("if", ProcessorElementDef.class, null, null, "!condition,id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("else", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("loop", LoopDef.class, LoopProcessor.class, "!list,!body", "id,item,index,maxloops,filter,empty",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("list", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("body", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("while", WhileDef.class, WhileProcessor.class, null, "id,!condition,index,maxloops,empty",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("function", FunctionDef.class, FunctionProcessor.class, null, "id,!name",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("return", ReturnDef.class, ReturnProcessor.class, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("call", CallDef.class, CallProcessor10.class, null, "id,!name",
+                Constants.XMLNS_CORE_10);
+        registerInternalElement("call", CallDef.class, CallProcessor.class, null, "id,!name",
+                Constants.XMLNS_CORE);
+        registerInternalElement("call-param", CallParamDef.class, CallParamProcessor.class, null, "id,!name",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("include", IncludeDef.class, IncludeProcessor.class, "", "id,!path",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("try", TryDef.class, TryProcessor.class, "!body,!catch", "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("catch", ProcessorElementDef.class, null, null, "id",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("script", ScriptDef.class, ScriptProcessor.class, null, "id,language,return",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+        registerInternalElement("exit", ExitDef.class, ExitProcessor.class, "", "id,condition,message",
+                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
 
         registerPlugin(SetVarPlugin.class, true, Constants.XMLNS_CORE);
         registerPlugin(DefVarPlugin.class, true, Constants.XMLNS_CORE);
@@ -133,13 +179,15 @@ public class DefinitionResolver {
         registerPlugin(SleepPlugin.class, true, Constants.XMLNS_CORE);
     }
 
-    /**
-     * Register core element.
-     * @param name Name of the element corresponding to the tag name in xml configuration
-     * @param elementInfo ElementInfo instance of the element
-     */
-    private static void registerInternalElement(String name, ElementInfo elementInfo) {
-        elementInfos.put(new ElementName(name), elementInfo);
+    private static void registerInternalElement(String name,
+                                                Class<? extends IElementDef> defClass,
+                                                Class<? extends AbstractProcessor> processorClass,
+                                                String children, String attributes,
+                                                String... xmlns) {
+        final ElementInfo elementInfo = new ElementInfo(name, defClass, processorClass, children, attributes);
+        for (String ns : xmlns) {
+            elementInfos.put(new ElementName(name, ns), elementInfo);
+        }
     }
 
     private static void registerPlugin(Class pluginClass, boolean isInternalPlugin, String uri) {
@@ -157,9 +205,6 @@ public class DefinitionResolver {
 
             ElementName pluginElementName = new ElementName(pluginName, uri);
 
-            if (elementInfos.containsKey(pluginElementName)) {
-                throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
-            }
 
             final ElementInfo elementInfo = new ElementInfo(
                     pluginName,
@@ -167,10 +212,17 @@ public class DefinitionResolver {
                     isInternalPlugin,
                     WebHarvestPluginDef.class,
                     plugin.getTagDesc(),
-                    plugin.getAttributeDesc());
+                    plugin.getAttributeDesc(),
+                    null);
 
             elementInfo.setPlugin(plugin);
+
+            if (elementInfos.containsKey(pluginElementName)) {
+                throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
+            }
             elementInfos.put(pluginElementName, elementInfo);
+
+
             if (!isInternalPlugin) {
                 externalPlugins.put(pluginClass.getName(), pluginElementName);
             }
@@ -235,10 +287,6 @@ public class DefinitionResolver {
         return pluginClass != null && isPluginRegistered(pluginClass.getName());
     }
 
-    public static Map<String, ElementName> getExternalPlugins() {
-        return externalPlugins;
-    }
-
     /**
      * @return Map of all allowed element infos.
      */
@@ -248,7 +296,7 @@ public class DefinitionResolver {
 
     /**
      * @param name Name of the element
-     * @param uri URI of the element
+     * @param uri  URI of the element
      * @return Instance of ElementInfo class for the specified element name,
      *         or null if no element is defined.
      */
@@ -269,15 +317,22 @@ public class DefinitionResolver {
         final String nodeUri = node.getUri();
 
         final ElementInfo elementInfo = getElementInfo(nodeName, nodeUri);
-        if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == BaseElementDef.class) {
+        if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == ProcessorElementDef.class) {
             throw new ConfigurationException("Unexpected configuration element: " + node.getQName() + "!");
         }
 
         validate(node);
 
-        Class elementClass = elementInfo.getDefinitionClass();
+        final Class elementClass = elementInfo.getDefinitionClass();
+        if (elementClass == WebHarvestPluginDef.class) {
+            return new WebHarvestPluginDef(node);
+        }
+
         try {
-            final IElementDef elementDef = (IElementDef) elementClass.getConstructor(new Class[]{XmlNode.class}).newInstance(node);
+            final IElementDef elementDef = (IElementDef) elementClass.
+                    getConstructor(XmlNode.class, Class.class).
+                    newInstance(node, elementInfo.getProcessorClass());
+
             if (elementDef instanceof WebHarvestPluginDef) {
                 WebHarvestPluginDef pluginDef = (WebHarvestPluginDef) elementDef;
                 pluginDef.setPluginClass(elementInfo.getPluginClass());
@@ -289,7 +344,7 @@ public class DefinitionResolver {
         } catch (InvocationTargetException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof ConfigurationException) {
-                throw (ConfigurationException)cause;
+                throw (ConfigurationException) cause;
             }
             throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
         } catch (InstantiationException e) {
@@ -331,9 +386,9 @@ public class DefinitionResolver {
 
         // check if element contains only allowed subelements
         for (ElementName elementName : node.getElementNameSet()) {
-            if ( (!areAllTagsAllowed && (!tags.contains(elementName.getName()) || !uri.equals(node.getUri())) ) ||
-                 (areAllTagsAllowed && !allTagNameSet.contains(elementName))
-               ) {
+            if ((!areAllTagsAllowed && (!tags.contains(elementName.getName()) || !uri.equals(node.getUri()))) ||
+                    (areAllTagsAllowed && !allTagNameSet.contains(elementName))
+                    ) {
                 throw new ConfigurationException(ErrMsg.invalidTag(node.getName(), elementName.toString()));
             }
         }
@@ -351,8 +406,8 @@ public class DefinitionResolver {
         for (XmlAttribute att : node.getAllAttributes()) {
             String attUri = att.getUri();
             String attName = att.getName();
-            if ( !atts.contains(attName) || !uri.equals(attUri) ) {
-                if ( !elementInfo.getNsAttsSet().contains(attUri) ) {
+            if (!atts.contains(attName) || !uri.equals(attUri)) {
+                if (!elementInfo.getNsAttsSet().contains(attUri)) {
                     throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
                 }
             }

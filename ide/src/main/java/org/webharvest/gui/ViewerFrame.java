@@ -458,11 +458,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                 String prettyXml = XmlUtil.prettyPrintXml(xmlText);
                 this.xmlPane.setText(prettyXml);
                 this.xmlPane.setCaretPosition(0);
-            } catch (ParserConfigurationException e) {
-                JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
-            } catch (SAXException e) {
-                JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "parsing error", JOptionPane.ERROR_MESSAGE);
             }
         }

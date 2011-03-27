@@ -2,14 +2,13 @@ package org.webharvest.definition;
 
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.utils.*;
 
 import java.util.Map;
 
 /**
  * Definition of all plugin processors.
  */
-public class WebHarvestPluginDef extends BaseElementDef {
+public class WebHarvestPluginDef extends AbstractElementDef {
 
     private XmlNode xmlNode;
     private Class pluginClass;

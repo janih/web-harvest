@@ -36,25 +36,27 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of regular expression processor.
  */
-public class RegexpDef extends BaseElementDef {
+public class RegexpDef extends ProcessorElementDef {
 
     private String max;
     private String replace;
     
-    private BaseElementDef regexpPatternDef;
-    private BaseElementDef regexpSourceDef;
-    private BaseElementDef regexpResultDef;
+    private ProcessorElementDef regexpPatternDef;
+    private ProcessorElementDef regexpSourceDef;
+    private ProcessorElementDef regexpResultDef;
     private String flagCaseInsensitive;
     private String flagMultiline;
     private String flagDotall;
     private String flagUnicodecase;
     private String flagCanoneq;
 
-    public RegexpDef(XmlNode xmlNode) {
-        super(xmlNode, false);
+    public RegexpDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, false, processorClass);
 
         this.max = xmlNode.getAttribute("max");
         this.replace = xmlNode.getAttribute("replace");
@@ -64,17 +66,17 @@ public class RegexpDef extends BaseElementDef {
         this.flagUnicodecase = xmlNode.getAttribute("flag-unicodecase");
         this.flagCanoneq = xmlNode.getAttribute("flag-canoneq");
 
-        XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern"));
+        XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
         DefinitionResolver.validate(regexpPatternDefNode);
-        regexpPatternDef = regexpPatternDefNode == null ? null : new BaseElementDef(regexpPatternDefNode, "regexp-pattern");
+        regexpPatternDef = regexpPatternDefNode == null ? null : new ProcessorElementDef(regexpPatternDefNode, "regexp-pattern");
         
-        XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source"));
+        XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
         DefinitionResolver.validate(regexpSourceDefNode);
-        regexpSourceDef = regexpSourceDefNode == null ? null : new BaseElementDef(regexpSourceDefNode, "regexp-source");
+        regexpSourceDef = regexpSourceDefNode == null ? null : new ProcessorElementDef(regexpSourceDefNode, "regexp-source");
         
-        XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result"));
+        XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
         DefinitionResolver.validate(regexpResultDefNode);
-        regexpResultDef = regexpResultDefNode == null ? null : new BaseElementDef(regexpResultDefNode, "regexp-result");
+        regexpResultDef = regexpResultDefNode == null ? null : new ProcessorElementDef(regexpResultDefNode, "regexp-result");
     }
 
     public String getMax() {
@@ -105,15 +107,15 @@ public class RegexpDef extends BaseElementDef {
         return flagCanoneq;
     }
 
-    public BaseElementDef getRegexpPatternDef() {
+    public ProcessorElementDef getRegexpPatternDef() {
 		return regexpPatternDef;
 	}
 
-	public BaseElementDef getRegexpResultDef() {
+	public ProcessorElementDef getRegexpResultDef() {
 		return regexpResultDef;
 	}
 
-	public BaseElementDef getRegexpSourceDef() {
+	public ProcessorElementDef getRegexpSourceDef() {
 		return regexpSourceDef;
 	}
 

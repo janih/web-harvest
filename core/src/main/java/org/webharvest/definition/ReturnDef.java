@@ -36,13 +36,15 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.runtime.processors.AbstractProcessor;
+
 /**
  * Definition of function's return statement.
  */
-public class ReturnDef extends BaseElementDef {
+public class ReturnDef extends ProcessorElementDef {
 
-    public ReturnDef(XmlNode xmlNode) {
-        super(xmlNode);
+    public ReturnDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+        super(xmlNode, processorClass);
     }
 
     public String getShortElementName() {

@@ -36,10 +36,10 @@
 */
 package org.webharvest.definition;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.exception.ParserException;
-import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 import org.webharvest.utils.Stack;
 import org.xml.sax.Attributes;
@@ -113,8 +113,12 @@ public class XmlParser extends DefaultHandler {
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        XmlNode currNode = getCurrentNode();
-        XmlNode newNode = new XmlNode(localName, qName, CommonUtil.isEmptyString(uri) ? Constants.XMLNS_CORE : uri, currNode);
+        final XmlNode currNode = getCurrentNode();
+        if (StringUtils.isEmpty(uri)) {
+            // if there is no xmlns we assume it is the old WH-config schema, aka 1.0
+            uri = Constants.XMLNS_CORE_10;
+        }
+        final XmlNode newNode = new XmlNode(localName, qName, uri, currNode);
         newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());
         elementStack.push(newNode);
 
@@ -122,10 +126,12 @@ public class XmlParser extends DefaultHandler {
             root = newNode;
         }
 
-        int attrsCount = attributes.getLength();
+        final int attrsCount = attributes.getLength();
         for (int i = 0; i < attrsCount; i++) {
-            String attUri = attributes.getURI(i);
-            newNode.addAttribute(attributes.getLocalName(i), CommonUtil.isEmptyString(attUri) ? Constants.XMLNS_CORE : attUri, attributes.getValue(i));
+            newNode.addAttribute(
+                    attributes.getLocalName(i),
+                    StringUtils.defaultIfEmpty(attributes.getURI(i), uri),
+                    attributes.getValue(i));
         }
     }
 
