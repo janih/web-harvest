@@ -21,9 +21,6 @@ public abstract class AbstractElementDef implements IElementDef {
     protected int lineNumber;
     protected int columnNumber;
 
-    protected AbstractElementDef() {
-    }
-
     protected AbstractElementDef(XmlNode node, boolean createBodyDefs) {
         if (node != null) {
             this.lineNumber = node.getLineNumber();

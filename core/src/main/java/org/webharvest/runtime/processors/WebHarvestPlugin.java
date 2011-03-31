@@ -41,7 +41,8 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.*;
+import org.webharvest.utils.Assert;
+import org.webharvest.utils.CommonUtil;
 
 import java.util.Map;
 
@@ -49,7 +50,7 @@ import java.util.Map;
  * Base for all user-defined plugins.
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public abstract class WebHarvestPlugin extends AbstractProcessor {
+public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPluginDef> {
 
     private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
 
@@ -194,18 +195,18 @@ public abstract class WebHarvestPlugin extends AbstractProcessor {
      * @return Map of attributes of this plugin
      */
     protected Map<String, String> getAttributes() {
-        return ((WebHarvestPluginDef)elementDef).getAttributes();
+        return elementDef.getAttributes();
     }
 
     /**
      * @return Map of attributes of this plugin
      */
     protected Map<String, String> getAttributes(String uri) {
-        return ((WebHarvestPluginDef)elementDef).getAttributes(uri);
+        return elementDef.getAttributes(uri);
     }
 
     /**
-     * @param attName Name of attrubte
+     * @param attName Name of attribute
      * @param scraper
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
@@ -214,11 +215,11 @@ public abstract class WebHarvestPlugin extends AbstractProcessor {
     }
 
     protected String evaluateAttribute(String attName, Scraper scraper) {
-        return evaluateAttribute(attName, ((WebHarvestPluginDef)elementDef).getUri(), scraper);
+        return evaluateAttribute(attName, elementDef.getUri(), scraper);
     }
 
     /**
-     * @param attName      Name of attrubte
+     * @param attName      Name of attribute
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as boolean, or default value if it cannot be recognized as valid boolean
@@ -228,11 +229,11 @@ public abstract class WebHarvestPlugin extends AbstractProcessor {
     }
 
     protected boolean evaluateAttributeAsBoolean(String attName, boolean defaultValue, Scraper scraper) {
-        return evaluateAttributeAsBoolean(attName, Constants.XMLNS_CORE, defaultValue, scraper);
+        return CommonUtil.getBooleanValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
     /**
-     * @param attName      Name of attrubte
+     * @param attName      Name of attribute
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as integer, or default value if it cannot be recognized as valid integer
@@ -242,11 +243,11 @@ public abstract class WebHarvestPlugin extends AbstractProcessor {
     }
 
     protected int evaluateAttributeAsInteger(String attName, int defaultValue, Scraper scraper) {
-        return evaluateAttributeAsInteger(attName, Constants.XMLNS_CORE, defaultValue, scraper);
+        return CommonUtil.getIntValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
     /**
-     * @param attName      Name of attrubte
+     * @param attName      Name of attribute
      * @param defaultValue
      * @param scraper
      * @return Value of specified attribute as double, or default value if it cannot be recognized as valid double
@@ -256,7 +257,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor {
     }
 
     protected double evaluateAttributeAsDouble(String attName, double defaultValue, Scraper scraper) {
-        return evaluateAttributeAsDouble(attName, Constants.XMLNS_CORE, defaultValue, scraper);
+        return CommonUtil.getDoubleValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
     /**

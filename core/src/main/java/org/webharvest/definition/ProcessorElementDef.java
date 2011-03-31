@@ -42,10 +42,6 @@ public class ProcessorElementDef extends AbstractElementDef {
 
     private Class<? extends AbstractProcessor> processorClass;
 
-    protected ProcessorElementDef(Class<? extends AbstractProcessor> processorClass) {
-        this.processorClass = processorClass;
-    }
-
     protected ProcessorElementDef(XmlNode node, Class<? extends AbstractProcessor> processorClass) {
         this(node, true, processorClass);
     }

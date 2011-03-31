@@ -48,7 +48,7 @@ public class ConstantDef extends ProcessorElementDef {
     private String text;
 
     public ConstantDef(String text, Class<? extends AbstractProcessor> processorClass) {
-        super(processorClass);
+        super(null, processorClass);
         this.text = text;
     }
 

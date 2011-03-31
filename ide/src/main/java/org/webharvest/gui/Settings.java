@@ -42,7 +42,9 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
 import java.io.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author: Vladimir Nikic
@@ -414,7 +416,7 @@ public class Settings implements Serializable {
         int pluginsCount = readInt(in, 0);
         plugins = new PluginInfo[pluginsCount];
         for (int i = 0; i < pluginsCount; i++) {
-            plugins[i] = new PluginInfo( readString(in, ""), Constants.XMLNS_CORE, null );
+            plugins[i] = new PluginInfo( readString(in, ""), Constants.XMLNS_CORE_10, null );
             try {
                 DefinitionResolver.registerPlugin(plugins[i].getClassName());
             } catch (PluginException e) {

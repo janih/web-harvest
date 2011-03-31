@@ -1,8 +1,5 @@
 package org.webharvest.gui;
 
-import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
-
 /**
  * Class definining elements in list of plugins. Each item has name (fully qualified class name)
  * and optional error message telling why plugin cannot be registered.
@@ -15,7 +12,7 @@ public class PluginInfo {
 
     public PluginInfo(String className, String uri, String errorMessage) {
         this.className = className;
-        this.uri = CommonUtil.nvl(uri, Constants.XMLNS_CORE);
+        this.uri = uri;
         this.errorMessage = errorMessage;
     }
 
