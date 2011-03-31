@@ -36,25 +36,30 @@
 */
 package org.webharvest.gui;
 
-import org.webharvest.gui.component.*;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
+import org.webharvest.gui.component.*;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 public class SettingsDialog extends CommonDialog implements ChangeListener {
 
@@ -62,6 +67,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
      * List model implementation for the list of plugins.
      */
     private class PluginListModel extends DefaultListModel {
+
         public void addElement(PluginInfo pluginInfo, boolean throwErrIfRegistered) {
             if (addPlugin(pluginInfo, throwErrIfRegistered)) {
                 super.addElement(pluginInfo);
@@ -81,7 +87,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             final String className = pluginInfo.getClassName();
             final String uri = pluginInfo.getUri();
 
-            if ( CommonUtil.isEmptyString(className) || CommonUtil.isEmptyString(uri) ) {
+            if (CommonUtil.isEmptyString(className) || CommonUtil.isEmptyString(uri)) {
                 GuiUtils.showError(SettingsDialog.this, "Full plugin class name and namespace URI must be specified!");
                 return false;
             }
@@ -101,7 +107,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             String errorMessage = null;
 
             final boolean isAlreadyRegistered = DefinitionResolver.isPluginRegistered(className);
-            if ( !isAlreadyRegistered || throwErrIfRegistered ) {
+            if (!isAlreadyRegistered || throwErrIfRegistered) {
                 try {
                     if (isAlreadyRegistered) {
                         DefinitionResolver.unregisterPlugin(className);
@@ -124,6 +130,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
      * plugin registration failed, tooltip is defined with error message for the label.
      */
     private class PluginListCellRenderer extends JLabel implements ListCellRenderer {
+
         private PluginListCellRenderer() {
             setOpaque(true);
             setPreferredSize(new Dimension(1, 18));
@@ -191,10 +198,11 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         this.ide = ide;
         this.setResizable(false);
 
-        pathChooser.setFileFilter( new FileFilter() {
+        pathChooser.setFileFilter(new FileFilter() {
             public boolean accept(File f) {
                 return f.exists() && f.isDirectory();
             }
+
             public String getDescription() {
                 return "All directories";
             }
@@ -209,9 +217,9 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         Container contentPane = this.getContentPane();
 
         JPanel generalPanel = new JPanel(new GridBagLayout());
-        generalPanel.setBorder( new EmptyBorder(4, 4, 4, 4) );
+        generalPanel.setBorder(new EmptyBorder(4, 4, 4, 4));
 
-        contentPane.setLayout( new BorderLayout() );
+        contentPane.setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -241,11 +249,11 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        generalPanel.add( new JLabel("Output path"), constraints );
+        generalPanel.add(new JLabel("Output path"), constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        JPanel pathPanel = new JPanel( new FlowLayout(FlowLayout.LEFT, 0, 0) );
+        JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.add(workingPathField);
         JButton chooseDirButton = new SmallButton("...") {
             public Dimension getPreferredSize() {
@@ -256,99 +264,99 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         chooseDirButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int returnVal = pathChooser.showOpenDialog(SettingsDialog.this);
-                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File selectedDir = pathChooser.getSelectedFile();
                     if (selectedDir != null) {
-                        workingPathField.setText( selectedDir.getAbsolutePath() );
+                        workingPathField.setText(selectedDir.getAbsolutePath());
                     }
                 }
             }
         });
         pathPanel.add(chooseDirButton);
-        generalPanel.add(pathPanel, constraints );
+        generalPanel.add(pathPanel, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
-        generalPanel.add( new JLabel("File encoding"), constraints );
+        generalPanel.add(new JLabel("File encoding"), constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 1;
-        generalPanel.add(fileCharsetComboBox, constraints );
+        generalPanel.add(fileCharsetComboBox, constraints);
 
 
         constraints.gridx = 0;
         constraints.gridy = 2;
-        generalPanel.add(proxyEnabledCheckBox , constraints );
+        generalPanel.add(proxyEnabledCheckBox, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 3;
         proxyServerLabel = new JLabel("Proxy server");
-        generalPanel.add(proxyServerLabel, constraints );
+        generalPanel.add(proxyServerLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 3;
-        generalPanel.add(proxyServerField, constraints );
+        generalPanel.add(proxyServerField, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 4;
         proxyPortLabel = new JLabel("Proxy port (blank is default)");
-        generalPanel.add(proxyPortLabel, constraints );
+        generalPanel.add(proxyPortLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 4;
-        generalPanel.add(proxyPortField, constraints );
+        generalPanel.add(proxyPortField, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 5;
-        generalPanel.add(proxyAuthEnabledCheckBox , constraints );
+        generalPanel.add(proxyAuthEnabledCheckBox, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 6;
         proxyUsernameLabel = new JLabel("Proxy username");
-        generalPanel.add(proxyUsernameLabel, constraints );
+        generalPanel.add(proxyUsernameLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 6;
-        generalPanel.add(proxyUsernameField, constraints );
+        generalPanel.add(proxyUsernameField, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 7;
         proxyPasswordLabel = new JLabel("Proxy password");
-        generalPanel.add(proxyPasswordLabel, constraints );
+        generalPanel.add(proxyPasswordLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 7;
-        generalPanel.add(proxyPasswordField, constraints );
+        generalPanel.add(proxyPasswordField, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 8;
-        generalPanel.add(ntlmEnabledCheckBox , constraints );
+        generalPanel.add(ntlmEnabledCheckBox, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 9;
         ntlmHostLabel = new JLabel("NT host");
-        generalPanel.add(ntlmHostLabel, constraints );
+        generalPanel.add(ntlmHostLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 9;
-        generalPanel.add(ntlmHostField, constraints );
+        generalPanel.add(ntlmHostField, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 10;
         ntlmDomainLabel = new JLabel("NT domain");
-        generalPanel.add(ntlmDomainLabel, constraints );
+        generalPanel.add(ntlmDomainLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 10;
-        generalPanel.add(ntlmDomainField, constraints );
+        generalPanel.add(ntlmDomainField, constraints);
 
-        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(createOkButton());
         buttonPanel.add(createCancelButton());
 
         JPanel viewPanel = new JPanel();
-        viewPanel.setBorder( new EmptyBorder(4, 4, 4, 4) );
-        viewPanel.setLayout( new BoxLayout(viewPanel, BoxLayout.PAGE_AXIS) );
+        viewPanel.setBorder(new EmptyBorder(4, 4, 4, 4));
+        viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.PAGE_AXIS));
         this.showHierarchyByDefaultCheckBox = new WHCheckBox("Show hierarchy panel by default");
         this.showLogByDefaultCheckBox = new WHCheckBox("Show log panel by default");
         this.showLineNumbersByDefaultCheckBox = new WHCheckBox("Show line numbers by default");
@@ -375,7 +383,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             public void actionPerformed(ActionEvent e) {
                 String className = pluginClassNameField.getText().trim();
                 String namespaceUri = pluginNamespaceUriField.getText().trim();
-                if ( CommonUtil.isEmptyString(namespaceUri) ) {
+                if (CommonUtil.isEmptyString(namespaceUri)) {
                     namespaceUri = Constants.XMLNS_CORE;
                 }
                 if (className != null) {
@@ -391,7 +399,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                 if (index >= 0) {
                     PluginInfo oldPluginInfo = (PluginInfo) pluginsList.getSelectedValue();
                     PluginInfo pluginInfo = new PluginInfo(pluginClassNameField.getText().trim(), pluginNamespaceUriField.getText().trim(), null);
-                    if ( !pluginInfo.equals(oldPluginInfo) ) {
+                    if (!pluginInfo.equals(oldPluginInfo)) {
                         boolean isSet = pluginListModel.setElement(pluginInfo, index);
                         if (isSet) {
                             DefinitionResolver.unregisterPlugin(oldPluginInfo.getClassName());
@@ -420,7 +428,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
         springLayout.putConstraint(SpringLayout.NORTH, pluginUpdateButton, 5, SpringLayout.SOUTH, pluginAddButton);
         springLayout.putConstraint(SpringLayout.NORTH, pluginRemoveButton, 5, SpringLayout.SOUTH, pluginUpdateButton);
-        
+
         pluginsPanel.add(pluginButtonsPanel, BorderLayout.EAST);
         JPanel pluginsListPanel = new JPanel(new BorderLayout(5, 5));
         pluginsListPanel.setBorder(new EmptyBorder(3, 3, 3, 3));
@@ -442,11 +450,11 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         pluginEditPanel.setLayout(new BoxLayout(pluginEditPanel, BoxLayout.Y_AXIS));
         final JLabel fullClassNameLabel = new JLabel("Full class name:");
         final JLabel nsLabel = new JLabel("Namespace URI:");
-        GuiUtils.fixComponentWidths(new Component[] {fullClassNameLabel, nsLabel});
+        GuiUtils.fixComponentWidths(new Component[]{fullClassNameLabel, nsLabel});
         this.pluginClassNameField = new JTextField("", 40);
         this.pluginNamespaceUriField = new JTextField("", 40);
         pluginEditPanel.add(GuiUtils.createLineOfComponents(new Component[]{fullClassNameLabel, pluginClassNameField}));
-        pluginEditPanel.add(GuiUtils.createLineOfComponents(new Component[] {nsLabel, pluginNamespaceUriField}));
+        pluginEditPanel.add(GuiUtils.createLineOfComponents(new Component[]{nsLabel, pluginNamespaceUriField}));
 
         pluginsPanel.add(pluginEditPanel, BorderLayout.NORTH);
 
@@ -465,24 +473,24 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     private void fillValues() {
         Settings settings = ide.getSettings();
 
-        workingPathField.setText( settings.getWorkingPath() );
-        fileCharsetComboBox.setSelectedItem( settings.getFileCharset() );
-        proxyServerField.setText( settings.getProxyServer() );
-        proxyPortField.setText( settings.getProxyPort() > 0 ? "" + settings.getProxyPort() : "" );
-        proxyUsernameField.setText( settings.getProxyUserename() );
-        proxyPasswordField.setText( settings.getProxyPassword() );
-        proxyEnabledCheckBox.setSelected( settings.isProxyEnabled() );
-        proxyAuthEnabledCheckBox.setSelected( settings.isProxyAuthEnabled() );
+        workingPathField.setText(settings.getWorkingPath());
+        fileCharsetComboBox.setSelectedItem(settings.getFileCharset());
+        proxyServerField.setText(settings.getProxyServer());
+        proxyPortField.setText(settings.getProxyPort() > 0 ? "" + settings.getProxyPort() : "");
+        proxyUsernameField.setText(settings.getProxyUserename());
+        proxyPasswordField.setText(settings.getProxyPassword());
+        proxyEnabledCheckBox.setSelected(settings.isProxyEnabled());
+        proxyAuthEnabledCheckBox.setSelected(settings.isProxyAuthEnabled());
 
-        ntlmEnabledCheckBox.setSelected( settings.isNtlmAuthEnabled() );
-        ntlmHostField.setText( settings.getNtlmHost() );
-        ntlmDomainField.setText( settings.getNtlmDomain() );
+        ntlmEnabledCheckBox.setSelected(settings.isNtlmAuthEnabled());
+        ntlmHostField.setText(settings.getNtlmHost());
+        ntlmDomainField.setText(settings.getNtlmDomain());
 
-        showHierarchyByDefaultCheckBox.setSelected( settings.isShowHierarchyByDefault() );
-        showLogByDefaultCheckBox.setSelected( settings.isShowLogByDefault() );
-        showLineNumbersByDefaultCheckBox.setSelected( settings.isShowLineNumbersByDefault() );
-        dynamicConfigLocateCheckBox.setSelected( settings.isDynamicConfigLocate() );
-        showFinishDialogCheckBox.setSelected( settings.isShowFinishDialog() );
+        showHierarchyByDefaultCheckBox.setSelected(settings.isShowHierarchyByDefault());
+        showLogByDefaultCheckBox.setSelected(settings.isShowLogByDefault());
+        showLineNumbersByDefaultCheckBox.setSelected(settings.isShowLineNumbersByDefault());
+        dynamicConfigLocateCheckBox.setSelected(settings.isDynamicConfigLocate());
+        showFinishDialogCheckBox.setSelected(settings.isShowFinishDialog());
 
         pluginListModel.clear();
         PluginInfo[] plugins = settings.getPlugins();
@@ -506,17 +514,16 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         for (int i = 0; i < count; i++) {
             PluginInfo item = (PluginInfo) pluginListModel.get(i);
             listSet.add(item);
-            if ( item.isValid() && !pluginSet.contains(item) ) {
+            if (item.isValid() && !pluginSet.contains(item)) {
                 DefinitionResolver.unregisterPlugin(item.getClassName());
             }
         }
 
         // register plugins unregistered during this setting session
-        for (int i = 0; i < plugins.length; i++) {
-            PluginInfo currPlugin = plugins[i];
-            if ( !listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin.getClassName()) ) {
+        for (PluginInfo currPlugin : plugins) {
+            if (!listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin.getClassName())) {
                 try {
-                    DefinitionResolver.registerPlugin(currPlugin.getClassName());
+                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), Constants.XMLNS_CORE); // TODO: <-- WHY Constants.XMLNS_CORE ???
                 } catch (PluginException e) {
                     ; // do nothing - ignore
                 }
@@ -536,26 +543,26 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     private void define() {
         Settings settings = this.ide.getSettings();
 
-        settings.setWorkingPath( this.workingPathField.getText() );
-        settings.setFileCharset( this.fileCharsetComboBox.getSelectedItem().toString() );
-        settings.setProxyServer( this.proxyServerField.getText() );
+        settings.setWorkingPath(this.workingPathField.getText());
+        settings.setFileCharset(this.fileCharsetComboBox.getSelectedItem().toString());
+        settings.setProxyServer(this.proxyServerField.getText());
 
         int port = -1;
         try {
-            port = Integer.parseInt( this.proxyPortField.getText() );
+            port = Integer.parseInt(this.proxyPortField.getText());
         } catch (NumberFormatException e) {
         }
         settings.setProxyPort(port);
 
-        settings.setProxyUserename( this.proxyUsernameField.getText() );
-        settings.setProxyPassword( this.proxyPasswordField.getText() );
+        settings.setProxyUserename(this.proxyUsernameField.getText());
+        settings.setProxyPassword(this.proxyPasswordField.getText());
 
-        settings.setProxyEnabled( this.proxyEnabledCheckBox.isSelected() );
-        settings.setProxyAuthEnabled( this.proxyAuthEnabledCheckBox.isSelected() );
+        settings.setProxyEnabled(this.proxyEnabledCheckBox.isSelected());
+        settings.setProxyAuthEnabled(this.proxyAuthEnabledCheckBox.isSelected());
 
-        settings.setNtlmAuthEnabled( this.ntlmEnabledCheckBox.isSelected() );
-        settings.setNtlmHost( this.ntlmHostField.getText() );
-        settings.setNtlmDomain( this.ntlmDomainField.getText() );
+        settings.setNtlmAuthEnabled(this.ntlmEnabledCheckBox.isSelected());
+        settings.setNtlmHost(this.ntlmHostField.getText());
+        settings.setNtlmDomain(this.ntlmDomainField.getText());
 
         settings.setShowHierarchyByDefault(this.showHierarchyByDefaultCheckBox.isSelected());
         settings.setShowLogByDefault(this.showLogByDefaultCheckBox.isSelected());
@@ -597,25 +604,25 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
         this.proxyAuthEnabledCheckBox.setEnabled(isProxyEnabled);
 
-        this.proxyUsernameLabel.setEnabled( isProxyEnabled && isProxyAuthEnabled );
-        this.proxyUsernameField.setEnabled( isProxyEnabled && isProxyAuthEnabled );
-        this.proxyPasswordLabel.setEnabled( isProxyEnabled && isProxyAuthEnabled );
-        this.proxyPasswordField.setEnabled( isProxyEnabled && isProxyAuthEnabled );
+        this.proxyUsernameLabel.setEnabled(isProxyEnabled && isProxyAuthEnabled);
+        this.proxyUsernameField.setEnabled(isProxyEnabled && isProxyAuthEnabled);
+        this.proxyPasswordLabel.setEnabled(isProxyEnabled && isProxyAuthEnabled);
+        this.proxyPasswordField.setEnabled(isProxyEnabled && isProxyAuthEnabled);
 
         this.ntlmEnabledCheckBox.setEnabled(isProxyEnabled && isProxyAuthEnabled);
 
-        this.ntlmHostLabel.setEnabled( isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled );
-        this.ntlmHostField.setEnabled( isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled );
-        this.ntlmDomainLabel.setEnabled( isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled );
-        this.ntlmDomainField.setEnabled( isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled );
+        this.ntlmHostLabel.setEnabled(isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled);
+        this.ntlmHostField.setEnabled(isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled);
+        this.ntlmDomainLabel.setEnabled(isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled);
+        this.ntlmDomainField.setEnabled(isProxyEnabled && isProxyAuthEnabled && isNtlmAuthEnabled);
 
         int selectedPluginIndex = pluginsList.getSelectedIndex();
-        pluginUpdateButton.setEnabled( selectedPluginIndex >= 0 );
-        pluginRemoveButton.setEnabled( selectedPluginIndex >= 0 );
+        pluginUpdateButton.setEnabled(selectedPluginIndex >= 0);
+        pluginRemoveButton.setEnabled(selectedPluginIndex >= 0);
         if (selectedPluginIndex >= 0 && selectedPluginIndex < pluginListModel.getSize()) {
             PluginInfo pluginItem = (PluginInfo) pluginListModel.get(selectedPluginIndex);
             pluginClassNameField.setText(pluginItem.getClassName());
-            pluginNamespaceUriField.setText( CommonUtil.nvl(pluginItem.getUri(), Constants.XMLNS_CORE) );
+            pluginNamespaceUriField.setText(CommonUtil.nvl(pluginItem.getUri(), Constants.XMLNS_CORE));
         } else {
             pluginClassNameField.setText("");
             pluginNamespaceUriField.setText(Constants.XMLNS_CORE);
@@ -649,7 +656,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     }
 
     protected void onOk() {
-        define();        
+        define();
     }
-    
+
 }

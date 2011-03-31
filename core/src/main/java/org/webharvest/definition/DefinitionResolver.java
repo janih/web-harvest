@@ -238,21 +238,12 @@ public class DefinitionResolver {
         }
     }
 
-    public static void registerPlugin(Class pluginClass) throws PluginException {
-        registerPlugin(pluginClass, false, Constants.XMLNS_CORE);
-    }
-
     public static void registerPlugin(Class pluginClass, String uri) throws PluginException {
         registerPlugin(pluginClass, false, uri);
     }
 
-    public static void registerPlugin(String fullClassName) throws PluginException {
-        registerPlugin(fullClassName, Constants.XMLNS_CORE);
-    }
-
     public static void registerPlugin(String fullClassName, String uri) throws PluginException {
-        Class pluginClass = ClassLoaderUtil.getPluginClass(fullClassName);
-        registerPlugin(pluginClass, false, uri);
+        registerPlugin(ClassLoaderUtil.getPluginClass(fullClassName), false, uri);
     }
 
     public static void unregisterPlugin(Class pluginClass) {

@@ -371,7 +371,8 @@ public class Settings implements Serializable {
         int pluginCount = CommonUtil.getIntValue(props.getProperty("plugin.count"), 0);
         plugins = new PluginInfo[pluginCount];
         for (int i = 0; i < pluginCount; i++) {
-            plugins[i] = new PluginInfo( props.getProperty("plugin" + i + ".class"), props.getProperty("plugin" + i + ".uri"), null ); ;
+            plugins[i] = new PluginInfo(props.getProperty("plugin" + i + ".class"), props.getProperty("plugin" + i + ".uri"), null);
+            ;
             try {
                 DefinitionResolver.registerPlugin(plugins[i].getClassName(), plugins[i].getUri());
             } catch (PluginException e) {
@@ -388,6 +389,7 @@ public class Settings implements Serializable {
 
     /**
      * Serialization read.
+     *
      * @param in
      * @throws IOException
      */
@@ -416,9 +418,9 @@ public class Settings implements Serializable {
         int pluginsCount = readInt(in, 0);
         plugins = new PluginInfo[pluginsCount];
         for (int i = 0; i < pluginsCount; i++) {
-            plugins[i] = new PluginInfo( readString(in, ""), Constants.XMLNS_CORE_10, null );
+            plugins[i] = new PluginInfo(readString(in, ""), Constants.XMLNS_CORE_10, null);
             try {
-                DefinitionResolver.registerPlugin(plugins[i].getClassName());
+                DefinitionResolver.registerPlugin(plugins[i].getClassName(), Constants.XMLNS_CORE_10);
             } catch (PluginException e) {
                 e.printStackTrace();
             }
@@ -434,14 +436,14 @@ public class Settings implements Serializable {
     private void readFromFile() throws IOException {
         File configFile = new File(CONFIG_FILE_PATH);
         // try first to read from the properties file
-        if ( configFile.exists() ) {
+        if (configFile.exists()) {
             Properties props = new Properties();
             props.load(new FileInputStream(CONFIG_FILE_PATH));
             loadFromProperties(props);
         } else {
             // if properties file doesn't exist, try to read from old formatted binary file
             configFile = new File(CONFIG_FILE_PATH_OLD);
-            if ( configFile.exists() ) {
+            if (configFile.exists()) {
                 FileInputStream fis = new FileInputStream(configFile);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 readObject_old(ois);

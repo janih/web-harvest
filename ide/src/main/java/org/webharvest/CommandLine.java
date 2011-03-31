@@ -36,6 +36,7 @@
 */
 package org.webharvest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.ScraperConfiguration;
@@ -135,9 +136,11 @@ public class CommandLine {
             // register plugins if specified
             String pluginsString = params.get("plugins");
             if (!CommonUtil.isEmpty(pluginsString)) {
-                for (String plugin : CommonUtil.tokenize(pluginsString, ",")) {
+                for (String pluginAndUri : CommonUtil.tokenize(pluginsString, ",")) {
                     try {
-                        DefinitionResolver.registerPlugin(plugin);
+                        final String pluginClass = StringUtils.substringBefore(pluginAndUri, ":");
+                        final String pluginUri = StringUtils.substringAfter(pluginAndUri, ":");
+                        DefinitionResolver.registerPlugin(pluginClass, pluginUri);
                     } catch (PluginException e) {
                         System.out.println(e.getMessage());
                     }
@@ -205,7 +208,7 @@ public class CommandLine {
         System.out.println("             [proxyntdomain=<NT domain name>]");
         System.out.println("             [loglevel=<level>]");
         System.out.println("             [logpropsfile=<path>]");
-        System.out.println("             [plugins=<list of plugin classes>]");
+        System.out.println("             [plugins=<plugin-class1>[:<uri1>][,<plugin-class2>[:<uri2>]]...]");
         System.out.println("             [#var1=<value1> [#var2=<value2>...]]");
         System.out.println("");
         System.out.println("   -h            - shows this help.");
@@ -220,7 +223,8 @@ public class CommandLine {
         System.out.println("   proxyntdomain - NTLM authentication scheme - the domain to authenticate within.");
         System.out.println("   loglevel      - specify level of logging for Log4J (trace,info,debug,warn,error,fatal).");
         System.out.println("   logpropsfile  - file path to custom Log4J properties. If specified, loglevel is ignored.");
-        System.out.println("   plugins       - comma-separated list of full plugins' class names.");
+        System.out.println("   plugins       - comma-separated list of pairs <plugin-class>[:<uri>], where <plugin-class> is full plugin class name," +
+                "and URI is an XML namespace in which this plugin is declared. If URI is not specified the default WebHarvest schema is assumed.");
         System.out.println("   #varN, valueN - specify initial variables of the Web-Harvest context. To be recognized, ");
         System.out.println("                   each variable name must have prefix #. ");
     }
