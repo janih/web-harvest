@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
-import org.webharvest.deprecated.runtime.runtime.processors.VarDefProcessor;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.ProcessorTestUtils;
