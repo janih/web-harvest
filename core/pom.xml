@@ -22,18 +22,32 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>add-sources</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java</source>
+                                <source>deprecated/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                                <source>deprecated/test/java</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <sources>
-                        <source>src/main/java</source>
-                        <source>src/deprecated/java</source>
-                    </sources>
-                </configuration>
             </plugin>
         </plugins>
     </build>
