@@ -36,7 +36,7 @@
  subject line.
  */
 
-package org.webharvest.runtime.processors;
+package org.webharvest.deprecated.runtime.processors;
 
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
@@ -44,9 +44,10 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.webharvest.deprecated.runtime.runtime.processors.VarDefProcessor;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
+import org.webharvest.runtime.processors.ProcessorTestUtils;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
