@@ -36,13 +36,13 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.deprecated.runtime.processors.CallProcessor10;
+import org.webharvest.deprecated.runtime.processors.VarDefProcessor;
+import org.webharvest.deprecated.runtime.processors.VarProcessor;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.processors.deprecated.CallProcessor10;
-import org.webharvest.runtime.processors.deprecated.VarDefProcessor;
-import org.webharvest.runtime.processors.deprecated.VarProcessor;
 import org.webharvest.runtime.processors.plugins.*;
 import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
 import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;

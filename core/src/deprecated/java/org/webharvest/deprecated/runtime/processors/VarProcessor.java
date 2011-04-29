@@ -34,7 +34,7 @@
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
 */
-package org.webharvest.runtime.processors.deprecated;
+package org.webharvest.deprecated.runtime.processors;
 
 import org.webharvest.definition.VarDef;
 import org.webharvest.exception.VariableException;
