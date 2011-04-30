@@ -115,7 +115,7 @@ public class GroovyScriptEngineTest extends UnitilsTestNG {
 
                 return null;
             }
-        }, false);
+        });
 
         // 'k' is out of scope
         assertFalse(context.containsVar("k"));

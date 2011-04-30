@@ -36,6 +36,7 @@
 */
 package org.webharvest.utils;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,6 +44,18 @@ import java.util.List;
  * Simple Stack (LIFO queue).
  */
 public class Stack<T> {
+
+    public static final Stack EMPTY = new Stack() {
+        @Override
+        public void push(Object o) {
+            throw new UnsupportedOperationException("EMPTY stack is immutable.");
+        }
+
+        @Override
+        public List getList() {
+            return Collections.EMPTY_LIST;
+        }
+    };
 
     private LinkedList<T> list = new LinkedList<T>();
 

@@ -129,7 +129,7 @@ public class ScraperContextTest extends UnitilsTestNG {
                 assertSame(context.getVar("x"), dummyVar);
                 return null;
             }
-        }, false);
+        });
         assertSame(context.getVar("x"), dummyVar);
     }
 
@@ -180,7 +180,7 @@ public class ScraperContextTest extends UnitilsTestNG {
                                 ), IteratorUtils.toList(context.iterator()), ReflectionComparatorMode.LENIENT_ORDER);
                                 return null;
                             }
-                        }, false);
+                        });
 
                         assertReflectionEquals(new NodeVariable("a"), context.getVar("x"));
                         assertReflectionEquals(new NodeVariable(2), context.getVar("y"));
@@ -193,7 +193,7 @@ public class ScraperContextTest extends UnitilsTestNG {
 
                         return null;
                     }
-                }, false);
+                });
 
                 assertReflectionEquals(new NodeVariable("a"), context.getVar("x"));
                 assertReflectionEquals(new NodeVariable(2), context.getVar("y"));
@@ -205,7 +205,7 @@ public class ScraperContextTest extends UnitilsTestNG {
 
                 return null;
             }
-        }, false);
+        });
 
         assertReflectionEquals(new NodeVariable("a"), context.getVar("x"));
         assertReflectionEquals(new NodeVariable(1), context.getVar("y"));

@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.LoopDef;
+import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -115,7 +115,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
                         }
                         return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
                     }
-                }, true);
+                });
     }
 
     /**
@@ -126,7 +126,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
      * @return Filtered list
      */
     private List createFilteredList(List list, String filterStr) {
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<Object>();
         Set<String> stringSet = new HashSet<String>();
 
         Filter filter = new Filter(filterStr, list.size());
@@ -249,17 +249,13 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
          * Checks if specified integer passes the filter
          */
         private boolean isInFilter(int num) {
-            int listSize = filterList.size();
-
-            if (listSize == 0) {
+            if (filterList.size() == 0) {
                 return true;
             }
 
-            for (int i = 0; i < listSize; i++) {
-                CommonUtil.IntPair curr = filterList.get(i);
-                if (curr instanceof IntRange && ((IntRange) curr).isInRange(num)) {
-                    return true;
-                } else if (curr instanceof IntSublist && ((IntSublist) curr).isInSublist(num)) {
+            for (CommonUtil.IntPair curr : filterList) {
+                if (curr instanceof IntRange && ((IntRange) curr).isInRange(num)
+                        || curr instanceof IntSublist && ((IntSublist) curr).isInSublist(num)) {
                     return true;
                 }
             }

@@ -36,28 +36,63 @@
  subject line.
  */
 
-package org.webharvest.runtime;
+package org.webharvest.deprecated.runtime;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.KeyValuePair;
+import org.webharvest.utils.Stack;
 
 import java.util.concurrent.Callable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: awajda
- * Date: Sep 20, 2010
- * Time: 9:32:52 PM
- */
-public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
+public class ScraperContext10 extends ScraperContext {
 
-    Variable getVar(String name);
+    private static final String CALLER_PREFIX = "caller.";
 
-    void setLocalVar(String key, Variable value);
+    public ScraperContext10(Scraper scraper) {
+        super(scraper);
+    }
 
-    <R> R executeWithinNewContext(Callable<R> callable) throws InterruptedException;
+    @Override
+    public Variable getVar(String name) {
+        checkIdentifier(name);
 
-    Variable replaceExistingVar(String name, Variable variable);
+        int level = 0;
+        while (name.startsWith(CALLER_PREFIX, level * CALLER_PREFIX.length())) {
+            level++;
+        }
 
-    boolean containsVar(String name);
+        @SuppressWarnings({"unchecked"})
+        final Stack<Variable> variableValueStack = (Stack<Variable>)
+                ObjectUtils.defaultIfNull(centralReferenceTable.get(name.substring(level * CALLER_PREFIX.length())), Stack.EMPTY);
+
+        return (variableValueStack.size() > level)
+                ? variableValueStack.getList().get(variableValueStack.size() - level - 1)
+                : null;
+    }
+
+    @Override
+    public <R> R executeWithinNewContext(Callable<R> callable) throws InterruptedException {
+        try {
+            // No new contexts.
+            // Just execute...
+            return callable.call();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <R> R executeFunctionCall(Callable<R> callable) throws InterruptedException {
+        // Here the context shifts.
+        return super.executeWithinNewContext(callable);
+    }
+
+
 }

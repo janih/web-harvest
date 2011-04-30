@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
@@ -50,10 +51,8 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
-import org.webharvest.utils.ClassLoaderUtil;
-import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.*;
 import org.webharvest.utils.Stack;
-import org.webharvest.utils.SystemUtilities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -121,7 +120,10 @@ public class Scraper {
 
         this.httpClientManager = new HttpClientManager(logger);
 
-        this.context = new ScraperContext(this);
+        this.context = Constants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
+                ? new ScraperContext10(this)
+                : new ScraperContext(this);
+
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
         context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
 

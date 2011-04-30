@@ -70,7 +70,7 @@ public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
         final boolean toOverwrite = (overwrite == null || CommonUtil.isBooleanTrue(overwrite));
 
         if (context.getVar(name) == null || toOverwrite) {
-            context.setVar_compat2b1(name, var);
+            context.setLocalVar(name, var);
         } else {
             this.setProperty("Default", var);
         }

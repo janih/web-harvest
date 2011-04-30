@@ -37,7 +37,6 @@
 package org.webharvest.runtime;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -54,8 +53,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import static java.text.MessageFormat.format;
-import static org.apache.commons.collections.IteratorUtils.filteredIterator;
-import static org.apache.commons.collections.IteratorUtils.toList;
 
 /**
  * Context of scraper execution. All the variables created during
@@ -66,14 +63,13 @@ public class ScraperContext implements DynamicScopeContext {
     public final Logger log;
 
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
-    private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
+    protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
     public ScraperContext(Scraper scraper) {
         variablesNamesStack.push(new HashSet<String>());
         log = scraper.getLogger();
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     public void setLocalVar(String name, Object value) {
         setLocalVar(name, CommonUtil.createVariable(value));
     }
@@ -105,19 +101,6 @@ public class ScraperContext implements DynamicScopeContext {
         return variableValueStack.replaceTop((Variable) ObjectUtils.defaultIfNull(variable, EmptyVariable.INSTANCE));
     }
 
-    /**
-     * Sets variable into local context.
-     * This method is kept for the backward compatibility only.
-     *
-     * @param varName
-     * @deprecated use {@link #setLocalVar(String, Object)}
-     */
-    @Deprecated
-    public void put(String varName, Object value) {
-        setLocalVar(varName, value);
-        log.warn("DEPRECATED METHOD INVOCATION: " + getClass().getName() + ".put(String, Object)");
-    }
-
     @Override
     public Variable getVar(String name) {
         checkIdentifier(name);
@@ -143,10 +126,9 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     @Override
-    public <R> R executeWithinNewContext(Callable<R> callable, boolean loopBody_compat2b1) throws InterruptedException {
+    public <R> R executeWithinNewContext(Callable<R> callable) throws InterruptedException {
         try {
             variablesNamesStack.push(new HashSet<String>());
-            loopBodyScope_compat2b1.push(loopBody_compat2b1);
             return callable.call();
 
         } catch (InterruptedException e) {
@@ -157,7 +139,6 @@ public class ScraperContext implements DynamicScopeContext {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            loopBodyScope_compat2b1.pop();
             for (String varName : variablesNamesStack.pop()) {
                 removeVarFromCRT(varName);
             }
@@ -176,100 +157,9 @@ public class ScraperContext implements DynamicScopeContext {
         }
     }
 
-    private void checkIdentifier(String identifier) {
+    protected void checkIdentifier(String identifier) {
         if (StringUtils.isBlank(identifier)) {
             throw new VariableException(format("Invalid identifier ''{0}''", identifier));
-        }
-    }
-
-    /**
-     * Compatibility stuff dedicated to <var-def> processor
-     * which is deprecated and replaced by <def> and <set> processors.
-     * <p/>
-     * ========= THE FOLLOWING MUST BE REMOVED IN 3.0 MAJOR RELEASE =========
-     */
-
-    private Stack<Boolean> loopBodyScope_compat2b1 = new Stack<Boolean>();
-
-    {
-        loopBodyScope_compat2b1.push(false);
-    }
-
-    @Deprecated
-    public void setVar_compat2b1(final String name, Variable var) {
-        checkIdentifier(name);
-        if (!loopBodyScope_compat2b1.peek()) {
-            setLocalVar(name, var);
-            return;
-        }
-
-        // Inside loops <var-def> used to operate with the loop outside scope
-        // and so do we below.
-
-        Stack<Variable> variableValueStack = centralReferenceTable.get(name);
-
-        final int enclosedLoopsCount = toList(filteredIterator(
-                ((LinkedList) loopBodyScope_compat2b1.getList()).descendingIterator(),
-                new Predicate() {
-                    private boolean gapNotReached = true;
-
-                    @Override
-                    public boolean evaluate(Object item) {
-                        return (gapNotReached &= ((Boolean) item));
-                    }
-                }
-        )).size();
-
-        final int valuesInsideLoopsCount = toList(filteredIterator(
-                ((LinkedList) variablesNamesStack.getList()).descendingIterator(),
-                new Predicate() {
-                    private int i = enclosedLoopsCount;
-
-                    @Override
-                    public boolean evaluate(Object item) {
-                        return (i-- > 0 && ((Set) item).contains(name));
-                    }
-                }
-        )).size();
-
-
-        final Set<String> loopOutsideVariableNames = variablesNamesStack.getList().
-                get(variablesNamesStack.size() - enclosedLoopsCount - 1);
-
-        if (var == null) {
-            var = EmptyVariable.INSTANCE;
-        }
-
-        if (variableValueStack == null) {
-            // Case A - new variable for the whole stack
-            // [-]...[-]L_[-]
-            //        v
-            // [-]...[+]L_[-]
-            variableValueStack = new Stack<Variable>();
-            centralReferenceTable.put(name, variableValueStack);
-            loopOutsideVariableNames.add(name);
-            variableValueStack.push(var);
-        } else if (loopOutsideVariableNames.contains(name)) {
-            // Case B - variable is defined in both the loop outside and the local scopes
-            // Case C - variable is defined in the loop outside scope but local
-            // [?]...[1]L_[?]
-            //        v
-            // [?]...[2]L_[?]
-            variableValueStack.getList().set(variableValueStack.size() - valuesInsideLoopsCount - 1, var);
-        } else if (variablesNamesStack.peek().contains(name)) {
-            // Case D - variable is defined in the local scope but loop outside
-            // [?]...[-]L_[+]
-            //        v
-            // [?]...[+]L_[+]
-            loopOutsideVariableNames.add(name);
-            variableValueStack.getList().add(variableValueStack.size() - valuesInsideLoopsCount, var);
-        } else {
-            // Case E - variable is NOT defined in the loop outside or local scopes, but defined somewhere earlier.
-            // [+]...[-]L_[-]
-            //        v
-            // [+]...[+]L_[-]
-            loopOutsideVariableNames.add(name);
-            variableValueStack.push(var);
         }
     }
 }

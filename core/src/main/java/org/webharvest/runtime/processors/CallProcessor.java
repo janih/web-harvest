@@ -74,7 +74,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         // executes body of call processor
         new BodyProcessor(elementDef).execute(scraper, context);
 
-        context.executeWithinNewContext(new Callable<Object>() {
+        final Callable<Object> callable = new Callable<Object>() {
 
             @Override
             public Object call() throws InterruptedException {
@@ -93,9 +93,15 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                     scraper.removeRunningFunction();
                 }
             }
-        }, false);
+        };
+
+        doCall(context, callable);
 
         return functionResult;
+    }
+
+    protected void doCall(ScraperContext context, Callable<Object> callable) throws InterruptedException {
+        context.executeWithinNewContext(callable);
     }
 
     public void setFunctionResult(Variable result) {

@@ -36,31 +36,58 @@
  subject line.
  */
 
-package org.webharvest.runtime.scripting;
+package org.webharvest.deprecated.runtime;
 
-import bsh.CallStack;
-import bsh.Interpreter;
-import bsh.UtilEvalError;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
+import org.unitils.inject.annotation.TestedObject;
+import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.utils.CommonUtil;
 
-/**
- * Used by BeanShell. Sets a variable to the context.
- *
- * @Deprecated
- */
+import java.util.concurrent.Callable;
 
-@SuppressWarnings({"UnusedDeclaration"})
-@Deprecated
-public class SetContextVar {
+public class ScraperContext10Test extends UnitilsTestNG {
 
-    public static final String SCRAPER_VAR_NAME = "__" + Scraper.class.getName().replace(".", "_");
+    @TestedObject
+    ScraperContext10 context;
 
-    public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) throws UtilEvalError {
-        final Scraper scraper = (Scraper) interpreter.getNameSpace().getVariable(SCRAPER_VAR_NAME);
-        scraper.getLogger().warn("SetContextVar is DEPRECATED! No need to use it anymore. " +
-                "All variables defined on the top level of the script block are propagated to the scraper context automatically.");
+    @Dummy
+    Scraper scraper;
 
-        scraper.getContext().setLocalVar(name, CommonUtil.createVariable(value));
+    @BeforeMethod
+    public void before() {
+        context = new ScraperContext10(scraper);
+    }
+
+    @Test
+    public void testGetVar() throws Exception {
+        // not existing var
+        Assert.assertNull(context.getVar("x"));
+
+        // local var
+        context.setLocalVar("x", 123);
+        Assert.assertEquals(context.getVar("x").toInt(), 123);
+
+        // sub-context. 1st level
+        context.executeFunctionCall(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Assert.assertNull(context.getVar("x"));
+                Assert.assertEquals(context.getVar("caller.x").toInt(), 123);
+
+                // sub-context. 2st level
+                return context.executeFunctionCall(new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                        Assert.assertNull(context.getVar("x"));
+                        Assert.assertNull(context.getVar("caller.x"));
+                        Assert.assertEquals(context.getVar("caller.caller.x").toInt(), 123);
+                        return null;
+                    }
+                });
+            }
+        });
     }
 }

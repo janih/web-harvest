@@ -102,7 +102,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
                 return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
             }
-        }, true);
+        });
     }
 
 }

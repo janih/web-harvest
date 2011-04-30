@@ -113,7 +113,7 @@ public class BeanShellScriptEngineTest extends UnitilsTestNG {
 
                 return null;
             }
-        }, false);
+        });
 
         // 'k' is out of scope
         assertFalse(context.containsVar("k"));

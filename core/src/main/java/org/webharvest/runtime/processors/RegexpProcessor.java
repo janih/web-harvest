@@ -116,7 +116,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
         List bodyList = source.toList();
         for (final Object currVar : bodyList) {
-            context.executeWithinNewContext(new Callable() {
+            context.executeWithinNewContext(new Callable<Object>() {
                 public Object call() throws InterruptedException {
                     String text = currVar.toString();
 
@@ -157,7 +157,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
                     return null;
                 }
-            }, true);
+            });
         }
 
 

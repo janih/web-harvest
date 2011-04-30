@@ -67,6 +67,7 @@ public class ScraperConfiguration {
     private ScriptingLanguage scriptingLanguage;
     private File sourceFile;
     private String url;
+    private String namespaceURI;
 
     /**
      * Creates configuration instance loaded from the specified input stream.
@@ -113,9 +114,7 @@ public class ScraperConfiguration {
         // loads configuration from input stream to the internal structure
         final XmlNode node = XmlNode.getInstance(in);
 
-        final String xmlns = node.getUri();
-        System.out.println("WH config URI: "+xmlns);
-
+        this.namespaceURI = node.getUri();
         this.charset = StringUtils.defaultIfEmpty(node.getAttribute("charset"), DEFAULT_CHARSET);
 
         this.scriptingLanguage = (ScriptingLanguage) ObjectUtils.defaultIfNull(
@@ -165,4 +164,7 @@ public class ScraperConfiguration {
         this.url = url;
     }
 
+    public String getNamespaceURI() {
+        return namespaceURI;
+    }
 }
