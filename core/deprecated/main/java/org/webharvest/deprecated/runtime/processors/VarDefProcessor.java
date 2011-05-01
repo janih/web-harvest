@@ -61,8 +61,6 @@ public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
     }
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        scraper.getLogger().warn("<var-def> is DEPRECATED! Use <def> or <set> instead.");
-
         final Variable var = new BodyProcessor(elementDef).execute(scraper, context);
 
         final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);

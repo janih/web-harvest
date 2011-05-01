@@ -41,7 +41,6 @@ package org.webharvest.deprecated.runtime;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -62,13 +61,16 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     private static final String CALLER_PREFIX = "caller.";
 
-    public final Logger log;
-
-    Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
+    private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
+    private Scraper scraper;
 
     public ScraperContext10(Scraper scraper) {
-        log = scraper.getLogger();
-        stack.push(new HashMap<String, Variable>());
+        this.stack.push(new HashMap<String, Variable>());
+        this.scraper = scraper;
+        scraper.getLogger().warn("" +
+                "You are using the DEPRECATED scraper configuration version. " +
+                "We urge you to migrate to the newer one! " +
+                "Please visit http://web-harvest.sourceforge.net/release.php for details.");
     }
 
     @Override
@@ -127,6 +129,7 @@ public class ScraperContext10 implements DynamicScopeContext {
         // Here the context shifts.
         try {
             stack.push(new HashMap<String, Variable>());
+            Scraper.initContext(this, scraper);
             return callable.call();
 
         } catch (InterruptedException e) {
@@ -148,8 +151,8 @@ public class ScraperContext10 implements DynamicScopeContext {
         return IteratorUtils.transformedIterator(stack.peek().entrySet().iterator(), new Transformer() {
             @Override
             public Object transform(Object input) {
-                final Map.Entry<String, Stack<Variable>> entry = (Map.Entry<String, Stack<Variable>>) input;
-                return new KeyValuePair<Variable>(entry.getKey(), entry.getValue().peek());
+                final Map.Entry<String, Variable> entry = (Map.Entry<String, Variable>) input;
+                return new KeyValuePair<Variable>(entry.getKey(), entry.getValue());
             }
         });
     }

@@ -57,8 +57,6 @@ public class VarProcessor extends AbstractProcessor<VarDef> {
     }
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
-        scraper.getLogger().warn("<var> is DEPRECATED! Use <get> or <value-of> instead.");
-
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         this.setProperty("Name", name);
 

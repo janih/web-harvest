@@ -124,10 +124,14 @@ public class Scraper {
                 ? new ScraperContext10(this)
                 : new ScraperContext(this);
 
-        context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
-        context.setLocalVar("http", new ScriptingVariable(httpClientManager.getHttpInfo()));
+        initContext(context, this);
 
         this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage(), this);
+    }
+
+    public static void initContext(DynamicScopeContext context, Scraper scraper) {
+        context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(scraper)));
+        context.setLocalVar("http", new ScriptingVariable(scraper.getHttpClientManager().getHttpInfo()));
     }
 
     /**
