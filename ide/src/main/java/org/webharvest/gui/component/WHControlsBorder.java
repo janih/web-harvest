@@ -1,6 +1,6 @@
 package org.webharvest.gui.component;
 
-import javax.swing.border.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 public class WHControlsBorder implements Border {

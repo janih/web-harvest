@@ -1,7 +1,6 @@
 package org.webharvest.gui.component;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Elements used for menu creation.

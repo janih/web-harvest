@@ -39,8 +39,8 @@ package org.webharvest.deprecated.runtime.processors;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.webharvest.definition.VarDefDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.BodyProcessor;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -60,7 +60,7 @@ public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
         super(varDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         scraper.getLogger().warn("<var-def> is DEPRECATED! Use <def> or <set> instead.");
 
         final Variable var = new BodyProcessor(elementDef).execute(scraper, context);

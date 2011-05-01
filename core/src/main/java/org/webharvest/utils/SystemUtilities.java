@@ -39,8 +39,8 @@ package org.webharvest.utils;
 import net.sf.saxon.trans.XPathException;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.ScraperXPathException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -94,7 +94,7 @@ public class SystemUtilities {
      * @param overwrite
      */
     public void defineVariable(String varName, Object varValue, boolean overwrite) {
-        ScraperContext context = scraper.getContext();
+        final DynamicScopeContext context = scraper.getContext();
         if (overwrite || context.getVar(varName) == null) {
             context.setLocalVar(varName, CommonUtil.createVariable(varValue));
         }

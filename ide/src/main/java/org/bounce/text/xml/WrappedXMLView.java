@@ -29,15 +29,9 @@
 
 package org.bounce.text.xml;
 
-import java.awt.Graphics;
-import java.awt.Shape;
+import javax.swing.text.*;
+import java.awt.*;
 import java.io.IOException;
-
-import javax.swing.text.View;
-import javax.swing.text.Element;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.WrappedPlainView;
 
 /**
  * The XML View uses the XML scanner to determine the style (font, color) of the

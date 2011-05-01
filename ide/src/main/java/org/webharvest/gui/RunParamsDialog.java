@@ -36,15 +36,24 @@
 */
 package org.webharvest.gui;
 
-import org.webharvest.gui.component.*;
+import org.webharvest.gui.component.CommonButton;
+import org.webharvest.gui.component.WHControlsBorder;
+import org.webharvest.gui.component.WHScrollPane;
 
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class RunParamsDialog extends JDialog {
 

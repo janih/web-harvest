@@ -1,7 +1,9 @@
 package org.webharvest.gui;
 
 import org.webharvest.WHConstants;
-import org.webharvest.definition.*;
+import org.webharvest.definition.DefinitionResolver;
+import org.webharvest.definition.ElementInfo;
+import org.webharvest.definition.ElementName;
 import org.webharvest.gui.component.WHScrollPane;
 import org.webharvest.utils.CommonUtil;
 

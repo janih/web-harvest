@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.TemplateDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -54,7 +54,7 @@ public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
         super(templateDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return new NodeVariable(BaseTemplater.evaluateToString(
                 getBodyTextContent(elementDef, scraper, context).toString(),
                 ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)),

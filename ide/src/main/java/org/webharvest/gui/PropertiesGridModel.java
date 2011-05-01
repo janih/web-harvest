@@ -39,9 +39,8 @@ package org.webharvest.gui;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author: Vladimir Nikic

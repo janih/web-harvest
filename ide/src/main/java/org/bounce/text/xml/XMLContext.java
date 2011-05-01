@@ -28,13 +28,11 @@
  */
 package org.bounce.text.xml;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.util.Hashtable;
-
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import java.awt.*;
+import java.util.Hashtable;
 
 /**
  * A list of styles used to render syntax-highlighted XML text.

@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.ScriptDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -54,7 +54,7 @@ public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
         super(scriptDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
 
         // For backward compatibility with ver.2b1 only!

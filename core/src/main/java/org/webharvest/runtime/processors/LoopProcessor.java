@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.definition.ProcessorElementDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -63,7 +63,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         super(loopDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
+    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, scraper);
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, scraper);

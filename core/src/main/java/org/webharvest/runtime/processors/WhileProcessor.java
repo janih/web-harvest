@@ -38,8 +38,8 @@ package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.WhileDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -61,7 +61,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         super(whileDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
+    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
         final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);

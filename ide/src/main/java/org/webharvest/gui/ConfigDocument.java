@@ -1,14 +1,16 @@
 package org.webharvest.gui;
 
-import org.webharvest.utils.CommonUtil;
 import org.bounce.text.xml.XMLDocument;
+import org.webharvest.utils.CommonUtil;
 
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import javax.swing.*;
-import javax.swing.text.*;
-import java.io.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
+import java.io.*;
 import java.net.URL;
 
 /**

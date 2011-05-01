@@ -38,8 +38,8 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.HttpHeaderDef;
 import org.webharvest.exception.HttpException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 
@@ -52,7 +52,7 @@ public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
         super(httpHeaderDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         Variable value = getBodyTextContent(elementDef, scraper, context);
 

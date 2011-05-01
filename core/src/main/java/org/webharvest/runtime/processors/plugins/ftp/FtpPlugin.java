@@ -3,8 +3,8 @@ package org.webharvest.runtime.processors.plugins.ftp;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -22,7 +22,7 @@ public class FtpPlugin extends WebHarvestPlugin {
         return "ftp";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String server = CommonUtil.nvl(evaluateAttribute("server", scraper), "");
         int port = evaluateAttributeAsInteger("port", 21, scraper);
         String username = CommonUtil.nvl(evaluateAttribute("username", scraper), "");

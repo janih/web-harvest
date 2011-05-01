@@ -1,9 +1,8 @@
 package org.webharvest.gui.component;
 
-import org.webharvest.gui.ui.*;
+import org.webharvest.gui.ui.WHButtonUI;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class CommonButton extends JButton {
 

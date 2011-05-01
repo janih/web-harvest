@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -51,7 +51,7 @@ public class FunctionProcessor extends AbstractProcessor<FunctionDef> {
         super(functionDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) {
         scraper.getConfiguration().addFunctionDef(elementDef);
 
         this.setProperty("Name", elementDef.getName());

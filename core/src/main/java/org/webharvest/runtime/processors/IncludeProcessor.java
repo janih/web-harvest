@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -61,7 +61,7 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
         super(includeDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 
         String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);

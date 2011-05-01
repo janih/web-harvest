@@ -29,13 +29,12 @@
 
 package org.bounce.text.xml;
 
-import org.webharvest.gui.*;
-
-import java.awt.*;
-import java.io.IOException;
+import org.webharvest.gui.BreakpointCollection;
+import org.webharvest.gui.XmlTextPane;
 
 import javax.swing.text.*;
-import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * The XML View uses the XML scanner to determine the style (font, color) of the

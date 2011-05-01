@@ -43,9 +43,9 @@ import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
 import org.webharvest.definition.XPathDef;
 import org.webharvest.exception.ScraperXPathException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -66,7 +66,7 @@ public class XPathProcessor extends AbstractProcessor<XPathDef> {
         super(xpathDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
         String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);
         if (expression != null) {

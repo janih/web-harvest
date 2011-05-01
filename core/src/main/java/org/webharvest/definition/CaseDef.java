@@ -38,7 +38,8 @@ package org.webharvest.definition;
 
 import org.webharvest.runtime.processors.AbstractProcessor;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Definition of case processor.

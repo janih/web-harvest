@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.TextDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -54,7 +54,7 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
         super(textDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();

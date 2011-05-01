@@ -38,8 +38,8 @@ package org.webharvest.deprecated.runtime.processors;
 
 import org.webharvest.definition.VarDef;
 import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
@@ -56,7 +56,7 @@ public class VarProcessor extends AbstractProcessor<VarDef> {
         super(varDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) {
         scraper.getLogger().warn("<var> is DEPRECATED! Use <get> or <value-of> instead.");
 
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);

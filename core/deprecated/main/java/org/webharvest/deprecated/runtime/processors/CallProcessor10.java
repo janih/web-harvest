@@ -39,7 +39,7 @@ package org.webharvest.deprecated.runtime.processors;
 
 import org.webharvest.definition.CallDef;
 import org.webharvest.deprecated.runtime.ScraperContext10;
-import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.processors.CallProcessor;
 
 import java.util.concurrent.Callable;
@@ -54,7 +54,7 @@ public class CallProcessor10 extends CallProcessor {
     }
 
     @Override
-    protected void doCall(ScraperContext context, Callable<Object> callable) throws InterruptedException {
+    protected void doCall(DynamicScopeContext context, Callable<Object> callable) throws InterruptedException {
         ((ScraperContext10) context).executeFunctionCall(callable);
     }
 }

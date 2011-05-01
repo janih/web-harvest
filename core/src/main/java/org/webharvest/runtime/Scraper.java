@@ -77,7 +77,7 @@ public class Scraper {
 
     private ScraperConfiguration configuration;
     private String workingDir;
-    private ScraperContext context;
+    private DynamicScopeContext context;
     private ScriptEngineFactory scriptEngineFactory;
 
     private RuntimeConfig runtimeConfig;
@@ -203,7 +203,7 @@ public class Scraper {
         }
     }
 
-    public ScraperContext getContext() {
+    public DynamicScopeContext getContext() {
         return context;
     }
 

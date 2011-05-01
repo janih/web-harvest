@@ -28,7 +28,7 @@
  */
 package org.bounce.text.xml;
 
-import javax.swing.JEditorPane;
+import javax.swing.*;
 import javax.swing.text.*;
 
 /**

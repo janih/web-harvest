@@ -1,7 +1,7 @@
 package org.webharvest.runtime;
 
-import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.Configuration;
+import net.sf.saxon.query.StaticQueryContext;
 import org.webharvest.runtime.processors.XQueryExpressionPool;
 
 /**

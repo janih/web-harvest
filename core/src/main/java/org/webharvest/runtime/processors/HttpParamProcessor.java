@@ -38,8 +38,8 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.HttpParamDef;
 import org.webharvest.exception.HttpException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -53,7 +53,7 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
         super(httpParamDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         String isFileStr = BaseTemplater.evaluateToString(elementDef.getIsfile(), null, scraper);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);

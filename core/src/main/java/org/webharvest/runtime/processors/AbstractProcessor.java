@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.io.FileUtils;
 import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.ProcessorElementDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -62,7 +62,7 @@ import java.util.Map;
  */
 public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
 
-    abstract public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException;
+    abstract public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
     protected TDef elementDef;
     private Map properties = new LinkedHashMap();
@@ -82,7 +82,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
     /**
      * Wrapper for the execute method. Adds controlling and logging logic.
      */
-    public Variable run(final Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable run(final Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         int scraperStatus = scraper.getStatus();
 
         if (scraperStatus == Scraper.STATUS_STOPPED || scraperStatus == Scraper.STATUS_EXIT) {
@@ -167,7 +167,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context,
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef == null) {
             return null;
@@ -185,11 +185,11 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context, boolean registerExecution) throws InterruptedException {
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, ScraperContext context) throws InterruptedException {
+    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, false);
     }
 

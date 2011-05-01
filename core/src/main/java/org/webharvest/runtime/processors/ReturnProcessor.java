@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.ReturnDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -51,7 +51,7 @@ public class ReturnProcessor extends AbstractProcessor<ReturnDef> {
         super(returnDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         CallProcessor callProcessor = scraper.getRunningFunction();
 
         if (callProcessor != null) {

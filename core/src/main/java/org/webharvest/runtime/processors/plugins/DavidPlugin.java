@@ -1,8 +1,10 @@
 package org.webharvest.runtime.processors.plugins;
 
-import org.webharvest.runtime.*;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.webharvest.runtime.variables.Variable;
 
 public class DavidPlugin extends WebHarvestPlugin {
 
@@ -12,7 +14,7 @@ public class DavidPlugin extends WebHarvestPlugin {
     }
 
     @Override
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return new NodeVariable("David: " + evaluateAttribute("name", scraper));
     }
 

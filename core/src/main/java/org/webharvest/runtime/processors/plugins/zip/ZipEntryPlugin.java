@@ -1,7 +1,7 @@
 package org.webharvest.runtime.processors.plugins.zip;
 
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -23,7 +23,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
         return "zip-entry";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         ZipPlugin zipPlugin = (ZipPlugin) scraper.getRunningProcessorOfType(ZipPlugin.class);
         if (zipPlugin != null) {
             String name = evaluateAttribute("name", scraper);

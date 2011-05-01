@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.FunctionException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -59,7 +59,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         super(callDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
+    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
@@ -100,7 +100,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         return functionResult;
     }
 
-    protected void doCall(ScraperContext context, Callable<Object> callable) throws InterruptedException {
+    protected void doCall(DynamicScopeContext context, Callable<Object> callable) throws InterruptedException {
         context.executeWithinNewContext(callable);
     }
 

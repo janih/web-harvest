@@ -39,8 +39,8 @@
 package org.webharvest.runtime.processors.plugins.variable;
 
 import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.Variable;
 
@@ -50,7 +50,7 @@ public class GetVarPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
         final String varName = evaluateAttribute(ATTR_VAR, scraper);
 
         final Variable value = context.getVar(varName);

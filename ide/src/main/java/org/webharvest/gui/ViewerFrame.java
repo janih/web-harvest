@@ -39,24 +39,21 @@ package org.webharvest.gui;
 import net.sf.saxon.trans.XPathException;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.gui.component.*;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.*;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Map;
@@ -171,7 +168,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         toolBar.setFloatable(false);
 
         if (scraper != null) {
-            final ScraperContext context = scraper.getContext();
+            final DynamicScopeContext context = scraper.getContext();
 
             if (propertyName == null) {
                 final EditableComboBox variablesComboBox = new EditableComboBox(20) {

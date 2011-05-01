@@ -28,12 +28,11 @@
  */
 package org.bounce.text.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Segment;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A XML input stream, for a XML Document.

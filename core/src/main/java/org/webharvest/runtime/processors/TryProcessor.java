@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.Variable;
 
 /**
@@ -52,7 +52,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
         super(tryDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         try {
             ProcessorElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor(tryBodyDef).run(scraper, context);

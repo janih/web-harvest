@@ -28,20 +28,14 @@
  */
 package org.bounce.text.xml;
 
-import org.webharvest.gui.*;
+import org.webharvest.gui.XmlTextPane;
 
-import java.awt.Color;
+import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-
-import javax.swing.JEditorPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
 
 /**
  * The XML editor kit supports handling of editing XML content. It supports

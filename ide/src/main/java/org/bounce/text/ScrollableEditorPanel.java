@@ -29,21 +29,11 @@
 
 package org.bounce.text;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.font.LineMetrics;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JViewport;
-import javax.swing.Scrollable;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
+import javax.swing.*;
 import javax.swing.text.View;
 import javax.swing.text.WrappedPlainView;
-import javax.swing.text.BadLocationException;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Wrapper panel to force the editor pane to resize when a

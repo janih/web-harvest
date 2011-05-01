@@ -29,17 +29,8 @@
 
 package org.bounce.text.xml;
 
-import java.awt.Graphics;
-import java.awt.Color;
-
-import javax.swing.text.TabExpander;
-import javax.swing.text.View;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.Segment;
-import javax.swing.text.Utilities;
-import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
 
 /**
  * The XML View uses the XML scanner to determine the style (font, color) of the

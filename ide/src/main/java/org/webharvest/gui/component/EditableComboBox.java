@@ -1,9 +1,10 @@
 package org.webharvest.gui.component;
 
-import org.webharvest.utils.*;
+import org.webharvest.utils.CommonUtil;
 
-import javax.swing.event.*;
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.awt.event.*;
 

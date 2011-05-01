@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.RegexpDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -63,7 +63,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
         super(regexpDef);
     }
 
-    public Variable execute(final Scraper scraper, final ScraperContext context) throws InterruptedException {
+    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
 
         ProcessorElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);

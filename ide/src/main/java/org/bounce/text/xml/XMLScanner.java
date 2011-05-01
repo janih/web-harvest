@@ -28,9 +28,8 @@
  */
 package org.bounce.text.xml;
 
-import java.io.IOException;
-
 import javax.swing.text.Document;
+import java.io.IOException;
 
 /**
  * Associates XML input stream characters with XML specific styles.

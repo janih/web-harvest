@@ -41,8 +41,8 @@ package org.webharvest.runtime.processors.plugins.variable;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -66,7 +66,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
         this.name = name;
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final String varName = getAttributes().get(ATTR_VAR);
         final String valueExpr = getAttributes().get(ATTR_VALUE);
         final String defaultExpr = getAttributes().get(ATTR_DEFAULT);
@@ -124,7 +124,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
         return EmptyVariable.INSTANCE;
     }
 
-    protected abstract void doExecute(ScraperContext context, String varName, Variable value);
+    protected abstract void doExecute(DynamicScopeContext context, String varName, Variable value);
 
     public String getName() {
         return name;

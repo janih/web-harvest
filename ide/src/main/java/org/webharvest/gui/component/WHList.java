@@ -1,8 +1,8 @@
 package org.webharvest.gui.component;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Combo boxes used in application

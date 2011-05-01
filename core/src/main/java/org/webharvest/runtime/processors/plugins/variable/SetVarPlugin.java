@@ -38,7 +38,7 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
-import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.variables.Variable;
 
 /**
@@ -51,7 +51,7 @@ public class SetVarPlugin extends AbstractVariableModifierPlugin {
     }
 
     @Override
-    protected void doExecute(ScraperContext context, String varName, Variable value) {
+    protected void doExecute(DynamicScopeContext context, String varName, Variable value) {
         if (context.containsVar(varName)) {
             context.replaceExistingVar(varName, value);
         } else {

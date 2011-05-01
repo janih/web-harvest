@@ -37,8 +37,8 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.WebHarvestPluginDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.Assert;
@@ -124,7 +124,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
         return true;
     }
 
-    public final Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public final Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         // pre processing
         final Variable variable = executePlugin(scraper, context);
         Assert.notNull(variable, "Plugin {0} returned 'null' instead of 'empty'", getClass().getName());
@@ -137,11 +137,12 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * be used for multiple executions, creator of plugin is responsible for initiating
      * local variables at the beginning of this method.
      *
+     *
      * @param scraper
      * @param context
      * @return Instance of variable as result of execution.
      */
-    public abstract Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException;
+    public abstract Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
     public String getTagDesc() {
         if (!hasBody()) {
@@ -263,11 +264,12 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
     /**
      * Executes body of plugin processor
      *
+     *
      * @param scraper
      * @param context
      * @return Instance of Variable
      */
-    protected Variable executeBody(Scraper scraper, ScraperContext context) throws InterruptedException {
+    protected Variable executeBody(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return new BodyProcessor(elementDef).execute(scraper, context);
     }
 

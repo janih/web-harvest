@@ -4,8 +4,8 @@ import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
 
-import java.util.Map;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Class represnts simple pool for XQuery expressions.

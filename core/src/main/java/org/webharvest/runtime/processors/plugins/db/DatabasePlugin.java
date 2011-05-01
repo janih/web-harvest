@@ -2,8 +2,8 @@ package org.webharvest.runtime.processors.plugins.db;
 
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -34,7 +34,7 @@ public class DatabasePlugin extends WebHarvestPlugin {
         return "database";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String jdbc = evaluateAttribute("jdbcclass", scraper);
         String connection = evaluateAttribute("connection", scraper);
         String username = evaluateAttribute("username", scraper);

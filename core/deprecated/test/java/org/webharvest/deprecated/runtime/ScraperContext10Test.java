@@ -45,6 +45,7 @@ import org.unitils.UnitilsTestNG;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.utils.CommonUtil;
 
 import java.util.concurrent.Callable;
 
@@ -67,7 +68,7 @@ public class ScraperContext10Test extends UnitilsTestNG {
         Assert.assertNull(context.getVar("x"));
 
         // local var
-        context.setLocalVar("x", 123);
+        context.setLocalVar("x", CommonUtil.createVariable(123));
         Assert.assertEquals(context.getVar("x").toInt(), 123);
 
         // sub-context. 1st level

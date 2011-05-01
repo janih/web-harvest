@@ -1,6 +1,7 @@
 package org.webharvest.gui.component;
 
-import javax.swing.border.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 /**

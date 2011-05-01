@@ -38,8 +38,8 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.FileDef;
 import org.webharvest.exception.FileException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -67,7 +67,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         super(fileDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String workingDir = scraper.getWorkingDir();
 
         String action = BaseTemplater.evaluateToString(elementDef.getAction(), null, scraper);
@@ -131,7 +131,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
      * Writing content to the specified file.
      * If parameter "append" is true, then append content, otherwise write
      */
-    private Variable executeFileWrite(boolean append, Scraper scraper, ScraperContext context, String fullPath, String type, String charset) throws InterruptedException {
+    private Variable executeFileWrite(boolean append, Scraper scraper, DynamicScopeContext context, String fullPath, String type, String charset) throws InterruptedException {
         Variable result;
 
         try {

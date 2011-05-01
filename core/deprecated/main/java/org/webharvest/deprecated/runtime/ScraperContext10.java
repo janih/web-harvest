@@ -38,20 +38,37 @@
 
 package org.webharvest.deprecated.runtime;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class ScraperContext10 extends ScraperContext {
+import static java.text.MessageFormat.format;
+
+public class ScraperContext10 implements DynamicScopeContext {
 
     private static final String CALLER_PREFIX = "caller.";
 
+    public final Logger log;
+
+    Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
+
     public ScraperContext10(Scraper scraper) {
-        super(scraper);
+        log = scraper.getLogger();
+        stack.push(new HashMap<String, Variable>());
     }
 
     @Override
@@ -63,13 +80,18 @@ public class ScraperContext10 extends ScraperContext {
             level++;
         }
 
-        @SuppressWarnings({"unchecked"})
-        final Stack<Variable> variableValueStack = (Stack<Variable>)
-                ObjectUtils.defaultIfNull(centralReferenceTable.get(name.substring(level * CALLER_PREFIX.length())), Stack.EMPTY);
+        final List<Map<String, Variable>> mapList = stack.getList();
+        if (mapList.size() > level) {
+            return mapList.get(mapList.size() - 1 - level).get(name.substring(level * CALLER_PREFIX.length()));
+        } else {
+            throw new VariableException(MessageFormat.format("Too many ''caller.'' prefixes in the variable name ''{0}''", name));
+        }
+    }
 
-        return (variableValueStack.size() > level)
-                ? variableValueStack.getList().get(variableValueStack.size() - level - 1)
-                : null;
+    @Override
+    public void setLocalVar(String key, Variable value) {
+        checkIdentifier(key);
+        stack.peek().put(key, value);
     }
 
     @Override
@@ -89,10 +111,52 @@ public class ScraperContext10 extends ScraperContext {
         }
     }
 
+    @Override
+    public Variable replaceExistingVar(String name, Variable variable) {
+        final Variable oldVar = getVar(name);
+        setLocalVar(name, variable);
+        return oldVar;
+    }
+
+    @Override
+    public boolean containsVar(String name) {
+        return getVar(name) != null;
+    }
+
     public <R> R executeFunctionCall(Callable<R> callable) throws InterruptedException {
         // Here the context shifts.
-        return super.executeWithinNewContext(callable);
+        try {
+            stack.push(new HashMap<String, Variable>());
+            return callable.call();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            stack.pop();
+        }
     }
 
 
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public Iterator<KeyValuePair<Variable>> iterator() {
+        return IteratorUtils.transformedIterator(stack.peek().entrySet().iterator(), new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                final Map.Entry<String, Stack<Variable>> entry = (Map.Entry<String, Stack<Variable>>) input;
+                return new KeyValuePair<Variable>(entry.getKey(), entry.getValue().peek());
+            }
+        });
+    }
+
+    protected void checkIdentifier(String identifier) {
+        if (StringUtils.isBlank(identifier)) {
+            throw new VariableException(format("Invalid identifier ''{0}''", identifier));
+        }
+    }
 }

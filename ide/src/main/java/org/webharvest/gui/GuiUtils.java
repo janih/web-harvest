@@ -36,7 +36,7 @@
 */
 package org.webharvest.gui;
 
-import org.webharvest.gui.component.*;
+import org.webharvest.gui.component.AlertDialog;
 
 import javax.swing.*;
 import java.awt.*;

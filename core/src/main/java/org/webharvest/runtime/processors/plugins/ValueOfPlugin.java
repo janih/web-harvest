@@ -38,8 +38,8 @@
 
 package org.webharvest.runtime.processors.plugins;
 
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
@@ -48,7 +48,7 @@ public class ValueOfPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_EXPRESSION = "expr";
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
         final String expression = getAttributes().get(ATTR_EXPRESSION);
         setProperty("Expression", expression);
         return BaseTemplater.evaluateToVariable(expression, null, scraper);

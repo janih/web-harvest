@@ -39,8 +39,8 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.XsltDef;
 import org.webharvest.exception.XsltException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -59,7 +59,7 @@ public class XsltProcessor extends AbstractProcessor<XsltDef> {
         super(xsltDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final ProcessorElementDef xsltElementDef = elementDef.getXmlDef();
         Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
         debug(xsltElementDef, scraper, xmlStr);

@@ -4,8 +4,8 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.webharvest.WHConstants;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -25,7 +25,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
         return "mail-attach";
     }
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         AbstractProcessor processor = scraper.getRunningProcessorOfType(MailPlugin.class);
         if (processor != null) {
             MailPlugin mailPlugin = (MailPlugin) processor;

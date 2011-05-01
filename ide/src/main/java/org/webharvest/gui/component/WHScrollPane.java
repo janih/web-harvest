@@ -1,7 +1,7 @@
 package org.webharvest.gui.component;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**

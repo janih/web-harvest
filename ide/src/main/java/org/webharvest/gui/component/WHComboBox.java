@@ -1,13 +1,15 @@
 package org.webharvest.gui.component;
 
-import org.webharvest.utils.*;
+import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicLabelUI;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
 
 /**
  * Combo boxes used in LiveCharts

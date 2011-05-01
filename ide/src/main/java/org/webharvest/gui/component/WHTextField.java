@@ -2,7 +2,8 @@ package org.webharvest.gui.component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * LC look & feel text field

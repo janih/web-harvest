@@ -38,8 +38,8 @@
 
 package org.webharvest.runtime.processors.plugins;
 
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -48,7 +48,7 @@ public class SleepPlugin extends WebHarvestPlugin {
 
     private static final String MILLISECONDS_ATT_NAME = "milliseconds";
 
-    public Variable executePlugin(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, scraper);
         setProperty("Milliseconds", millis);
         if (millis > 0) {

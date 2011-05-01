@@ -1,6 +1,6 @@
 package org.webharvest.runtime.web;
 
-import org.webharvest.runtime.variables.*;
+import org.webharvest.runtime.variables.Variable;
 
 /**
  * Information about http request parameter.

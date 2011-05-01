@@ -40,8 +40,8 @@ import org.apache.commons.lang.BooleanUtils;
 import org.htmlcleaner.*;
 import org.webharvest.definition.HtmlToXmlDef;
 import org.webharvest.exception.ParserException;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -58,7 +58,7 @@ public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
         super(htmlToXmlDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable body = getBodyTextContent(elementDef, scraper, context);
 
         HtmlCleaner cleaner = new HtmlCleaner();

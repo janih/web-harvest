@@ -1,14 +1,14 @@
 package org.webharvest.utils;
 
-import org.webharvest.exception.*;
+import org.webharvest.exception.PluginException;
 
-import java.net.URLClassLoader;
-import java.net.URL;
+import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.io.File;
-import java.sql.*;
 
 /**
  * Class loading utility - used for loading JDBC driver classes and plugin classes.

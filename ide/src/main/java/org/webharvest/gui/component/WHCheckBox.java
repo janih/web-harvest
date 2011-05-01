@@ -1,7 +1,5 @@
 package org.webharvest.gui.component;
 
-import org.webharvest.gui.*;
-
 import javax.swing.*;
 import java.awt.*;
 

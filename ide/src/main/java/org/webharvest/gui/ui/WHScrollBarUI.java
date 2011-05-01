@@ -1,8 +1,8 @@
 package org.webharvest.gui.ui;
 
-import javax.swing.plaf.basic.*;
-import javax.swing.plaf.*;
 import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 
 public class WHScrollBarUI extends BasicScrollBarUI {

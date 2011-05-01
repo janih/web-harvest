@@ -2,8 +2,8 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.IElementDef;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -17,7 +17,7 @@ public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
         super(elementDef);
     }
 
-    public Variable execute(Scraper scraper, ScraperContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final IElementDef[] defs = elementDef.getOperationDefs();
 
         if (defs.length == 0) {
