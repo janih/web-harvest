@@ -50,7 +50,6 @@ import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,48 +115,44 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
         List bodyList = source.toList();
         for (final Object currVar : bodyList) {
-            context.executeWithinNewContext(new Callable<Object>() {
-                public Object call() throws InterruptedException {
-                    String text = currVar.toString();
 
-                    Matcher matcher = pattern.matcher(text);
-                    int groupCount = matcher.groupCount();
+            String text = currVar.toString();
 
-                    StringBuffer buffer = new StringBuffer();
+            Matcher matcher = pattern.matcher(text);
+            int groupCount = matcher.groupCount();
 
-                    int index = 0;
-                    while (matcher.find()) {
-                        index++;
+            StringBuffer buffer = new StringBuffer();
 
-                        // if index exceeds maximum number of matching sequences exists the loop
-                        if (maxLoops < index) {
-                            break;
-                        }
+            int index = 0;
+            while (matcher.find()) {
+                index++;
 
-                        for (int i = 0; i <= groupCount; i++) {
-                            context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
-                        }
-
-                        ProcessorElementDef resultDef = elementDef.getRegexpResultDef();
-                        Variable result = getBodyTextContent(resultDef, scraper, context, true);
-                        debug(resultDef, scraper, result);
-
-                        String currResult = (result == null) ? matcher.group(0) : result.toString();
-                        if (isReplace) {
-                            matcher.appendReplacement(buffer, currResult);
-                        } else {
-                            resultList.add(new NodeVariable(currResult));
-                        }
-                    }
-
-                    if (isReplace) {
-                        matcher.appendTail(buffer);
-                        resultList.add(new NodeVariable(buffer.toString()));
-                    }
-
-                    return null;
+                // if index exceeds maximum number of matching sequences exists the loop
+                if (maxLoops < index) {
+                    break;
                 }
-            });
+
+                for (int i = 0; i <= groupCount; i++) {
+                    context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
+                }
+
+                ProcessorElementDef resultDef = elementDef.getRegexpResultDef();
+                Variable result = getBodyTextContent(resultDef, scraper, context, true);
+                debug(resultDef, scraper, result);
+
+                String currResult = (result == null) ? matcher.group(0) : result.toString();
+                if (isReplace) {
+                    matcher.appendReplacement(buffer, currResult);
+                } else {
+                    resultList.add(new NodeVariable(currResult));
+                }
+            }
+
+            if (isReplace) {
+                matcher.appendTail(buffer);
+                resultList.add(new NodeVariable(buffer.toString()));
+            }
+
         }
 
 

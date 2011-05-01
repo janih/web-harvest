@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * Special variable used for database records
  */
+// todo: review this class
 public class DbRowVariable extends NodeVariable {
 
     private static final String ROW_TAG_NAME = "row";
@@ -51,7 +52,7 @@ public class DbRowVariable extends NodeVariable {
     public Variable get(String columnName) {
         int index = -1;
         for (int i = 0; i < columnDescription.length; i++) {
-            if ( columnName.equalsIgnoreCase(columnDescription[i].getName()) ) {
+            if (columnName.equalsIgnoreCase(columnDescription[i].getName())) {
                 index = i;
                 break;
             }
@@ -84,8 +85,9 @@ public class DbRowVariable extends NodeVariable {
         return this.data;
     }
 
-    public List toList() {
+    public List<Variable> toList() {
+        // todo: this method suppose to return a list of variables, no?
         return new ArrayList(Arrays.asList(data));
     }
-    
+
 }

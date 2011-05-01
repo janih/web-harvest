@@ -38,13 +38,16 @@
 
 package org.webharvest.deprecated.runtime;
 
+import org.slf4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.inject.annotation.TestedObject;
+import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 
 import java.util.concurrent.Callable;
@@ -54,12 +57,16 @@ public class ScraperContext10Test extends UnitilsTestNG {
     @TestedObject
     ScraperContext10 context;
 
+    Mock<Scraper> scraperMock;
+
     @Dummy
-    Scraper scraper;
+    Logger logger;
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext10(scraper);
+        scraperMock.returns(logger).getLogger();
+        scraperMock.returns(new HttpClientManager(logger)).getHttpClientManager();
+        context = new ScraperContext10(scraperMock.getMock());
     }
 
     @Test
@@ -78,6 +85,10 @@ public class ScraperContext10Test extends UnitilsTestNG {
                 Assert.assertNull(context.getVar("x"));
                 Assert.assertEquals(context.getVar("caller.x").toInt(), 123);
 
+                // inner variables should be accessible at any level
+                Assert.assertNotNull(context.getVar("sys"));
+                Assert.assertNotNull(context.getVar("http"));
+
                 // sub-context. 2st level
                 return context.executeFunctionCall(new Callable<Object>() {
                     @Override
@@ -85,6 +96,10 @@ public class ScraperContext10Test extends UnitilsTestNG {
                         Assert.assertNull(context.getVar("x"));
                         Assert.assertNull(context.getVar("caller.x"));
                         Assert.assertEquals(context.getVar("caller.caller.x").toInt(), 123);
+
+                        // inner variables should be accessible at any level
+                        Assert.assertNotNull(context.getVar("sys"));
+                        Assert.assertNotNull(context.getVar("http"));
                         return null;
                     }
                 });

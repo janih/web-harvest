@@ -128,7 +128,7 @@ public class ListVariable extends Variable implements Iterable {
         return toBinary(null);
     }
 
-    public List toList() {
+    public List<Variable> toList() {
         return list;
     }
 

@@ -50,7 +50,6 @@ import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Conditional processor.
@@ -66,43 +65,41 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
         final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
 
-        return context.executeWithinNewContext(new Callable<Variable>() {
-            public Variable call() throws InterruptedException {
-                final List<Object> resultList = new ArrayList<Object>();
-                int i = 1;
 
-                // define first value of index variable
-                if (index != null && !"".equals(index)) {
-                    context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
-                }
+        final List<Object> resultList = new ArrayList<Object>();
+        int i = 1;
 
-                String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
+        // define first value of index variable
+        if (index != null && !"".equals(index)) {
+            context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
+        }
 
-                setProperty("Condition", condition);
-                setProperty("Index", index);
-                setProperty("Max Loops", maxLoopsString);
-                setProperty("Empty", String.valueOf(isEmpty));
+        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
 
-                // iterates while testing variable represents boolean true or loop limit is exceeded
-                final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
-                while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
-                    Variable loopResult = new BodyProcessor(elementDef).execute(scraper, context);
-                    if (!isEmpty) {
-                        resultList.addAll(loopResult.toList());
-                    }
+        setProperty("Condition", condition);
+        setProperty("Index", index);
+        setProperty("Max Loops", maxLoopsString);
+        setProperty("Empty", String.valueOf(isEmpty));
 
-                    i++;
-                    // define current value of index variable
-                    if (index != null && !"".equals(index)) {
-                        context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
-                    }
-
-                    condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
-                }
-
-                return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
+        // iterates while testing variable represents boolean true or loop limit is exceeded
+        final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+        while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
+            Variable loopResult = new BodyProcessor(elementDef).execute(scraper, context);
+            if (!isEmpty) {
+                resultList.addAll(loopResult.toList());
             }
-        });
+
+            i++;
+            // define current value of index variable
+            if (index != null && !"".equals(index)) {
+                context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
+            }
+
+            condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
+        }
+
+        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
+
     }
 
 }

@@ -52,7 +52,7 @@ public abstract class Variable {
 
     abstract public String toString(String charset);
 
-    abstract public List toList();
+    abstract public List<Variable> toList();
 
     abstract public boolean isEmpty();
 

@@ -50,7 +50,6 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Constants;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,40 +81,40 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
 
         final List list = loopValue != null ? loopValue.toList() : null;
-        return (list == null)
-                ? EmptyVariable.INSTANCE
-                : context.executeWithinNewContext(
-                new Callable<Variable>() {
-                    public Variable call() throws InterruptedException {
-                        final List<Object> resultList = new ArrayList<Object>();
-                        List filteredList = filter != null ? createFilteredList(list, filter) : list;
-                        Iterator it = filteredList.iterator();
 
-                        final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
-                        for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
-                            Variable currElement = (Variable) it.next();
+        if (list == null) {
+            return EmptyVariable.INSTANCE;
 
-                            // define current value of item variable
-                            if (item != null && !"".equals(item)) {
-                                context.setLocalVar(item, currElement);
-                            }
+        } else {
+            final List<Variable> resultList = new ArrayList<Variable>();
+            List filteredList = filter != null ? createFilteredList(list, filter) : list;
+            Iterator it = filteredList.iterator();
 
-                            // define current value of index variable
-                            if (index != null && !"".equals(index)) {
-                                context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
-                            }
+            final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+            for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
+                Variable currElement = (Variable) it.next();
 
-                            // execute the loop body
-                            ProcessorElementDef bodyDef = elementDef.getLoopBodyDef();
-                            Variable loopResult = bodyDef != null ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
-                            debug(bodyDef, scraper, loopResult);
-                            if (!isEmpty) {
-                                resultList.addAll(loopResult.toList());
-                            }
-                        }
-                        return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
-                    }
-                });
+                // define current value of item variable
+                if (item != null && !"".equals(item)) {
+                    context.setLocalVar(item, currElement);
+                }
+
+                // define current value of index variable
+                if (index != null && !"".equals(index)) {
+                    context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
+                }
+
+                // execute the loop body
+                ProcessorElementDef bodyDef = elementDef.getLoopBodyDef();
+                Variable loopResult = (bodyDef != null) ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
+                debug(bodyDef, scraper, loopResult);
+                if (!isEmpty) {
+                    resultList.addAll(loopResult.toList());
+                }
+            }
+            return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);
+
+        }
     }
 
     /**

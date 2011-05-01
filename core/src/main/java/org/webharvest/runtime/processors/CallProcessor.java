@@ -38,6 +38,7 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.exception.BaseException;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -74,7 +75,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         // executes body of call processor
         new BodyProcessor(elementDef).execute(scraper, context);
 
-        final Callable<Object> callable = new Callable<Object>() {
+        doCall(context, new Callable<Object>() {
 
             @Override
             public Object call() throws InterruptedException {
@@ -93,15 +94,23 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                     scraper.removeRunningFunction();
                 }
             }
-        };
-
-        doCall(context, callable);
+        });
 
         return functionResult;
     }
 
     protected void doCall(DynamicScopeContext context, Callable<Object> callable) throws InterruptedException {
-        context.executeWithinNewContext(callable);
+        try {
+            callable.call();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(e);
+        }
     }
 
     public void setFunctionResult(Variable result) {

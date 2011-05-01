@@ -101,11 +101,11 @@ public class NodeVariable extends Variable {
         }
     }
 
-    public List toList() {
-        return (isEmpty()) ? Collections.EMPTY_LIST
+    public List<Variable> toList() {
+        return (isEmpty()) ? Collections.<Variable>emptyList()
                 : (data instanceof Iterable) ? new ListVariable((Iterable) data).toList()
                 : (data instanceof Object[]) ? new ListVariable(Arrays.asList(data)).toList()
-                : Arrays.asList(this);
+                : Arrays.asList((Variable) this);
     }
 
     public boolean isEmpty() {

@@ -73,8 +73,8 @@ public class EmptyVariable extends Variable {
     }
 
     @Override
-    public List toList() {
-        return Collections.EMPTY_LIST;
+    public List<Variable> toList() {
+        return Collections.emptyList();
     }
 
     @Override

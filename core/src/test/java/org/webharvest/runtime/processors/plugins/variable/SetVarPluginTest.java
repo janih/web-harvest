@@ -44,14 +44,13 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.utils.KeyValuePair;
 
-import static java.util.Arrays.asList;
 import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
@@ -60,63 +59,65 @@ public class SetVarPluginTest extends UnitilsTestNG {
     @Dummy
     Logger logger;
 
-    Mock<ScraperContext> contextMock;
+    ScraperContext context;
     Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
         scraperMock.returns(logger).getLogger();
-        scraperMock.returns(contextMock.getMock()).getContext();
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
+
+        context = new ScraperContext(scraperMock.getMock());
+        scraperMock.returns(context).getContext();
     }
 
     @Test
     public void testExecutePlugin_valueAsAttr() throws Exception {
-        contextMock.returns(
-                asList(new KeyValuePair("name", new NodeVariable("World"))).iterator()).
-                iterator();
+        context.setLocalVar("name", new NodeVariable("World"));
 
         createPlugin(
                 "<set var='greetings' value='Hello, ${name}!'/>",
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
+                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
-        contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
-        contextMock.assertNotInvoked().replaceExistingVar(null, null);
+        ReflectionAssert.assertReflectionEquals(
+                new NodeVariable("Hello, World!"),
+                context.getVar("greetings"));
     }
 
     @Test
     public void testExecutePlugin_valueAsBody() throws Exception {
-        contextMock.returns(
-                asList(new KeyValuePair("name", new NodeVariable("World"))).iterator()).
-                iterator();
+        context.setLocalVar("name", new NodeVariable("World"));
 
         createPlugin(
                 "<set var='greetings'><template>Hello, ${name}!</template></set>",
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
+                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
-        contextMock.assertInvoked().setLocalVar("greetings", new NodeVariable("Hello, World!"));
-        contextMock.assertNotInvoked().replaceExistingVar(null, null);
+        ReflectionAssert.assertReflectionEquals(
+                new NodeVariable("Hello, World!"),
+                context.getVar("greetings"));
     }
 
     @Test
     public void testExecutePlugin_bodyIgnoredWhenAttrSpecified() throws Exception {
         createPlugin(
                 "<set var='x' value='actual'>ignored</set>",
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
+                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
-        contextMock.assertInvoked().setLocalVar("x", new NodeVariable("actual"));
-        contextMock.assertNotInvoked().replaceExistingVar(null, null);
+        ReflectionAssert.assertReflectionEquals(
+                new NodeVariable("actual"),
+                context.getVar("x"));
     }
 
     @Test
     public void testExecutePlugin_replace() throws Exception {
-        contextMock.returns(true).containsVar("x");
+        context.setLocalVar("x", new NodeVariable("old"));
 
         createPlugin(
                 "<set var='x' value='new'/>",
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
+                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
-        contextMock.assertInvoked().replaceExistingVar("x", new NodeVariable("new"));
-        contextMock.assertNotInvoked().setLocalVar("x", null);
+        ReflectionAssert.assertReflectionEquals(
+                new NodeVariable("new"),
+                context.getVar("x"));
     }
 }
