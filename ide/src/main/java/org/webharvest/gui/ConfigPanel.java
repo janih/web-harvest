@@ -82,7 +82,13 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     private static final String VIEW_RESULT_AS_LIST = "View result as list";
 
     // basic skeleton for new opened configuration
-    private static final String BASIC_CONFIG_SKELETON = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<config>\n\t\n</config>";
+    private static final String BASIC_CONFIG_SKELETON = "" +
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" +
+            "<config xmlns=\"" + Constants.XMLNS_CORE + "\"\n" +
+            "\t\txmlns:var=\"" + Constants.XMLNS_VAR + "\"\n" +
+            "\t\txmlns:p=\"" + Constants.XMLNS_PARAM + "\">\n" +
+            "\t\n" +
+            "</config>";
 
     private static Logger logger = Logger.getLogger(ConfigPanel.class);
 
