@@ -69,7 +69,7 @@ public class ScraperContext10 implements DynamicScopeContext {
         this.scraper = scraper;
         scraper.getLogger().warn("" +
                 "You are using the DEPRECATED scraper configuration version. " +
-                "We urge you to migrate to the newer one! " +
+                "We urge you to migrate to a newer one! " +
                 "Please visit http://web-harvest.sourceforge.net/release.php for details.");
     }
 
