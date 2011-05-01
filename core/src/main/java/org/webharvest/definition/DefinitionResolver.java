@@ -315,12 +315,11 @@ public class DefinitionResolver {
         validate(node);
 
         final Class elementClass = elementInfo.getDefinitionClass();
-        if (elementClass == WebHarvestPluginDef.class) {
-            return new WebHarvestPluginDef(node);
-        }
 
         try {
-            final IElementDef elementDef = (IElementDef) elementClass.
+            final IElementDef elementDef = (elementClass == WebHarvestPluginDef.class)
+                    ? new WebHarvestPluginDef(node)
+                    : (IElementDef) elementClass.
                     getConstructor(XmlNode.class, Class.class).
                     newInstance(node, elementInfo.getProcessorClass());
 

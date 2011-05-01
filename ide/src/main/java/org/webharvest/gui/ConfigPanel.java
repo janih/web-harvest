@@ -37,7 +37,10 @@
 package org.webharvest.gui;
 
 import org.apache.log4j.Logger;
-import org.webharvest.definition.*;
+import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.ConstantDef;
+import org.webharvest.definition.IElementDef;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
@@ -785,7 +788,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             Object userObject = treeNode.getUserObject();
             if (userObject instanceof TreeNodeInfo) {
                 TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
-                ProcessorElementDef elementDef = (ProcessorElementDef) treeNodeInfo.getElementDef();
+                AbstractElementDef elementDef = (AbstractElementDef) treeNodeInfo.getElementDef();
                 int lineNumber = elementDef.getLineNumber();
                 int columnNumber = elementDef.getColumnNumber();
 
