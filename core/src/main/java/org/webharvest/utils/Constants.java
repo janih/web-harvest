@@ -36,6 +36,11 @@
 */
 package org.webharvest.utils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Constants {
 
     //todo: merge with org.webharvest.WHConstants
@@ -49,9 +54,15 @@ public class Constants {
     public static final int SPLITTER_WIDTH = 7;
 
     // uris to identify xml namespaces of the Web-Harvest language
+    public static final String XMLNS_CORE = "http://web-harvest.sourceforge.net/schema/2.1/core";
+    public static final String XMLNS_VAR = "http://web-harvest.sourceforge.net/schema/2.1/var";
+    public static final String XMLNS_PARAM = "http://web-harvest.sourceforge.net/schema/2.1/param";
+
+    // Legacy namespaces (aka WH-1.0)
     public static final String XMLNS_CORE_10 = "http://web-harvest.sourceforge.net/schema/1.0/config";
-    public static final String XMLNS_CORE = "http://web-harvest.sourceforge.net/schema/2.0/core";
-    public static final String XMLNS_VAR = "http://web-harvest.sourceforge.net/schema/2.0/var";
-    public static final String XMLNS_PARAM = "http://web-harvest.sourceforge.net/schema/2.0/param";
+    public static final Set<String> XMLNS_CORE_10_ALIASES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+            "http://web-harvest.sourceforge.net/wh-core.xsd"
+            // what other URIs might people have used?
+    )));
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://web-harvest.sourceforge.net/schema/2.0/core"
-           targetNamespace="http://web-harvest.sourceforge.net/schema/2.0/core"
+           xmlns="http://web-harvest.sourceforge.net/schema/2.1/core"
+           targetNamespace="http://web-harvest.sourceforge.net/schema/2.1/core"
            elementFormDefault="unqualified"
            attributeFormDefault="unqualified">
 
@@ -881,7 +881,7 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:anyAttribute namespace="http://web-harvest.sourceforge.net/schema/2.0/var"/>
+                <xs:anyAttribute namespace="http://web-harvest.sourceforge.net/schema/2.1/var"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

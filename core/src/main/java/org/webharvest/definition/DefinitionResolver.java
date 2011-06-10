@@ -73,8 +73,8 @@ public class DefinitionResolver {
     // map containing pairs (class name, plugin element name) of externally registered plugins
     private static Map<String, ElementName> externalPlugins = new LinkedHashMap<String, ElementName>();
 
-    // map of external plugin dependances
-    private static Map<ElementName, Class[]> externalPluginDependences = new HashMap<ElementName, Class[]>();
+    // map of external plugin dependencies
+    private static Map<ElementName, Class[]> externalPluginDependencies = new HashMap<ElementName, Class[]>();
 
     // defines all valid elements of Web-Harvest configuration file
 
@@ -226,7 +226,7 @@ public class DefinitionResolver {
             if (!isInternalPlugin) {
                 externalPlugins.put(pluginClass.getName(), pluginElementName);
             }
-            externalPluginDependences.put(pluginElementName, plugin.getDependantProcessors());
+            externalPluginDependencies.put(pluginElementName, plugin.getDependantProcessors());
 
             for (Class subClass : plugin.getDependantProcessors()) {
                 registerPlugin(subClass, isInternalPlugin, uri);
@@ -260,8 +260,8 @@ public class DefinitionResolver {
             externalPlugins.remove(className);
 
             // unregister deependant classes as well
-            Class[] dependantClasses = externalPluginDependences.get(pluginElementName);
-            externalPluginDependences.remove(pluginElementName);
+            Class[] dependantClasses = externalPluginDependencies.get(pluginElementName);
+            externalPluginDependencies.remove(pluginElementName);
             if (dependantClasses != null) {
                 for (Class c : dependantClasses) {
                     unregisterPlugin(c);

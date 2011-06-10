@@ -114,7 +114,7 @@ public class XmlParser extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         final XmlNode currNode = getCurrentNode();
-        if (StringUtils.isEmpty(uri)) {
+        if (StringUtils.isEmpty(uri) || Constants.XMLNS_CORE_10_ALIASES.contains(uri)) {
             // if there is no xmlns we assume it is the old WH-config schema, aka 1.0
             uri = Constants.XMLNS_CORE_10;
         }
