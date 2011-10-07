@@ -36,9 +36,11 @@
 */
 package org.webharvest.runtime.variables;
 
+import org.apache.commons.collections.iterators.EmptyIterator;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -85,6 +87,10 @@ public class EmptyVariable extends Variable {
     @Override
     public Object getWrappedObject() {
         return StringUtils.EMPTY;
+    }
+
+    @Override public Iterator toIterator() {
+        return EmptyIterator.INSTANCE;
     }
 
 }

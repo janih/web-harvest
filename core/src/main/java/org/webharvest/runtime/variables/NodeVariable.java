@@ -36,12 +36,17 @@
 */
 package org.webharvest.runtime.variables;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.iterators.EmptyIterator;
 import org.webharvest.exception.VariableException;
+import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.XmlNodeWrapper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -101,21 +106,36 @@ public class NodeVariable extends Variable {
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<Variable> toList() {
-        return (isEmpty()) ? Collections.<Variable>emptyList()
-                : (data instanceof Iterable) ? new ListVariable((Iterable) data).toList()
-                : (data instanceof Object[]) ? new ListVariable(Arrays.asList(data)).toList()
-                : Arrays.asList((Variable) this);
+        return (isEmpty()) ? Collections.<Variable>emptyList() : IteratorUtils.toList(toIterator());
     }
 
     public boolean isEmpty() {
         return data == null
+                || data instanceof Iterator && !((Iterator) data).hasNext()
+                || data instanceof Iterable && !((Iterable) data).iterator().hasNext()
                 || data instanceof XmlNodeWrapper && ((XmlNodeWrapper) data).isEmpty()
                 || data instanceof CharSequence && ((CharSequence) data).length() == 0;
     }
 
     public Object getWrappedObject() {
         return this.data;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    @Override public Iterator<Variable> toIterator() {
+        return (isEmpty()) ? EmptyIterator.INSTANCE
+                : IteratorUtils.transformedIterator(
+                (data instanceof Iterator) ? (Iterator) data
+                        : (data instanceof Iterable) ? ((Iterable) data).iterator()
+                        : (data instanceof Object[]) ? IteratorUtils.arrayIterator(data)
+                        : Arrays.asList((Variable) this).iterator(),
+                new Transformer() {
+                    @Override public Object transform(Object o) {
+                        return CommonUtil.createVariable(o);
+                    }
+                });
     }
 
 }

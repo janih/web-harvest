@@ -88,8 +88,7 @@ public class ListVariable extends Variable implements Iterable {
     }
 
     public String toString(String charset, String delimiter) {
-        StringBuffer buffer = new StringBuffer();
-
+        final StringBuilder buffer = new StringBuilder();
         for (Variable var : list) {
             final String value = var.toString(charset);
             if (value.length() != 0) {
@@ -99,7 +98,6 @@ public class ListVariable extends Variable implements Iterable {
                 buffer.append(value);
             }
         }
-
         return buffer.toString();
     }
 
@@ -173,6 +171,10 @@ public class ListVariable extends Variable implements Iterable {
 
     public Object getWrappedObject() {
         return this.list;
+    }
+
+    @Override public Iterator toIterator() {
+        return list.iterator();
     }
 
     public Variable get(int index) {

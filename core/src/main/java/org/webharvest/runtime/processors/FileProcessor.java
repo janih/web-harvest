@@ -36,16 +36,18 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Predicate;
 import org.webharvest.definition.FileDef;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Types;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.FileListIterator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +56,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -107,24 +108,39 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         }
     }
 
-    private Variable executeFileList(String filePath, String listFilter, boolean listFiles, boolean listDirs, boolean listRecursive) {
-        File dir = new File(filePath);
+    private Variable executeFileList(String filePath, final String listFilter, final boolean listFiles, final boolean listDirs, final boolean listRecursive) {
+        final File dir = new File(filePath);
         if (!dir.exists()) {
             throw new FileException("Directory \"" + dir + "\" doesn't exist!");
         } else if (!dir.isDirectory()) {
             throw new FileException("\"" + dir + "\" is not directory!");
         }
 
-        Collection<File> collection = listFiles(dir, new CommandPromptFilenameFilter(listFilter), listRecursive);
-        TreeSet<String> sortedFileNames = new TreeSet<String>();
-        for (File file : collection) {
-            boolean isDir = file.isDirectory();
-            if (!((!listDirs && isDir) || (!listFiles && !isDir))) {
-                sortedFileNames.add(file.getAbsolutePath());
+        return new NodeVariable(IteratorUtils.filteredIterator(new FileListIterator(dir, listRecursive), new Predicate() {
+            private final CommandPromptFilenameFilter filenameFilter = new CommandPromptFilenameFilter(listFilter);
+
+            @Override public boolean evaluate(Object object) {
+                final File file = (File) object;
+                return (file.isDirectory() && listDirs || file.isFile() && listFiles)
+                        && filenameFilter.accept(null, file.getName());
+            }
+        }));
+    }
+
+    private Collection<File> listFiles(File directory, FilenameFilter filter, boolean recurse) {
+        List<File> files = new ArrayList<File>();
+        File[] entries = directory.listFiles();
+        if (entries != null) {
+            for (File entry : entries) {
+                if (filter == null || filter.accept(directory, entry.getName())) {
+                    files.add(entry);
+                }
+                if (recurse && entry.isDirectory()) {
+                    files.addAll(listFiles(entry, filter, recurse));
+                }
             }
         }
-
-        return new ListVariable(new ArrayList<String>(sortedFileNames));
+        return files;
     }
 
     /**
@@ -212,22 +228,6 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         }
 
         return new NodeVariable(result);
-    }
-
-    private Collection<File> listFiles(File directory, FilenameFilter filter, boolean recurse) {
-        List<File> files = new ArrayList<File>();
-        File[] entries = directory.listFiles();
-        if (entries != null) {
-            for (File entry : entries) {
-                if (filter == null || filter.accept(directory, entry.getName())) {
-                    files.add(entry);
-                }
-                if (recurse && entry.isDirectory()) {
-                    files.addAll(listFiles(entry, filter, recurse));
-                }
-            }
-        }
-        return files;
     }
 
     private class CommandPromptFilenameFilter implements FilenameFilter {

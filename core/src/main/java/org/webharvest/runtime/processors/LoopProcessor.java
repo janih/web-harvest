@@ -36,6 +36,8 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.definition.ProcessorElementDef;
@@ -80,19 +82,18 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         debug(loopValueDef, scraper, loopValue);
 
 
-        final List list = loopValue != null ? loopValue.toList() : null;
+        final Iterator iter = loopValue != null ? loopValue.toIterator() : null;
 
-        if (list == null) {
+        if (iter == null) {
             return EmptyVariable.INSTANCE;
 
         } else {
             final List<Variable> resultList = new ArrayList<Variable>();
-            List filteredList = filter != null ? createFilteredList(list, filter) : list;
-            Iterator it = filteredList.iterator();
+            final Iterator filteredIterator = filter != null ? createFilteredList(iter, filter) : iter;
 
             final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
-            for (int i = 1; it.hasNext() && i <= maxLoops; i++) {
-                Variable currElement = (Variable) it.next();
+            for (int i = 1; filteredIterator.hasNext() && i <= maxLoops; i++) {
+                Variable currElement = (Variable) filteredIterator.next();
 
                 // define current value of item variable
                 if (item != null && !"".equals(item)) {
@@ -120,37 +121,35 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
     /**
      * Create filtered list based on specified list and filterStr
      *
-     * @param list
+     * @param iter
      * @param filterStr
      * @return Filtered list
      */
-    private List createFilteredList(List list, String filterStr) {
-        List<Object> result = new ArrayList<Object>();
-        Set<String> stringSet = new HashSet<String>();
+    private Iterator createFilteredList(Iterator iter, String filterStr) {
+        final Filter filter = new Filter(filterStr);
 
-        Filter filter = new Filter(filterStr, list.size());
-
-        Iterator it = list.iterator();
-        int index = 1;
-        while (it.hasNext()) {
-            Variable curr = (Variable) it.next();
-
-            if (filter.isInFilter(index)) {
-                if (filter.isUnique) {
-                    String currStr = curr.toString();
-                    if (!stringSet.contains(curr.toString())) {
-                        result.add(curr);
-                        stringSet.add(currStr);
+        return IteratorUtils.filteredIterator(iter, new Predicate() {
+            final Set<String> stringSet = new HashSet<String>();
+            int index = 1;
+            @Override public boolean evaluate(Object curr) {
+                try {
+                    if (filter.isInFilter(index)) {
+                        if (filter.isUnique) {
+                            final String currStr = curr.toString();
+                            if (!stringSet.contains(currStr)) {
+                                stringSet.add(currStr);
+                                return true;
+                            }
+                        } else {
+                            return true;
+                        }
                     }
-                } else {
-                    result.add(curr);
+                    return false;
+                } finally {
+                    index++;
                 }
             }
-
-            index++;
-        }
-
-        return result;
+        });
     }
 
     /**
@@ -223,7 +222,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         private boolean isUnique = false;
         private List<CommonUtil.IntPair> filterList;
 
-        private Filter(String filterStr, int size) {
+        private Filter(String filterStr) {
             StringTokenizer tokenizer = new StringTokenizer(filterStr, ",");
             filterList = new ArrayList<CommonUtil.IntPair>();
 
@@ -237,9 +236,9 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
                 } else if ("even".equals(token)) {
                     filterList.add(new IntSublist(2, 2));
                 } else if (IntRange.isValid(token)) {
-                    filterList.add(new IntRange(token, size));
+                    filterList.add(new IntRange(token, Integer.MAX_VALUE));
                 } else if (IntSublist.isValid(token)) {
-                    filterList.add(new IntSublist(token, size));
+                    filterList.add(new IntSublist(token, Integer.MAX_VALUE));
                 }
             }
         }
