@@ -70,9 +70,7 @@ public class FileListIterator implements Iterator<File> {
         return next != null;
     }
 
-    static int i=0;
     @Override public File next() {
-        System.out.println(">> " + ++i);
         return hasNext() ? (curr = next) : null;
     }
 
