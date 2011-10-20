@@ -55,6 +55,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Basic evaluation utilities
@@ -212,30 +213,14 @@ public class CommonUtil {
         return path.substring(i2 + 1);
     }
 
-    /**
-     * Returns class name without packages for the specified object
-     */
-    public static String getClassName(Object o) {
-        if (o != null) {
-            String processorClassName = o.getClass().getName();
-            int dotIndex = processorClassName.lastIndexOf('.');
-            if (dotIndex >= 0) {
-                processorClassName = processorClassName.substring(dotIndex + 1);
-            }
+    private static AtomicReference<String> cachedBlankString = new AtomicReference<String>(StringUtils.repeat(" ", 128));
 
-            return processorClassName;
-        } else {
-            return "null value";
+    public static String indent(int length) {
+        String blankString;
+        while ((blankString = cachedBlankString.get()).length() < length) {
+            cachedBlankString.compareAndSet(blankString, StringUtils.repeat(" ", (blankString.length() * 3) / 2 + 1));
         }
-    }
-
-    public static String replicate(String s, int count) {
-        String result = "";
-        for (int i = 1; i <= count; i++) {
-            result += s;
-        }
-
-        return result;
+        return blankString.substring(0, length);
     }
 
     private static String encodeUrlParam(String value, String charset) throws UnsupportedEncodingException {

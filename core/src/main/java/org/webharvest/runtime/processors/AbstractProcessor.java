@@ -83,7 +83,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
      * Wrapper for the execute method. Adds controlling and logging logic.
      */
     public Variable run(final Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        int scraperStatus = scraper.getStatus();
+        final int scraperStatus = scraper.getStatus();
 
         if (scraperStatus == Scraper.STATUS_STOPPED || scraperStatus == Scraper.STATUS_EXIT) {
             return EmptyVariable.INSTANCE;
@@ -94,38 +94,34 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
 
         if (scraperStatus == Scraper.STATUS_PAUSED) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
+            final SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
             synchronized (scraper) {
-                if (scraper.getLogger().isInfoEnabled()) {
-                    scraper.getLogger().info("Execution paused [" + dateFormatter.format(new Date()) + "].");
-                }
+                scraper.getLogger().info("Execution paused [{}].", dateFormatter.format(new Date()));
                 scraper.wait();
             }
 
 
             scraper.continueExecution();
-            if (scraper.getLogger().isInfoEnabled()) {
-                scraper.getLogger().info("Execution continued [" + dateFormatter.format(new Date()) + "].");
-            }
+            scraper.getLogger().info("Execution continued [{}].", dateFormatter.format(new Date()));
         }
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
 
-        int runningLevel = scraper.getRunningLevel();
-
-        String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, scraper) : null;
-        String idDesc = id != null ? "[ID=" + id + "] " : "";
-        String indent = CommonUtil.replicate("    ", runningLevel - 1);
+        final String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, scraper) : null;
 
         setProperty("ID", id);
 
         if (scraper.getLogger().isInfoEnabled()) {
-            scraper.getLogger().info(indent + CommonUtil.getClassName(this) + " starts processing..." + idDesc);
+            scraper.getLogger().info("{}{} starts processing...{}", new Object[]{
+                    CommonUtil.indent((scraper.getRunningLevel() - 1) * 4),
+                    getClass().getSimpleName(),
+                    id != null ? "[ID=" + id + "] " : ""});
         }
 
         scraper.setExecutingProcessor(this);
-        Variable result = execute(scraper, context);
-        long executionTime = System.currentTimeMillis() - startTime;
+
+        final Variable result = execute(scraper, context);
+        final long executionTime = System.currentTimeMillis() - startTime;
 
         setProperty(Constants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
         setProperty(Constants.VALUE_PROPERTY_NAME, result);
@@ -139,7 +135,11 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
 
         if (scraper.getLogger().isInfoEnabled()) {
-            scraper.getLogger().info(indent + CommonUtil.getClassName(this) + " processor executed in " + executionTime + "ms." + idDesc);
+            scraper.getLogger().info("{}{} processor executed in {}ms.{}", new Object[]{
+                    CommonUtil.indent((scraper.getRunningLevel() - 1) * 4),
+                    getClass().getSimpleName(),
+                    executionTime,
+                    id != null ? "[ID=" + id + "] " : ""});
         }
 
         return result;

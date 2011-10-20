@@ -52,6 +52,11 @@
 
     <repositories>
         <repository>
+            <id>repo1.maven.org</id>
+            <name>http://repo1.maven.org/maven2/</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
             <id>ibiblio.org</id>
             <name>ibiblio Mirror of http://repo1.maven.org/maven2/</name>
             <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
@@ -205,17 +210,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.6.0</version>
+                <version>1.6.3</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
