@@ -36,9 +36,9 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.WHConstants;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.runtime.processors.AbstractProcessor;
-import org.webharvest.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class XPathDef extends ProcessorElementDef {
         super(xmlNode, processorClass);
 
         this.expression = xmlNode.getAttribute("expression");
-        for (Map.Entry<String, String> attEntry : xmlNode.getAttributes(Constants.XMLNS_VAR).entrySet()) {
+        for (Map.Entry<String, String> attEntry : xmlNode.getAttributes(WHConstants.XMLNS_VAR).entrySet()) {
             variableMap.put(attEntry.getKey(), attEntry.getValue());
         }
 

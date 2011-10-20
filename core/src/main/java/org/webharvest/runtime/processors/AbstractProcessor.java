@@ -37,6 +37,7 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.io.FileUtils;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -46,7 +47,6 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 import org.webharvest.utils.KeyValuePair;
 
 import java.io.File;
@@ -123,8 +123,8 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         final Variable result = execute(scraper, context);
         final long executionTime = System.currentTimeMillis() - startTime;
 
-        setProperty(Constants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
-        setProperty(Constants.VALUE_PROPERTY_NAME, result);
+        setProperty(WHConstants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
+        setProperty(WHConstants.VALUE_PROPERTY_NAME, result);
 
         scraper.processorFinishedExecution(this, this.properties);
         scraper.finishExecutingProcessor();

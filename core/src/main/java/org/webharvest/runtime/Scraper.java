@@ -38,6 +38,7 @@ package org.webharvest.runtime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
@@ -120,7 +121,7 @@ public class Scraper {
 
         this.httpClientManager = new HttpClientManager(logger);
 
-        this.context = Constants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
+        this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
                 ? new ScraperContext10(this)
                 : new ScraperContext(this);
 

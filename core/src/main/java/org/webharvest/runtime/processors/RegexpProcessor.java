@@ -37,6 +37,7 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -46,7 +47,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
         this.setProperty("Flag UnicodeCase", String.valueOf(flagUnicodecase));
         this.setProperty("Flag CanonEq", String.valueOf(flagCanoneq));
 
-        final double maxLoops = NumberUtils.toDouble(BaseTemplater.evaluateToString(elementDef.getMax(), null, scraper), Constants.DEFAULT_MAX_LOOPS);
+        final double maxLoops = NumberUtils.toDouble(BaseTemplater.evaluateToString(elementDef.getMax(), null, scraper), WHConstants.DEFAULT_MAX_LOOPS);
 
         this.setProperty("Max loops", String.valueOf(maxLoops));
 

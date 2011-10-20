@@ -36,9 +36,9 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.WHConstants;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.utils.Constants;
 
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -107,9 +107,9 @@ public class ElementInfo {
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken().toLowerCase();
                 if ("p:*".equals(token)) {
-                    nsAttsSet.add(Constants.XMLNS_PARAM);
+                    nsAttsSet.add(WHConstants.XMLNS_PARAM);
                 } else if ("v:*".equals(token)) {
-                    nsAttsSet.add(Constants.XMLNS_VAR);
+                    nsAttsSet.add(WHConstants.XMLNS_VAR);
                 } else if (token.startsWith("!")) {
                     token = token.substring(1);
                     this.requiredAttsSet.add(token);

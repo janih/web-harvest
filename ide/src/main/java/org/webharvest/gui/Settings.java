@@ -36,10 +36,10 @@
 */
 package org.webharvest.gui;
 
+import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -418,9 +418,9 @@ public class Settings implements Serializable {
         int pluginsCount = readInt(in, 0);
         plugins = new PluginInfo[pluginsCount];
         for (int i = 0; i < pluginsCount; i++) {
-            plugins[i] = new PluginInfo(readString(in, ""), Constants.XMLNS_CORE_10, null);
+            plugins[i] = new PluginInfo(readString(in, ""), WHConstants.XMLNS_CORE_10, null);
             try {
-                DefinitionResolver.registerPlugin(plugins[i].getClassName(), Constants.XMLNS_CORE_10);
+                DefinitionResolver.registerPlugin(plugins[i].getClassName(), WHConstants.XMLNS_CORE_10);
             } catch (PluginException e) {
                 e.printStackTrace();
             }

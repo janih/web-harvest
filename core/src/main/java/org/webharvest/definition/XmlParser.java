@@ -39,8 +39,8 @@ package org.webharvest.definition;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.WHConstants;
 import org.webharvest.exception.ParserException;
-import org.webharvest.utils.Constants;
 import org.webharvest.utils.Stack;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -114,9 +114,9 @@ public class XmlParser extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         final XmlNode currNode = getCurrentNode();
-        if (StringUtils.isEmpty(uri) || Constants.XMLNS_CORE_10_ALIASES.contains(uri)) {
+        if (StringUtils.isEmpty(uri) || WHConstants.XMLNS_CORE_10_ALIASES.contains(uri)) {
             // if there is no xmlns we assume it is the old WH-config schema, aka 1.0
-            uri = Constants.XMLNS_CORE_10;
+            uri = WHConstants.XMLNS_CORE_10;
         }
         final XmlNode newNode = new XmlNode(localName, qName, uri, currNode);
         newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());

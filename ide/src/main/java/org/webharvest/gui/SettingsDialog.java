@@ -36,11 +36,11 @@
 */
 package org.webharvest.gui;
 
+import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.component.*;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -384,7 +384,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                 String className = pluginClassNameField.getText().trim();
                 String namespaceUri = pluginNamespaceUriField.getText().trim();
                 if (CommonUtil.isEmptyString(namespaceUri)) {
-                    namespaceUri = Constants.XMLNS_CORE;
+                    namespaceUri = WHConstants.XMLNS_CORE;
                 }
                 if (className != null) {
                     pluginListModel.addElement(new PluginInfo(className, namespaceUri, null), true);
@@ -523,7 +523,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         for (PluginInfo currPlugin : plugins) {
             if (!listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin.getClassName())) {
                 try {
-                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), Constants.XMLNS_CORE); // TODO: <-- WHY Constants.XMLNS_CORE ???
+                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), WHConstants.XMLNS_CORE); // TODO: <-- WHY WHConstants.XMLNS_CORE ???
                 } catch (PluginException e) {
                     ; // do nothing - ignore
                 }
@@ -622,10 +622,10 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         if (selectedPluginIndex >= 0 && selectedPluginIndex < pluginListModel.getSize()) {
             PluginInfo pluginItem = (PluginInfo) pluginListModel.get(selectedPluginIndex);
             pluginClassNameField.setText(pluginItem.getClassName());
-            pluginNamespaceUriField.setText(CommonUtil.nvl(pluginItem.getUri(), Constants.XMLNS_CORE));
+            pluginNamespaceUriField.setText(CommonUtil.nvl(pluginItem.getUri(), WHConstants.XMLNS_CORE));
         } else {
             pluginClassNameField.setText("");
-            pluginNamespaceUriField.setText(Constants.XMLNS_CORE);
+            pluginNamespaceUriField.setText(WHConstants.XMLNS_CORE);
         }
     }
 

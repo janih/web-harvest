@@ -36,6 +36,11 @@
 */
 package org.webharvest;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: awajda
@@ -462,4 +467,19 @@ public class WHConstants {
             "xgl/movie",
     };
 
+    public static final int DEFAULT_MAX_LOOPS = 1000000000;
+    public static final String VALUE_PROPERTY_NAME = "[Value]";
+    public static final String EXECUTION_TIME_PROPERTY_NAME = "[Execution Time]";
+    // size of splitter pane dividers
+    public static final int SPLITTER_WIDTH = 7;
+    // uris to identify xml namespaces of the Web-Harvest language
+    public static final String XMLNS_CORE = "http://web-harvest.sourceforge.net/schema/2.1/core";
+    public static final String XMLNS_VAR = "http://web-harvest.sourceforge.net/schema/2.1/var";
+    public static final String XMLNS_PARAM = "http://web-harvest.sourceforge.net/schema/2.1/param";
+    // Legacy namespaces (aka WH-1.0)
+    public static final String XMLNS_CORE_10 = "http://web-harvest.sourceforge.net/schema/1.0/config";
+    public static final Set<String> XMLNS_CORE_10_ALIASES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+            "http://web-harvest.sourceforge.net/wh-core.xsd"
+            // what other URIs might people have used?
+    )));
 }

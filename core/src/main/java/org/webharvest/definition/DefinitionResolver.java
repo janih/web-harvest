@@ -36,6 +36,7 @@
 */
 package org.webharvest.definition;
 
+import org.webharvest.WHConstants;
 import org.webharvest.deprecated.runtime.processors.CallProcessor10;
 import org.webharvest.deprecated.runtime.processors.VarDefProcessor;
 import org.webharvest.deprecated.runtime.processors.VarProcessor;
@@ -54,7 +55,6 @@ import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -80,103 +80,103 @@ public class DefinitionResolver {
 
     static {
         registerInternalElement("config", ProcessorElementDef.class, null, null, "charset,scriptlang,id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("empty", EmptyDef.class, EmptyProcessor.class, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("text", TextDef.class, TextProcessor.class, null, "id,charset,delimiter",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("file", FileDef.class, FileProcessor.class, null,
                 "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("var-def", VarDefDef.class, VarDefProcessor.class, null, "id,!name,overwrite",
-                Constants.XMLNS_CORE_10);
+                WHConstants.XMLNS_CORE_10);
         registerInternalElement("var", VarDef.class, VarProcessor.class, "", "id,!name",
-                Constants.XMLNS_CORE_10);
+                WHConstants.XMLNS_CORE_10);
         registerInternalElement("http", HttpDef.class, HttpProcessor.class, null,
                 "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("http-param", HttpParamDef.class, HttpParamProcessor.class, null, "id,!name,isfile,filename,contenttype",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("http-header", HttpHeaderDef.class, HttpHeaderProcessor.class, null, "id,!name",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("html-to-xml", HtmlToXmlDef.class, HtmlToXmlProcessor.class, null, "" +
                 "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars,nbsp-to-sp," +
                 "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
                 "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
                 "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("regexp", RegexpDef.class, RegexpProcessor.class,
                 "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("regexp-pattern", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("regexp-source", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("regexp-result", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xpath", XPathDef.class, XPathProcessor.class, null, "id,expression,v:*",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xquery", XQueryDef.class, XQueryProcessor.class, "xq-param,!xq-expression", "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xq-param", ProcessorElementDef.class, null, null, "!name,type,id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xq-expression", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xslt", XsltDef.class, XsltProcessor.class, "!xml,!stylesheet", "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("xml", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("stylesheet", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("template", TemplateDef.class, TemplateProcessor.class, null, "id,language",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("case", CaseDef.class, CaseProcessor.class, "!if,else", "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("if", ProcessorElementDef.class, null, null, "!condition,id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("else", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("loop", LoopDef.class, LoopProcessor.class, "!list,!body", "id,item,index,maxloops,filter,empty",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("list", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("body", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("while", WhileDef.class, WhileProcessor.class, null, "id,!condition,index,maxloops,empty",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("function", FunctionDef.class, FunctionProcessor.class, null, "id,!name",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("return", ReturnDef.class, ReturnProcessor.class, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("call", CallDef.class, CallProcessor10.class, null, "id,!name",
-                Constants.XMLNS_CORE_10);
+                WHConstants.XMLNS_CORE_10);
         registerInternalElement("call", CallDef.class, CallProcessor.class, null, "id,!name",
-                Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE);
         registerInternalElement("call-param", CallParamDef.class, CallParamProcessor.class, null, "id,!name",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("include", IncludeDef.class, IncludeProcessor.class, "", "id,!path",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("try", TryDef.class, TryProcessor.class, "!body,!catch", "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("catch", ProcessorElementDef.class, null, null, "id",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("script", ScriptDef.class, ScriptProcessor.class, null, "id,language,return",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
         registerInternalElement("exit", ExitDef.class, ExitProcessor.class, "", "id,condition,message",
-                Constants.XMLNS_CORE_10, Constants.XMLNS_CORE);
+                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
 
-        registerPlugin(SetVarPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(DefVarPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(GetVarPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(ValueOfPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(DatabasePlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(JsonToXmlPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(XmlToJsonPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(MailPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(ZipPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(FtpPlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(TokenizePlugin.class, true, Constants.XMLNS_CORE);
-        registerPlugin(SleepPlugin.class, true, Constants.XMLNS_CORE);
+        registerPlugin(SetVarPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(DefVarPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(GetVarPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(ValueOfPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(DatabasePlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(JsonToXmlPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(XmlToJsonPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(MailPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(ZipPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(FtpPlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(TokenizePlugin.class, true, WHConstants.XMLNS_CORE);
+        registerPlugin(SleepPlugin.class, true, WHConstants.XMLNS_CORE);
     }
 
     private static void registerInternalElement(String name,

@@ -37,6 +37,7 @@
 package org.webharvest.gui;
 
 import net.sf.saxon.trans.XPathException;
+import org.webharvest.WHConstants;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.gui.component.*;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -346,7 +347,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         splitPane.setTopComponent(new XmlEditorScrollPane(xmlPane, false));
         splitPane.setBottomComponent(xpathPanel);
         splitPane.setDividerLocation(0.75d);
-        splitPane.setDividerSize(Constants.SPLITTER_WIDTH);
+        splitPane.setDividerSize(WHConstants.SPLITTER_WIDTH);
 
         this.cardPanel.add(splitPane, String.valueOf(XML_VIEW));
 

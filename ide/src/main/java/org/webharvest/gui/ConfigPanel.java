@@ -37,6 +37,7 @@
 package org.webharvest.gui;
 
 import org.apache.log4j.Logger;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
@@ -48,7 +49,6 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.web.HttpClientManager;
-import org.webharvest.utils.Constants;
 import org.xml.sax.InputSource;
 
 import javax.swing.*;
@@ -87,9 +87,9 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     // basic skeleton for new opened configuration
     private static final String BASIC_CONFIG_SKELETON = "" +
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" +
-            "<config xmlns=\"" + Constants.XMLNS_CORE + "\"\n" +
-            "\t\txmlns:var=\"" + Constants.XMLNS_VAR + "\"\n" +
-            "\t\txmlns:p=\"" + Constants.XMLNS_PARAM + "\">\n" +
+            "<config xmlns=\"" + WHConstants.XMLNS_CORE + "\"\n" +
+            "\t\txmlns:var=\"" + WHConstants.XMLNS_VAR + "\"\n" +
+            "\t\txmlns:p=\"" + WHConstants.XMLNS_PARAM + "\">\n" +
             "\t\n" +
             "</config>";
 
@@ -131,8 +131,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                     if (userObject instanceof TreeNodeInfo) {
                         TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
                         Map properties = treeNodeInfo.getProperties();
-                        Object value = properties == null ? null : properties.get(Constants.VALUE_PROPERTY_NAME);
-                        final ViewerFrame viewerFrame = new ViewerFrame(scraper, Constants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
+                        Object value = properties == null ? null : properties.get(WHConstants.VALUE_PROPERTY_NAME);
+                        final ViewerFrame viewerFrame = new ViewerFrame(scraper, WHConstants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 viewerFrame.setVisible(true);
@@ -312,15 +312,14 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         this.leftView.setTopComponent(treeView);
         this.leftView.setBottomComponent(propertiesView);
         this.leftView.setDividerLocation(0.8d);
-        this.leftView.setDividerSize(Constants.SPLITTER_WIDTH);
-//        this.leftView.setDividerSize(Constants.SPLITTER_WIDTH);
+        this.leftView.setDividerSize(WHConstants.SPLITTER_WIDTH);
 
         //Add the scroll panes to a split pane.
         leftSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         leftSplitter.setBorder(null);
         leftSplitter.setLeftComponent(leftView);
         leftSplitter.setRightComponent(this.xmlEditorScrollPane);
-        leftSplitter.setDividerSize(Constants.SPLITTER_WIDTH);
+        leftSplitter.setDividerSize(WHConstants.SPLITTER_WIDTH);
 
         leftSplitter.setDividerLocation(250);
 
@@ -330,7 +329,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         bottomSplitter.setResizeWeight(1.0d);
         bottomSplitter.setBorder(null);
         bottomSplitter.setTopComponent(leftSplitter);
-        bottomSplitter.setDividerSize(Constants.SPLITTER_WIDTH);
+        bottomSplitter.setDividerSize(WHConstants.SPLITTER_WIDTH);
         bottomView = new JScrollPane(logTextArea);
         bottomView.setBorder(new EmptyBorder(0, 0, 0, 0));
         bottomSplitter.setBottomComponent(this.bottomView);

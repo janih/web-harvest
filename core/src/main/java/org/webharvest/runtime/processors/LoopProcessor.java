@@ -39,6 +39,7 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.math.NumberUtils;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -49,7 +50,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -91,7 +91,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
             final List<Variable> resultList = new ArrayList<Variable>();
             final Iterator filteredIterator = filter != null ? createFilteredList(iter, filter) : iter;
 
-            final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+            final double maxLoops = NumberUtils.toDouble(maxLoopsString, WHConstants.DEFAULT_MAX_LOOPS);
             for (int i = 1; filteredIterator.hasNext() && i <= maxLoops; i++) {
                 Variable currElement = (Variable) filteredIterator.next();
 

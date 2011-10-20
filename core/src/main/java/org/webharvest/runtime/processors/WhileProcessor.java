@@ -37,6 +37,7 @@
 package org.webharvest.runtime.processors;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.webharvest.WHConstants;
 import org.webharvest.definition.WhileDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -46,7 +47,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         setProperty("Empty", String.valueOf(isEmpty));
 
         // iterates while testing variable represents boolean true or loop limit is exceeded
-        final double maxLoops = NumberUtils.toDouble(maxLoopsString, Constants.DEFAULT_MAX_LOOPS);
+        final double maxLoops = NumberUtils.toDouble(maxLoopsString, WHConstants.DEFAULT_MAX_LOOPS);
         while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
             Variable loopResult = new BodyProcessor(elementDef).execute(scraper, context);
             if (!isEmpty) {
