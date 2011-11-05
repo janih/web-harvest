@@ -156,7 +156,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
 
         String requiredTags[] = getRequiredSubprocessors();
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String subProcessor : validSubprocessors) {
             if (result.length() != 0) {
                 result.append(',');
@@ -177,7 +177,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
 
         String requiredAtts[] = getRequiredAttributes();
 
-        StringBuffer result = new StringBuffer("id,");
+        StringBuilder result = new StringBuilder("id,");
         for (String attr : validAtts) {
             if (CommonUtil.existsInStringArray(requiredAtts, attr, true)) {
                 result.append('!');

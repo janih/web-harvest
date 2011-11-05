@@ -236,7 +236,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
         private CommandPromptFilenameFilter(String filter) {
             if (!CommonUtil.isEmpty(filter)) {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 for (int i = 0; i < filter.length(); i++) {
                     char ch = filter.charAt(i);
                     switch (ch) {

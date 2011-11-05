@@ -121,7 +121,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
             Matcher matcher = pattern.matcher(text);
             int groupCount = matcher.groupCount();
 
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             int index = 0;
             while (matcher.find()) {

@@ -124,7 +124,7 @@ public class ElementInfo {
      * @return Template with allowed attributes.
      */
     public String getTemplate(boolean onlyRequiredAtts) {
-        StringBuffer result = new StringBuffer("<" + this.name);
+        StringBuilder result = new StringBuilder("<" + this.name);
 
         for (String att : (onlyRequiredAtts ? this.requiredAttsSet : this.attsSet)) {
             result.append(" ").append(att).append("=\"\"");

@@ -69,10 +69,10 @@ public class XmlNode implements Serializable {
     private List<Serializable> elementList = new ArrayList<Serializable>();
 
     // textBuff value
-    private StringBuffer textBuff = new StringBuffer();
+    private StringBuilder textBuff = new StringBuilder();
 
     // text buffer containing continuous text
-    private transient StringBuffer tmpBuf = new StringBuffer();
+    private transient StringBuilder tmpBuf = new StringBuilder();
 
     // location of element in the XML
     private int lineNumber;

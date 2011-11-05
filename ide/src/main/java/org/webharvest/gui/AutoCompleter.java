@@ -315,7 +315,7 @@ public class AutoCompleter {
             text = text.substring(1);
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         int len = text.length();
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
@@ -334,7 +334,7 @@ public class AutoCompleter {
      * @return Maximal peace at the end of specified string which is valid tag or attribute name.
      */
     private String getIdentifierFromEnd(String text) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = text.length() - 1; i >= 0; i--) {
             char ch = text.charAt(i);
             if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!') {
@@ -352,7 +352,7 @@ public class AutoCompleter {
      * @return Identifier name at start of given string.
      */
     private String getIdentifierAtStart(String text) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
             if (Character.isLetter(ch) || (i != 0 && (ch == '-' || ch == '_' || ch == '!'))) {

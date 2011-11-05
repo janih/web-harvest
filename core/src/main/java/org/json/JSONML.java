@@ -309,7 +309,7 @@ public class JSONML {
     	String       k;
 	    Iterator     keys;
 	    int			 length;
-    	StringBuffer sb = new StringBuffer();
+    	StringBuilder sb = new StringBuilder();
 	    String       tagName;
 	    String       v;
 	    
@@ -385,7 +385,7 @@ public class JSONML {
      * @throws JSONException
      */
 	public static String toString(JSONObject jo) throws JSONException {
-	    StringBuffer sb = new StringBuffer();
+	    StringBuilder sb = new StringBuilder();
 	    Object		 e;
 	    int          i;
 	    JSONArray    ja;

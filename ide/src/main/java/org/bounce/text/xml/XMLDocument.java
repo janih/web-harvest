@@ -133,7 +133,7 @@ public class XMLDocument extends PlainDocument {
         if ( str.equals( ">") && isTagCompletion()) {
             int dot = editor.getCaret().getDot();
             
-            StringBuffer endTag = new StringBuffer( str);
+            StringBuilder endTag = new StringBuilder( str);
     
             String text = getText( 0, off);
             int startTag = text.lastIndexOf( '<', off);
@@ -175,7 +175,7 @@ public class XMLDocument extends PlainDocument {
     
             editor.getCaret().setDot( dot + 1);
         } else if ( str.equals( "\n") && isAutoIndentation()) {
-            StringBuffer newStr = new StringBuffer(str);
+            StringBuilder newStr = new StringBuilder(str);
             Element elem = getDefaultRootElement().getElement( getDefaultRootElement().getElementIndex(off));
             int start = elem.getStartOffset();
             int end = elem.getEndOffset();

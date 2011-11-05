@@ -93,7 +93,7 @@ public class AlertDialog extends CommonDialog {
      */
     private String prepareMsg(String msg) {
         final int maxLength = 80;
-        StringBuffer result = new StringBuffer("");
+        StringBuilder result = new StringBuilder("");
         int lineLength = 0;
         if (msg != null) {
             for (int i = 0; i < msg.length(); i++) {

@@ -38,7 +38,7 @@ public class FtpListPlugin extends WebHarvestPlugin {
 
             Pattern pattern = null;
             if ( !CommonUtil.isEmptyString(listFilter) ) {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 for (int i = 0; i < listFilter.length(); i++) {
                     char ch = listFilter.charAt(i);
                     switch (ch) {

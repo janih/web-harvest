@@ -340,7 +340,7 @@ public class CommonUtil {
      */
     public static String escapeXml(String s) {
         if (s != null) {
-            StringBuffer result = new StringBuffer(s);
+            StringBuilder result = new StringBuilder(s);
             int index = 0;
             for (int i = 0; i < s.length(); i++) {
                 char ch = s.charAt(i);
@@ -581,7 +581,7 @@ public class CommonUtil {
      * @throws IOException
      */
     public static String readStringFromUrl(URL url) throws IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
         int ch;
         while ((ch = in.read()) != -1) {
@@ -702,7 +702,7 @@ public class CommonUtil {
         if (value == null) {
             return "_";
         }
-        StringBuffer validIdentifier = new StringBuffer();
+        StringBuilder validIdentifier = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             char ch = value.charAt(i);
             if ((i == 0 && !Character.isJavaIdentifierStart(ch)) || !Character.isJavaIdentifierPart(ch)) {

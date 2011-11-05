@@ -16,7 +16,7 @@ public class XmlParserUtils {
             return null;
         }
         
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int index = 0;
         int len = source.length();
         boolean charOk = true;

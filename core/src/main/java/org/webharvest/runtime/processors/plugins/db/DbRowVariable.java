@@ -66,7 +66,7 @@ public class DbRowVariable extends NodeVariable {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer("<" + ROW_TAG_NAME + ">");
+        StringBuilder buffer = new StringBuilder("<" + ROW_TAG_NAME + ">");
         for (int i = 0; i < columnDescription.length; i++) {
             String colIdentifier = columnDescription[i].getIdentifier();
             buffer.append("<").append(colIdentifier).append(">");

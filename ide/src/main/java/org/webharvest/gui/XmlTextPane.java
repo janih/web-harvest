@@ -116,7 +116,7 @@ public class XmlTextPane extends JEditorPane {
                 if ( selectedText != null && !CommonUtil.isEmpty(selectedText) ) {
                     String trimmed = selectedText.trim();
                     if ( trimmed.startsWith("<!--") && trimmed.endsWith("-->") ) {
-                        StringBuffer buffer = new StringBuffer(selectedText);
+                        StringBuilder buffer = new StringBuilder(selectedText);
                         int pos = buffer.indexOf("<!--");
                         buffer.delete(pos, pos + 4);
                         pos = buffer.lastIndexOf("-->");                           
@@ -233,7 +233,7 @@ public class XmlTextPane extends JEditorPane {
 
                 String text = textComponent.getText(begin, end - begin);
                 int len = text.length();
-                StringBuffer out = new StringBuffer(len);
+                StringBuilder out = new StringBuilder(len);
                 if (lastNewLineBeforeSelection < 0) {
                     out.insert(0, '\t');
                     selectionStart++;
@@ -304,7 +304,7 @@ public class XmlTextPane extends JEditorPane {
                     text = "\n" + text;
                 }
                 int len = text.length();
-                StringBuffer out = new StringBuffer(len);
+                StringBuilder out = new StringBuilder(len);
                 for (int i = 0; i < len; i++) {
                     char ch = text.charAt(i);
                     out.append(ch);
