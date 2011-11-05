@@ -169,18 +169,18 @@ public class AutoCompleter {
         }
     }
 
-    private void defineAttributesMenu(String elementName, String prefix, NamespaceResolver nsResolver) {
-        elementName = elementName.toLowerCase();
-        prefix = prefix.toLowerCase();
+    private void defineAttributesMenu(String elementQName, String attrPrefix, NamespaceResolver nsResolver) {
+        final QName qName = XmlNamespaceUtils.parseQName(elementQName, nsResolver);
+        attrPrefix = attrPrefix.toLowerCase();
 
         this.model.clear();
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(elementName, null);
+        ElementInfo elementInfo = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
         if (elementInfo != null) {
             for (Object attObj : elementInfo.getAttsSet()) {
                 if (attObj != null) {
                     String att = ((String) attObj).toLowerCase();
-                    if (att.startsWith(prefix) && !"id".equals(att)) {
+                    if (att.startsWith(attrPrefix) && !"id".equals(att)) {
                         model.addElement(att);
                     }
                 }

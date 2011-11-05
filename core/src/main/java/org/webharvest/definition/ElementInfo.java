@@ -120,7 +120,7 @@ public class ElementInfo {
     }
 
     /**
-     * @param onlyRequiredAtts
+     * @param onlyRequiredAtts only required attributes
      * @return Template with allowed attributes.
      */
     public String getTemplate(boolean onlyRequiredAtts) {
