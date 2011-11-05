@@ -36,6 +36,7 @@
 */
 package org.webharvest.gui;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
@@ -56,10 +57,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class SettingsDialog extends CommonDialog implements ChangeListener {
 
@@ -106,11 +104,11 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
             String errorMessage = null;
 
-            final boolean isAlreadyRegistered = DefinitionResolver.isPluginRegistered(className);
+            final boolean isAlreadyRegistered = DefinitionResolver.isPluginRegistered(className, uri);
             if (!isAlreadyRegistered || throwErrIfRegistered) {
                 try {
                     if (isAlreadyRegistered) {
-                        DefinitionResolver.unregisterPlugin(className);
+                        DefinitionResolver.unregisterPlugin(className, uri);
                     }
                     DefinitionResolver.registerPlugin(className, uri);
                 } catch (PluginException e) {
@@ -182,7 +180,6 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     private JCheckBox dynamicConfigLocateCheckBox;
     private JCheckBox showFinishDialogCheckBox;
 
-    private JButton pluginAddButton;
     private JButton pluginUpdateButton;
     private JButton pluginRemoveButton;
     private PluginListModel pluginListModel;
@@ -229,8 +226,8 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
         workingPathField = new FixedSizeTextField(250, -1);
 
-        Map charsetsMap = Charset.availableCharsets();
-        Vector allSupportedCharsets = new Vector(charsetsMap.keySet());
+        Map<String, Charset> charsetsMap = Charset.availableCharsets();
+        Vector<String> allSupportedCharsets = new Vector<String>(charsetsMap.keySet());
         fileCharsetComboBox = new WHComboBox(allSupportedCharsets);
 
         proxyServerField = new FixedSizeTextField(250, -1);
@@ -257,7 +254,6 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         pathPanel.add(workingPathField);
         JButton chooseDirButton = new SmallButton("...") {
             public Dimension getPreferredSize() {
-                Dimension preferredSize = super.getPreferredSize();
                 return new Dimension(30, workingPathField.getHeight());
             }
         };
@@ -376,9 +372,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         pluginButtonsPanel.setBorder(new EmptyBorder(3, 0, 3, 3));
         pluginButtonsPanel.setPreferredSize(new Dimension(116, 1));
 
-        final String pluginInputMsg = "Full class name of the plugin";
-
-        pluginAddButton = new FixedSizeButton("Add plugin", 110, 22);
+        final JButton pluginAddButton = new FixedSizeButton("Add plugin", 110, 22);
         pluginAddButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String className = pluginClassNameField.getText().trim();
@@ -402,7 +396,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                     if (!pluginInfo.equals(oldPluginInfo)) {
                         boolean isSet = pluginListModel.setElement(pluginInfo, index);
                         if (isSet) {
-                            DefinitionResolver.unregisterPlugin(oldPluginInfo.getClassName());
+                            DefinitionResolver.unregisterPlugin(oldPluginInfo.getClassName(), pluginInfo.getUri());
                             DefinitionResolver.registerPlugin(pluginInfo.getClassName(), pluginInfo.getUri());
                         }
                     }
@@ -414,8 +408,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             public void actionPerformed(ActionEvent e) {
                 int index = pluginsList.getSelectedIndex();
                 if (index >= 0) {
-                    String oldClassName = pluginsList.getSelectedValue().toString();
-                    DefinitionResolver.unregisterPlugin(oldClassName);
+                    DefinitionResolver.unregisterPlugin(pluginsList.getSelectedValue().toString(), pluginNamespaceUriField.getText().trim());
                     pluginListModel.remove(index);
                     pluginsList.setSelectedIndex(Math.min(index, pluginListModel.size() - 1));
                 }
@@ -494,19 +487,14 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
         pluginListModel.clear();
         PluginInfo[] plugins = settings.getPlugins();
-        for (int i = 0; i < plugins.length; i++) {
-            pluginListModel.addElement(plugins[i], false);
+        for (PluginInfo plugin : plugins) {
+            pluginListModel.addElement(plugin, false);
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     private void undoPlugins() {
-        Settings settings = ide.getSettings();
-        PluginInfo[] plugins = settings.getPlugins();
-        Set<PluginInfo> pluginSet = new HashSet<PluginInfo>();
-        for (int i = 0; i < plugins.length; i++) {
-            pluginSet.add(plugins[i]);
-        }
-
+        Set<PluginInfo> pluginSet = new HashSet<PluginInfo>(Arrays.asList(ide.getSettings().getPlugins()));
         Set<PluginInfo> listSet = new HashSet<PluginInfo>();
 
         // unregister plugins registered during this settings session
@@ -515,17 +503,17 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             PluginInfo item = (PluginInfo) pluginListModel.get(i);
             listSet.add(item);
             if (item.isValid() && !pluginSet.contains(item)) {
-                DefinitionResolver.unregisterPlugin(item.getClassName());
+                DefinitionResolver.unregisterPlugin(item.getClassName(), item.getUri());
             }
         }
 
         // register plugins unregistered during this setting session
-        for (PluginInfo currPlugin : plugins) {
-            if (!listSet.contains(currPlugin) && !DefinitionResolver.isPluginRegistered(currPlugin.getClassName())) {
+        for (PluginInfo currPlugin : (Iterable<? extends PluginInfo>) CollectionUtils.subtract(pluginSet, listSet)) {
+            if (!DefinitionResolver.isPluginRegistered(currPlugin.getClassName(), currPlugin.getUri())) {
                 try {
-                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), WHConstants.XMLNS_CORE); // TODO: <-- WHY WHConstants.XMLNS_CORE ???
+                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), currPlugin.getUri());
                 } catch (PluginException e) {
-                    ; // do nothing - ignore
+                    // do nothing - ignore
                 }
             }
         }
@@ -550,7 +538,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         int port = -1;
         try {
             port = Integer.parseInt(this.proxyPortField.getText());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
         settings.setProxyPort(port);
 

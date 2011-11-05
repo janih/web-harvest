@@ -36,7 +36,6 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.WHConstants;
 import org.webharvest.deprecated.runtime.processors.CallProcessor10;
 import org.webharvest.deprecated.runtime.processors.VarDefProcessor;
 import org.webharvest.deprecated.runtime.processors.VarProcessor;
@@ -59,6 +58,9 @@ import org.webharvest.utils.CommonUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 /**
  * Class contains information and logic to validate and crate definition classes for
  * parsed xml nodes from Web-Harvest configurations.
@@ -68,10 +70,35 @@ import java.util.*;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DefinitionResolver {
 
+    private final static class PluginClassKey {
+
+        private PluginClassKey(String className, String uri) {
+            this.className = className;
+            this.uri = uri;
+        }
+
+        final String className;
+        final String uri;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final PluginClassKey that = (PluginClassKey) o;
+            return className.equals(that.className) && uri.equals(that.uri);
+
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * className.hashCode() + uri.hashCode();
+        }
+    }
+
     private static Map<ElementName, ElementInfo> elementInfos = new TreeMap<ElementName, ElementInfo>();
 
     // map containing pairs (class name, plugin element name) of externally registered plugins
-    private static Map<String, ElementName> externalPlugins = new LinkedHashMap<String, ElementName>();
+    private static Map<PluginClassKey, ElementName> externalPlugins = new LinkedHashMap<PluginClassKey, ElementName>();
 
     // map of external plugin dependencies
     private static Map<ElementName, Class[]> externalPluginDependencies = new HashMap<ElementName, Class[]>();
@@ -79,104 +106,111 @@ public class DefinitionResolver {
     // defines all valid elements of Web-Harvest configuration file
 
     static {
+
+        // register processors
         registerInternalElement("config", ProcessorElementDef.class, null, null, "charset,scriptlang,id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("empty", EmptyDef.class, EmptyProcessor.class, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("text", TextDef.class, TextProcessor.class, null, "id,charset,delimiter",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("file", FileDef.class, FileProcessor.class, null,
                 "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
-        registerInternalElement("var-def", VarDefDef.class, VarDefProcessor.class, null, "id,!name,overwrite",
-                WHConstants.XMLNS_CORE_10);
-        registerInternalElement("var", VarDef.class, VarProcessor.class, "", "id,!name",
-                WHConstants.XMLNS_CORE_10);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("http", HttpDef.class, HttpProcessor.class, null,
                 "id,!url,method,follow-redirects,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("http-param", HttpParamDef.class, HttpParamProcessor.class, null, "id,!name,isfile,filename,contenttype",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("http-header", HttpHeaderDef.class, HttpHeaderProcessor.class, null, "id,!name",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("html-to-xml", HtmlToXmlDef.class, HtmlToXmlProcessor.class, null, "" +
                 "id,outputtype,advancedxmlescape,usecdata,specialentities,unicodechars,nbsp-to-sp," +
                 "omitunknowntags,treatunknowntagsascontent,omitdeprtags,treatdeprtagsascontent," +
                 "omitxmldecl,omitcomments,omithtmlenvelope,useemptyelementtags,allowmultiwordattributes," +
                 "allowhtmlinsideattributes,namespacesaware,hyphenreplacement,prunetags,booleanatts",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("regexp", RegexpDef.class, RegexpProcessor.class,
                 "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("regexp-pattern", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("regexp-source", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("regexp-result", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xpath", XPathDef.class, XPathProcessor.class, null, "id,expression,v:*",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xquery", XQueryDef.class, XQueryProcessor.class, "xq-param,!xq-expression", "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xq-param", ProcessorElementDef.class, null, null, "!name,type,id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xq-expression", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xslt", XsltDef.class, XsltProcessor.class, "!xml,!stylesheet", "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xml", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("stylesheet", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("template", TemplateDef.class, TemplateProcessor.class, null, "id,language",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("case", CaseDef.class, CaseProcessor.class, "!if,else", "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("if", ProcessorElementDef.class, null, null, "!condition,id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("else", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("loop", LoopDef.class, LoopProcessor.class, "!list,!body", "id,item,index,maxloops,filter,empty",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("list", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("body", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("while", WhileDef.class, WhileProcessor.class, null, "id,!condition,index,maxloops,empty",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("function", FunctionDef.class, FunctionProcessor.class, null, "id,!name",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("return", ReturnDef.class, ReturnProcessor.class, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("call", CallDef.class, CallProcessor10.class, null, "id,!name",
-                WHConstants.XMLNS_CORE_10);
+                XMLNS_CORE_10);
         registerInternalElement("call", CallDef.class, CallProcessor.class, null, "id,!name",
-                WHConstants.XMLNS_CORE);
+                XMLNS_CORE);
         registerInternalElement("call-param", CallParamDef.class, CallParamProcessor.class, null, "id,!name",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("include", IncludeDef.class, IncludeProcessor.class, "", "id,!path",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("try", TryDef.class, TryProcessor.class, "!body,!catch", "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("catch", ProcessorElementDef.class, null, null, "id",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("script", ScriptDef.class, ScriptProcessor.class, null, "id,language,return",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("exit", ExitDef.class, ExitProcessor.class, "", "id,condition,message",
-                WHConstants.XMLNS_CORE_10, WHConstants.XMLNS_CORE);
+                XMLNS_CORE_10, XMLNS_CORE);
 
-        registerPlugin(SetVarPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(DefVarPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(GetVarPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(ValueOfPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(DatabasePlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(JsonToXmlPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(XmlToJsonPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(MailPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(ZipPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(FtpPlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(TokenizePlugin.class, true, WHConstants.XMLNS_CORE);
-        registerPlugin(SleepPlugin.class, true, WHConstants.XMLNS_CORE);
+        // register deprecated processor
+        registerInternalElement("var-def", VarDefDef.class, VarDefProcessor.class, null, "id,!name,overwrite",
+                XMLNS_CORE_10);
+        registerInternalElement("var", VarDef.class, VarProcessor.class, "", "id,!name",
+                XMLNS_CORE_10);
+
+        // plugins for version 1.0 and 2.1
+        registerPlugin(DatabasePlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(JsonToXmlPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(XmlToJsonPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(MailPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(ZipPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(FtpPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+        registerPlugin(TokenizePlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
+
+        // plugins introduced in version 2.1
+        registerPlugin(SetVarPlugin.class, true, XMLNS_CORE);
+        registerPlugin(DefVarPlugin.class, true, XMLNS_CORE);
+        registerPlugin(GetVarPlugin.class, true, XMLNS_CORE);
+        registerPlugin(ValueOfPlugin.class, true, XMLNS_CORE);
+        registerPlugin(SleepPlugin.class, true, XMLNS_CORE);
     }
 
     private static void registerInternalElement(String name,
@@ -190,7 +224,7 @@ public class DefinitionResolver {
         }
     }
 
-    private static void registerPlugin(Class pluginClass, boolean isInternalPlugin, String uri) {
+    private static void registerPlugin(Class pluginClass, boolean isInternalPlugin, String... uris) {
         Assert.notNull(pluginClass);
         try {
             final Object pluginObj = pluginClass.newInstance();
@@ -203,34 +237,35 @@ public class DefinitionResolver {
                 throw new PluginException("Plugin class \"" + pluginClass.getName() + "\" does not define valid name!");
             }
 
-            ElementName pluginElementName = new ElementName(pluginName, uri);
+            for (String uri : uris) {
+                final ElementInfo elementInfo = new ElementInfo(
+                        pluginName,
+                        pluginClass,
+                        isInternalPlugin,
+                        WebHarvestPluginDef.class,
+                        plugin.getTagDesc(),
+                        plugin.getAttributeDesc(),
+                        null);
+
+                elementInfo.setPlugin(plugin);
+
+                final ElementName pluginElementName = new ElementName(pluginName, uri);
+                if (elementInfos.containsKey(pluginElementName)) {
+                    throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
+                }
+                elementInfos.put(pluginElementName, elementInfo);
 
 
-            final ElementInfo elementInfo = new ElementInfo(
-                    pluginName,
-                    pluginClass,
-                    isInternalPlugin,
-                    WebHarvestPluginDef.class,
-                    plugin.getTagDesc(),
-                    plugin.getAttributeDesc(),
-                    null);
-
-            elementInfo.setPlugin(plugin);
-
-            if (elementInfos.containsKey(pluginElementName)) {
-                throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
+                if (!isInternalPlugin) {
+                    externalPlugins.put(new PluginClassKey(pluginClass.getName(), uri), pluginElementName);
+                }
+                externalPluginDependencies.put(pluginElementName, plugin.getDependantProcessors());
             }
-            elementInfos.put(pluginElementName, elementInfo);
-
-
-            if (!isInternalPlugin) {
-                externalPlugins.put(pluginClass.getName(), pluginElementName);
-            }
-            externalPluginDependencies.put(pluginElementName, plugin.getDependantProcessors());
 
             for (Class subClass : plugin.getDependantProcessors()) {
-                registerPlugin(subClass, isInternalPlugin, uri);
+                registerPlugin(subClass, isInternalPlugin, uris);
             }
+
         } catch (InstantiationException e) {
             throw new PluginException("Error instantiating plugin class \"" + pluginClass.getName() + "\": " + e.getMessage(), e);
         } catch (IllegalAccessException e) {
@@ -242,40 +277,41 @@ public class DefinitionResolver {
         registerPlugin(pluginClass, false, uri);
     }
 
-    public static void registerPlugin(String fullClassName, String uri) throws PluginException {
-        registerPlugin(ClassLoaderUtil.getPluginClass(fullClassName), false, uri);
+    public static void registerPlugin(String className, String uri) throws PluginException {
+        registerPlugin(ClassLoaderUtil.getPluginClass(className), false, uri);
     }
 
-    public static void unregisterPlugin(Class pluginClass) {
+    public static void unregisterPlugin(Class pluginClass, String uri) {
         if (pluginClass != null) {
-            unregisterPlugin(pluginClass.getName());
+            unregisterPlugin(pluginClass.getName(), uri);
         }
     }
 
-    public static void unregisterPlugin(String className) {
+    public static void unregisterPlugin(String className, String uri) {
+        final PluginClassKey key = new PluginClassKey(className, uri);
         // only external plugins can be unregistered
-        if (isPluginRegistered(className)) {
-            ElementName pluginElementName = externalPlugins.get(className);
+        if (externalPlugins.containsKey(key)) {
+            final ElementName pluginElementName = externalPlugins.get(key);
             elementInfos.remove(pluginElementName);
-            externalPlugins.remove(className);
+            externalPlugins.remove(key);
 
-            // unregister deependant classes as well
+            // unregister dependant classes as well
             Class[] dependantClasses = externalPluginDependencies.get(pluginElementName);
             externalPluginDependencies.remove(pluginElementName);
             if (dependantClasses != null) {
                 for (Class c : dependantClasses) {
-                    unregisterPlugin(c);
+                    unregisterPlugin(c, uri);
                 }
             }
         }
     }
 
-    public static boolean isPluginRegistered(String className) {
-        return externalPlugins.containsKey(className);
+    public static boolean isPluginRegistered(String className, String uri) {
+        return externalPlugins.containsKey(new PluginClassKey(className, uri));
     }
 
-    public static boolean isPluginRegistered(Class pluginClass) {
-        return pluginClass != null && isPluginRegistered(pluginClass.getName());
+    public static boolean isPluginRegistered(Class pluginClass, String uri) {
+        return pluginClass != null && isPluginRegistered(pluginClass.getName(), uri);
     }
 
     /**
@@ -299,7 +335,7 @@ public class DefinitionResolver {
      * Creates proper element definition instance based on given xml node
      * from input configuration.
      *
-     * @param node
+     * @param node node
      * @return Instance of IElementDef, or exception is thrown if cannot find
      *         appropriate element definition.
      */
@@ -348,7 +384,7 @@ public class DefinitionResolver {
      * Validates specified xml node with appropriate element info instance.
      * If validation fails, an runtime exception is thrown.
      *
-     * @param node
+     * @param node node
      */
     public static void validate(XmlNode node) {
         if (node == null) {
@@ -402,6 +438,75 @@ public class DefinitionResolver {
                 }
             }
         }
+    }
+
+    // Deprecated stuff
+
+    /**
+     * Check if plugin is registered in <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param className plugin class
+     * @return boolean
+     * @deprecated Use {@link #isPluginRegistered(String className, String uri)}
+     */
+    @Deprecated public static boolean isPluginRegistered(String className) {
+        return externalPlugins.containsKey(new PluginClassKey(className, XMLNS_CORE_10));
+    }
+
+    /**
+     * Check if plugin is registered in <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param pluginClass plugin class
+     * @return boolean
+     * @deprecated Use {@link #isPluginRegistered(Class pluginClass, String uri)}
+     */
+    @Deprecated public static boolean isPluginRegistered(Class pluginClass) {
+        return pluginClass != null && isPluginRegistered(pluginClass.getName(), XMLNS_CORE_10);
+    }
+
+
+    /**
+     * Register plugin to <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param className plugin class
+     * @throws org.webharvest.exception.PluginException
+     *          trouble
+     * @deprecated Use {@link #registerPlugin(String className, String uri)}
+     */
+    @Deprecated public static void registerPlugin(String className) throws PluginException {
+        registerPlugin(ClassLoaderUtil.getPluginClass(className), false, XMLNS_CORE_10);
+    }
+
+    /**
+     * Register plugin to <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param pluginClass plugin class
+     * @throws org.webharvest.exception.PluginException
+     *          trouble
+     * @deprecated Use {@link #unregisterPlugin(Class pluginClass, String uri)}
+     */
+    @Deprecated public static void registerPlugin(Class pluginClass) throws PluginException {
+        registerPlugin(pluginClass, false, XMLNS_CORE_10);
+    }
+
+    /**
+     * Unregister plugin from <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param pluginClass plugin class
+     * @deprecated Use {@link #unregisterPlugin(Class pluginClass, String uri)}
+     */
+    @Deprecated public static void unregisterPlugin(Class pluginClass) {
+        unregisterPlugin(pluginClass, XMLNS_CORE_10);
+    }
+
+    /**
+     * Unregister plugin from <em>http://web-harvest.sourceforge.net/schema/1.0/config</em> namespace
+     *
+     * @param className class name
+     * @deprecated Use {@link #unregisterPlugin(String className, String uri)}
+     */
+    @Deprecated public static void unregisterPlugin(String className) {
+        unregisterPlugin(className, XMLNS_CORE_10);
     }
 
 }

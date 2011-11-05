@@ -1,7 +1,7 @@
 package org.webharvest.exception;
 
 /**
- * Runtime exception occured during plugin processors registration or creation.
+ * Runtime exception occurred during plugin processors registration or creation.
  */
 public class PluginException extends BaseException {
     public PluginException() {
