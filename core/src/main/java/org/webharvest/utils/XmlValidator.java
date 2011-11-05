@@ -7,7 +7,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 
 /**
@@ -16,16 +15,12 @@ import java.io.IOException;
  */
 public class XmlValidator extends DefaultHandler {
 
-    int lineNumber, columnNumber;
+    private int lineNumber, columnNumber;
     private Exception exception;
 
     public boolean parse(InputSource in) {
         try {
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            parserFactory.setValidating(false);
-            parserFactory.setNamespaceAware(false);
-
-            SAXParser parser = parserFactory.newSAXParser();
+            SAXParser parser = XmlUtil.getSAXParserFactory(false, false).newSAXParser();
 
             // call parsing
             parser.parse(in, this);

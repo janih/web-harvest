@@ -95,6 +95,7 @@ public class DefinitionResolver {
         }
     }
 
+    // used by auto-completer in GUI
     private static Map<ElementName, ElementInfo> elementInfos = new TreeMap<ElementName, ElementInfo>();
 
     // map containing pairs (class name, plugin element name) of externally registered plugins

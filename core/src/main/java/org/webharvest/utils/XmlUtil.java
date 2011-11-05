@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -31,11 +32,47 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * XML utils - contains common logic for XML handling
  */
 public class XmlUtil {
+
+    private static final Map<Integer, SAXParserFactory> saxParserFactoryMap;
+
+    static {
+        final HashMap<Integer, SAXParserFactory> map = new HashMap<Integer, SAXParserFactory>();
+        SAXParserFactory factory;
+
+        // non-validating ns-unaware
+        factory = SAXParserFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(false);
+        map.put(0, factory);
+
+        // validating ns-unaware
+        /*factory = SAXParserFactory.newInstance();
+        factory.setValidating(true);
+        factory.setNamespaceAware(false);
+        map.put(1, factory);*/
+
+        // non-validating ns-aware
+        factory = SAXParserFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+        map.put(2, factory);
+
+        // validating ns-aware
+        /*factory = SAXParserFactory.newInstance();
+        factory.setValidating(true);
+        factory.setNamespaceAware(true);
+        map.put(3, factory);*/
+
+        saxParserFactoryMap = Collections.unmodifiableMap(map);
+    }
 
     private static final ThreadLocal<DocumentBuilder> documentBuilderTL =
             new ThreadLocal<DocumentBuilder>() {
@@ -134,5 +171,9 @@ public class XmlUtil {
         }
 
         return listVariable;
+    }
+
+    public static SAXParserFactory getSAXParserFactory(boolean validating, boolean nsAware) {
+        return saxParserFactoryMap.get((validating ? 1 : 0) | (nsAware ? 1 : 0) << 1);
     }
 }

@@ -1,6 +1,9 @@
 package org.webharvest.gui;
 
+import net.sf.saxon.om.NamespaceResolver;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.WHConstants;
+import org.webharvest.XmlNamespaceUtils;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.ElementInfo;
 import org.webharvest.definition.ElementName;
@@ -19,7 +22,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -29,8 +31,8 @@ import java.util.Set;
  * pane and popup menu that offers context specific set of tags/attributes in the
  * editor.
  *
- * @author: Vladimir Nikic
- * Date: May 24, 2007
+ * @author Vladimir Nikic
+ *         Date: May 24, 2007
  */
 public class AutoCompleter {
 
@@ -99,7 +101,7 @@ public class AutoCompleter {
     // xml pane instance which this auto completer is bound to
     private XmlTextPane xmlPane;
 
-    // current context for auto cempletion
+    // current context for auto completion
     private transient int context = TAG_CONTEXT;
 
     // length of prefix that user already has typed
@@ -108,7 +110,7 @@ public class AutoCompleter {
     /**
      * Constructor.
      *
-     * @param xmlPane
+     * @param xmlPane XmlTextPane
      */
     public AutoCompleter(final XmlTextPane xmlPane) {
         this.xmlPane = xmlPane;
@@ -129,21 +131,31 @@ public class AutoCompleter {
         this.popupMenu.setBorder(new EmptyBorder(1, 1, 1, 1));
     }
 
-    private void defineTagsMenu(String prefix) {
-        if (prefix != null) {
-            prefix = prefix.toLowerCase();
-        }
+    private void defineTagsMenu(String chunk, NamespaceResolver nsResolver) {
+        chunk = chunk.toLowerCase();
+        final String nsPrefix = chunk.contains(":") ? StringUtils.trimToNull(StringUtils.substringBefore(chunk, ":")) : "";
+        final String nsUri = (nsPrefix != null) ? nsResolver.getURIForPrefix(nsPrefix, true) : null;
+
+        @SuppressWarnings({"ConstantConditions"})
+        final String localNamePrefix = StringUtils.isNotEmpty(nsPrefix) ? chunk.substring(nsPrefix.length() + 1) : chunk;
 
         this.model.clear();
 
-        for (Map.Entry<ElementName, ElementInfo> entry: DefinitionResolver.getElementInfos().entrySet()) {
-            if ( prefix == null || entry.getKey().getName().startsWith(prefix) ) {
-                model.addElement(entry.getValue().getName());
+        if (nsUri != null) {
+            for (ElementName elementName : DefinitionResolver.getElementInfos().keySet()) {
+                if (elementName.getUri().equals(nsUri) && elementName.getName().startsWith(localNamePrefix)) {
+                    final StringBuilder str = new StringBuilder();
+                    if (StringUtils.isNotEmpty(nsPrefix)) {
+                        str.append(nsPrefix).append(':');
+                    }
+                    str.append(elementName.getName());
+                    model.addElement(str.toString());
+                }
             }
         }
 
-        boolean addCData = CDATA_NAME.toLowerCase().startsWith("<" + prefix);
-        boolean addXmlComment = XML_COMMENT_NAME.toLowerCase().startsWith("<" + prefix);
+        boolean addCData = CDATA_NAME.toLowerCase().startsWith("<" + chunk);
+        boolean addXmlComment = XML_COMMENT_NAME.toLowerCase().startsWith("<" + chunk);
 
         if (addCData || addXmlComment) {
             if (addCData) {
@@ -155,7 +167,7 @@ public class AutoCompleter {
         }
     }
 
-    private void defineAttributesMenu(String elementName, String prefix) {
+    private void defineAttributesMenu(String elementName, String prefix, NamespaceResolver nsResolver) {
         elementName = elementName.toLowerCase();
         prefix = prefix.toLowerCase();
 
@@ -174,7 +186,7 @@ public class AutoCompleter {
         }
     }
 
-    private void defineAttributeValuesMenu(String tagName, String attributeName, String attValuePrefix) {
+    private void defineAttributeValuesMenu(String tagName, String attributeName, String attValuePrefix, NamespaceResolver nsResolver) {
         this.model.clear();
 
         ElementInfo elementInfo = DefinitionResolver.getElementInfo(tagName, null);
@@ -218,9 +230,10 @@ public class AutoCompleter {
      */
     public void autoComplete() {
         try {
-            Document document = this.xmlPane.getDocument();
-            int offset = this.xmlPane.getCaretPosition();
+            final Document document = this.xmlPane.getDocument();
+            final int offset = this.xmlPane.getCaretPosition();
             String text = document.getText(0, offset);
+            final NamespaceResolver nsResolver = XmlNamespaceUtils.getNamespaceResolverFromBrokenXml(text);
 
             int openindex = text.lastIndexOf('<');
             int closeindex = text.lastIndexOf('>');
@@ -248,7 +261,11 @@ public class AutoCompleter {
                                 String attName = getIdentifierFromEnd(trimmedText);
                                 if (attName != null && attName.length() > 0) {
                                     this.context = ATTRIBUTE_VALUE_CONTEXT;
-                                    defineAttributeValuesMenu(tagName.toLowerCase().trim(), attName.toLowerCase().trim(), attValuePrefix.toLowerCase().trim());
+                                    defineAttributeValuesMenu(
+                                            tagName.toLowerCase().trim(),
+                                            attName.toLowerCase().trim(),
+                                            attValuePrefix.toLowerCase().trim(),
+                                            nsResolver);
                                 }
                             }
                         }
@@ -260,17 +277,17 @@ public class AutoCompleter {
                     if (containWhitespaces(text)) {           // attributes context
                         this.context = ATTRIBUTE_CONTEXT;
                         String elementName = getIdentifierFromStart(text);
-                        defineAttributesMenu(elementName, identifier);
+                        defineAttributesMenu(elementName, identifier, nsResolver);
                         this.prefixLength = identifier.length();
                     } else {
                         this.context = TAG_CONTEXT;         // tag name context
-                        defineTagsMenu(identifier);
+                        defineTagsMenu(identifier, nsResolver);
                         this.prefixLength = identifier.length() + 1;
                     }
                 }
             } else {                                        // ouside tag definition
                 this.context = TAG_CONTEXT;
-                defineTagsMenu("");
+                defineTagsMenu("", nsResolver);
                 this.prefixLength = 0;
             }
 
@@ -292,7 +309,7 @@ public class AutoCompleter {
     }
 
     /**
-     * @param text
+     * @param text text
      * @return True if specified string contains any whitespace characters, false otherwise.
      */
     private boolean containWhitespaces(String text) {
@@ -307,7 +324,7 @@ public class AutoCompleter {
     }
 
     /**
-     * @param text
+     * @param text text
      * @return Maximal peace at the start of specified string which is valid tag or attribute name.
      */
     private String getIdentifierFromStart(String text) {
@@ -319,7 +336,7 @@ public class AutoCompleter {
         int len = text.length();
         for (int i = 0; i < len; i++) {
             char ch = text.charAt(i);
-            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!') {
+            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!' || ch == ':') {
                 result.append(ch);
             } else {
                 break;
@@ -330,14 +347,14 @@ public class AutoCompleter {
     }
 
     /**
-     * @param text
+     * @param text text
      * @return Maximal peace at the end of specified string which is valid tag or attribute name.
      */
     private String getIdentifierFromEnd(String text) {
         StringBuilder result = new StringBuilder();
         for (int i = text.length() - 1; i >= 0; i--) {
             char ch = text.charAt(i);
-            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!') {
+            if (Character.isLetter(ch) || ch == '-' || ch == '_' || ch == '!' || ch == ':') {
                 result.insert(0, ch);
             } else {
                 break;
@@ -348,14 +365,14 @@ public class AutoCompleter {
     }
 
     /**
-     * @param text
+     * @param text text
      * @return Identifier name at start of given string.
      */
     private String getIdentifierAtStart(String text) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (Character.isLetter(ch) || (i != 0 && (ch == '-' || ch == '_' || ch == '!'))) {
+            if (Character.isLetter(ch) || (i != 0 && (ch == '-' || ch == '_' || ch == '!' || ch == ':'))) {
                 result.append(ch);
             } else {
                 break;

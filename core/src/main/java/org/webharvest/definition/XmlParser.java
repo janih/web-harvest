@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
 import org.webharvest.exception.ParserException;
 import org.webharvest.utils.Stack;
+import org.webharvest.utils.XmlUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -50,8 +51,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 
 
@@ -70,14 +69,7 @@ public class XmlParser extends DefaultHandler {
 
         XmlParser handler = new XmlParser();
         try {
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            parserFactory.setValidating(false);
-            parserFactory.setNamespaceAware(true);
-
-            SAXParser parser = parserFactory.newSAXParser();
-
-            // call parsing
-            parser.parse(in, handler);
+            XmlUtil.getSAXParserFactory(false, true).newSAXParser().parse(in, handler);
 
             log.info("XML parsed in " + (System.currentTimeMillis() - startTime) + "ms.");
 
