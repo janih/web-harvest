@@ -18,6 +18,19 @@ public class XmlNamespaceUtils {
 
     @SuppressWarnings({"finally", "ReturnInsideFinallyBlock"})
     public static NamespaceResolver getNamespaceResolverFromBrokenXml(String xmlHeadFragment) {
+        int openIndex = xmlHeadFragment.lastIndexOf('<');
+        int closeIndex = xmlHeadFragment.lastIndexOf('>');
+
+        if (openIndex > closeIndex) {
+            if (xmlHeadFragment.endsWith("='")) {
+                xmlHeadFragment += "'>";
+            } else if (xmlHeadFragment.endsWith("=\"")) {
+                xmlHeadFragment += "\">";
+            } else {
+                xmlHeadFragment += ">";
+            }
+        }
+
         final Map<String, Stack<String>> nsMap = new HashMap<String, Stack<String>>();
         try {
             XmlUtil.getSAXParserFactory(false, true).

@@ -10,6 +10,14 @@ import static org.webharvest.XmlNamespaceUtils.getNamespaceResolverFromBrokenXml
 public class XmlNamespaceUtilsTest {
 
     @Test
+    public void testGetNamespaceResolverFromBrokenXml_root() throws Exception {
+        assertEquals(getNamespaceResolverFromBrokenXml("<root xmlns:a='foo'").getURIForPrefix("a", false), "foo");
+        assertEquals(getNamespaceResolverFromBrokenXml("<root xmlns:a='bar' ").getURIForPrefix("a", false), "bar");
+        assertEquals(getNamespaceResolverFromBrokenXml("<root xmlns:a='baz' b='").getURIForPrefix("a", false), "baz");
+        assertEquals(getNamespaceResolverFromBrokenXml("<root xmlns:a='qux' b=\"").getURIForPrefix("a", false), "qux");
+    }
+
+    @Test
     public void testGetNamespaceResolverFromBrokenXml_in_scope() throws Exception {
         final NamespaceResolver nsResolver = getNamespaceResolverFromBrokenXml("" +
                 "<root xmlns:a='aaa' xmlns:b='bbb'>" +
