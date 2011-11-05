@@ -40,7 +40,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 20, 2007
  */
 public class StatusBar extends JLabel {

@@ -14,7 +14,7 @@ import java.io.*;
 import java.net.URL;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 17, 2007
  */
 public class ConfigDocument implements DocumentListener {

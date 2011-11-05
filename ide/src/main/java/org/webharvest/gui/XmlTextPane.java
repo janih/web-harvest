@@ -37,7 +37,7 @@
 package org.webharvest.gui;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 20, 2007
  */
 

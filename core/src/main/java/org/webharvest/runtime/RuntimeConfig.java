@@ -7,7 +7,7 @@ import org.webharvest.runtime.processors.XQueryExpressionPool;
 /**
  * Facade for runtime objects needed for specific processors' execution.
  * 
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Jul 4, 2007
  */
 public class RuntimeConfig {

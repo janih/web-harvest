@@ -55,7 +55,7 @@ import java.io.StringReader;
 import java.net.URL;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 25, 2007
  */
 public class WelcomePanel extends JPanel implements HyperlinkListener {

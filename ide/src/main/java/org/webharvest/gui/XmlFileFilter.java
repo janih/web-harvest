@@ -41,7 +41,7 @@ import java.io.File;
 /**
  * File filter for XML files.
  * 
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 17, 2007
  */
 public class XmlFileFilter extends javax.swing.filechooser.FileFilter {

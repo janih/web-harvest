@@ -37,7 +37,7 @@
 package org.webharvest.gui.component;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 8, 2007
  */
 public interface DropDownButtonListener {

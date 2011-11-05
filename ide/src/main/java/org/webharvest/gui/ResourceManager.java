@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.Properties;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 19, 2007
  */
 public class ResourceManager {

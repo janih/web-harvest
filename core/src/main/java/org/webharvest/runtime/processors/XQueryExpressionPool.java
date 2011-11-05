@@ -11,7 +11,7 @@ import java.util.Map;
  * Class represnts simple pool for XQuery expressions.
  * Client obtains compiled query using method getCompiledExpression.
  *
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Jul 4, 2007
  */
 public class XQueryExpressionPool {

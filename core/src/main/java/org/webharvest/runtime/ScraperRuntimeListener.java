@@ -5,7 +5,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 import java.util.Map;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 20, 2007
  */
 public interface ScraperRuntimeListener {

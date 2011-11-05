@@ -45,7 +45,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 24, 2007
  */
 public class ElementInfo {

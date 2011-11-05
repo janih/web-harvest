@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 7, 2007
  */
 public class PropertiesGridModel extends AbstractTableModel implements TableModelListener {

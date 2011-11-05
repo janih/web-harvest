@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 19, 2007
  */
 public class TreeNodeInfo {

@@ -62,7 +62,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 8, 2007
  */
 public class ViewerFrame extends JFrame implements DropDownButtonListener, ActionListener {

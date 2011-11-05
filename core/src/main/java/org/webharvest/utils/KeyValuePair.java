@@ -39,7 +39,7 @@ package org.webharvest.utils;
 import org.apache.commons.collections.keyvalue.DefaultKeyValue;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Jul 2, 2007
  */
 public class KeyValuePair<T> extends DefaultKeyValue {

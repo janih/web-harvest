@@ -48,7 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 7, 2007
  */
 public class PropertiesGrid extends JTable {

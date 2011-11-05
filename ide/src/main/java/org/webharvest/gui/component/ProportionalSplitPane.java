@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Jul 4, 2007
  */
 public class ProportionalSplitPane extends JSplitPane {

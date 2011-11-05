@@ -46,7 +46,7 @@ import javax.swing.*;
  * Simple example of creating a Log4j appender that will
  * write to a JTextArea.
  *
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 20, 2007
  */
 public class TextAreaAppender extends WriterAppender {

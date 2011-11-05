@@ -46,7 +46,7 @@ import java.awt.*;
  * All methods are static in order to be used easier from everywhere. The only
  * requirement is that parent component have to be initialized before any use.  
  *
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 17, 2007
  */
 public class GuiUtils {

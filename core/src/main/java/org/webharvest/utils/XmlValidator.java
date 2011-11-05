@@ -10,7 +10,7 @@ import javax.xml.parsers.SAXParser;
 import java.io.IOException;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 9, 2007
  */
 public class XmlValidator extends DefaultHandler {

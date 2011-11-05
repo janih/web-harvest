@@ -46,7 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Sep 18, 2007
  */
 public class GCPanel extends JPanel {

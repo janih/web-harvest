@@ -8,7 +8,7 @@ import org.webharvest.exception.ScraperXQueryException;
 import java.util.Properties;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Sep 4, 2007
  */
 public class XmlNodeWrapper {

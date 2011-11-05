@@ -1,7 +1,7 @@
 package org.bounce.text.xml;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: May 23, 2007
  */
 public class XmlParserUtils {

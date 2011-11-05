@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * @author: Vladimir Nikic
+ * @author Vladimir Nikic
  * Date: Apr 27, 2007
  */
 public class Settings implements Serializable {
