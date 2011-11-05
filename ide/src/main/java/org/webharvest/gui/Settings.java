@@ -372,7 +372,6 @@ public class Settings implements Serializable {
         plugins = new PluginInfo[pluginCount];
         for (int i = 0; i < pluginCount; i++) {
             plugins[i] = new PluginInfo(props.getProperty("plugin" + i + ".class"), props.getProperty("plugin" + i + ".uri"), null);
-            ;
             try {
                 DefinitionResolver.registerPlugin(plugins[i].getClassName(), plugins[i].getUri());
             } catch (PluginException e) {
