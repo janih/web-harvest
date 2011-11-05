@@ -188,10 +188,11 @@ public class AutoCompleter {
         }
     }
 
-    private void defineAttributeValuesMenu(String tagName, String attributeName, String attValuePrefix, NamespaceResolver nsResolver) {
+    private void defineAttributeValuesMenu(String tagQName, String attributeName, String attValuePrefix, NamespaceResolver nsResolver) {
         this.model.clear();
+        final QName qName = XmlNamespaceUtils.parseQName(tagQName, nsResolver);
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(tagName, null);
+        ElementInfo elementInfo = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
         if (elementInfo != null) {
             String[] suggs = getAttributeValueSuggestions(elementInfo, attributeName);
             if (suggs != null) {
@@ -205,6 +206,8 @@ public class AutoCompleter {
     }
 
     /**
+     * @param elementInfo element info
+     * @param attributeName attribute name
      * @return Array of suggested values for specified attribute - used for auto-completion in IDE.
      */
     private static String[] getAttributeValueSuggestions(ElementInfo elementInfo, String attributeName) {
