@@ -1,12 +1,14 @@
 package org.webharvest;
 
 import net.sf.saxon.om.NamespaceResolver;
+import org.apache.commons.lang.StringUtils;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.XmlUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.namespace.QName;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,6 +57,14 @@ public class XmlNamespaceUtils {
                 }
             };
         }
+    }
+
+    public static QName parseQName(String qName, NamespaceResolver nsResolver) {
+        final String nsPrefix = qName.contains(":") ? StringUtils.substringBefore(qName, ":") : "";
+        return new QName(
+                nsResolver.getURIForPrefix(nsPrefix, true),
+                StringUtils.isNotEmpty(nsPrefix) ? qName.substring(nsPrefix.length() + 1) : qName,
+                nsPrefix);
     }
 
 }

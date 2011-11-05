@@ -15,12 +15,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.xml.namespace.QName;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
@@ -427,20 +429,23 @@ public class AutoCompleter {
         }
     }
 
-    private void completeTag(String name) throws BadLocationException {
+    private void completeTag(String qNameStr) throws BadLocationException {
         Document document = xmlPane.getDocument();
-        int pos = xmlPane.getCaretPosition();
+        final int pos = xmlPane.getCaretPosition();
 
-        if (CDATA_NAME.equals(name)) {
+        if (CDATA_NAME.equals(qNameStr)) {
             document.insertString(pos, "<![CDATA[  ]]>".substring(this.prefixLength), null);
             xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
-        } else if (XML_COMMENT_NAME.equals(name)) {
+        } else if (XML_COMMENT_NAME.equals(qNameStr)) {
             document.insertString(pos, "<!--  -->".substring(this.prefixLength), null);
             xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
         } else {
-            ElementInfo info = DefinitionResolver.getElementInfo(name, null);
+            final QName qName = XmlNamespaceUtils.parseQName(qNameStr, XmlNamespaceUtils.getNamespaceResolverFromBrokenXml(document.getText(0, pos)));
+            final ElementInfo info = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
             if (info != null) {
-                String template = info.getTemplate(true).substring(this.prefixLength);
+                String template = MessageFormat.
+                        format(info.getTemplate(true), StringUtils.isNotEmpty(qName.getPrefix()) ? qName.getPrefix() + ":" : "").
+                        substring(this.prefixLength);
                 document.insertString(pos, template, null);
                 int closingIndex = template.lastIndexOf("</");
                 if (closingIndex >= 0) {

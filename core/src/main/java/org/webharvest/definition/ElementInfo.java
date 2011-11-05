@@ -124,17 +124,17 @@ public class ElementInfo {
      * @return Template with allowed attributes.
      */
     public String getTemplate(boolean onlyRequiredAtts) {
-        StringBuilder result = new StringBuilder("<" + this.name);
+        StringBuilder result = new StringBuilder().append("<{0}").append(this.name);
 
         for (String att : (onlyRequiredAtts ? this.requiredAttsSet : this.attsSet)) {
-            result.append(" ").append(att).append("=\"\"");
+            result.append(' ').append(att).append("=\"\"");
         }
 
         // if no valid subtags
         if (this.validTags != null && "".equals(this.validTags.trim())) {
             result.append("/>");
         } else {
-            result.append("></").append(name).append(">");
+            result.append("></{0}").append(name).append('>');
         }
 
         return result.toString();
