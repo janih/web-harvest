@@ -91,14 +91,14 @@ public class AutoCompleter {
     private JPopupMenu popupMenu = new JPopupMenu();
 
     // auto-completer list model
-    private DefaultListModel<String> model = new DefaultListModel<String>() {
+     private DefaultListModel model = new DefaultListModel() {
         public void addElement(String str) {
             super.addElement(" " + str + " ");
         }
     };
 
     // auto completer list
-    private JList<String> list = new JList<String>(model);
+    private JList list = new JList(model);
 
     // xml pane instance which this auto completer is bound to
     private XmlTextPane xmlPane;
@@ -390,7 +390,7 @@ public class AutoCompleter {
      * Action for auto complete items
      */
     public void doComplete() {
-        String selectedValue = list.getSelectedValue();
+        String selectedValue = (String) list.getSelectedValue();
         if (selectedValue != null) {
             selectedValue = selectedValue.trim();
             try {
