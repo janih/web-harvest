@@ -1,0 +1,4 @@
+- UI to register JDBC drives via GUI
+- <script> should be able to ignore returning value when it is not expected.
+- Retire explicit Variable wrapper. The expression ${x.toInt() < y.toInt()} should become ${x < y}
+- Passing variables by reference or by value? (consider the case of passing mutable collections)
