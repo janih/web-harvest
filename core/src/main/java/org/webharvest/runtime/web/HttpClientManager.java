@@ -58,6 +58,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -174,18 +175,7 @@ public class HttpClientManager {
             }
         }
 
-        // If cookie expiry date is not specified in the response, HttClient 3.1 doesn't send it back.
-        // This leads to inability to login to some sites, being always redirected to login page.
-        // Workaround here is to set cookies with null expiry dates to the current date.
-        // todo: remove this code if next version fixes the problem
-        Cookie[] cookies = clientState.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getExpiryDate() == null) {
-                    cookie.setExpiryDate(new Date());
-                }
-            }
-        }
+        fixCookiesWithoutExpirationDate(clientState);
 
         HttpMethodBase method;
         if ("post".equalsIgnoreCase(methodType)) {
@@ -216,6 +206,25 @@ public class HttpClientManager {
             return doExecute(url, method, followRedirects, retryAttempts, retryDelay, retryDelayFactor);
         } finally {
             method.releaseConnection();
+        }
+    }
+
+    private void fixCookiesWithoutExpirationDate(HttpState clientState) {
+        // If cookie expiry date is not specified in the response, HttpClient 3.1 doesn't send it back.
+        // This leads to inability to login to some sites, being always redirected to login page.
+        // Workaround here is to set cookies with null expiry dates to the current date plus 1 day
+        // ( patched by heysteveo - https://sourceforge.net/projects/web-harvest/forums/forum/591299/topic/4372223 post #10 )
+        // todo: remove this method if HttpClient 4.x fixes the problem
+        final Cookie[] cookies = clientState.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            final Calendar defaultExpirationDate = Calendar.getInstance();
+            defaultExpirationDate.setTime(new Date());
+            defaultExpirationDate.add(Calendar.DAY_OF_MONTH, 1);
+            for (Cookie cookie : cookies) {
+                if (cookie.getExpiryDate() == null) {
+                    cookie.setExpiryDate(defaultExpirationDate.getTime());
+                }
+            }
         }
     }
 
