@@ -62,11 +62,6 @@
             <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
         </repository>
         <repository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2/</url>
-        </repository>
-        <repository>
             <id>repository.apache.org/releases</id>
             <name>Apache repo (releases)</name>
             <url>https://repository.apache.org/content/repositories/releases/</url>
@@ -237,17 +232,17 @@
                 <artifactId>js</artifactId>
                 <version>1.7R2</version>
             </dependency>
+            <dependency>
+                <groupId>org.dbmaintain</groupId>
+                <artifactId>dbmaintain</artifactId>
+                <version>2.2</version>
+            </dependency>
 
             <!-- Saxon -->
 
             <dependency>
                 <groupId>net.sourceforge.saxon</groupId>
                 <artifactId>saxon</artifactId>
-                <version>9.1.0.8</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.saxon</groupId>
-                <artifactId>saxon-dom</artifactId>
                 <version>9.1.0.8</version>
             </dependency>
 
