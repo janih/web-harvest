@@ -2,3 +2,5 @@
 - <script> should be able to ignore returning value when it is not expected.
 - Retire explicit Variable wrapper. The expression ${x.toInt() < y.toInt()} should become ${x < y}
 - Passing variables by reference or by value? (consider the case of passing mutable collections)
+- Rework <database>. Use decent connection pool and clean all the resources properly.
+- What about transactions support for <database>?
