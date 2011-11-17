@@ -62,7 +62,7 @@
             <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
         </repository>
         <repository>
-            <id>repository.apache.org/releases</id>
+            <id>repository.apache.org (releases)</id>
             <name>Apache repo (releases)</name>
             <url>https://repository.apache.org/content/repositories/releases/</url>
         </repository>
@@ -80,6 +80,12 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -94,6 +100,18 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.4.3</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.0.4</version>
+                </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.3.1</version>

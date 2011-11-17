@@ -67,7 +67,7 @@
                     <artifactItems/>
                     <includeScope>compile</includeScope>
                     <includeScope>runtime</includeScope>
-                    <outputDirectory>${build.outputDirectory}</outputDirectory>
+                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
