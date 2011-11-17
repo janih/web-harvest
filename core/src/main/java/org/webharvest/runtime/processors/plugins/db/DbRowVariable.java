@@ -22,7 +22,7 @@ public class DbRowVariable extends NodeVariable {
     private Object data[] = null;
 
     public DbRowVariable(DbColumnDescription columnDescription[], Object data[]) {
-        super(null);
+        super(data);
         this.columnDescription = columnDescription;
         this.data = data;
     }

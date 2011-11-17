@@ -3,45 +3,23 @@ package org.webharvest.utils;
 import org.webharvest.exception.PluginException;
 
 import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.*;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 /**
  * Class loading utility - used for loading JDBC driver classes and plugin classes.
  */
 public class ClassLoaderUtil {
 
-    private static class DriverShim implements Driver {
-        private Driver driver;
-
-        DriverShim(Driver d) {
-            this.driver = d;
-        }
-        public boolean acceptsURL(String u) throws SQLException {
-            return this.driver.acceptsURL(u);
-        }
-        public Connection connect(String u, Properties p) throws SQLException {
-            return this.driver.connect(u, p);
-        }
-        public int getMajorVersion() {
-            return this.driver.getMajorVersion();
-        }
-        public int getMinorVersion() {
-            return this.driver.getMinorVersion();
-        }
-        public DriverPropertyInfo[] getPropertyInfo(String u, Properties p) throws SQLException {
-            return this.driver.getPropertyInfo(u, p);
-        }
-        public boolean jdbcCompliant() {
-            return this.driver.jdbcCompliant();
-        }
-    }
-
-    // class loader that insludes all JAR libraries in the working folder of the application. 
+    // class loader that insludes all JAR libraries in the working folder of the application.
     private static URLClassLoader rootClassLoader = null;
 
     /**
@@ -62,10 +40,10 @@ public class ClassLoaderUtil {
         if (entries != null) {
             for (int f = 0; f < entries.length; f++) {
                 File entry = entries[f];
-                if ( entry != null && !entry.isDirectory() && entry.getName().toLowerCase().endsWith(".jar") ) {
-                   try {
-                       String jarAbsolutePath = entry.getAbsolutePath();
-                       urls.add( new URL("jar:file:/" + jarAbsolutePath.replace('\\', '/') + "!/") );
+                if (entry != null && !entry.isDirectory() && entry.getName().toLowerCase().endsWith(".jar")) {
+                    try {
+                        String jarAbsolutePath = entry.getAbsolutePath();
+                        urls.add(new URL("jar:file:/" + jarAbsolutePath.replace('\\', '/') + "!/"));
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     }
@@ -81,14 +59,21 @@ public class ClassLoaderUtil {
         rootClassLoader = new URLClassLoader(urlsArray);
     }
 
-    public static void registerJDBCDriver(String driverClassName)
+    public static void registerJDBCDriver(final String driverClassName)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
         if (rootClassLoader == null) {
             defineRootLoader();
         }
-        
-        Driver driver = (Driver)Class.forName(driverClassName, true, rootClassLoader).newInstance();
-        DriverManager.registerDriver(new DriverShim(driver));
+
+        DriverManager.registerDriver((Driver) Proxy.newProxyInstance(
+                ClassLoader.getSystemClassLoader(),
+                new Class<?>[]{Driver.class},
+                new InvocationHandler() {
+                    final Driver driver = (Driver) Class.forName(driverClassName, true, rootClassLoader).newInstance();
+                    @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        return method.invoke(driver, args);
+                    }
+                }));
     }
 
     public static Class getPluginClass(String fullClassName) throws PluginException {
