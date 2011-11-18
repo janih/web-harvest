@@ -65,9 +65,9 @@ public class ConfigDocument implements DocumentListener {
         final Document document = xmlPane.getDocument();
         document.addDocumentListener(this);
         document.addUndoableEditListener( xmlPane.getUndoManager() );
-        document.putProperty( PlainDocument.tabSizeAttribute, new Integer(4) );
-        document.putProperty( XMLDocument.AUTO_INDENTATION_ATTRIBUTE, new Boolean(true) );
-        document.putProperty( XMLDocument.TAG_COMPLETION_ATTRIBUTE, new Boolean(true) );
+        document.putProperty( PlainDocument.tabSizeAttribute, 4);
+        document.putProperty( XMLDocument.AUTO_INDENTATION_ATTRIBUTE, true);
+        document.putProperty( XMLDocument.TAG_COMPLETION_ATTRIBUTE, true);
 
         Document doc = xmlPane.getDocument();
         int len = doc.getLength();

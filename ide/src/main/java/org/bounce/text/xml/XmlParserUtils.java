@@ -12,14 +12,14 @@ public class XmlParserUtils {
      *         of specified string.
      */
     public static String getIdentifier(String source) {
-        if (source == null && source.length() == 0) {
+        if (source.length() == 0) {
             return null;
         }
         
         StringBuilder buffer = new StringBuilder();
         int index = 0;
         int len = source.length();
-        boolean charOk = true;
+        boolean charOk;
         do {
             char ch = source.charAt(index);
             charOk = ( index == 0 && Character.isJavaIdentifierStart(ch) ) ||

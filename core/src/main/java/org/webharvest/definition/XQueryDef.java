@@ -82,10 +82,10 @@ public class XQueryDef extends ProcessorElementDef {
     }
 
     public IElementDef[] getOperationDefs() {
-        int size = externalParamDefs == null ? 1 : externalParamDefs.length + 1;
+        final int size = externalParamDefs == null ? 1 : externalParamDefs.length + 1;
         IElementDef[] result = new IElementDef[size];
-        for (int i = 0; i < externalParamDefs.length; i++) {
-            result[i] = externalParamDefs[i];
+        if (externalParamDefs != null) {
+            System.arraycopy(externalParamDefs, 0, result, 0, externalParamDefs.length);
         }
         result[result.length - 1] = this.xqDef;
 

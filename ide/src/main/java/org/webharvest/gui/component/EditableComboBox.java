@@ -154,8 +154,6 @@ abstract public class EditableComboBox extends WHComboBox {
             for ( int i = Math.max(0, fixedItemsSize); i < itemCount; i++ ) {
                 Object currItem = getItemAt(i);
                 if ( itemAsString.equals(currItem.toString()) ) {
-                    ActionListener[] actionListeners = getActionListeners();
-
                     disableActionListeners();
                     removeItem(currItem);
                     enableActionListeners();
@@ -235,15 +233,15 @@ abstract public class EditableComboBox extends WHComboBox {
         if (actionListeners == null) {
             actionListeners = getActionListeners();
         }
-        for (int j = 0; j < actionListeners.length; j++) {
-            removeActionListener( actionListeners[j] );
+        for (ActionListener actionListener : actionListeners) {
+            removeActionListener(actionListener);
         }
     }
 
     private void enableActionListeners() {
         if (actionListeners != null) {
-            for (int j = 0; j < actionListeners.length; j++) {
-                addActionListener( actionListeners[j] );
+            for (ActionListener actionListener : actionListeners) {
+                addActionListener(actionListener);
             }
             actionListeners = null;
         }

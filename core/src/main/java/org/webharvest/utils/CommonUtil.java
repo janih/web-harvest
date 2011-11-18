@@ -70,7 +70,7 @@ public class CommonUtil {
     }
 
     /**
-     * Contains pair of intger values
+     * Contains pair of integer values
      */
     public static class IntPair {
 
@@ -92,8 +92,7 @@ public class CommonUtil {
         public void defineFromString(String s, char separator, int maxValue) {
             int columnIndex = s.indexOf(separator);
             if (columnIndex == -1) {
-                x = Integer.parseInt(s);
-                y = x;
+                y = x = Integer.parseInt(s);
             } else {
                 if (columnIndex == 0) {
                     x = 1;
@@ -170,7 +169,7 @@ public class CommonUtil {
     }
 
     /**
-     * For the goven working path and file path returns absolute file path.
+     * For the given working path and file path returns absolute file path.
      *
      * @param workingPath
      * @param filePath
@@ -231,13 +230,13 @@ public class CommonUtil {
         try {
             String decoded = URLDecoder.decode(value, charset);
 
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for (int i = 0; i < decoded.length(); i++) {
                 char ch = decoded.charAt(i);
-                result += (ch == '#') ? "#" : URLEncoder.encode(String.valueOf(ch), charset);
+                result.append((ch == '#') ? "#" : URLEncoder.encode(String.valueOf(ch), charset));
             }
 
-            return result;
+            return result.toString();
         } catch (IllegalArgumentException e) {
             return value;
         }
@@ -251,7 +250,7 @@ public class CommonUtil {
         int index = url.indexOf("?");
         if (index >= 0) {
             try {
-                String result = url.substring(0, index + 1);
+                StringBuilder result = new StringBuilder(url.substring(0, index + 1));
                 String paramsPart = url.substring(index + 1);
                 StringTokenizer tokenizer = new StringTokenizer(paramsPart, "&");
                 while (tokenizer.hasMoreTokens()) {
@@ -260,17 +259,16 @@ public class CommonUtil {
                     if (eqIndex >= 0) {
                         String paramName = definition.substring(0, eqIndex);
                         String paramValue = definition.substring(eqIndex + 1);
-                        result += paramName + "=" + encodeUrlParam(paramValue, charset) + "&";
+                        result.append(paramName).append('=').append(encodeUrlParam(paramValue, charset)).append('&');
                     } else {
-                        result += encodeUrlParam(definition, charset) + "&";
+                        result.append(encodeUrlParam(definition, charset)).append('&');
                     }
                 }
 
-                if (result.endsWith("&")) {
-                    result = result.substring(0, result.length() - 1);
-                }
+                return result.charAt(result.length() - 1) == '&'
+                        ? result.substring(0, result.length() - 1)
+                        : result.toString();
 
-                return result;
             } catch (UnsupportedEncodingException e) {
                 throw new VariableException("Charset " + charset + " is not supported!", e);
             }

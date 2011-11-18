@@ -36,31 +36,31 @@ import java.util.Iterator;
 public class XML {
 
     /** The Character '&'. */
-    public static final Character AMP   = new Character('&');
+    public static final Character AMP   = '&';
 
     /** The Character '''. */
-    public static final Character APOS  = new Character('\'');
+    public static final Character APOS  = '\'';
 
     /** The Character '!'. */
-    public static final Character BANG  = new Character('!');
+    public static final Character BANG  = '!';
 
     /** The Character '='. */
-    public static final Character EQ    = new Character('=');
+    public static final Character EQ    = '=';
 
     /** The Character '>'. */
-    public static final Character GT    = new Character('>');
+    public static final Character GT    = '>';
 
     /** The Character '<'. */
-    public static final Character LT    = new Character('<');
+    public static final Character LT    = '<';
 
     /** The Character '?'. */
-    public static final Character QUEST = new Character('?');
+    public static final Character QUEST = '?';
 
     /** The Character '"'. */
-    public static final Character QUOT  = new Character('"');
+    public static final Character QUOT  = '"';
 
     /** The Character '/'. */
-    public static final Character SLASH = new Character('/');
+    public static final Character SLASH = '/';
 
     /**
      * Replace special characters with XML escapes:
@@ -332,7 +332,6 @@ public class XML {
         String       k;
         Iterator     keys;
         int          len;
-        String       s;
         Object       v;
         if (o instanceof JSONObject) {
 
@@ -351,11 +350,6 @@ public class XML {
             while (keys.hasNext()) {
                 k = keys.next().toString();
                 v = jo.get(k);
-                if (v instanceof String) {
-                    s = (String)v;
-                } else {
-                    s = null;
-                }
 
 // Emit content in body
 
@@ -414,7 +408,7 @@ public class XML {
             }
             return b.toString();
         } else {
-            s = (o == null) ? "null" : escape(o.toString());
+            final String s = (o == null) ? "null" : escape(o.toString());
             return (tagName == null) ? "\"" + s + "\"" :
                 (s.length() == 0) ? "<" + tagName + "/>" :
                 "<" + tagName + ">" + s + "</" + tagName + ">";

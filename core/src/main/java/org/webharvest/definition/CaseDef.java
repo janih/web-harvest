@@ -86,18 +86,15 @@ public class CaseDef extends ProcessorElementDef {
     public IElementDef[] getOperationDefs() {
         int size = (ifDefs == null ? 0 : ifDefs.length) + (elseDef == null ? 0 : 1);
         IElementDef[] result = new IElementDef[size];
-        int index = 0;
         if (ifDefs != null) {
-            for (; index < ifDefs.length; index++) {
-                result[index] = ifDefs[index];
-            }
+            System.arraycopy(ifDefs, 0, result, 0, ifDefs.length);
         }
 
         if (elseDef != null) {
-            result[index] = elseDef;
+            result[size - 1] = elseDef;
         }
 
         return result;
     }
-    
+
 }

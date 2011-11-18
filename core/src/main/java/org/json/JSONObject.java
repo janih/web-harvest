@@ -1000,7 +1000,7 @@ public class JSONObject {
      * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, int value) throws JSONException {
-        put(key, new Integer(value));
+        put(key, Integer.valueOf(value));
         return this;
     }
 
@@ -1014,7 +1014,7 @@ public class JSONObject {
      * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, long value) throws JSONException {
-        put(key, new Long(value));
+        put(key, Long.valueOf(value));
         return this;
     }
 
@@ -1336,16 +1336,11 @@ public class JSONObject {
             return "null";
         }
         if (value instanceof JSONString) {
-            Object o;
             try {
-                o = ((JSONString)value).toJSONString();
+                return ((JSONString)value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            if (o instanceof String) {
-                return (String)o;
-            }
-            throw new JSONException("Bad value from toJSONString: " + o);
         }
         if (value instanceof Number) {
             return numberToString((Number) value);
@@ -1388,10 +1383,7 @@ public class JSONObject {
         }
         try {
             if (value instanceof JSONString) {
-                Object o = ((JSONString)value).toJSONString();
-                if (o instanceof String) {
-                    return (String)o;
-                }
+                return ((JSONString)value).toJSONString();
             }
         } catch (Exception e) {
             /* forget about it */

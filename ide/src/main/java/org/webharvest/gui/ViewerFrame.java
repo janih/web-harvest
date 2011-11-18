@@ -63,7 +63,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Vladimir Nikic
- * Date: May 8, 2007
+ *         Date: May 8, 2007
  */
 public class ViewerFrame extends JFrame implements DropDownButtonListener, ActionListener {
 
@@ -76,6 +76,10 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     public static final int HTML_VIEW = 2;
     public static final int IMAGE_VIEW = 3;
     public static final int LIST_VIEW = 4;
+
+    public static final String MSG_NO_RESULT = "No results";
+    public static final String HTML_HEADER = "<html><head></head><body style='font-family:Tahoma,Verdana;font-size:11pt;'>";
+    public static final String HTML_FOOTER = "</body></html>";
 
     private abstract class MyAction extends AbstractAction {
 
@@ -422,28 +426,45 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
      * @param text XML text to be searched
      */
     private void evaluateXPath(String text) {
-        final String htmlHeader = "<html><head></head><body style='font-family:Tahoma,Verdana;font-size:11pt;'>";
-        final String htmlFooter = "</body></html>";
         try {
             ListVariable result = XmlUtil.evaluateXPath(text, xmlPane.getText(), runtimeConfig);
             java.util.List resultList = result.toList();
             if (resultList.size() == 0) {
-                this.xpathResultPane.setText(htmlHeader + "No results" + htmlFooter);
+                this.xpathResultPane.setText(
+                        new StringBuilder(HTML_HEADER.length() + MSG_NO_RESULT.length() + HTML_FOOTER.length()).
+                                append(HTML_HEADER).
+                                append(MSG_NO_RESULT).
+                                append(HTML_FOOTER).
+                                toString());
             } else {
-                String tableHtml = "<table width='100%' cellspacing='0' cellpadding='2'>";
+                StringBuilder tableHtml = new StringBuilder(HTML_HEADER);
+                tableHtml.append("<table width='100%' cellspacing='0' cellpadding='2'>");
                 Iterator iterator = resultList.iterator();
                 int index = 0;
                 while (iterator.hasNext()) {
                     index++;
                     Object curr = iterator.next();
-                    tableHtml += "<tr style='background:" + (index % 2 == 0 ? "#E1E1E1" : "#EEEEEE") + "'><td align='left' width='30'>" + index + ".&nbsp;</td><td align='left' nowrap>" + CommonUtil.escapeXml(curr.toString()) + "</td></tr>";
+                    tableHtml.append("<tr style='background:");
+                    tableHtml.append(index % 2 == 0 ? "#E1E1E1" : "#EEEEEE");
+                    tableHtml.append("'><td align='left' width='30'>");
+                    tableHtml.append(index);
+                    tableHtml.append(".&nbsp;</td><td align='left' nowrap>");
+                    tableHtml.append(CommonUtil.escapeXml(curr.toString()));
+                    tableHtml.append("</td></tr>");
                 }
-                tableHtml += "</table>";
-                this.xpathResultPane.setText(htmlHeader + tableHtml + htmlFooter);
+                tableHtml.append("</table>");
+                tableHtml.append(HTML_FOOTER);
+                this.xpathResultPane.setText(tableHtml.toString());
                 this.xpathResultPane.setCaretPosition(0);
             }
         } catch (XPathException e) {
-            String html = htmlHeader + "<div style='color:#800000'>" + e.getMessage() + "</div>" + htmlFooter;
+            String html = new StringBuilder().
+                    append(HTML_HEADER).
+                    append("<div style='color:#800000'>").
+                    append(e.getMessage()).
+                    append("</div>").
+                    append(HTML_FOOTER).
+                    toString();
             this.xpathResultPane.setText(html);
         }
     }

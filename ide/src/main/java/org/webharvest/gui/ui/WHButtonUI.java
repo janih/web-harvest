@@ -1,7 +1,8 @@
 package org.webharvest.gui.ui;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 
@@ -12,11 +13,6 @@ public class WHButtonUI extends BasicButtonUI {
     private Component comp = null;
 
     private boolean showDownArrow = false;
-    private boolean isDefaultColor = true;
-
-    public static ComponentUI createUI(JComponent c) {
-        return new WHButtonUI();
-    }
 
     public void installUI(JComponent c) {
         this.comp = c;
@@ -31,7 +27,6 @@ public class WHButtonUI extends BasicButtonUI {
         AbstractButton b = (AbstractButton) c;
         ButtonModel model = b.getModel();
         FontMetrics fm = b.getFontMetrics(b.getFont());
-        int mnemonicIndex = b.getDisplayedMnemonicIndex();
         int textShiftOffset = getTextShiftOffset();
 
         if (showDownArrow) {
@@ -42,7 +37,7 @@ public class WHButtonUI extends BasicButtonUI {
                     if (text != null && text.endsWith("...")) {
                         text = text.substring(0, text.length() - 3);
                     }
-                    if (text.length() > 0) {
+                    if (StringUtils.isNotEmpty(text)) {
                         text = text.substring(0, text.length() - 1);
                     } else {
                         text = "...";
@@ -73,10 +68,6 @@ public class WHButtonUI extends BasicButtonUI {
 
     public boolean isShowDownArrow() {
         return showDownArrow;
-    }
-
-    public void setShowDownArrow(boolean showDownArrow) {
-        this.showDownArrow = showDownArrow;
     }
 
 }

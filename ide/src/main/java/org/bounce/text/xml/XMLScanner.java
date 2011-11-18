@@ -39,7 +39,7 @@ import java.io.IOException;
  * Prinzing </b>. See:
  * http://java.sun.com/products/jfc/tsc/articles/text/editor_kit/
  * </p>
- * 
+ *
  * @version $Revision: 1.2 $, $Date: 2005/03/28 13:34:48 $
  * @author Edwin Dankert <edankert@gmail.com>
  */
@@ -59,17 +59,17 @@ public class XMLScanner {
     private long pos = 0;
 
     private XMLInputReader in = null;
-    
+
     private boolean valid = false;
-    
+
     /** The last token scanned */
     public String token = null;
-    
+
     /**
      * Constructs a scanner for the Document.
-     * 
+     *
      * @param document the document containing the XML content.
-     * 
+     *
      * @throws IOException
      */
     public XMLScanner( Document document) throws IOException {
@@ -82,19 +82,19 @@ public class XMLScanner {
         in.read();
         scan();
     }
-    
+
     /**
      * Returns true when no paint has invalidated the scanner.
-     * 
+     *
      * @return true when no paint has invalidated the output.
      */
     boolean isValid() {
         return valid;
     }
-    
+
     /**
      * Set valid when correct range is set.
-     * 
+     *
      * @param valid when correct range set.
      */
     void setValid( boolean valid) {
@@ -103,10 +103,10 @@ public class XMLScanner {
 
     /**
      * Sets the scanning range.
-     * 
+     *
      * @param start the start of the range.
      * @param end the end of the range.
-     * 
+     *
      * @throws IOException
      */
     public void setRange( int start, int end) throws IOException {
@@ -124,7 +124,7 @@ public class XMLScanner {
 
     /**
      * Gets the starting location of the current token in the document.
-     * 
+     *
      * @return the starting location.
      */
     public final int getStartOffset() {
@@ -134,7 +134,7 @@ public class XMLScanner {
 
     /**
      * Gets the end location of the current token in the document.
-     * 
+     *
      * @return the end location.
      */
     public final int getEndOffset() {
@@ -144,9 +144,9 @@ public class XMLScanner {
 
     /**
      * Scans the Xml Stream for XML specific tokens.
-     * 
+     *
      * @return the last location.
-     * 
+     *
      * @throws IOException
      */
     public long scan() throws IOException {
@@ -172,7 +172,7 @@ public class XMLScanner {
                     return l;
 
                 case 60: // '<'
-                    ch = in.read();
+                    in.read();
 
                     tagScanner = TAG_SCANNER;
                     tagScanner.reset();
@@ -582,11 +582,11 @@ public class XMLScanner {
      * Scans an elements attribute 'xxx:xxxx="hhhh"' or 'xmlns:xxxx="hhhh"'.
      */
     private class AttributeScanner extends Scanner {
-        private final int NAME = 0;
+        private static final int NAME = 0;
 
-        private final int VALUE = 1;
+        private static final int VALUE = 1;
 
-        private final int END = 2;
+        private static final int END = 2;
 
         private int mode = NAME;
 
@@ -746,7 +746,7 @@ public class XMLScanner {
 
         /**
          * Scan the input steam for a token.
-         * 
+         *
          * @param in the input stream reader.
          * @return the token.
          * @throws IOException
@@ -768,7 +768,7 @@ public class XMLScanner {
         /**
          * returns whether this scanner has finished scanning all it was
          * supposed to scan.
-         * 
+         *
          * @return true when the scanner is finished.
          */
         public boolean isFinished() {
@@ -785,7 +785,7 @@ public class XMLScanner {
 
         /**
          * returns the token value for the currently scanned text.
-         * 
+         *
          * @return the token value.
          */
         public int getToken() {
