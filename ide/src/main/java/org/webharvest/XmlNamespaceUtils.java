@@ -11,13 +11,12 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.namespace.QName;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class XmlNamespaceUtils {
 
     @SuppressWarnings({"finally", "ReturnInsideFinallyBlock"})
-    public static NamespaceResolver getNamespaceResolverFromBrokenXml(String xmlHeadFragment) {
+    public static WHNamespaceResolver getNamespaceResolverFromBrokenXml(String xmlHeadFragment) {
         int openIndex = xmlHeadFragment.lastIndexOf('<');
         int closeIndex = xmlHeadFragment.lastIndexOf('>');
 
@@ -55,20 +54,7 @@ public class XmlNamespaceUtils {
                         }
                     });
         } finally {
-            return new NamespaceResolver() {
-                @Override public String getURIForPrefix(String prefix, boolean useDefault) {
-                    if (useDefault || prefix.length() > 0) {
-                        final Stack<String> stack = nsMap.get(prefix);
-                        return stack == null ? null : stack.peek();
-                    } else {
-                        return null;
-                    }
-                }
-
-                @Override public Iterator iteratePrefixes() {
-                    return nsMap.keySet().iterator();
-                }
-            };
+            return new WHNamespaceResolver(nsMap);
         }
     }
 

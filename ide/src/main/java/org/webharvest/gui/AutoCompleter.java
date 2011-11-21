@@ -3,6 +3,7 @@ package org.webharvest.gui;
 import net.sf.saxon.om.NamespaceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.WHConstants;
+import org.webharvest.WHNamespaceResolver;
 import org.webharvest.XmlNamespaceUtils;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.ElementInfo;
@@ -238,7 +239,7 @@ public class AutoCompleter {
             final Document document = this.xmlPane.getDocument();
             final int offset = this.xmlPane.getCaretPosition();
             String text = document.getText(0, offset);
-            final NamespaceResolver nsResolver = XmlNamespaceUtils.getNamespaceResolverFromBrokenXml(text);
+            final NamespaceResolver nsResolver = getScraperNSResolver(text);
 
             int openindex = text.lastIndexOf('<');
             int closeindex = text.lastIndexOf('>');
@@ -443,7 +444,7 @@ public class AutoCompleter {
             document.insertString(pos, "<!--  -->".substring(this.prefixLength), null);
             xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
         } else {
-            final QName qName = XmlNamespaceUtils.parseQName(qNameStr, XmlNamespaceUtils.getNamespaceResolverFromBrokenXml(document.getText(0, pos)));
+            final QName qName = XmlNamespaceUtils.parseQName(qNameStr, getScraperNSResolver(document.getText(0, pos)));
             final ElementInfo info = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
             if (info != null) {
                 String template = MessageFormat.
@@ -456,6 +457,14 @@ public class AutoCompleter {
                 }
             }
         }
+    }
+
+    private NamespaceResolver getScraperNSResolver(String scraperXmlFragment) {
+        final WHNamespaceResolver resolver = XmlNamespaceUtils.getNamespaceResolverFromBrokenXml(scraperXmlFragment);
+        if (resolver.isEmpty()) {
+            resolver.addPrefix(StringUtils.EMPTY, WHConstants.XMLNS_CORE_10);
+        }
+        return resolver;
     }
 
 }
