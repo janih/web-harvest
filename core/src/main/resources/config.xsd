@@ -66,6 +66,7 @@
 					<xs:attribute name="url" use="required"/>
 					<xs:attribute name="method"/>
 					<xs:attribute name="follow-redirects"/>
+					<xs:attribute name="ignore-response-body"/>
 					<xs:attribute name="charset"/>
 					<xs:attribute name="username"/>
 					<xs:attribute name="password"/>

@@ -61,6 +61,7 @@ public class HttpDef extends ProcessorElementDef {
     private String password;
     private String cookiePolicy;
     private String followRedirects;
+    private String ignoreResponseBody;
 
     private String retryAttempts;
     private String retryDelay;
@@ -77,6 +78,7 @@ public class HttpDef extends ProcessorElementDef {
         this.password = xmlNode.getAttribute("password");
         this.cookiePolicy = xmlNode.getAttribute("cookie-policy");
         this.followRedirects = xmlNode.getAttribute("follow-redirects");
+        this.ignoreResponseBody = xmlNode.getAttribute("ignore-response-body");
 
         this.retryAttempts = CommonUtil.nvl(xmlNode.getAttribute("retry-attempts"), DEFAULT_RETRY_ATTEMPTS);
         this.retryDelay = CommonUtil.nvl(xmlNode.getAttribute("retry-delay"), DEFAULT_RETRY_DELAY);
@@ -129,5 +131,9 @@ public class HttpDef extends ProcessorElementDef {
 
     public String getRetryDelayFactor() {
         return retryDelayFactor;
+    }
+
+    public String getIgnoreResponseBody() {
+        return ignoreResponseBody;
     }
 }

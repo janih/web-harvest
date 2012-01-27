@@ -51,23 +51,19 @@ public class HttpResponseWrapper {
 
     private String charset;
     private String mimeType;
-    private byte[] body;
     private KeyValuePair<String> headers[];
     private int statusCode;
     private String statusText;
+    private HttpMethodBase httpMethod;
 
     /**
      * Constructor - defines response result based on specified HttpMethodBase instance.
      *
-     * @param method
+     * @param method Http method object
      */
+    @SuppressWarnings({"unchecked"})
     public HttpResponseWrapper(HttpMethodBase method) {
-        try {
-            this.body = method.getResponseBody();
-        } catch (IOException e) {
-            // todo: handle exception
-            e.printStackTrace();
-        }
+        this.httpMethod = method;
 
         Header[] headerArray = method.getResponseHeaders();
         if (headerArray != null) {
@@ -90,7 +86,7 @@ public class HttpResponseWrapper {
     }
 
     public long getContentLength() {
-        return this.body == null ? 0 : this.body.length;
+        return httpMethod.getResponseContentLength();
     }
 
     public String getCharset() {
@@ -101,12 +97,30 @@ public class HttpResponseWrapper {
         return this.mimeType;
     }
 
+    /**
+     * @return byte array
+     * @deprecated Left only for backward compatibility. Use {@link #readBodyAsArray()} or {@link #getBodyAsInputStream()}
+     */
+    @Deprecated
     public byte[] getBody() {
-        return this.body;
+        return readBodyAsArray();
+    }
+
+    public byte[] readBodyAsArray() {
+        try {
+            return httpMethod.getResponseBody();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public InputStream getBodyAsInputStream() {
-        return new ByteArrayInputStream(body);
+        // TODO: Fix this so a real stream is returned. DO NOT CACHE THE ENTIRE RESPONSE IN THE MEMORY!
+        return new ByteArrayInputStream(readBodyAsArray());
+    }
+
+    public void skipBody() {
+        httpMethod.releaseConnection();
     }
 
     public KeyValuePair<String>[] getHeaders() {

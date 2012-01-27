@@ -580,6 +580,15 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute name="ignore-response-body" use="optional" default="no" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Specifies if the response body should be skipped. Skipping response corpus saves traffic and time for downloading.
+                            It is sometimes useful with POST requests when you send some data to the server to change the server state and you are
+                            not interested in the data (possibly large binary data, e.g. image or document) which is sent to you in a response.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="retry-attempts" use="optional" default="5" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>

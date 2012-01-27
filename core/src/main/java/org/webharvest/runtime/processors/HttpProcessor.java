@@ -42,6 +42,7 @@ import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
@@ -87,6 +88,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         final String username = BaseTemplater.evaluateToString(elementDef.getUsername(), null, scraper);
         final String password = BaseTemplater.evaluateToString(elementDef.getPassword(), null, scraper);
         final String cookiePolicy = BaseTemplater.evaluateToString(elementDef.getCookiePolicy(), null, scraper);
+        final boolean skipResponseBody = getBooleanValue(BaseTemplater.evaluateToString(elementDef.getIgnoreResponseBody(), null, scraper), false);
 
         final int retryAttempts = BaseTemplater.evaluateToVariable(elementDef.getRetryAttempts(), null, scraper).toInt();
         final long retryDelay = BaseTemplater.evaluateToVariable(elementDef.getRetryDelay(), null, scraper).toLong();
@@ -110,53 +112,66 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
                 method, followRedirects, isMultipart, encodedUrl, charset, username, password,
                 httpParams, httpHeaderMap, retryAttempts, retryDelay, retryDelayFactor);
 
+        final long declaredContentLength = res.getContentLength();
+        final long actualContentLength;
+
         scraper.removeRunningHttpProcessor();
-
-        final String mimeType = StringUtils.lowerCase(res.getMimeType());
-
-        long contentLength = res.getContentLength();
-        if (scraper.getLogger().isInfoEnabled()) {
-            scraper.getLogger().info("Downloaded: " + url + ", mime type = " + mimeType + ", length = " + contentLength + "B.");
-        }
 
         Variable result;
 
-        byte[] responseBody = res.getBody();
+        if (skipResponseBody) {
+            res.skipBody();
+            result = EmptyVariable.INSTANCE;
+            actualContentLength = 0;
 
-        if (mimeType != null && !isTextMimeType(mimeType)) {
-            result = new NodeVariable(responseBody);
         } else {
-            try {
-                // resolves charset in the following way:
-                //    1. if explicitly defined as charset attribute in http processor, then use it
-                //    2. if it is HTML document, reads first KB from response's body as ASCII stream
-                //       and tries to find meta tag with specified charset
-                //    3. use charset from response's header
-                //    4. uses default charset for the configuration
-                if (specifiedCharset == null) {
-                    final String responseCharset = res.getCharset();
-                    if (responseCharset != null && Charset.isSupported(responseCharset)) {
-                        charset = responseCharset;
-                    }
-                    if ("text/html".equals(mimeType)) {
-                        String firstBodyKb = new String(responseBody, 0, Math.min(responseBody.length, 1024), "ASCII");
-                        Matcher matcher = Pattern.compile(HTML_META_CHARSET_REGEX, Pattern.CASE_INSENSITIVE).matcher(firstBodyKb);
-                        if (matcher.find()) {
-                            String foundCharset = matcher.group(5);
-                            try {
-                                if (Charset.isSupported(foundCharset)) {
-                                    charset = foundCharset;
+            scraper.getLogger().info("Getting response ({} bytes)...", declaredContentLength);
+
+            final byte[] responseBody = res.readBodyAsArray();
+
+            final String mimeType = StringUtils.lowerCase(res.getMimeType());
+
+            actualContentLength = responseBody.length;
+
+            if (scraper.getLogger().isInfoEnabled()) {
+                scraper.getLogger().info("Downloaded: " + url + ", mime type = " + mimeType + ", length = " + actualContentLength + "B.");
+            }
+
+            if (mimeType != null && !isTextMimeType(mimeType)) {
+                result = new NodeVariable(responseBody);
+            } else {
+                try {
+                    // resolves charset in the following way:
+                    //    1. if explicitly defined as charset attribute in http processor, then use it
+                    //    2. if it is HTML document, reads first KB from response's body as ASCII stream
+                    //       and tries to find meta tag with specified charset
+                    //    3. use charset from response's header
+                    //    4. uses default charset for the configuration
+                    if (specifiedCharset == null) {
+                        final String responseCharset = res.getCharset();
+                        if (responseCharset != null && Charset.isSupported(responseCharset)) {
+                            charset = responseCharset;
+                        }
+                        if ("text/html".equals(mimeType)) {
+                            String firstBodyKb = new String(responseBody, 0, Math.min(responseBody.length, 1024), "ASCII");
+                            Matcher matcher = Pattern.compile(HTML_META_CHARSET_REGEX, Pattern.CASE_INSENSITIVE).matcher(firstBodyKb);
+                            if (matcher.find()) {
+                                String foundCharset = matcher.group(5);
+                                try {
+                                    if (Charset.isSupported(foundCharset)) {
+                                        charset = foundCharset;
+                                    }
+                                } catch (IllegalCharsetNameException e) {
+                                    // do nothing - charset will not be set here
                                 }
-                            } catch (IllegalCharsetNameException e) {
-                                // do nothing - charset will not be set here
                             }
                         }
                     }
-                }
-                result = new NodeVariable(new String(responseBody, charset));
+                    result = new NodeVariable(new String(responseBody, charset));
 
-            } catch (UnsupportedEncodingException e) {
-                throw new HttpException("Charset " + charset + " is not supported!", e);
+                } catch (UnsupportedEncodingException e) {
+                    throw new HttpException("Charset " + charset + " is not supported!", e);
+                }
             }
         }
 
@@ -164,10 +179,14 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         this.setProperty("Method", method);
         this.setProperty("Follow-Redirects", followRedirects);
         this.setProperty("Multipart", String.valueOf(isMultipart));
-        this.setProperty("Charset", charset);
-        this.setProperty("Content length", String.valueOf(contentLength));
         this.setProperty("Status code", res.getStatusCode());
         this.setProperty("Status text", res.getStatusText());
+        this.setProperty("Skip Response Body", skipResponseBody);
+        this.setProperty("Declared Content length", String.valueOf(declaredContentLength));
+        if (!skipResponseBody) {
+            this.setProperty("Received Content length", String.valueOf(actualContentLength));
+            this.setProperty("Charset", charset);
+        }
 
         KeyValuePair<String>[] headerPairs = res.getHeaders();
         if (headerPairs != null) {
