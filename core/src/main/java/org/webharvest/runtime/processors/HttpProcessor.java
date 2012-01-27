@@ -108,6 +108,8 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);
 
+        scraper.getLogger().info("Executing method {}...", method);
+
         final HttpResponseWrapper res = manager.execute(
                 method, followRedirects, isMultipart, encodedUrl, charset, username, password,
                 httpParams, httpHeaderMap, retryAttempts, retryDelay, retryDelayFactor);
@@ -120,6 +122,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         Variable result;
 
         if (skipResponseBody) {
+            scraper.getLogger().info("Skipping response ({} bytes)", declaredContentLength);
             res.skipBody();
             result = EmptyVariable.INSTANCE;
             actualContentLength = 0;
