@@ -101,6 +101,12 @@ public class DatabasePlugin extends WebHarvestPlugin {
                     Object rowData[] = new Object[columnCount];
                     for (int i = 0; i < columnCount; i++) {
                         switch (colDescs[i].getType()) {
+                            case Types.TIME:
+                                rowData[i] = resultSet.getTime(i + 1); break;
+                            case Types.TIMESTAMP:
+                                rowData[i] = resultSet.getTimestamp(i + 1); break;
+                            case Types.DATE:
+                                rowData[i] = resultSet.getDate(i + 1); break;
                             case Types.FLOAT:
                                 rowData[i] = resultSet.getFloat(i + 1); break;
                             case Types.DOUBLE:
