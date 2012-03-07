@@ -41,6 +41,7 @@ import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
 /**
@@ -54,17 +55,16 @@ public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
-        Variable value = getBodyTextContent(elementDef, scraper, context);
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
         if (httpProcessor != null) {
-            httpProcessor.addHttpHeader(name, value.toString());
+            httpProcessor.addHttpHeader(name, getBodyTextContent(elementDef, scraper, context).toString());
             this.setProperty("Name", name);
         } else {
             throw new HttpException("Usage of http-header processor is not allowed outside of http processor!");
         }
 
-        return value;
+        return EmptyVariable.INSTANCE;
     }
 
 }

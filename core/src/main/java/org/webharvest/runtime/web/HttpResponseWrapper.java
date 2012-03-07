@@ -119,7 +119,7 @@ public class HttpResponseWrapper {
         return new ByteArrayInputStream(readBodyAsArray());
     }
 
-    public void skipBody() {
+    public void close() {
         httpMethod.releaseConnection();
     }
 

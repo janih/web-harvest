@@ -41,6 +41,7 @@ import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -59,11 +60,10 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);
         String fileName = BaseTemplater.evaluateToString(elementDef.getFilename(), null, scraper);
         String contentType = BaseTemplater.evaluateToString(elementDef.getContenttype(), null, scraper);
-        Variable value = new BodyProcessor(elementDef).execute(scraper, context);
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
         if (httpProcessor != null) {
-            httpProcessor.addHttpParam(name, isFile, fileName, contentType, value);
+            httpProcessor.addHttpParam(name, isFile, fileName, contentType, new BodyProcessor(elementDef).execute(scraper, context));
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);
@@ -72,7 +72,7 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
             throw new HttpException("Usage of http-param processor is not allowed outside of http processor!");
         }
 
-        return value;
+        return EmptyVariable.INSTANCE;
     }
 
 }

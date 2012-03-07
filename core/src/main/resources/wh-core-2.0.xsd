@@ -566,10 +566,10 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="multipart" use="optional" default="no" type="xs:string">
+                <xs:attribute name="content-type" use="optional" default="application/x-www-form-urlencoded" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
-                            Tells if form is multipart encoded (enabling data upload).
+                            HTTP request Content Type
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>

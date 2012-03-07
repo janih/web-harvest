@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.*;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
@@ -147,13 +148,13 @@ public class HttpClientManager {
     public HttpResponseWrapper execute(
             String methodType,
             Boolean followRedirects,
-            Boolean multipart,
+            String contentType,
             String url,
             String charset,
             String username,
             String password,
-            Map<String, HttpParamInfo> params,
-            Map headers, int retryAttempts, long retryDelay, double retryDelayFactor) throws InterruptedException {
+            Variable bodyContent, Map<String, HttpParamInfo> params,
+            Map headers, int retryAttempts, long retryDelay, double retryDelayFactor) throws InterruptedException, UnsupportedEncodingException {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
@@ -179,7 +180,7 @@ public class HttpClientManager {
 
         HttpMethodBase method;
         if ("post".equalsIgnoreCase(methodType)) {
-            method = createPostMethod(url, params, multipart, charset);
+            method = createPostMethod(url, params, contentType, charset, bodyContent);
         } else {
             method = createGetMethod(url, params, charset, followRedirects);
         }
@@ -202,10 +203,15 @@ public class HttpClientManager {
             identifyAsDefaultBrowser(method);
         }
 
+        HttpResponseWrapper responseWrapper = null;
         try {
-            return doExecute(url, method, followRedirects, retryAttempts, retryDelay, retryDelayFactor);
+            responseWrapper = doExecute(url, method, followRedirects, retryAttempts, retryDelay, retryDelayFactor);
+            return responseWrapper;
         } finally {
-            method.releaseConnection();
+            if (responseWrapper == null) {
+                // i.e. an exception need thrown
+                method.releaseConnection();
+            }
         }
     }
 
@@ -304,12 +310,13 @@ public class HttpClientManager {
         method.addRequestHeader(new Header("User-Agent", DEFAULT_USER_AGENT));
     }
 
-    private HttpMethodBase createPostMethod(String url, Map<String, HttpParamInfo> params, boolean multipart, String charset) {
+    private HttpMethodBase createPostMethod(String url, Map<String, HttpParamInfo> params, String contentType, String charset, Variable bodyContent)
+            throws UnsupportedEncodingException {
         PostMethod method = new PostMethod(url);
 
         int filenameIndex = 1;
         if (params != null) {
-            if (multipart) {
+            if ("multipart/form-data".equals(contentType)) {
                 Part[] parts = new Part[params.size()];
                 int index = 0;
                 for (Map.Entry<String, HttpParamInfo> entry : params.entrySet()) {
@@ -323,19 +330,23 @@ public class HttpClientManager {
                             filename = "uploadedfile_" + filenameIndex;
                             filenameIndex++;
                         }
-                        String contentType = httpParamInfo.getContentType();
-                        if (CommonUtil.isEmptyString(contentType)) {
-                            contentType = null;
+                        String paramContentType = httpParamInfo.getContentType();
+                        if (CommonUtil.isEmptyString(paramContentType)) {
+                            paramContentType = null;
                         }
 
                         byte[] bytes = value.toBinary(charset);
-                        parts[index] = new FilePart(httpParamInfo.getName(), new ByteArrayPartSource(filename, bytes), contentType, charset);
+                        parts[index] = new FilePart(httpParamInfo.getName(), new ByteArrayPartSource(filename, bytes), paramContentType, charset);
                     } else {
                         parts[index] = new StringPart(name, CommonUtil.nvl(value, ""), charset);
                     }
                     index++;
                 }
                 method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
+
+            } else if (StringUtils.startsWith(contentType, "text/") || StringUtils.startsWith(contentType, "application/xml")) {
+                method.setRequestEntity(new StringRequestEntity(bodyContent.toString(charset), contentType, charset));
+
             } else {
                 NameValuePair[] paramArray = new NameValuePair[params.size()];
                 int index = 0;

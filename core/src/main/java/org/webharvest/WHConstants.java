@@ -366,6 +366,7 @@ public class WHConstants {
             "model/vnd.dwf",
             "model/vrml",
             "model/x-pov",
+            "multipart/form-data",
             "multipart/x-gzip",
             "multipart/x-ustar",
             "multipart/x-zip",

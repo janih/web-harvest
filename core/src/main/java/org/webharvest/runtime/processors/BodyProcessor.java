@@ -4,6 +4,7 @@ import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -44,7 +45,9 @@ public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
                         result.addVariable(variable);
                     }
                 }
-                return result;
+                return result.isEmpty() ? EmptyVariable.INSTANCE
+                        : result.getList().size() == 1 ? CommonUtil.createVariable(result.get(0))
+                        : result;
             }
         });
     }

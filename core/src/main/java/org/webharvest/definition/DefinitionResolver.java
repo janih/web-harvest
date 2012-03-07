@@ -119,7 +119,7 @@ public class DefinitionResolver {
                 "id,!path,action,type,charset,listfilter,listfiles,listdirs,listrecursive",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("http", HttpDef.class, HttpProcessor.class, null,
-                "id,!url,method,follow-redirects,ignore-response-body,retry-attempts,retry-delay,retry-delay-factor,multipart,charset,username,password,cookie-policy",
+                "id,!url,method,follow-redirects,ignore-response-body,retry-attempts,retry-delay,retry-delay-factor,content-type,charset,username,password,cookie-policy",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("http-param", HttpParamDef.class, HttpParamProcessor.class, null, "id,!name,isfile,filename,contenttype",
                 XMLNS_CORE_10, XMLNS_CORE);

@@ -150,7 +150,7 @@ public class ListVariable extends Variable implements Iterable {
         }
     }
 
-    private Collection<Variable> getList() {
+    public Collection<Variable> getList() {
         return this.list;
     }
 

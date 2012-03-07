@@ -47,14 +47,14 @@ import java.util.concurrent.TimeUnit;
 public class HttpDef extends ProcessorElementDef {
 
     public static final String DEFAULT_METHOD = "get";
-    public static final String DEFAULT_MULTIPART = "false";
+    public static final String DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
     private static final String DEFAULT_RETRY_ATTEMPTS = Integer.toString(5);
     private static final String DEFAULT_RETRY_DELAY = Long.toString(TimeUnit.SECONDS.toMillis(10));
     private static final String DEFAULT_RETRY_DELAY_FACTOR = Double.toString(2);
 
     private String method;
-    private String multipart;
+    private String contentType;
     private String url;
     private String charset;
     private String username;
@@ -71,7 +71,7 @@ public class HttpDef extends ProcessorElementDef {
         super(xmlNode, processorClass);
 
         this.method = CommonUtil.nvl(xmlNode.getAttribute("method"), DEFAULT_METHOD);
-        this.multipart = CommonUtil.nvl(xmlNode.getAttribute("multipart"), DEFAULT_MULTIPART);
+        this.contentType = CommonUtil.nvl(xmlNode.getAttribute("content-type"), DEFAULT_CONTENT_TYPE);
         this.url = xmlNode.getAttribute("url");
         this.charset = xmlNode.getAttribute("charset");
         this.username = xmlNode.getAttribute("username");
@@ -93,8 +93,8 @@ public class HttpDef extends ProcessorElementDef {
         return followRedirects;
     }
 
-    public String getMultipart() {
-        return multipart;
+    public String getContentType() {
+        return contentType;
     }
 
     public String getUrl() {
