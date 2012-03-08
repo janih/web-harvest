@@ -36,12 +36,16 @@
 */
 package org.webharvest.runtime.processors;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
+
+import java.util.concurrent.Callable;
 
 /**
  * OnError processor - sets .
@@ -52,22 +56,35 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
         super(tryDef);
     }
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         try {
             ProcessorElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor(tryBodyDef).run(scraper, context);
             debug(tryBodyDef, scraper, result);
 
             return result;
-        } catch (BaseException e) {
+        } catch (final BaseException e) {
+            if (Thread.interrupted()) {
+                Thread.currentThread().interrupt();
+                final int interruptedExceptionIndexInChain = ExceptionUtils.indexOfType(e, InterruptedException.class);
+                throw (interruptedExceptionIndexInChain < 0)
+                        ? new InterruptedException(e.getMessage())
+                        : (InterruptedException) ExceptionUtils.getThrowableList(e).get(interruptedExceptionIndexInChain);
+            }
             if (scraper.getLogger().isInfoEnabled()) {
                 scraper.getLogger().info("Exception caught with try processor: " + e.getMessage());
             }
-            ProcessorElementDef catchValueDef = elementDef.getCatchValueDef();
-            Variable result = new BodyProcessor(catchValueDef).run(scraper, context);
-            debug(catchValueDef, scraper, result);
 
-            return result;
+            return context.executeWithinNewContext(new Callable<Variable>() {
+                @Override
+                public Variable call() throws Exception {
+                    context.setLocalVar("_error", CommonUtil.createVariable(e));
+                    final ProcessorElementDef catchValueDef = elementDef.getCatchValueDef();
+                    final Variable res = new BodyProcessor(catchValueDef).run(scraper, context);
+                    debug(catchValueDef, scraper, res);
+                    return res;
+                }
+            });
         }
     }
 

@@ -39,6 +39,7 @@ package org.webharvest.utils;
 import net.sf.saxon.trans.XPathException;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.ScraperXPathException;
+import org.webharvest.exception.UserException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -200,6 +201,10 @@ public class SystemUtilities {
 
     public String getCurrentDir() {
         return scraper.getConfiguration().getSourceFile().getParentFile().getAbsolutePath();
+    }
+
+    public void error(String message) {
+        throw new UserException(message);
     }
 
 }

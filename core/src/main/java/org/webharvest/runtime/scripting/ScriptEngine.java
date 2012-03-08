@@ -36,6 +36,8 @@
 */
 package org.webharvest.runtime.scripting;
 
+import org.webharvest.exception.BaseException;
+import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -80,6 +82,10 @@ public abstract class ScriptEngine {
             }
 
             return result;
+        } catch (BaseException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ScriptException(e);
         } finally {
             afterEvaluation();
         }
