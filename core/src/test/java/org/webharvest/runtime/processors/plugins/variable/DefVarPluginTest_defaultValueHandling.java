@@ -45,6 +45,7 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.mock.annotation.Dummy;
+import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
@@ -80,13 +81,13 @@ public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
         assertReflectionEquals(new NodeVariable("zzz"), context.getVar("x"));
     }
 
-    @Test(expectedExceptions = MissingPropertyException.class)
+    @Test(expectedExceptions = ScriptException.class)
     public void testExecutePlugin_default_notResolvedVarInConcatenation() throws Exception {
         createPlugin("<def var='x' value='a ${x} b' default='zzz'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
-    @Test(expectedExceptions = MissingPropertyException.class)
+    @Test(expectedExceptions = ScriptException.class)
     public void testExecutePlugin_default_notResolvedVarInExpression() throws Exception {
         createPlugin("<def var='x' value='${x+1}' default='zzz'/>",
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
