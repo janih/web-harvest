@@ -1,5 +1,6 @@
 package org.webharvest.runtime.processors.plugins.db;
 
+import org.apache.commons.dbutils.DbUtils;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -46,12 +47,14 @@ public class DatabasePlugin extends WebHarvestPlugin {
         Variable body = executeBody(scraper, context);
         String sql = body.toString();
 
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
         try {
             conn.setAutoCommit(isAutoCommit);
-            PreparedStatement statement = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            statement = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             int index = 1;
             if (dbParams != null) {
-                for (DbParamInfo paramInfo: dbParams) {
+                for (DbParamInfo paramInfo : dbParams) {
                     if ("int".equalsIgnoreCase(paramInfo.type)) {
                         try {
                             int intValue = Integer.parseInt(paramInfo.value.toString());
@@ -81,9 +84,9 @@ public class DatabasePlugin extends WebHarvestPlugin {
                     index++;
                 }
             }
-            
+
             statement.execute();
-            ResultSet resultSet = statement.getResultSet();
+            resultSet = statement.getResultSet();
 
             if (resultSet != null) {
                 ResultSetMetaData metadata = resultSet.getMetaData();
@@ -97,38 +100,46 @@ public class DatabasePlugin extends WebHarvestPlugin {
                 }
 
                 int rowCount = 0;
-                while ( resultSet.next() && (maxRows < 0 || rowCount < maxRows) ) {
+                while (resultSet.next() && (maxRows < 0 || rowCount < maxRows)) {
                     Object rowData[] = new Object[columnCount];
                     for (int i = 0; i < columnCount; i++) {
                         switch (colDescs[i].getType()) {
                             case Types.TIME:
-                                rowData[i] = resultSet.getTime(i + 1); break;
+                                rowData[i] = resultSet.getTime(i + 1);
+                                break;
                             case Types.TIMESTAMP:
-                                rowData[i] = resultSet.getTimestamp(i + 1); break;
+                                rowData[i] = resultSet.getTimestamp(i + 1);
+                                break;
                             case Types.DATE:
-                                rowData[i] = resultSet.getDate(i + 1); break;
+                                rowData[i] = resultSet.getDate(i + 1);
+                                break;
                             case Types.FLOAT:
-                                rowData[i] = resultSet.getFloat(i + 1); break;
+                                rowData[i] = resultSet.getFloat(i + 1);
+                                break;
                             case Types.DOUBLE:
                             case Types.DECIMAL:
                             case Types.NUMERIC:
                             case Types.REAL:
-                                rowData[i] = resultSet.getDouble(i + 1); break;
+                                rowData[i] = resultSet.getDouble(i + 1);
+                                break;
                             case Types.SMALLINT:
                             case Types.INTEGER:
                             case Types.TINYINT:
-                                rowData[i] = resultSet.getInt(i + 1); break;
+                                rowData[i] = resultSet.getInt(i + 1);
+                                break;
                             case Types.BLOB:
                             case Types.BINARY:
                             case Types.VARBINARY:
                             case Types.LONGVARBINARY:
-                                rowData[i] = resultSet.getBytes(i + 1); break;
+                                rowData[i] = resultSet.getBytes(i + 1);
+                                break;
                             default:
-                                rowData[i] = resultSet.getString(i + 1); break;
+                                rowData[i] = resultSet.getString(i + 1);
+                                break;
                         }
                     }
 
-                    queryResult.addVariable( new DbRowVariable(colDescs, rowData) );
+                    queryResult.addVariable(new DbRowVariable(colDescs, rowData));
                     rowCount++;
                 }
                 return queryResult;
@@ -137,13 +148,16 @@ public class DatabasePlugin extends WebHarvestPlugin {
             }
         } catch (SQLException e) {
             throw new DatabaseException(e);
+        } finally {
+            DbUtils.closeQuietly(resultSet);
+            DbUtils.closeQuietly(statement);
         }
-        
+
 
     }
 
     public String[] getValidAttributes() {
-        return new String[] {
+        return new String[]{
                 "jdbcclass",
                 "connection",
                 "username",
@@ -153,22 +167,22 @@ public class DatabasePlugin extends WebHarvestPlugin {
     }
 
     public String[] getRequiredAttributes() {
-        return new String[] {"jdbcclass", "connection"};
+        return new String[]{"jdbcclass", "connection"};
     }
 
     public String[] getAttributeValueSuggestions(String attributeName) {
         if ("output".equalsIgnoreCase(attributeName)) {
-            return new String[] {"text", "xml"};
+            return new String[]{"text", "xml"};
         } else if ("autocommit".equalsIgnoreCase(attributeName)) {
-            return new String[] {"true", "false"};
+            return new String[]{"true", "false"};
         }
         return null;
     }
 
 
     public Class[] getDependantProcessors() {
-        return new Class[] {
-            DbParamPlugin.class,
+        return new Class[]{
+                DbParamPlugin.class,
         };
     }
 
