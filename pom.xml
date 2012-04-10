@@ -45,6 +45,12 @@
         <url>http://web-harvest.svn.sourceforge.net/</url>
     </scm>
 
+    <properties>
+        <saxon.version>9.1.0.8</saxon.version>
+        <slf4j.version>1.6.3</slf4j.version>
+        <unitils.version>[3.1,)</unitils.version>
+    </properties>
+
     <modules>
         <module>core</module>
         <module>ide</module>
@@ -233,17 +239,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.6.3</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>1.6.3</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.6.3</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
@@ -271,12 +277,13 @@
             <dependency>
                 <groupId>net.sourceforge.saxon</groupId>
                 <artifactId>saxon</artifactId>
-                <version>9.1.0.8</version>
+                <version>${saxon.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.sf.saxon</groupId>
-                <artifactId>saxon-dom</artifactId>
-                <version>8.7</version>
+                <groupId>net.sourceforge.saxon</groupId>
+                <artifactId>saxon</artifactId>
+                <classifier>dom</classifier>
+                <version>${saxon.version}</version>
             </dependency>
 
             <!-- TEST SCOPE -->
@@ -294,37 +301,37 @@
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-spring</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-inject</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-testng</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-core</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-mock</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
-                <version>[3.1,)</version>
+                <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
 
