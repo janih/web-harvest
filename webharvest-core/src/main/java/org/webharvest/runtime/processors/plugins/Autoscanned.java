@@ -29,7 +29,7 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
- */
+*/
 package org.webharvest.runtime.processors.plugins;
 
 import java.lang.annotation.Documented;
@@ -40,9 +40,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation may be used on the web harvest plugin class to indicate
- * one or more target XML namespaces for the plugin. This information is taken
- * under consideration during plugin registration process.
+ * Indicates that the annotated plugin should be automatically registered in
+ * system. Web Harvest plugins can be autoscanned from classpath - these
+ * annotated with {@link Autoscanned} are eligible for automatic registration.
  *
  * @author Piotr Dyraga
  * @since 2.1.0-SNAPSHOT
@@ -52,10 +52,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Inherited
 @Documented
-public @interface TargetNamespace {
+public @interface Autoscanned {
 
-    /**
-     * Indicates target XML namespaces for the plugin.
-     */
-    String[] uri();
 }
