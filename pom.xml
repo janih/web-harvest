@@ -52,7 +52,7 @@
     </properties>
 
     <modules>
-        <module>core</module>
+        <module>webharvest-core</module>
         <module>ide</module>
     </modules>
 
