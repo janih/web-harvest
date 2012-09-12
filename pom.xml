@@ -53,7 +53,7 @@
 
     <modules>
         <module>webharvest-core</module>
-        <module>ide</module>
+        <module>webharvest-ide</module>
     </modules>
 
     <repositories>
