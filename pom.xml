@@ -13,6 +13,7 @@
     </description>
     <url>http://web-harvest.sourceforge.net/</url>
     <inceptionYear>2006</inceptionYear>
+
     <developers>
         <developer>
             <id>vnikic</id>
@@ -29,7 +30,29 @@
                 <role>Developer</role>
             </roles>
         </developer>
+        <developer>
+            <id>rbala</id>
+            <name>Robert Bala</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>pdyraga</id>
+            <name>Piotr Dyraga</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>mczapiewski</id>
+            <name>Maciej Czapiewski</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
     </developers>
+
     <licenses>
         <license>
             <name>BSD License</name>
@@ -41,8 +64,10 @@
             </comments>
         </license>
     </licenses>
+
     <scm>
         <url>http://web-harvest.svn.sourceforge.net/</url>
+        <connection>http://web-harvest.svn.sourceforge.net/</connection>
     </scm>
 
     <properties>
@@ -55,24 +80,6 @@
         <module>webharvest-core</module>
         <module>webharvest-ide</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>repo1.maven.org</id>
-            <name>http://repo1.maven.org/maven2/</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <id>ibiblio.org</id>
-            <name>ibiblio Mirror of http://repo1.maven.org/maven2/</name>
-            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-        </repository>
-        <repository>
-            <id>repository.apache.org (releases)</id>
-            <name>Apache repo (releases)</name>
-            <url>https://repository.apache.org/content/repositories/releases/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
