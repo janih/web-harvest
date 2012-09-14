@@ -61,6 +61,8 @@ import java.util.*;
 
 public class SettingsDialog extends CommonDialog implements ChangeListener {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     /**
      * List model implementation for the list of plugins.
      */
@@ -104,13 +106,13 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
 
             String errorMessage = null;
 
-            final boolean isAlreadyRegistered = DefinitionResolver.isPluginRegistered(className, uri);
+            final boolean isAlreadyRegistered = definitionResolver.isPluginRegistered(className, uri);
             if (!isAlreadyRegistered || throwErrIfRegistered) {
                 try {
                     if (isAlreadyRegistered) {
-                        DefinitionResolver.unregisterPlugin(className, uri);
+                        definitionResolver.unregisterPlugin(className, uri);
                     }
-                    DefinitionResolver.registerPlugin(className, uri);
+                    definitionResolver.registerPlugin(className, uri);
                 } catch (PluginException e) {
                     errorMessage = e.getMessage();
                 }
@@ -396,8 +398,8 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
                     if (!pluginInfo.equals(oldPluginInfo)) {
                         boolean isSet = pluginListModel.setElement(pluginInfo, index);
                         if (isSet) {
-                            DefinitionResolver.unregisterPlugin(oldPluginInfo.getClassName(), pluginInfo.getUri());
-                            DefinitionResolver.registerPlugin(pluginInfo.getClassName(), pluginInfo.getUri());
+                            definitionResolver.unregisterPlugin(oldPluginInfo.getClassName(), pluginInfo.getUri());
+                            definitionResolver.registerPlugin(pluginInfo.getClassName(), pluginInfo.getUri());
                         }
                     }
                 }
@@ -408,7 +410,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             public void actionPerformed(ActionEvent e) {
                 int index = pluginsList.getSelectedIndex();
                 if (index >= 0) {
-                    DefinitionResolver.unregisterPlugin(pluginsList.getSelectedValue().toString(), pluginNamespaceUriField.getText().trim());
+                    definitionResolver.unregisterPlugin(pluginsList.getSelectedValue().toString(), pluginNamespaceUriField.getText().trim());
                     pluginListModel.remove(index);
                     pluginsList.setSelectedIndex(Math.min(index, pluginListModel.size() - 1));
                 }
@@ -503,15 +505,15 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             PluginInfo item = (PluginInfo) pluginListModel.get(i);
             listSet.add(item);
             if (item.isValid() && !pluginSet.contains(item)) {
-                DefinitionResolver.unregisterPlugin(item.getClassName(), item.getUri());
+                definitionResolver.unregisterPlugin(item.getClassName(), item.getUri());
             }
         }
 
         // register plugins unregistered during this setting session
         for (PluginInfo currPlugin : (Iterable<? extends PluginInfo>) CollectionUtils.subtract(pluginSet, listSet)) {
-            if (!DefinitionResolver.isPluginRegistered(currPlugin.getClassName(), currPlugin.getUri())) {
+            if (!definitionResolver.isPluginRegistered(currPlugin.getClassName(), currPlugin.getUri())) {
                 try {
-                    DefinitionResolver.registerPlugin(currPlugin.getClassName(), currPlugin.getUri());
+                    definitionResolver.registerPlugin(currPlugin.getClassName(), currPlugin.getUri());
                 } catch (PluginException e) {
                     // do nothing - ignore
                 }

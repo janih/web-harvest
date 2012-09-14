@@ -43,9 +43,11 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class RegexpDef extends ProcessorElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     private String max;
     private String replace;
-    
+
     private ProcessorElementDef regexpPatternDef;
     private ProcessorElementDef regexpSourceDef;
     private ProcessorElementDef regexpResultDef;
@@ -67,22 +69,22 @@ public class RegexpDef extends ProcessorElementDef {
         this.flagCanoneq = xmlNode.getAttribute("flag-canoneq");
 
         XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
-        DefinitionResolver.validate(regexpPatternDefNode);
+        definitionResolver.validate(regexpPatternDefNode);
         regexpPatternDef = regexpPatternDefNode == null ? null : new ProcessorElementDef(regexpPatternDefNode, "regexp-pattern");
-        
+
         XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
-        DefinitionResolver.validate(regexpSourceDefNode);
+        definitionResolver.validate(regexpSourceDefNode);
         regexpSourceDef = regexpSourceDefNode == null ? null : new ProcessorElementDef(regexpSourceDefNode, "regexp-source");
-        
+
         XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
-        DefinitionResolver.validate(regexpResultDefNode);
+        definitionResolver.validate(regexpResultDefNode);
         regexpResultDef = regexpResultDefNode == null ? null : new ProcessorElementDef(regexpResultDefNode, "regexp-result");
     }
 
     public String getMax() {
         return max;
     }
-    
+
     public String getReplace() {
         return replace;
     }
@@ -108,16 +110,16 @@ public class RegexpDef extends ProcessorElementDef {
     }
 
     public ProcessorElementDef getRegexpPatternDef() {
-		return regexpPatternDef;
-	}
+        return regexpPatternDef;
+    }
 
-	public ProcessorElementDef getRegexpResultDef() {
-		return regexpResultDef;
-	}
+    public ProcessorElementDef getRegexpResultDef() {
+        return regexpResultDef;
+    }
 
-	public ProcessorElementDef getRegexpSourceDef() {
-		return regexpSourceDef;
-	}
+    public ProcessorElementDef getRegexpSourceDef() {
+        return regexpSourceDef;
+    }
 
     public String getShortElementName() {
         return "regexp";

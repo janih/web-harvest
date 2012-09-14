@@ -54,6 +54,8 @@ import java.util.Map;
  */
 public class ScraperConfiguration {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     public static final String DEFAULT_CHARSET = "UTF-8";
     private static final ScriptingLanguage DEFAULT_SCRIPTING_LANGUAGE = ScriptingLanguage.BEANSHELL;
 
@@ -123,7 +125,7 @@ public class ScraperConfiguration {
 
         for (Object element : node.getElementList()) {
             operations.add((element instanceof XmlNode)
-                    ? DefinitionResolver.createElementDefinition((XmlNode) element)
+                    ? definitionResolver.createElementDefinition((XmlNode) element)
                     : new ConstantDef(element.toString(), ConstantProcessor.class));
         }
     }

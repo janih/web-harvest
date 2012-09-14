@@ -59,6 +59,9 @@ import java.util.Properties;
  */
 public class CommandLine {
 
+    private static DefinitionResolver definitionResolver =
+        DefinitionResolver.INSTANCE;
+
     private static Map<String, String> getArgValue(String[] args, boolean caseSensitive) {
         Map<String, String> params = new HashMap<String, String>();
         for (String curr : args) {
@@ -140,7 +143,7 @@ public class CommandLine {
                     try {
                         final String pluginClass = StringUtils.substringBefore(pluginAndUri, ":");
                         final String pluginUri = StringUtils.substringAfter(pluginAndUri, ":");
-                        DefinitionResolver.registerPlugin(pluginClass, pluginUri);
+                        definitionResolver.registerPlugin(pluginClass, pluginUri);
                     } catch (PluginException e) {
                         System.out.println(e.getMessage());
                     }

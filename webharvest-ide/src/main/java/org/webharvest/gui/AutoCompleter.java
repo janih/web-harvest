@@ -39,7 +39,7 @@ import java.util.Set;
  */
 public class AutoCompleter {
 
-    // editor context which decides about auto completion type  
+    // editor context which decides about auto completion type
     private static final int TAG_CONTEXT = 0;
     private static final int ATTRIBUTE_CONTEXT = 1;
     private static final int ATTRIBUTE_VALUE_CONTEXT = 2;
@@ -55,6 +55,8 @@ public class AutoCompleter {
     private static final Font POPUP_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
     private static final Properties attrValuesProperties = org.webharvest.gui.ResourceManager.getAttrValuesProperties();
+
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     /**
      * Class that provides listener for key events inside completer popup menu.
@@ -145,7 +147,7 @@ public class AutoCompleter {
         this.model.clear();
 
         if (nsUri != null) {
-            for (ElementName elementName : DefinitionResolver.getElementInfos().keySet()) {
+            for (ElementName elementName : definitionResolver.getElementInfos().keySet()) {
                 if (elementName.getUri().equals(nsUri) && elementName.getName().startsWith(localNamePrefix)) {
                     final StringBuilder str = new StringBuilder();
                     if (StringUtils.isNotEmpty(nsPrefix)) {
@@ -176,7 +178,7 @@ public class AutoCompleter {
 
         this.model.clear();
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
+        ElementInfo elementInfo = definitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
         if (elementInfo != null) {
             for (Object attObj : elementInfo.getAttsSet()) {
                 if (attObj != null) {
@@ -193,7 +195,7 @@ public class AutoCompleter {
         this.model.clear();
         final QName qName = XmlNamespaceUtils.parseQName(tagQName, nsResolver);
 
-        ElementInfo elementInfo = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
+        ElementInfo elementInfo = definitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
         if (elementInfo != null) {
             String[] suggs = getAttributeValueSuggestions(elementInfo, attributeName);
             if (suggs != null) {
@@ -445,7 +447,7 @@ public class AutoCompleter {
             xmlPane.setCaretPosition(xmlPane.getCaretPosition() - 4);
         } else {
             final QName qName = XmlNamespaceUtils.parseQName(qNameStr, getScraperNSResolver(document.getText(0, pos)));
-            final ElementInfo info = DefinitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
+            final ElementInfo info = definitionResolver.getElementInfo(qName.getLocalPart(), qName.getNamespaceURI());
             if (info != null) {
                 String template = MessageFormat.
                         format(info.getTemplate(true), StringUtils.isNotEmpty(qName.getPrefix()) ? qName.getPrefix() + ":" : "").

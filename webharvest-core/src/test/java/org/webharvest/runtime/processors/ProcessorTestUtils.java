@@ -52,10 +52,13 @@ import java.io.StringReader;
  */
 public final class ProcessorTestUtils {
 
+    private static DefinitionResolver definitionResolver =
+        DefinitionResolver.INSTANCE;
+
     @SuppressWarnings({"unchecked"})
     public static <T extends AbstractProcessor> T processor(String xml) {
         return (T) ProcessorResolver.createProcessor(
-                DefinitionResolver.createElementDefinition(
+                definitionResolver.createElementDefinition(
                         XmlNode.getInstance(new InputSource(new StringReader(xml)))));
     }
 

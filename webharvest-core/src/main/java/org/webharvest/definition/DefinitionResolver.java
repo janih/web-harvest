@@ -36,14 +36,52 @@
 */
 package org.webharvest.definition;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.webharvest.deprecated.runtime.processors.CallProcessor10;
 import org.webharvest.deprecated.runtime.processors.VarDefProcessor;
 import org.webharvest.deprecated.runtime.processors.VarProcessor;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
-import org.webharvest.runtime.processors.*;
-import org.webharvest.runtime.processors.plugins.*;
+import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.CallParamProcessor;
+import org.webharvest.runtime.processors.CallProcessor;
+import org.webharvest.runtime.processors.CaseProcessor;
+import org.webharvest.runtime.processors.EmptyProcessor;
+import org.webharvest.runtime.processors.ExitProcessor;
+import org.webharvest.runtime.processors.FileProcessor;
+import org.webharvest.runtime.processors.FunctionProcessor;
+import org.webharvest.runtime.processors.HtmlToXmlProcessor;
+import org.webharvest.runtime.processors.HttpHeaderProcessor;
+import org.webharvest.runtime.processors.HttpParamProcessor;
+import org.webharvest.runtime.processors.HttpProcessor;
+import org.webharvest.runtime.processors.IncludeProcessor;
+import org.webharvest.runtime.processors.LoopProcessor;
+import org.webharvest.runtime.processors.RegexpProcessor;
+import org.webharvest.runtime.processors.ReturnProcessor;
+import org.webharvest.runtime.processors.ScriptProcessor;
+import org.webharvest.runtime.processors.TemplateProcessor;
+import org.webharvest.runtime.processors.TextProcessor;
+import org.webharvest.runtime.processors.TryProcessor;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.WhileProcessor;
+import org.webharvest.runtime.processors.XPathProcessor;
+import org.webharvest.runtime.processors.XQueryProcessor;
+import org.webharvest.runtime.processors.XsltProcessor;
+import org.webharvest.runtime.processors.plugins.JsonToXmlPlugin;
+import org.webharvest.runtime.processors.plugins.SleepPlugin;
+import org.webharvest.runtime.processors.plugins.TokenizePlugin;
+import org.webharvest.runtime.processors.plugins.ValueOfPlugin;
+import org.webharvest.runtime.processors.plugins.XmlToJsonPlugin;
 import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
 import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
 import org.webharvest.runtime.processors.plugins.mail.MailPlugin;
@@ -55,12 +93,6 @@ import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
-import static org.webharvest.WHConstants.XMLNS_CORE;
-import static org.webharvest.WHConstants.XMLNS_CORE_10;
-
 /**
  * Class contains information and logic to validate and crate definition classes for
  * parsed xml nodes from Web-Harvest configurations.
@@ -68,7 +100,12 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  * @author Vladimir Nikic
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class DefinitionResolver {
+public enum DefinitionResolver {
+
+    /**
+     * Singleton instance reference.
+     */
+    INSTANCE;
 
     private final static class PluginClassKey {
 
@@ -96,17 +133,20 @@ public class DefinitionResolver {
     }
 
     // used by auto-completer in GUI
-    private static Map<ElementName, ElementInfo> elementInfos = new TreeMap<ElementName, ElementInfo>();
+    private Map<ElementName, ElementInfo> elementInfos =
+        new TreeMap<ElementName, ElementInfo>();
 
-    // map containing pairs (class name, plugin element name) of externally registered plugins
-    private static Map<PluginClassKey, ElementName> externalPlugins = new LinkedHashMap<PluginClassKey, ElementName>();
+    // map containing pairs (class name, plugin element name)
+    // of externally registered plugins
+    private Map<PluginClassKey, ElementName> externalPlugins =
+        new LinkedHashMap<PluginClassKey, ElementName>();
 
     // map of external plugin dependencies
-    private static Map<ElementName, Class[]> externalPluginDependencies = new HashMap<ElementName, Class[]>();
+    private Map<ElementName, Class[]> externalPluginDependencies =
+        new HashMap<ElementName, Class[]>();
 
-    // defines all valid elements of Web-Harvest configuration file
 
-    static {
+    private DefinitionResolver() {
 
         // register processors
         registerInternalElement("config", ProcessorElementDef.class, null, null, "charset,scriptlang,id",
@@ -214,7 +254,7 @@ public class DefinitionResolver {
         registerPlugin(SleepPlugin.class, true, XMLNS_CORE);
     }
 
-    private static void registerInternalElement(String name,
+    private void registerInternalElement(String name,
                                                 Class<? extends IElementDef> defClass,
                                                 Class<? extends AbstractProcessor> processorClass,
                                                 String children, String attributes,
@@ -225,7 +265,7 @@ public class DefinitionResolver {
         }
     }
 
-    private static void registerPlugin(Class pluginClass, boolean isInternalPlugin, String... uris) {
+    private void registerPlugin(Class pluginClass, boolean isInternalPlugin, String... uris) {
         Assert.notNull(pluginClass);
         try {
             final Object pluginObj = pluginClass.newInstance();
@@ -274,21 +314,21 @@ public class DefinitionResolver {
         }
     }
 
-    public static void registerPlugin(Class pluginClass, String uri) throws PluginException {
+    public void registerPlugin(Class pluginClass, String uri) throws PluginException {
         registerPlugin(pluginClass, false, uri);
     }
 
-    public static void registerPlugin(String className, String uri) throws PluginException {
+    public void registerPlugin(String className, String uri) throws PluginException {
         registerPlugin(ClassLoaderUtil.getPluginClass(className), false, uri);
     }
 
-    public static void unregisterPlugin(Class pluginClass, String uri) {
+    public void unregisterPlugin(Class pluginClass, String uri) {
         if (pluginClass != null) {
             unregisterPlugin(pluginClass.getName(), uri);
         }
     }
 
-    public static void unregisterPlugin(String className, String uri) {
+    public void unregisterPlugin(String className, String uri) {
         final PluginClassKey key = new PluginClassKey(className, uri);
         // only external plugins can be unregistered
         if (externalPlugins.containsKey(key)) {
@@ -307,18 +347,18 @@ public class DefinitionResolver {
         }
     }
 
-    public static boolean isPluginRegistered(String className, String uri) {
+    public boolean isPluginRegistered(String className, String uri) {
         return externalPlugins.containsKey(new PluginClassKey(className, uri));
     }
 
-    public static boolean isPluginRegistered(Class pluginClass, String uri) {
+    public boolean isPluginRegistered(Class pluginClass, String uri) {
         return pluginClass != null && isPluginRegistered(pluginClass.getName(), uri);
     }
 
     /**
      * @return Map of all allowed element infos.
      */
-    public static Map<ElementName, ElementInfo> getElementInfos() {
+    public Map<ElementName, ElementInfo> getElementInfos() {
         return elementInfos;
     }
 
@@ -328,7 +368,7 @@ public class DefinitionResolver {
      * @return Instance of ElementInfo class for the specified element name,
      *         or null if no element is defined.
      */
-    public static ElementInfo getElementInfo(String name, String uri) {
+    public ElementInfo getElementInfo(String name, String uri) {
         return elementInfos.get(new ElementName(name, uri));
     }
 
@@ -340,7 +380,7 @@ public class DefinitionResolver {
      * @return Instance of IElementDef, or exception is thrown if cannot find
      *         appropriate element definition.
      */
-    public static IElementDef createElementDefinition(XmlNode node) {
+    public IElementDef createElementDefinition(XmlNode node) {
         final String nodeName = node.getName();
         final String nodeUri = node.getUri();
 
@@ -387,7 +427,7 @@ public class DefinitionResolver {
      *
      * @param node node
      */
-    public static void validate(XmlNode node) {
+    public void validate(XmlNode node) {
         if (node == null) {
             return;
         }
@@ -450,7 +490,7 @@ public class DefinitionResolver {
      * @return boolean
      * @deprecated Use {@link #isPluginRegistered(String className, String uri)}
      */
-    @Deprecated public static boolean isPluginRegistered(String className) {
+    @Deprecated public boolean isPluginRegistered(String className) {
         return externalPlugins.containsKey(new PluginClassKey(className, XMLNS_CORE_10));
     }
 
@@ -461,7 +501,7 @@ public class DefinitionResolver {
      * @return boolean
      * @deprecated Use {@link #isPluginRegistered(Class pluginClass, String uri)}
      */
-    @Deprecated public static boolean isPluginRegistered(Class pluginClass) {
+    @Deprecated public boolean isPluginRegistered(Class pluginClass) {
         return pluginClass != null && isPluginRegistered(pluginClass.getName(), XMLNS_CORE_10);
     }
 
@@ -474,7 +514,7 @@ public class DefinitionResolver {
      *          trouble
      * @deprecated Use {@link #registerPlugin(String className, String uri)}
      */
-    @Deprecated public static void registerPlugin(String className) throws PluginException {
+    @Deprecated public void registerPlugin(String className) throws PluginException {
         registerPlugin(ClassLoaderUtil.getPluginClass(className), false, XMLNS_CORE_10);
     }
 
@@ -486,7 +526,7 @@ public class DefinitionResolver {
      *          trouble
      * @deprecated Use {@link #unregisterPlugin(Class pluginClass, String uri)}
      */
-    @Deprecated public static void registerPlugin(Class pluginClass) throws PluginException {
+    @Deprecated public void registerPlugin(Class pluginClass) throws PluginException {
         registerPlugin(pluginClass, false, XMLNS_CORE_10);
     }
 
@@ -496,7 +536,7 @@ public class DefinitionResolver {
      * @param pluginClass plugin class
      * @deprecated Use {@link #unregisterPlugin(Class pluginClass, String uri)}
      */
-    @Deprecated public static void unregisterPlugin(Class pluginClass) {
+    @Deprecated public void unregisterPlugin(Class pluginClass) {
         unregisterPlugin(pluginClass, XMLNS_CORE_10);
     }
 
@@ -506,7 +546,7 @@ public class DefinitionResolver {
      * @param className class name
      * @deprecated Use {@link #unregisterPlugin(String className, String uri)}
      */
-    @Deprecated public static void unregisterPlugin(String className) {
+    @Deprecated public void unregisterPlugin(String className) {
         unregisterPlugin(className, XMLNS_CORE_10);
     }
 

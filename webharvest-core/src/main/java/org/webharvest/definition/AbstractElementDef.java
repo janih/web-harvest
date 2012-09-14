@@ -9,6 +9,8 @@ import java.util.List;
 
 public abstract class AbstractElementDef implements IElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     // sequence of operation definitions
     List<IElementDef> operationDefs = new ArrayList<IElementDef>();
     // text content if no nested operation definitions
@@ -35,7 +37,7 @@ public abstract class AbstractElementDef implements IElementDef {
                     for (Object element : elementList) {
                         if (element instanceof XmlNode) {
                             XmlNode currElementNode = (XmlNode) element;
-                            IElementDef def = DefinitionResolver.createElementDefinition(currElementNode);
+                            IElementDef def = definitionResolver.createElementDefinition(currElementNode);
                             if (def != null) {
                                 operationDefs.add(def);
                             }

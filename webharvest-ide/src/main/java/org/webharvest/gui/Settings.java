@@ -84,6 +84,8 @@ public class Settings implements Serializable {
     // list of recently open files
     private List recentFiles = new LinkedList();
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     public Settings() {
         try {
             readFromFile();
@@ -373,7 +375,7 @@ public class Settings implements Serializable {
         for (int i = 0; i < pluginCount; i++) {
             plugins[i] = new PluginInfo(props.getProperty("plugin" + i + ".class"), props.getProperty("plugin" + i + ".uri"), null);
             try {
-                DefinitionResolver.registerPlugin(plugins[i].getClassName(), plugins[i].getUri());
+                definitionResolver.registerPlugin(plugins[i].getClassName(), plugins[i].getUri());
             } catch (PluginException e) {
                 e.printStackTrace();
             }
@@ -419,7 +421,7 @@ public class Settings implements Serializable {
         for (int i = 0; i < pluginsCount; i++) {
             plugins[i] = new PluginInfo(readString(in, ""), WHConstants.XMLNS_CORE_10, null);
             try {
-                DefinitionResolver.registerPlugin(plugins[i].getClassName(), WHConstants.XMLNS_CORE_10);
+                definitionResolver.registerPlugin(plugins[i].getClassName(), WHConstants.XMLNS_CORE_10);
             } catch (PluginException e) {
                 e.printStackTrace();
             }

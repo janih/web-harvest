@@ -46,6 +46,8 @@ import java.util.List;
  */
 public class XQueryDef extends ProcessorElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     private ProcessorElementDef xqDef;
 
     private XQueryExternalParamDef[] externalParamDefs;
@@ -54,7 +56,7 @@ public class XQueryDef extends ProcessorElementDef {
         super(xmlNode, false, processorClass);
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
-        DefinitionResolver.validate(xqDefNode);
+        definitionResolver.validate(xqDefNode);
         xqDef = xqDefNode == null ? null : new ProcessorElementDef(xqDefNode, "xq-expression");
 
         List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
@@ -67,7 +69,7 @@ public class XQueryDef extends ProcessorElementDef {
             int index = 0;
             while (it.hasNext()) {
                 XmlNode currParamNode =  (XmlNode) it.next();
-                DefinitionResolver.validate(currParamNode);
+                definitionResolver.validate(currParamNode);
                 externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode, getProcessorClass());
             }
         }

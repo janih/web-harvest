@@ -43,28 +43,30 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class XsltDef extends ProcessorElementDef {
 
-	private ProcessorElementDef xmlDef;
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
+    private ProcessorElementDef xmlDef;
     private ProcessorElementDef stylesheetDef;
 
     public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
-        
+
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
-        DefinitionResolver.validate(xmlDefNode);
+        definitionResolver.validate(xmlDefNode);
         xmlDef = xmlDefNode == null ? null : new ProcessorElementDef(xmlDefNode, "xml");
 
         XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
-        DefinitionResolver.validate(stylesheetDefNode);
+        definitionResolver.validate(stylesheetDefNode);
         stylesheetDef = stylesheetDefNode == null ? null : new ProcessorElementDef(stylesheetDefNode, "stylesheet");
     }
 
     public ProcessorElementDef getStylesheetDef() {
-		return stylesheetDef;
-	}
+        return stylesheetDef;
+    }
 
-	public ProcessorElementDef getXmlDef() {
-		return xmlDef;
-	}
+    public ProcessorElementDef getXmlDef() {
+        return xmlDef;
+    }
 
     public String getShortElementName() {
         return "xslt";

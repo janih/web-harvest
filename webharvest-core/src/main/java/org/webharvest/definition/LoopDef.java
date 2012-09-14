@@ -43,6 +43,8 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class LoopDef extends ProcessorElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     private String maxloops;
     private String item;
     private String index;
@@ -55,11 +57,11 @@ public class LoopDef extends ProcessorElementDef {
         super(xmlNode, false, processorClass);
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
-        DefinitionResolver.validate(loopValueDefNode);
+        definitionResolver.validate(loopValueDefNode);
         this.loopValueDef = loopValueDefNode == null ? null : new ProcessorElementDef(loopValueDefNode, "list");
 
         XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
-        DefinitionResolver.validate(loopBodyDefNode);
+        definitionResolver.validate(loopBodyDefNode);
         this.loopBodyDef = loopBodyDefNode == null ? null : new ProcessorElementDef(loopBodyDefNode, "body");
 
         this.maxloops = xmlNode.getAttribute("maxloops");

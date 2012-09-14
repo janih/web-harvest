@@ -43,18 +43,20 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class TryDef extends ProcessorElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     private ProcessorElementDef tryBodyDef;
     private ProcessorElementDef catchValueDef;
 
     public TryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-    	super(xmlNode, false, processorClass);
+        super(xmlNode, false, processorClass);
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
-        DefinitionResolver.validate(tryBodyDefNode);
+        definitionResolver.validate(tryBodyDefNode);
         this.tryBodyDef = tryBodyDefNode == null ? null : new ProcessorElementDef(tryBodyDefNode, "body");
 
         XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
-        DefinitionResolver.validate(catchValueDefNode);
+        definitionResolver.validate(catchValueDefNode);
         this.catchValueDef = catchValueDefNode == null ? null : new ProcessorElementDef(catchValueDefNode, "catch");
     }
 

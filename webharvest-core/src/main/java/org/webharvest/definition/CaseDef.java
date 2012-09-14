@@ -46,6 +46,8 @@ import java.util.List;
  */
 public class CaseDef extends ProcessorElementDef {
 
+    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
     private IfDef[] ifDefs;
     private ProcessorElementDef elseDef;
 
@@ -61,13 +63,13 @@ public class CaseDef extends ProcessorElementDef {
             int index = 0;
             while (it.hasNext()) {
                 XmlNode currParamNode = (XmlNode) it.next();
-                DefinitionResolver.validate(currParamNode);
+                definitionResolver.validate(currParamNode);
                 ifDefs[index++] = new IfDef(currParamNode, getProcessorClass());
             }
         }
 
         XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
-        DefinitionResolver.validate(elseDefNode);
+        definitionResolver.validate(elseDefNode);
         elseDef = elseDefNode == null ? null : new ProcessorElementDef(elseDefNode, "else");
     }
 
