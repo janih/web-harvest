@@ -133,6 +133,7 @@ public enum DefinitionResolver {
     }
 
     // used by auto-completer in GUI
+    //TODO: refactor towards elements registry
     private Map<ElementName, ElementInfo> elementInfos =
         new TreeMap<ElementName, ElementInfo>();
 
@@ -281,12 +282,11 @@ public enum DefinitionResolver {
             for (String uri : uris) {
                 final ElementInfo elementInfo = new ElementInfo(
                         pluginName,
-                        pluginClass,
-                        isInternalPlugin,
                         WebHarvestPluginDef.class,
+                        null,
                         plugin.getTagDesc(),
                         plugin.getAttributeDesc(),
-                        null);
+                        pluginClass);
 
                 elementInfo.setPlugin(plugin);
 

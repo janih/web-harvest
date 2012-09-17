@@ -53,8 +53,7 @@ public class ElementInfo {
     // properties containing suggested attribute values
 
     private String name;
-    private Class pluginClass;
-    private boolean isInternalPlugin;
+    private Class<? extends WebHarvestPlugin> pluginClass;
     private Class<? extends IElementDef> definitionClass;
     private Class<? extends AbstractProcessor> processorClass;
     private String validTags;
@@ -74,16 +73,18 @@ public class ElementInfo {
 
     public ElementInfo(String name,
                        Class<? extends IElementDef> definitionClass,
-                       Class<? extends AbstractProcessor> processorClass, String validTags, String validAtts) {
-        this(name, null, true, definitionClass, validTags, validAtts, processorClass);
+                       Class<? extends AbstractProcessor> processorClass,
+                       String validTags, String validAtts) {
+        this(name, definitionClass, processorClass, validTags, validAtts, null);
     }
 
-    public ElementInfo(String name, Class pluginClass, boolean isInternalPlugin,
+    public ElementInfo(String name,
                        Class<? extends IElementDef> definitionClass,
-                       String validTags, String validAtts, Class<? extends AbstractProcessor> processorClass) {
+                       Class<? extends AbstractProcessor> processorClass,
+                       String validTags, String validAtts,
+                       Class<? extends WebHarvestPlugin> pluginClass) {
         this.name = name;
         this.pluginClass = pluginClass;
-        this.isInternalPlugin = isInternalPlugin;
         this.definitionClass = definitionClass;
         this.processorClass = processorClass;
         this.validTags = validTags;
@@ -143,10 +144,6 @@ public class ElementInfo {
 
     public Class getPluginClass() {
         return pluginClass;
-    }
-
-    public boolean isInternalPlugin() {
-        return isInternalPlugin;
     }
 
     public Class<? extends IElementDef> getDefinitionClass() {
