@@ -57,7 +57,7 @@ public class XQueryDef extends ProcessorElementDef {
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
         definitionResolver.validate(xqDefNode);
-        xqDef = xqDefNode == null ? null : new ProcessorElementDef(xqDefNode, "xq-expression");
+        xqDef = xqDefNode == null ? null : new ProcessorElementDef(xqDefNode, null);
 
         List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
 

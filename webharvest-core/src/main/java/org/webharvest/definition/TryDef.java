@@ -53,11 +53,11 @@ public class TryDef extends ProcessorElementDef {
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(tryBodyDefNode);
-        this.tryBodyDef = tryBodyDefNode == null ? null : new ProcessorElementDef(tryBodyDefNode, "body");
+        this.tryBodyDef = tryBodyDefNode == null ? null : new ProcessorElementDef(tryBodyDefNode, null);
 
         XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
         definitionResolver.validate(catchValueDefNode);
-        this.catchValueDef = catchValueDefNode == null ? null : new ProcessorElementDef(catchValueDefNode, "catch");
+        this.catchValueDef = catchValueDefNode == null ? null : new ProcessorElementDef(catchValueDefNode, null);
     }
 
     public ProcessorElementDef getTryBodyDef() {

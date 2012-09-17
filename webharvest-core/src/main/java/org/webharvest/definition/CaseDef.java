@@ -70,7 +70,7 @@ public class CaseDef extends ProcessorElementDef {
 
         XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
         definitionResolver.validate(elseDefNode);
-        elseDef = elseDefNode == null ? null : new ProcessorElementDef(elseDefNode, "else");
+        elseDef = elseDefNode == null ? null : new ProcessorElementDef(elseDefNode, null);
     }
 
     public IfDef[] getIfDefs() {

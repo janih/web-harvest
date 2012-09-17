@@ -46,11 +46,6 @@ public class ProcessorElementDef extends AbstractElementDef {
         this(node, true, processorClass);
     }
 
-    protected ProcessorElementDef(XmlNode node, String descName) {
-        this(node, (Class<AbstractProcessor>) null);
-        this.descName = descName;
-    }
-
     protected ProcessorElementDef(XmlNode node, boolean createBodyDefs, Class<? extends AbstractProcessor> processorClass) {
         super(node, createBodyDefs);
         this.processorClass = processorClass;

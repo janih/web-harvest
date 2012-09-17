@@ -403,7 +403,6 @@ public enum DefinitionResolver {
             if (elementDef instanceof WebHarvestPluginDef) {
                 WebHarvestPluginDef pluginDef = (WebHarvestPluginDef) elementDef;
                 pluginDef.setPluginClass(elementInfo.getPluginClass());
-                pluginDef.setPluginName(elementInfo.getName());
             }
             return elementDef;
         } catch (NoSuchMethodException e) {

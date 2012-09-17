@@ -46,6 +46,7 @@ public class XsltDef extends ProcessorElementDef {
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     private ProcessorElementDef xmlDef;
+
     private ProcessorElementDef stylesheetDef;
 
     public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
@@ -53,11 +54,11 @@ public class XsltDef extends ProcessorElementDef {
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
         definitionResolver.validate(xmlDefNode);
-        xmlDef = xmlDefNode == null ? null : new ProcessorElementDef(xmlDefNode, "xml");
+        xmlDef = xmlDefNode == null ? null : new ProcessorElementDef(xmlDefNode, null);
 
         XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
         definitionResolver.validate(stylesheetDefNode);
-        stylesheetDef = stylesheetDefNode == null ? null : new ProcessorElementDef(stylesheetDefNode, "stylesheet");
+        stylesheetDef = stylesheetDefNode == null ? null : new ProcessorElementDef(stylesheetDefNode, null);
     }
 
     public ProcessorElementDef getStylesheetDef() {

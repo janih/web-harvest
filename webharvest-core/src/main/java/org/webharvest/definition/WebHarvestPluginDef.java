@@ -1,6 +1,7 @@
 package org.webharvest.definition;
 
 import org.webharvest.exception.PluginException;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 
 import java.util.Map;
@@ -10,21 +11,20 @@ import java.util.Map;
  */
 public class WebHarvestPluginDef extends AbstractElementDef {
 
-    private XmlNode xmlNode;
-    private Class pluginClass;
-    private String name;
 
-    public WebHarvestPluginDef(XmlNode xmlNode) {
-        super(xmlNode, true);
-        this.xmlNode = xmlNode;
+    private Class<? extends AbstractProcessor> pluginClass;
+
+    public WebHarvestPluginDef(final XmlNode xmlNode) {
+        this(xmlNode, true);
+    }
+
+    public WebHarvestPluginDef(final XmlNode xmlNode,
+            final boolean createBodyDefs) {
+        super(xmlNode, createBodyDefs);
     }
 
     void setPluginClass(Class pluginClass) {
         this.pluginClass = pluginClass;
-    }
-
-    void setPluginName(String name) {
-        this.name = name;
     }
 
     public String getUri() {
@@ -53,10 +53,6 @@ public class WebHarvestPluginDef extends AbstractElementDef {
         }
 
         throw new PluginException("Cannot create plugin!");
-    }
-
-    public String getShortElementName() {
-        return xmlNode.getQName();
     }
 
 }

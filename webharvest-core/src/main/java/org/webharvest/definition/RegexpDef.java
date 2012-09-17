@@ -70,15 +70,15 @@ public class RegexpDef extends ProcessorElementDef {
 
         XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
         definitionResolver.validate(regexpPatternDefNode);
-        regexpPatternDef = regexpPatternDefNode == null ? null : new ProcessorElementDef(regexpPatternDefNode, "regexp-pattern");
+        regexpPatternDef = regexpPatternDefNode == null ? null : new ProcessorElementDef(regexpPatternDefNode, null);
 
         XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
         definitionResolver.validate(regexpSourceDefNode);
-        regexpSourceDef = regexpSourceDefNode == null ? null : new ProcessorElementDef(regexpSourceDefNode, "regexp-source");
+        regexpSourceDef = regexpSourceDefNode == null ? null : new ProcessorElementDef(regexpSourceDefNode, null);
 
         XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
         definitionResolver.validate(regexpResultDefNode);
-        regexpResultDef = regexpResultDefNode == null ? null : new ProcessorElementDef(regexpResultDefNode, "regexp-result");
+        regexpResultDef = regexpResultDefNode == null ? null : new ProcessorElementDef(regexpResultDefNode, null);
     }
 
     public String getMax() {

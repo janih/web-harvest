@@ -11,45 +11,41 @@ public abstract class AbstractElementDef implements IElementDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
+    protected XmlNode xmlNode;
     // sequence of operation definitions
-    List<IElementDef> operationDefs = new ArrayList<IElementDef>();
+    protected  List<IElementDef> operationDefs = new ArrayList<IElementDef>();
     // text content if no nested operation definitions
-    String body;
-    // element ID
-    String id;
-    // descriptive name
-    protected String descName = "*";
-    // location of this element in source XML
-    protected int lineNumber;
-    protected int columnNumber;
+    protected String body;
+
 
     protected AbstractElementDef(XmlNode node, boolean createBodyDefs) {
-        if (node != null) {
-            this.lineNumber = node.getLineNumber();
-            this.columnNumber = node.getColumnNumber();
+        if (node == null) {
+            throw new IllegalArgumentException("XmlNode must not be null.");
+        }
+        this.xmlNode = node;
 
-            this.id = node.getAttribute("id");
+        List<Serializable> elementList = node.getElementList();
 
-            List<Serializable> elementList = node.getElementList();
-
-            if (createBodyDefs) {
-                if (elementList != null && elementList.size() > 0) {
-                    for (Object element : elementList) {
-                        if (element instanceof XmlNode) {
-                            XmlNode currElementNode = (XmlNode) element;
-                            IElementDef def = definitionResolver.createElementDefinition(currElementNode);
-                            if (def != null) {
-                                operationDefs.add(def);
-                            }
-                        } else {
-                            operationDefs.add(new ConstantDef(element.toString(), ConstantProcessor.class));
+        if (createBodyDefs) {
+            if (elementList != null && elementList.size() > 0) {
+                for (Object element : elementList) {
+                    if (element instanceof XmlNode) {
+                        XmlNode currElementNode = (XmlNode) element;
+                        IElementDef def = definitionResolver
+                                .createElementDefinition(currElementNode);
+                        if (def != null) {
+                            operationDefs.add(def);
                         }
+                    } else {
+                        operationDefs.add(new ConstantDef(element.toString(),
+                                ConstantProcessor.class));
                     }
-                } else {
-                    body = node.getText();
                 }
+            } else {
+                body = node.getText();
             }
         }
+
     }
 
     public boolean hasOperations() {
@@ -72,18 +68,18 @@ public abstract class AbstractElementDef implements IElementDef {
     }
 
     public String getId() {
-        return id;
+        return xmlNode.getAttribute("id");
     }
 
     public String getShortElementName() {
-        return descName;
+        return xmlNode.getQName();
     }
 
     public int getLineNumber() {
-        return lineNumber;
+        return xmlNode.getLineNumber();
     }
 
     public int getColumnNumber() {
-        return columnNumber;
+        return xmlNode.getColumnNumber();
     }
 }

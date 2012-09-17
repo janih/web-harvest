@@ -58,11 +58,11 @@ public class LoopDef extends ProcessorElementDef {
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
         definitionResolver.validate(loopValueDefNode);
-        this.loopValueDef = loopValueDefNode == null ? null : new ProcessorElementDef(loopValueDefNode, "list");
+        this.loopValueDef = loopValueDefNode == null ? null : new ProcessorElementDef(loopValueDefNode, null);
 
         XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(loopBodyDefNode);
-        this.loopBodyDef = loopBodyDefNode == null ? null : new ProcessorElementDef(loopBodyDefNode, "body");
+        this.loopBodyDef = loopBodyDefNode == null ? null : new ProcessorElementDef(loopBodyDefNode, null);
 
         this.maxloops = xmlNode.getAttribute("maxloops");
         this.item = xmlNode.getAttribute("item");
