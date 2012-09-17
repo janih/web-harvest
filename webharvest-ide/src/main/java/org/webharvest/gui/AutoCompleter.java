@@ -147,7 +147,7 @@ public class AutoCompleter {
         this.model.clear();
 
         if (nsUri != null) {
-            for (ElementName elementName : definitionResolver.getElementInfos().keySet()) {
+            for (ElementName elementName : definitionResolver.getElementNames()) {
                 if (elementName.getUri().equals(nsUri) && elementName.getName().startsWith(localNamePrefix)) {
                     final StringBuilder str = new StringBuilder();
                     if (StringUtils.isNotEmpty(nsPrefix)) {

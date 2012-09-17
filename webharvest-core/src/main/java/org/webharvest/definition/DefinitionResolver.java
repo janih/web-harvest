@@ -44,8 +44,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
+import org.webharvest.AlreadyBoundException;
 import org.webharvest.deprecated.runtime.processors.CallProcessor10;
 import org.webharvest.deprecated.runtime.processors.VarDefProcessor;
 import org.webharvest.deprecated.runtime.processors.VarProcessor;
@@ -132,10 +132,7 @@ public enum DefinitionResolver {
         }
     }
 
-    // used by auto-completer in GUI
-    //TODO: refactor towards elements registry
-    private Map<ElementName, ElementInfo> elementInfos =
-        new TreeMap<ElementName, ElementInfo>();
+    private ElementsRegistry elements = new ElementsRegistryImpl();
 
     // map containing pairs (class name, plugin element name)
     // of externally registered plugins
@@ -262,7 +259,15 @@ public enum DefinitionResolver {
                                                 String... xmlns) {
         final ElementInfo elementInfo = new ElementInfo(name, defClass, processorClass, children, attributes);
         for (String ns : xmlns) {
-            elementInfos.put(new ElementName(name, ns), elementInfo);
+            try {
+                elements.bind(new ElementName(name, ns), elementInfo);
+            } catch (AlreadyBoundException e) {
+                // FIXME: This exception should never happen, since
+                // only internal elements are registered here. We'll get rid
+                // of this exception as soon as we'll refactor processors
+                // registration logic
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -291,11 +296,11 @@ public enum DefinitionResolver {
                 elementInfo.setPlugin(plugin);
 
                 final ElementName pluginElementName = new ElementName(pluginName, uri);
-                if (elementInfos.containsKey(pluginElementName)) {
+                try {
+                    elements.bind(pluginElementName, elementInfo);
+                } catch (AlreadyBoundException e) {
                     throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
                 }
-                elementInfos.put(pluginElementName, elementInfo);
-
 
                 if (!isInternalPlugin) {
                     externalPlugins.put(new PluginClassKey(pluginClass.getName(), uri), pluginElementName);
@@ -333,7 +338,7 @@ public enum DefinitionResolver {
         // only external plugins can be unregistered
         if (externalPlugins.containsKey(key)) {
             final ElementName pluginElementName = externalPlugins.get(key);
-            elementInfos.remove(pluginElementName);
+            elements.unbind(pluginElementName);
             externalPlugins.remove(key);
 
             // unregister dependant classes as well
@@ -356,10 +361,10 @@ public enum DefinitionResolver {
     }
 
     /**
-     * @return Map of all allowed element infos.
+     * Returns names of all known elements.
      */
-    public Map<ElementName, ElementInfo> getElementInfos() {
-        return elementInfos;
+    public Set<ElementName> getElementNames() {
+        return elements.listBound();
     }
 
     /**
@@ -369,7 +374,7 @@ public enum DefinitionResolver {
      *         or null if no element is defined.
      */
     public ElementInfo getElementInfo(String name, String uri) {
-        return elementInfos.get(new ElementName(name, uri));
+        return elements.lookup(new ElementName(name, uri));
     }
 
     /**
@@ -447,7 +452,7 @@ public enum DefinitionResolver {
         }
 
         final boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
-        final Set<ElementName> allTagNameSet = elementInfos.keySet();
+        final Set<ElementName> allTagNameSet = elements.listBound();
         final Set<String> tags = elementInfo.getTagsSet();
 
         // check if element contains only allowed subelements
