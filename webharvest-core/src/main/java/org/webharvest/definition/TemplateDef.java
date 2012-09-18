@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of template task.
  */
-public class TemplateDef extends ProcessorElementDef {
+public class TemplateDef extends WebHarvestPluginDef {
 
     private String language;
 

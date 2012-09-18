@@ -5,7 +5,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of function call parameter.
  */
-public class CallParamDef extends ProcessorElementDef {
+public class CallParamDef extends WebHarvestPluginDef {
 
     private String name;
 

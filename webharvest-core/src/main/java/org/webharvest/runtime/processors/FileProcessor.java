@@ -64,10 +64,6 @@ import java.util.regex.PatternSyntaxException;
  */
 public class FileProcessor extends AbstractProcessor<FileDef> {
 
-    public FileProcessor(FileDef fileDef) {
-        super(fileDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String workingDir = scraper.getWorkingDir();
 
@@ -158,7 +154,8 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
             byte[] data;
 
             if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
-                Variable bodyListVar = new BodyProcessor(elementDef).execute(scraper, context);
+                Variable bodyListVar = new BodyProcessor.Builder(elementDef).
+                    build().execute(scraper, context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {

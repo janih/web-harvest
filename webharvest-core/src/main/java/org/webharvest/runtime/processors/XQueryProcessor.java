@@ -36,12 +36,21 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.transform.stream.StreamSource;
+
 import net.sf.saxon.Configuration;
 import net.sf.saxon.query.DynamicQueryContext;
 import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
-import org.webharvest.definition.ProcessorElementDef;
+
+import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.XQueryDef;
 import org.webharvest.definition.XQueryExternalParamDef;
 import org.webharvest.exception.ScraperXQueryException;
@@ -53,13 +62,6 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.XmlUtil;
-
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * XQuery processor.
@@ -89,12 +91,8 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
     }
 
 
-    public XQueryProcessor(XQueryDef xqueryDef) {
-        super(xqueryDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        ProcessorElementDef xqueryElementDef = elementDef.getXqDef();
+        AbstractElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
         debug(xqueryElementDef, scraper, xq);
 
@@ -123,7 +121,8 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
                 }
 
                 if (externalParamType.endsWith("*")) {
-                    BodyProcessor bodyProcessor = new BodyProcessor(externalParamDef);
+                    BodyProcessor bodyProcessor =
+                        new BodyProcessor.Builder(externalParamDef).build();
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
                     Variable variable = bodyProcessor.run(scraper, context);

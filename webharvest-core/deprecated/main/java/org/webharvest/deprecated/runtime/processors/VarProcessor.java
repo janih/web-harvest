@@ -52,10 +52,6 @@ import org.webharvest.runtime.variables.Variable;
 @Deprecated
 public class VarProcessor extends AbstractProcessor<VarDef> {
 
-    public VarProcessor(VarDef varDef) {
-        super(varDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         this.setProperty("Name", name);

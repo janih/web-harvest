@@ -46,7 +46,7 @@ import java.util.Map;
 /**
  * Definition of XPath processor.
  */
-public class XPathDef extends ProcessorElementDef {
+public class XPathDef extends WebHarvestPluginDef {
 
     private String expression;
     private Map<String, String> variableMap = new HashMap<String, String>();

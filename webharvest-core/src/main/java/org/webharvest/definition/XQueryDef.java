@@ -44,11 +44,11 @@ import java.util.List;
 /**
  * Definition of XQuery processor.
  */
-public class XQueryDef extends ProcessorElementDef {
+public class XQueryDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private ProcessorElementDef xqDef;
+    private AbstractElementDef xqDef;
 
     private XQueryExternalParamDef[] externalParamDefs;
 
@@ -57,7 +57,7 @@ public class XQueryDef extends ProcessorElementDef {
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
         definitionResolver.validate(xqDefNode);
-        xqDef = xqDefNode == null ? null : new ProcessorElementDef(xqDefNode, null);
+        xqDef = xqDefNode == null ? null : new WebHarvestPluginDef(xqDefNode, null);
 
         List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
 
@@ -70,12 +70,12 @@ public class XQueryDef extends ProcessorElementDef {
             while (it.hasNext()) {
                 XmlNode currParamNode =  (XmlNode) it.next();
                 definitionResolver.validate(currParamNode);
-                externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode, getProcessorClass());
+                externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode, processorClass);
             }
         }
     }
 
-    public ProcessorElementDef getXqDef() {
+    public AbstractElementDef getXqDef() {
         return xqDef;
     }
 

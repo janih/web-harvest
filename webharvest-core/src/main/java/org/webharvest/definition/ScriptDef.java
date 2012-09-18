@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of script processor.
  */
-public class ScriptDef extends ProcessorElementDef {
+public class ScriptDef extends WebHarvestPluginDef {
 
     private String language;
 

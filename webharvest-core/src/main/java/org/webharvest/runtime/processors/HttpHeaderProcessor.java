@@ -49,10 +49,6 @@ import org.webharvest.runtime.variables.Variable;
  */
 public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
 
-    public HttpHeaderProcessor(HttpHeaderDef httpHeaderDef) {
-        super(httpHeaderDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
 

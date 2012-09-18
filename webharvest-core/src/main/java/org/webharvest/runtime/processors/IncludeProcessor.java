@@ -57,10 +57,6 @@ import java.net.URL;
  */
 public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
 
-    public IncludeProcessor(IncludeDef includeDef) {
-        super(includeDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 

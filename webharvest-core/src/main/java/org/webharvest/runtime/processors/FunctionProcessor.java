@@ -47,10 +47,6 @@ import org.webharvest.runtime.variables.Variable;
  */
 public class FunctionProcessor extends AbstractProcessor<FunctionDef> {
 
-    public FunctionProcessor(FunctionDef functionDef) {
-        super(functionDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
         scraper.getConfiguration().addFunctionDef(elementDef);
 

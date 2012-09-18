@@ -50,10 +50,6 @@ import org.webharvest.runtime.variables.Variable;
  */
 public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
 
-    public TemplateProcessor(TemplateDef templateDef) {
-        super(templateDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return new NodeVariable(BaseTemplater.evaluateToString(
                 getBodyTextContent(elementDef, scraper, context).toString(),

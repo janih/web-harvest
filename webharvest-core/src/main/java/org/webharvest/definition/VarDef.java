@@ -42,7 +42,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of variable call.
  */
-public class VarDef extends ProcessorElementDef {
+public class VarDef extends WebHarvestPluginDef {
 
     private String name;
 

@@ -42,7 +42,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of variable.
  */
-public class VarDefDef extends ProcessorElementDef {
+public class VarDefDef extends WebHarvestPluginDef {
 
     private String name;
     private String overwrite;

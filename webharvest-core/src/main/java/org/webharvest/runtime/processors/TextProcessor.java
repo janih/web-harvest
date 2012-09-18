@@ -50,10 +50,6 @@ import org.webharvest.utils.CommonUtil;
  */
 public class TextProcessor extends AbstractProcessor<TextDef> {
 
-    public TextProcessor(TextDef textDef) {
-        super(textDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
         if (CommonUtil.isEmptyString(charset)) {
@@ -64,7 +60,8 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
             delimiter = "\n";
         }
 
-        Variable body = new BodyProcessor(elementDef).execute(scraper, context);
+        Variable body = new BodyProcessor.Builder(elementDef).build().
+            execute(scraper, context);
         return new NodeVariable(body instanceof ListVariable ? ((ListVariable) body).toString(charset, delimiter) : body.toString(charset));
     }
 

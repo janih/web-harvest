@@ -37,32 +37,12 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.IElementDef;
-import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.definition.WebHarvestPluginDef;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class ProcessorResolver {
 
     public static AbstractProcessor createProcessor(IElementDef elementDef) {
-        if (elementDef instanceof ProcessorElementDef) {
-            try {
-                return ((ProcessorElementDef) elementDef).
-                        getProcessorClass().
-                        getConstructor(elementDef.getClass()).
-                        newInstance(elementDef);
-
-            } catch (InstantiationException e) {
-                throw new IllegalStateException(e);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            } catch (InvocationTargetException e) {
-                throw new IllegalStateException(e);
-            } catch (NoSuchMethodException e) {
-                throw new IllegalStateException(e);
-            }
-
-        } else if (elementDef instanceof WebHarvestPluginDef) {
+        if (elementDef instanceof WebHarvestPluginDef) {
             return ((WebHarvestPluginDef) elementDef).createPlugin();
 
         } else {

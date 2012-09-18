@@ -42,7 +42,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  * Definition of empty element. Empty element just executes body and
  * returns single empty variable.
  */
-public class EmptyDef extends ProcessorElementDef {
+public class EmptyDef extends WebHarvestPluginDef {
 
     public EmptyDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
     	super(xmlNode, processorClass);

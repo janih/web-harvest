@@ -62,10 +62,6 @@ import java.util.Map;
  */
 public class XPathProcessor extends AbstractProcessor<XPathDef> {
 
-    public XPathProcessor(XPathDef xpathDef) {
-        super(xpathDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
         String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);

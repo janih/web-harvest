@@ -47,10 +47,6 @@ import org.webharvest.runtime.variables.Variable;
  */
 public class ConstantProcessor extends AbstractProcessor<ConstantDef> {
 
-    public ConstantProcessor(ConstantDef constantDef) {
-        super(constantDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
         return new NodeVariable(elementDef.getText());
     }

@@ -41,31 +41,31 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of user-defined function.
  */
-public class XsltDef extends ProcessorElementDef {
+public class XsltDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private ProcessorElementDef xmlDef;
+    private AbstractElementDef xmlDef;
 
-    private ProcessorElementDef stylesheetDef;
+    private AbstractElementDef stylesheetDef;
 
     public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
         definitionResolver.validate(xmlDefNode);
-        xmlDef = xmlDefNode == null ? null : new ProcessorElementDef(xmlDefNode, null);
+        xmlDef = xmlDefNode == null ? null : new WebHarvestPluginDef(xmlDefNode, null);
 
         XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
         definitionResolver.validate(stylesheetDefNode);
-        stylesheetDef = stylesheetDefNode == null ? null : new ProcessorElementDef(stylesheetDefNode, null);
+        stylesheetDef = stylesheetDefNode == null ? null : new WebHarvestPluginDef(stylesheetDefNode, null);
     }
 
-    public ProcessorElementDef getStylesheetDef() {
+    public AbstractElementDef getStylesheetDef() {
         return stylesheetDef;
     }
 
-    public ProcessorElementDef getXmlDef() {
+    public AbstractElementDef getXmlDef() {
         return xmlDef;
     }
 

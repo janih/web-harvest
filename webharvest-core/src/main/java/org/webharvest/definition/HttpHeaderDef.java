@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of HTTP header.
  */
-public class HttpHeaderDef extends ProcessorElementDef {
+public class HttpHeaderDef extends WebHarvestPluginDef {
 
     private String name;
 

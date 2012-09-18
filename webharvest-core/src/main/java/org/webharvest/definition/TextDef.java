@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of text processor.
  */
-public class TextDef extends ProcessorElementDef {
+public class TextDef extends WebHarvestPluginDef {
 
     private String charset;
     private String delimiter;

@@ -36,9 +36,14 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.ProcessorElementDef;
+import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -48,28 +53,20 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Regular expression replace processor.
  */
 public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
-    public RegexpProcessor(RegexpDef regexpDef) {
-        super(regexpDef);
-    }
-
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
 
-        ProcessorElementDef patternDef = elementDef.getRegexpPatternDef();
+        AbstractElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
         debug(patternDef, scraper, patternVar);
 
-        ProcessorElementDef sourceDef = elementDef.getRegexpSourceDef();
-        Variable source = new BodyProcessor(sourceDef).run(scraper, context);
+        AbstractElementDef sourceDef = elementDef.getRegexpSourceDef();
+        Variable source = new BodyProcessor.Builder(sourceDef).build().
+            run(scraper, context);
         debug(sourceDef, scraper, source);
 
         String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, scraper);
@@ -136,7 +133,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
                     context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
                 }
 
-                ProcessorElementDef resultDef = elementDef.getRegexpResultDef();
+                AbstractElementDef resultDef = elementDef.getRegexpResultDef();
                 Variable result = getBodyTextContent(resultDef, scraper, context, true);
                 debug(resultDef, scraper, result);
 

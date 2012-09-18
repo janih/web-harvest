@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of HTTP parameter.
  */
-public class HttpParamDef extends ProcessorElementDef {
+public class HttpParamDef extends WebHarvestPluginDef {
 
     private String name;
     private String isfile;

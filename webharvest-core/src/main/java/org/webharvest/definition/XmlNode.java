@@ -45,6 +45,8 @@ import java.util.*;
 
 public class XmlNode implements Serializable {
 
+    public static final XmlNode NULL = new XmlNode(null, "*", null, null);
+
     protected static final Logger log = LoggerFactory.getLogger(XmlNode.class);
 
     // node name - corresponds to xml local name

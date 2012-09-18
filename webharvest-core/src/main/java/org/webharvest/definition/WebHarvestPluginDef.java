@@ -14,16 +14,15 @@ public class WebHarvestPluginDef extends AbstractElementDef {
 
     private Class<? extends AbstractProcessor> pluginClass;
 
-    public WebHarvestPluginDef(final XmlNode xmlNode) {
-        this(xmlNode, true);
+    public WebHarvestPluginDef(final XmlNode xmlNode,
+            Class<? extends AbstractProcessor> pluginClass) {
+        this(xmlNode, true, pluginClass);
     }
 
     public WebHarvestPluginDef(final XmlNode xmlNode,
-            final boolean createBodyDefs) {
+            final boolean createBodyDefs,
+            Class<? extends AbstractProcessor> pluginClass) {
         super(xmlNode, createBodyDefs);
-    }
-
-    void setPluginClass(Class pluginClass) {
         this.pluginClass = pluginClass;
     }
 
@@ -39,11 +38,11 @@ public class WebHarvestPluginDef extends AbstractElementDef {
         return xmlNode.getAttributes(uri);
     }
 
-    public WebHarvestPlugin createPlugin() {
+    public AbstractProcessor createPlugin() {
         if (pluginClass != null) {
             try {
-                WebHarvestPlugin plugin = (WebHarvestPlugin) pluginClass.newInstance();
-                plugin.setDef(this);
+                AbstractProcessor plugin = pluginClass.newInstance();
+                plugin.setElementDef(this);
                 return plugin;
             } catch (InstantiationException e) {
                 throw new PluginException(e);

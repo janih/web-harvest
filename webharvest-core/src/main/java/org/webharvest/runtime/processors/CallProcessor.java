@@ -56,10 +56,6 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
 
     private Variable functionResult = new NodeVariable("");
 
-    public CallProcessor(CallDef callDef) {
-        super(callDef);
-    }
-
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
@@ -73,7 +69,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         scraper.clearFunctionParams();
 
         // executes body of call processor
-        new BodyProcessor(elementDef).execute(scraper, context);
+        new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
 
         doCall(context, new Callable<Object>() {
 
@@ -87,7 +83,8 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                 scraper.addRunningFunction(CallProcessor.this);
                 try {
                     // executes body of function using new context
-                    new BodyProcessor(functionDef).execute(scraper, context);
+                    new BodyProcessor.Builder(functionDef).build().
+                        execute(scraper, context);
                     return null;
                 } finally {
                     // remove running function from the stack

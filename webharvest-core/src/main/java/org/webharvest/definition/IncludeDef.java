@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of include element.
  */
-public class IncludeDef extends ProcessorElementDef {
+public class IncludeDef extends WebHarvestPluginDef {
 
     private String path;
 

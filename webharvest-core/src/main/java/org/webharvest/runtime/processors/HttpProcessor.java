@@ -74,10 +74,6 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
 
-    public HttpProcessor(HttpDef httpDef) {
-        super(httpDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         scraper.setRunningHttpProcessor(this);
 
@@ -104,7 +100,8 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         final String encodedUrl = CommonUtil.encodeUrl(url, charset);
 
         // executes body of HTTP processor
-        final Variable bodyContent = new BodyProcessor(elementDef).execute(scraper, context);
+        final Variable bodyContent = new BodyProcessor.Builder(elementDef).
+            build().execute(scraper, context);
 
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);

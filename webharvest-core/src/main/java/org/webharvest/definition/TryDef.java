@@ -41,30 +41,30 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of try-catche element.
  */
-public class TryDef extends ProcessorElementDef {
+public class TryDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private ProcessorElementDef tryBodyDef;
-    private ProcessorElementDef catchValueDef;
+    private AbstractElementDef tryBodyDef;
+    private AbstractElementDef catchValueDef;
 
     public TryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(tryBodyDefNode);
-        this.tryBodyDef = tryBodyDefNode == null ? null : new ProcessorElementDef(tryBodyDefNode, null);
+        this.tryBodyDef = tryBodyDefNode == null ? null : new WebHarvestPluginDef(tryBodyDefNode, null);
 
         XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
         definitionResolver.validate(catchValueDefNode);
-        this.catchValueDef = catchValueDefNode == null ? null : new ProcessorElementDef(catchValueDefNode, null);
+        this.catchValueDef = catchValueDefNode == null ? null : new WebHarvestPluginDef(catchValueDefNode, null);
     }
 
-    public ProcessorElementDef getTryBodyDef() {
+    public AbstractElementDef getTryBodyDef() {
         return tryBodyDef;
     }
 
-    public ProcessorElementDef getCatchValueDef() {
+    public AbstractElementDef getCatchValueDef() {
         return catchValueDef;
     }
 

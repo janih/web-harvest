@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of while loop processor (while-empty and while-not-empty).
  */
-public class WhileDef extends ProcessorElementDef {
+public class WhileDef extends WebHarvestPluginDef {
 
 	private String condition;
     private String maxLoops;

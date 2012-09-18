@@ -37,7 +37,6 @@
  */
 package org.webharvest.deprecated.runtime.processors;
 
-import org.webharvest.definition.CallDef;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.processors.CallProcessor;
@@ -48,10 +47,6 @@ import java.util.concurrent.Callable;
  * Function call processor.
  */
 public class CallProcessor10 extends CallProcessor {
-
-    public CallProcessor10(CallDef callDef) {
-        super(callDef);
-    }
 
     @Override
     protected void doCall(DynamicScopeContext context, Callable<Object> callable) throws InterruptedException {

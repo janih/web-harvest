@@ -50,7 +50,7 @@ public class PluginTestUtils {
 
     public static WebHarvestPlugin createPlugin(String xml, Class<? extends WebHarvestPlugin> clazz) {
         final WebHarvestPlugin plugin = ReflectionUtils.createInstanceOfType(clazz, true);
-        plugin.setDef(new WebHarvestPluginDef(XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+        plugin.setElementDef(new WebHarvestPluginDef(XmlNode.getInstance(new InputSource(new StringReader(xml))), clazz));
         return plugin;
     }
 }

@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of function call.
  */
-public class CallDef extends ProcessorElementDef {
+public class CallDef extends WebHarvestPluginDef {
 
     private String name;
 

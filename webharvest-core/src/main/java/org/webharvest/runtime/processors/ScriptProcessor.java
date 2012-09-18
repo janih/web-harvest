@@ -50,10 +50,6 @@ import org.webharvest.utils.CommonUtil;
  */
 public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
 
-    public ScriptProcessor(ScriptDef scriptDef) {
-        super(scriptDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
 

@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of user-defined function.
  */
-public class FunctionDef extends ProcessorElementDef {
+public class FunctionDef extends WebHarvestPluginDef {
 
     private String name;
 

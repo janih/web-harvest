@@ -56,12 +56,9 @@ import org.webharvest.utils.CommonUtil;
 @Deprecated
 public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 
-    public VarDefProcessor(VarDefDef varDef) {
-        super(varDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        final Variable var = new BodyProcessor(elementDef).execute(scraper, context);
+        final Variable var = new BodyProcessor.Builder(elementDef).build().
+            execute(scraper, context);
 
         final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, scraper);

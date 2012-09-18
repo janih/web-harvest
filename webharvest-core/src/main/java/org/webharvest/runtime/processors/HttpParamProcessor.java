@@ -50,10 +50,6 @@ import org.webharvest.utils.CommonUtil;
  */
 public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 
-    public HttpParamProcessor(HttpParamDef httpParamDef) {
-        super(httpParamDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
         String isFileStr = BaseTemplater.evaluateToString(elementDef.getIsfile(), null, scraper);
@@ -63,7 +59,7 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
         if (httpProcessor != null) {
-            httpProcessor.addHttpParam(name, isFile, fileName, contentType, new BodyProcessor(elementDef).execute(scraper, context));
+            httpProcessor.addHttpParam(name, isFile, fileName, contentType, new BodyProcessor.Builder(elementDef).build().execute(scraper, context));
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);

@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of XQuery external parameter.
  */
-public class XQueryExternalParamDef extends ProcessorElementDef {
+public class XQueryExternalParamDef extends WebHarvestPluginDef {
 
     private String name;
     private String type;

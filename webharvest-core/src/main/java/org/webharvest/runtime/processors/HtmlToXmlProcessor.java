@@ -54,10 +54,6 @@ import java.io.IOException;
  */
 public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
 
-    public HtmlToXmlProcessor(HtmlToXmlDef htmlToXmlDef) {
-        super(htmlToXmlDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable body = getBodyTextContent(elementDef, scraper, context);
 

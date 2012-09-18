@@ -38,6 +38,8 @@ package org.webharvest.definition;
 
 import org.webharvest.runtime.processors.AbstractProcessor;
 
+@Deprecated
+//TODO: When Feature request #22 will be done, this class could be removed as unused components.
 public class ProcessorElementDef extends AbstractElementDef {
 
     private Class<? extends AbstractProcessor> processorClass;

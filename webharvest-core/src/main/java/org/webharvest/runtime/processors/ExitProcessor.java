@@ -13,10 +13,6 @@ import org.webharvest.utils.CommonUtil;
  */
 public class ExitProcessor extends AbstractProcessor<ExitDef> {
 
-    public ExitProcessor(ExitDef exitDef) {
-        super(exitDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
         String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
         if (condition == null || "".equals(condition)) {

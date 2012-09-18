@@ -44,12 +44,12 @@ import java.util.List;
 /**
  * Definition of case processor.
  */
-public class CaseDef extends ProcessorElementDef {
+public class CaseDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     private IfDef[] ifDefs;
-    private ProcessorElementDef elseDef;
+    private AbstractElementDef elseDef;
 
     public CaseDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
@@ -64,20 +64,20 @@ public class CaseDef extends ProcessorElementDef {
             while (it.hasNext()) {
                 XmlNode currParamNode = (XmlNode) it.next();
                 definitionResolver.validate(currParamNode);
-                ifDefs[index++] = new IfDef(currParamNode, getProcessorClass());
+                ifDefs[index++] = new IfDef(currParamNode, processorClass);
             }
         }
 
         XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
         definitionResolver.validate(elseDefNode);
-        elseDef = elseDefNode == null ? null : new ProcessorElementDef(elseDefNode, null);
+        elseDef = elseDefNode == null ? null : new WebHarvestPluginDef(elseDefNode, null);
     }
 
     public IfDef[] getIfDefs() {
         return ifDefs;
     }
 
-    public ProcessorElementDef getElseDef() {
+    public AbstractElementDef getElseDef() {
         return elseDef;
     }
 

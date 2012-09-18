@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of loop processor.
  */
-public class LoopDef extends ProcessorElementDef {
+public class LoopDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
@@ -50,19 +50,19 @@ public class LoopDef extends ProcessorElementDef {
     private String index;
     private String filter;
     private String empty;
-    private ProcessorElementDef loopValueDef;
-    private ProcessorElementDef loopBodyDef;
+    private AbstractElementDef loopValueDef;
+    private AbstractElementDef loopBodyDef;
 
     public LoopDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
         definitionResolver.validate(loopValueDefNode);
-        this.loopValueDef = loopValueDefNode == null ? null : new ProcessorElementDef(loopValueDefNode, null);
+        this.loopValueDef = loopValueDefNode == null ? null : new WebHarvestPluginDef(loopValueDefNode, null);
 
         XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(loopBodyDefNode);
-        this.loopBodyDef = loopBodyDefNode == null ? null : new ProcessorElementDef(loopBodyDefNode, null);
+        this.loopBodyDef = loopBodyDefNode == null ? null : new WebHarvestPluginDef(loopBodyDefNode, null);
 
         this.maxloops = xmlNode.getAttribute("maxloops");
         this.item = xmlNode.getAttribute("item");
@@ -91,11 +91,11 @@ public class LoopDef extends ProcessorElementDef {
         return empty;
     }
 
-    public ProcessorElementDef getLoopValueDef() {
+    public AbstractElementDef getLoopValueDef() {
         return loopValueDef;
     }
 
-    public ProcessorElementDef getLoopBodyDef() {
+    public AbstractElementDef getLoopBodyDef() {
         return loopBodyDef;
     }
 

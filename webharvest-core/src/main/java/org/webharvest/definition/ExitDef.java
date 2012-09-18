@@ -5,7 +5,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of exit processor.
  */
-public class ExitDef extends ProcessorElementDef {
+public class ExitDef extends WebHarvestPluginDef {
 
 	private String condition;
 	private String message;

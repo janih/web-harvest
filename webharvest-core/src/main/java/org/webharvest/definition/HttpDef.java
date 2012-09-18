@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Definition of HTTP processor.
  */
-public class HttpDef extends ProcessorElementDef {
+public class HttpDef extends WebHarvestPluginDef {
 
     public static final String DEFAULT_METHOD = "get";
     public static final String DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded";

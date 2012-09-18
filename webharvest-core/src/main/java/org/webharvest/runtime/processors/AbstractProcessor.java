@@ -39,7 +39,6 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.io.FileUtils;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
-import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -68,15 +67,6 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
     private Map properties = new LinkedHashMap();
 
     protected AbstractProcessor() {
-    }
-
-    /**
-     * Base constructor - assigns element definition to the processor.
-     *
-     * @param elementDef
-     */
-    protected AbstractProcessor(TDef elementDef) {
-        this.elementDef = elementDef;
     }
 
     /**
@@ -157,7 +147,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected void debug(ProcessorElementDef elementDef, Scraper scraper, Variable variable) {
+    protected void debug(AbstractElementDef elementDef, Scraper scraper, Variable variable) {
         String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper) : null;
 
         if (scraper.isDebugMode() && id != null) {
@@ -167,12 +157,13 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context,
+    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef == null) {
             return null;
         } else if (elementDef.hasOperations()) {
-            BodyProcessor bodyProcessor = new BodyProcessor(elementDef);
+            BodyProcessor bodyProcessor =
+                new BodyProcessor.Builder(elementDef).build();
             if (properties != null) {
                 for (KeyValuePair property : properties) {
                     bodyProcessor.setProperty(property.getKey(), property.getValue());
@@ -185,15 +176,25 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
+    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(ProcessorElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, false);
     }
 
-    public AbstractElementDef getElementDef() {
+    /**
+     * Sets appropriate element definition to the processor.
+     *
+     * @param elementDef
+     *            the element definition
+     */
+    public void setElementDef(final TDef elementDef) {
+        this.elementDef = elementDef;
+    }
+
+    public TDef getElementDef() {
         return elementDef;
     }
 

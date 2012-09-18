@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of HTML to XML rensformation task.
  */
-public class HtmlToXmlDef extends ProcessorElementDef {
+public class HtmlToXmlDef extends WebHarvestPluginDef {
 
     private String outputType;
     private String advancedXmlEscape;

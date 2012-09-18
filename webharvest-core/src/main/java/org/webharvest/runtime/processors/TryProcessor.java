@@ -36,8 +36,10 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.util.concurrent.Callable;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.webharvest.definition.ProcessorElementDef;
+import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -45,21 +47,16 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import java.util.concurrent.Callable;
-
 /**
  * OnError processor - sets .
  */
 public class TryProcessor extends AbstractProcessor<TryDef> {
 
-    public TryProcessor(TryDef tryDef) {
-        super(tryDef);
-    }
-
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         try {
-            ProcessorElementDef tryBodyDef = elementDef.getTryBodyDef();
-            Variable result = new BodyProcessor(tryBodyDef).run(scraper, context);
+            AbstractElementDef tryBodyDef = elementDef.getTryBodyDef();
+            Variable result = new BodyProcessor.Builder(tryBodyDef).build().
+                run(scraper, context);
             debug(tryBodyDef, scraper, result);
 
             return result;
@@ -79,8 +76,10 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                 @Override
                 public Variable call() throws Exception {
                     context.setLocalVar("_error", CommonUtil.createVariable(e));
-                    final ProcessorElementDef catchValueDef = elementDef.getCatchValueDef();
-                    final Variable res = new BodyProcessor(catchValueDef).run(scraper, context);
+                    final AbstractElementDef catchValueDef = elementDef.getCatchValueDef();
+                    final Variable res =
+                        new BodyProcessor.Builder(catchValueDef).build().
+                            run(scraper, context);
                     debug(catchValueDef, scraper, res);
                     return res;
                 }

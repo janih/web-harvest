@@ -188,10 +188,6 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
         return result.toString();
     }
 
-    public void setDef(WebHarvestPluginDef def) {
-        this.elementDef = def;
-    }
-
     /**
      * @return Map of attributes of this plugin
      */
@@ -270,7 +266,8 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @return Instance of Variable
      */
     protected Variable executeBody(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        return new BodyProcessor(elementDef).execute(scraper, context);
+        return new BodyProcessor.Builder(elementDef).build().
+            execute(scraper, context);
     }
 
 }

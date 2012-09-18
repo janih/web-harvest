@@ -41,16 +41,16 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of regular expression processor.
  */
-public class RegexpDef extends ProcessorElementDef {
+public class RegexpDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     private String max;
     private String replace;
 
-    private ProcessorElementDef regexpPatternDef;
-    private ProcessorElementDef regexpSourceDef;
-    private ProcessorElementDef regexpResultDef;
+    private AbstractElementDef regexpPatternDef;
+    private AbstractElementDef regexpSourceDef;
+    private AbstractElementDef regexpResultDef;
     private String flagCaseInsensitive;
     private String flagMultiline;
     private String flagDotall;
@@ -70,15 +70,15 @@ public class RegexpDef extends ProcessorElementDef {
 
         XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
         definitionResolver.validate(regexpPatternDefNode);
-        regexpPatternDef = regexpPatternDefNode == null ? null : new ProcessorElementDef(regexpPatternDefNode, null);
+        regexpPatternDef = regexpPatternDefNode == null ? null : new WebHarvestPluginDef(regexpPatternDefNode, null);
 
         XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
         definitionResolver.validate(regexpSourceDefNode);
-        regexpSourceDef = regexpSourceDefNode == null ? null : new ProcessorElementDef(regexpSourceDefNode, null);
+        regexpSourceDef = regexpSourceDefNode == null ? null : new WebHarvestPluginDef(regexpSourceDefNode, null);
 
         XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
         definitionResolver.validate(regexpResultDefNode);
-        regexpResultDef = regexpResultDefNode == null ? null : new ProcessorElementDef(regexpResultDefNode, null);
+        regexpResultDef = regexpResultDefNode == null ? null : new WebHarvestPluginDef(regexpResultDefNode, null);
     }
 
     public String getMax() {
@@ -109,15 +109,15 @@ public class RegexpDef extends ProcessorElementDef {
         return flagCanoneq;
     }
 
-    public ProcessorElementDef getRegexpPatternDef() {
+    public AbstractElementDef getRegexpPatternDef() {
         return regexpPatternDef;
     }
 
-    public ProcessorElementDef getRegexpResultDef() {
+    public AbstractElementDef getRegexpResultDef() {
         return regexpResultDef;
     }
 
-    public ProcessorElementDef getRegexpSourceDef() {
+    public AbstractElementDef getRegexpSourceDef() {
         return regexpSourceDef;
     }
 

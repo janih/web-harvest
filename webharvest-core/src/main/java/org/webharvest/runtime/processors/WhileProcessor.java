@@ -56,10 +56,6 @@ import java.util.List;
  */
 public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
-    public WhileProcessor(WhileDef whileDef) {
-        super(whileDef);
-    }
-
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
@@ -84,7 +80,8 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         // iterates while testing variable represents boolean true or loop limit is exceeded
         final double maxLoops = NumberUtils.toDouble(maxLoopsString, WHConstants.DEFAULT_MAX_LOOPS);
         while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
-            Variable loopResult = new BodyProcessor(elementDef).execute(scraper, context);
+            Variable loopResult = new BodyProcessor.Builder(elementDef).build().
+                execute(scraper, context);
             if (!isEmpty) {
                 resultList.addAll(loopResult.toList());
             }

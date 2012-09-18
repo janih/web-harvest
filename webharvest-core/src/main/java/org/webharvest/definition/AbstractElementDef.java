@@ -13,10 +13,9 @@ public abstract class AbstractElementDef implements IElementDef {
 
     protected XmlNode xmlNode;
     // sequence of operation definitions
-    protected  List<IElementDef> operationDefs = new ArrayList<IElementDef>();
+    protected List<IElementDef> operationDefs = new ArrayList<IElementDef>();
     // text content if no nested operation definitions
     protected String body;
-
 
     protected AbstractElementDef(XmlNode node, boolean createBodyDefs) {
         if (node == null) {
@@ -24,25 +23,27 @@ public abstract class AbstractElementDef implements IElementDef {
         }
         this.xmlNode = node;
 
-        List<Serializable> elementList = node.getElementList();
+        if (node != XmlNode.NULL) {
+            List<Serializable> elementList = node.getElementList();
 
-        if (createBodyDefs) {
-            if (elementList != null && elementList.size() > 0) {
-                for (Object element : elementList) {
-                    if (element instanceof XmlNode) {
-                        XmlNode currElementNode = (XmlNode) element;
-                        IElementDef def = definitionResolver
-                                .createElementDefinition(currElementNode);
-                        if (def != null) {
-                            operationDefs.add(def);
+            if (createBodyDefs) {
+                if (elementList != null && elementList.size() > 0) {
+                    for (Object element : elementList) {
+                        if (element instanceof XmlNode) {
+                            XmlNode currElementNode = (XmlNode) element;
+                            IElementDef def = definitionResolver
+                                    .createElementDefinition(currElementNode);
+                            if (def != null) {
+                                operationDefs.add(def);
+                            }
+                        } else {
+                            operationDefs.add(new ConstantDef(element.toString(),
+                                    ConstantProcessor.class));
                         }
-                    } else {
-                        operationDefs.add(new ConstantDef(element.toString(),
-                                ConstantProcessor.class));
                     }
+                } else {
+                    body = node.getText();
                 }
-            } else {
-                body = node.getText();
             }
         }
 

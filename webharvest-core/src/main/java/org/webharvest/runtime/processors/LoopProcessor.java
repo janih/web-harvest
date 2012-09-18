@@ -36,12 +36,21 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
+import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.LoopDef;
-import org.webharvest.definition.ProcessorElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -51,18 +60,10 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Loop list processor.
  */
 public class LoopProcessor extends AbstractProcessor<LoopDef> {
-
-    public LoopProcessor(LoopDef loopDef) {
-        super(loopDef);
-    }
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, scraper);
@@ -77,8 +78,9 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         this.setProperty("Filter", filter);
         this.setProperty("Empty", String.valueOf(isEmpty));
 
-        ProcessorElementDef loopValueDef = elementDef.getLoopValueDef();
-        Variable loopValue = new BodyProcessor(loopValueDef).run(scraper, context);
+        AbstractElementDef loopValueDef = elementDef.getLoopValueDef();
+        Variable loopValue = new BodyProcessor.Builder(loopValueDef).build().
+            run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
 
@@ -106,8 +108,8 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
                 }
 
                 // execute the loop body
-                ProcessorElementDef bodyDef = elementDef.getLoopBodyDef();
-                Variable loopResult = (bodyDef != null) ? new BodyProcessor(bodyDef).run(scraper, context) : EmptyVariable.INSTANCE;
+                AbstractElementDef bodyDef = elementDef.getLoopBodyDef();
+                Variable loopResult = (bodyDef != null) ? new BodyProcessor.Builder(bodyDef).build().run(scraper, context) : EmptyVariable.INSTANCE;
                 debug(bodyDef, scraper, loopResult);
                 if (!isEmpty) {
                     resultList.addAll(loopResult.toList());

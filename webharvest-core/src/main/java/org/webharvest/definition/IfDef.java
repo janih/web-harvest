@@ -41,7 +41,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 /**
  * Definition of conditional processor.
  */
-public class IfDef extends ProcessorElementDef {
+public class IfDef extends WebHarvestPluginDef {
 
 	private String condition;
 

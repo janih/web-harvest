@@ -47,12 +47,8 @@ import org.webharvest.runtime.variables.Variable;
  */
 public class EmptyProcessor extends AbstractProcessor<EmptyDef> {
 
-    public EmptyProcessor(EmptyDef emptyDef) {
-        super(emptyDef);
-    }
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        new BodyProcessor(elementDef).execute(scraper, context);
+        new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
 
         return EmptyVariable.INSTANCE;
     }

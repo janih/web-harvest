@@ -147,7 +147,7 @@ public enum DefinitionResolver {
     private DefinitionResolver() {
 
         // register processors
-        registerInternalElement("config", ProcessorElementDef.class, null, null, "charset,scriptlang,id",
+        registerInternalElement("config", WebHarvestPluginDef.class, null, null, "charset,scriptlang,id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("empty", EmptyDef.class, EmptyProcessor.class, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
@@ -172,39 +172,39 @@ public enum DefinitionResolver {
         registerInternalElement("regexp", RegexpDef.class, RegexpProcessor.class,
                 "!regexp-pattern,!regexp-source,regexp-result", "id,replace,max,flag-caseinsensitive,flag-multiline,flag-dotall,flag-unicodecase,flag-canoneq",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("regexp-pattern", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("regexp-pattern", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("regexp-source", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("regexp-source", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("regexp-result", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("regexp-result", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xpath", XPathDef.class, XPathProcessor.class, null, "id,expression,v:*",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xquery", XQueryDef.class, XQueryProcessor.class, "xq-param,!xq-expression", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("xq-param", ProcessorElementDef.class, null, null, "!name,type,id",
+        registerInternalElement("xq-param", WebHarvestPluginDef.class, null, null, "!name,type,id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("xq-expression", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("xq-expression", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xslt", XsltDef.class, XsltProcessor.class, "!xml,!stylesheet", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("xml", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("xml", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("stylesheet", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("stylesheet", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("template", TemplateDef.class, TemplateProcessor.class, null, "id,language",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("case", CaseDef.class, CaseProcessor.class, "!if,else", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("if", ProcessorElementDef.class, null, null, "!condition,id",
+        registerInternalElement("if", WebHarvestPluginDef.class, null, null, "!condition,id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("else", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("else", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("loop", LoopDef.class, LoopProcessor.class, "!list,!body", "id,item,index,maxloops,filter,empty",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("list", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("list", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("body", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("body", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("while", WhileDef.class, WhileProcessor.class, null, "id,!condition,index,maxloops,empty",
                 XMLNS_CORE_10, XMLNS_CORE);
@@ -222,7 +222,7 @@ public enum DefinitionResolver {
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("try", TryDef.class, TryProcessor.class, "!body,!catch", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("catch", ProcessorElementDef.class, null, null, "id",
+        registerInternalElement("catch", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("script", ScriptDef.class, ScriptProcessor.class, null, "id,language,return",
                 XMLNS_CORE_10, XMLNS_CORE);
@@ -390,38 +390,33 @@ public enum DefinitionResolver {
         final String nodeUri = node.getUri();
 
         final ElementInfo elementInfo = getElementInfo(nodeName, nodeUri);
-        if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == ProcessorElementDef.class) {
+        if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == WebHarvestPluginDef.class) {
             throw new ConfigurationException("Unexpected configuration element: " + node.getQName() + "!");
         }
 
         validate(node);
 
-        final Class elementClass = elementInfo.getDefinitionClass();
-
+        //FIXME: use a better construction than this as soon as possible
         try {
-            final IElementDef elementDef = (elementClass == WebHarvestPluginDef.class)
-                    ? new WebHarvestPluginDef(node)
-                    : (IElementDef) elementClass.
-                    getConstructor(XmlNode.class, Class.class).
-                    newInstance(node, elementInfo.getProcessorClass());
-
-            if (elementDef instanceof WebHarvestPluginDef) {
-                WebHarvestPluginDef pluginDef = (WebHarvestPluginDef) elementDef;
-                pluginDef.setPluginClass(elementInfo.getPluginClass());
-            }
-            return elementDef;
+            return (IElementDef) elementInfo.getDefinitionClass().
+                getConstructor(XmlNode.class, Class.class).
+                newInstance(node, elementInfo.getProcessorClass());
         } catch (NoSuchMethodException e) {
-            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+            throw new ConfigurationException("Cannot create class instance: " +
+                    elementInfo.getDefinitionClass() + "!", e);
         } catch (InvocationTargetException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof ConfigurationException) {
                 throw (ConfigurationException) cause;
             }
-            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+            throw new ConfigurationException("Cannot create class instance: " +
+                    elementInfo.getDefinitionClass() + "!", e);
         } catch (InstantiationException e) {
-            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+            throw new ConfigurationException("Cannot create class instance: " +
+                    elementInfo.getDefinitionClass() + "!", e);
         } catch (IllegalAccessException e) {
-            throw new ConfigurationException("Cannot create class instance: " + elementClass + "!", e);
+            throw new ConfigurationException("Cannot create class instance: " +
+                    elementInfo.getDefinitionClass() + "!", e);
         }
     }
 

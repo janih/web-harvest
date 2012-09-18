@@ -43,12 +43,12 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  * in configuaration xml, but is used internally to define static
  * (text) content. 
  */
-public class ConstantDef extends ProcessorElementDef {
+public class ConstantDef extends WebHarvestPluginDef {
 
     private String text;
 
     public ConstantDef(String text, Class<? extends AbstractProcessor> processorClass) {
-        super(null, processorClass);
+        super(XmlNode.NULL, processorClass);
         this.text = text;
     }
 

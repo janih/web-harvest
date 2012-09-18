@@ -42,7 +42,7 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Definition of file proessor.
  */
-public class FileDef extends ProcessorElementDef {
+public class FileDef extends WebHarvestPluginDef {
 
     private String action;
     private String path;
