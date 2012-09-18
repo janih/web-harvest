@@ -29,7 +29,7 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
- */
+*/
 package org.webharvest.runtime.processors.plugins;
 
 import java.lang.annotation.Documented;
@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
  * @version %I%, %G%
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 @Inherited
 @Documented
 public @interface TargetNamespace {
@@ -57,5 +57,5 @@ public @interface TargetNamespace {
     /**
      * Indicates target XML namespaces for the plugin.
      */
-    String[] uri();
+    String[] value();
 }
