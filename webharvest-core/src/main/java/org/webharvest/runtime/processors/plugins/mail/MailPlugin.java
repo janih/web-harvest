@@ -1,9 +1,14 @@
 package org.webharvest.runtime.processors.plugins.mail;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.mail.*;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -17,6 +22,8 @@ import java.util.Set;
 /**
  * Mail sending processor.
  */
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 public class MailPlugin extends WebHarvestPlugin {
 
     public static DataSource createDataSourceOfVariable(Variable variable, String charset, String mimeType) throws IOException {
@@ -36,7 +43,7 @@ public class MailPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         email = null;
-        
+
         boolean isHtml = "html".equalsIgnoreCase(evaluateAttribute("type", scraper));
         if (isHtml) {
             email = new HtmlEmail();
@@ -142,7 +149,7 @@ public class MailPlugin extends WebHarvestPlugin {
                 "bcc",
                 "subject",
                 "charset",
-                "username", 
+                "username",
                 "password",
                 "security"
         };

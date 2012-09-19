@@ -1,11 +1,16 @@
 package org.webharvest.runtime.processors.plugins.db;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.dbutils.DbUtils;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -17,6 +22,8 @@ import java.util.List;
 /**
  * Support for database operations.
  */
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 public class DatabasePlugin extends WebHarvestPlugin {
 
     private class DbParamInfo {

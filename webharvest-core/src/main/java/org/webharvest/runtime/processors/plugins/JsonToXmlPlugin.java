@@ -1,5 +1,8 @@
 package org.webharvest.runtime.processors.plugins;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -13,6 +16,8 @@ import org.webharvest.runtime.variables.Variable;
 /**
  * Converter from JSON to XML
  */
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 public class JsonToXmlPlugin extends WebHarvestPlugin {
 
     private final static String ATTR_ROOT_TAG_NAME = "tag";

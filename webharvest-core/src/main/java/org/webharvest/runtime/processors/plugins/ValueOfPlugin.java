@@ -38,12 +38,16 @@
 
 package org.webharvest.runtime.processors.plugins;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 
+@Autoscanned
+@TargetNamespace(XMLNS_CORE)
 public class ValueOfPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_EXPRESSION = "expr";

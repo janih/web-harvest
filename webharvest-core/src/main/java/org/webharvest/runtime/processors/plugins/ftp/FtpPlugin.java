@@ -1,11 +1,16 @@
 package org.webharvest.runtime.processors.plugins.ftp;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -14,6 +19,8 @@ import java.io.IOException;
 /**
  * FTP processor
  */
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 public class FtpPlugin extends WebHarvestPlugin {
 
     FTPClient ftpClient;
@@ -98,5 +105,5 @@ public class FtpPlugin extends WebHarvestPlugin {
     public FTPClient getFtpClient() {
         return ftpClient;
     }
-    
+
 }

@@ -38,12 +38,18 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+
 import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 
 /**
  * Support for database operations.
  */
+@Autoscanned
+@TargetNamespace(XMLNS_CORE)
 public class DefVarPlugin extends AbstractVariableModifierPlugin {
 
     public DefVarPlugin() {

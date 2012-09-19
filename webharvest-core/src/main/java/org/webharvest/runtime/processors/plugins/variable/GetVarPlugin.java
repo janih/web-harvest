@@ -38,14 +38,20 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 
 import java.text.MessageFormat;
 
+@Autoscanned
+@TargetNamespace(XMLNS_CORE)
 public class GetVarPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
@@ -81,5 +87,5 @@ public class GetVarPlugin extends WebHarvestPlugin {
     public boolean hasBody() {
         return false;
     }
-    
+
 }
