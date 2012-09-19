@@ -42,6 +42,8 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,18 +79,6 @@ import org.webharvest.runtime.processors.WhileProcessor;
 import org.webharvest.runtime.processors.XPathProcessor;
 import org.webharvest.runtime.processors.XQueryProcessor;
 import org.webharvest.runtime.processors.XsltProcessor;
-import org.webharvest.runtime.processors.plugins.JsonToXmlPlugin;
-import org.webharvest.runtime.processors.plugins.SleepPlugin;
-import org.webharvest.runtime.processors.plugins.TokenizePlugin;
-import org.webharvest.runtime.processors.plugins.ValueOfPlugin;
-import org.webharvest.runtime.processors.plugins.XmlToJsonPlugin;
-import org.webharvest.runtime.processors.plugins.db.DatabasePlugin;
-import org.webharvest.runtime.processors.plugins.ftp.FtpPlugin;
-import org.webharvest.runtime.processors.plugins.mail.MailPlugin;
-import org.webharvest.runtime.processors.plugins.variable.DefVarPlugin;
-import org.webharvest.runtime.processors.plugins.variable.GetVarPlugin;
-import org.webharvest.runtime.processors.plugins.variable.SetVarPlugin;
-import org.webharvest.runtime.processors.plugins.zip.ZipPlugin;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
@@ -100,12 +90,16 @@ import org.webharvest.utils.CommonUtil;
  * @author Vladimir Nikic
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public enum DefinitionResolver {
+public class DefinitionResolver extends AbstractRefreshableResolver {
 
     /**
      * Singleton instance reference.
      */
-    INSTANCE;
+    public static final DefinitionResolver INSTANCE;
+
+    static {
+        INSTANCE = new DefinitionResolver();
+    }
 
     private final static class PluginClassKey {
 
@@ -132,8 +126,6 @@ public enum DefinitionResolver {
         }
     }
 
-    private ElementsRegistry elements = new ElementsRegistryImpl();
-
     // map containing pairs (class name, plugin element name)
     // of externally registered plugins
     private Map<PluginClassKey, ElementName> externalPlugins =
@@ -145,8 +137,24 @@ public enum DefinitionResolver {
 
 
     private DefinitionResolver() {
+        // FIXME: invocation below is a dirty hack and should be removed when
+        //        deprecated registerInternalProcessors method will be moved
+        //        somewhere else
+        addPostProcessor(new ResolverPostProcessor() {
+            @Override
+            public void postProcess(final ConfigurableResolver resolver) {
+                registerInternalProcessors();
+            }
+        });
+        addPostProcessor(new AnnotatedPluginsPostProcessor(
+            "org.webharvest.runtime.processors.plugins"));
 
-        // register processors
+        refresh();
+    }
+
+    @Deprecated
+    private void registerInternalProcessors() {
+         // register processors
         registerInternalElement("config", WebHarvestPluginDef.class, null, null, "charset,scriptlang,id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("empty", EmptyDef.class, EmptyProcessor.class, null, "id",
@@ -234,22 +242,6 @@ public enum DefinitionResolver {
                 XMLNS_CORE_10);
         registerInternalElement("var", VarDef.class, VarProcessor.class, "", "id,!name",
                 XMLNS_CORE_10);
-
-        // plugins for version 1.0 and 2.1
-        registerPlugin(DatabasePlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(JsonToXmlPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(XmlToJsonPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(MailPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(ZipPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(FtpPlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-        registerPlugin(TokenizePlugin.class, true, XMLNS_CORE, XMLNS_CORE_10);
-
-        // plugins introduced in version 2.1
-        registerPlugin(SetVarPlugin.class, true, XMLNS_CORE);
-        registerPlugin(DefVarPlugin.class, true, XMLNS_CORE);
-        registerPlugin(GetVarPlugin.class, true, XMLNS_CORE);
-        registerPlugin(ValueOfPlugin.class, true, XMLNS_CORE);
-        registerPlugin(SleepPlugin.class, true, XMLNS_CORE);
     }
 
     private void registerInternalElement(String name,
@@ -260,7 +252,8 @@ public enum DefinitionResolver {
         final ElementInfo elementInfo = new ElementInfo(name, defClass, processorClass, children, attributes);
         for (String ns : xmlns) {
             try {
-                elements.bind(new ElementName(name, ns), elementInfo);
+                getElementsRegistry().bind(new ElementName(name, ns),
+                        elementInfo);
             } catch (AlreadyBoundException e) {
                 // FIXME: This exception should never happen, since
                 // only internal elements are registered here. We'll get rid
@@ -297,7 +290,7 @@ public enum DefinitionResolver {
 
                 final ElementName pluginElementName = new ElementName(pluginName, uri);
                 try {
-                    elements.bind(pluginElementName, elementInfo);
+                    getElementsRegistry().bind(pluginElementName, elementInfo);
                 } catch (AlreadyBoundException e) {
                     throw new PluginException("Plugin \"" + pluginElementName + "\" is already registered!");
                 }
@@ -319,8 +312,14 @@ public enum DefinitionResolver {
         }
     }
 
-    public void registerPlugin(Class pluginClass, String uri) throws PluginException {
-        registerPlugin(pluginClass, false, uri);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerPlugin(
+            final Class< ? extends WebHarvestPlugin > pluginClass,
+            final String namespace) throws PluginException {
+        registerPlugin(pluginClass, false, namespace);
     }
 
     public void registerPlugin(String className, String uri) throws PluginException {
@@ -338,7 +337,7 @@ public enum DefinitionResolver {
         // only external plugins can be unregistered
         if (externalPlugins.containsKey(key)) {
             final ElementName pluginElementName = externalPlugins.get(key);
-            elements.unbind(pluginElementName);
+            getElementsRegistry().unbind(pluginElementName);
             externalPlugins.remove(key);
 
             // unregister dependant classes as well
@@ -364,7 +363,7 @@ public enum DefinitionResolver {
      * Returns names of all known elements.
      */
     public Set<ElementName> getElementNames() {
-        return elements.listBound();
+        return getElementsRegistry().listBound();
     }
 
     /**
@@ -374,7 +373,7 @@ public enum DefinitionResolver {
      *         or null if no element is defined.
      */
     public ElementInfo getElementInfo(String name, String uri) {
-        return elements.lookup(new ElementName(name, uri));
+        return getElementsRegistry().lookup(new ElementName(name, uri));
     }
 
     /**
@@ -447,7 +446,8 @@ public enum DefinitionResolver {
         }
 
         final boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
-        final Set<ElementName> allTagNameSet = elements.listBound();
+        final Set<ElementName> allTagNameSet =
+            getElementsRegistry().listBound();
         final Set<String> tags = elementInfo.getTagsSet();
 
         // check if element contains only allowed subelements
