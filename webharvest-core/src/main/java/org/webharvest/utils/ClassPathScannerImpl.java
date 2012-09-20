@@ -88,7 +88,8 @@ public final class ClassPathScannerImpl implements ClassPathScanner {
             new TypeAnnotationsScanner().filterResultsBy(annotationFilter);
 
         final ConfigurationBuilder builder = new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forJavaClassPath())
+            .setUrls(ClasspathHelper.forPackage(packageName,
+                    ClasspathHelper.classLoaders()))
             .filterInputsBy(packageFilter)
             .setScanners(annotationScanner);
 
