@@ -53,7 +53,6 @@ public class ElementInfo {
     // properties containing suggested attribute values
 
     private String name;
-    private Class<? extends WebHarvestPlugin> pluginClass;
     private Class<? extends IElementDef> definitionClass;
     private Class<? extends AbstractProcessor> processorClass;
     private String validTags;
@@ -75,16 +74,7 @@ public class ElementInfo {
                        Class<? extends IElementDef> definitionClass,
                        Class<? extends AbstractProcessor> processorClass,
                        String validTags, String validAtts) {
-        this(name, definitionClass, processorClass, validTags, validAtts, null);
-    }
-
-    public ElementInfo(String name,
-                       Class<? extends IElementDef> definitionClass,
-                       Class<? extends AbstractProcessor> processorClass,
-                       String validTags, String validAtts,
-                       Class<? extends WebHarvestPlugin> pluginClass) {
         this.name = name;
-        this.pluginClass = pluginClass;
         this.definitionClass = definitionClass;
         this.processorClass = processorClass;
         this.validTags = validTags;
@@ -139,11 +129,6 @@ public class ElementInfo {
         }
 
         return result.toString();
-    }
-
-
-    public Class getPluginClass() {
-        return pluginClass;
     }
 
     public Class<? extends IElementDef> getDefinitionClass() {

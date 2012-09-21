@@ -281,10 +281,9 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
                 final ElementInfo elementInfo = new ElementInfo(
                         pluginName,
                         WebHarvestPluginDef.class,
-                        null,
+                        pluginClass,
                         plugin.getTagDesc(),
-                        plugin.getAttributeDesc(),
-                        pluginClass);
+                        plugin.getAttributeDesc());
 
                 elementInfo.setPlugin(plugin);
 
@@ -389,7 +388,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
         final String nodeUri = node.getUri();
 
         final ElementInfo elementInfo = getElementInfo(nodeName, nodeUri);
-        if (elementInfo == null || elementInfo.getDefinitionClass() == null || elementInfo.getDefinitionClass() == WebHarvestPluginDef.class) {
+        if (elementInfo == null || elementInfo.getDefinitionClass() == null) {
             throw new ConfigurationException("Unexpected configuration element: " + node.getQName() + "!");
         }
 
