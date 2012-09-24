@@ -36,7 +36,6 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.definition.HttpDef;
 import org.webharvest.exception.HttpException;
@@ -106,7 +105,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         HttpClientManager manager = scraper.getHttpClientManager();
         manager.setCookiePolicy(cookiePolicy);
 
-        scraper.getLogger().info("Executing method {}...", method);
+        LOG.info("Executing method {}...", method);
 
         HttpResponseWrapper res = null;
         try {
@@ -122,12 +121,12 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
             Variable result;
 
             if (skipResponseBody) {
-                scraper.getLogger().info("Skipping response ({} bytes)", declaredContentLength);
+                LOG.info("Skipping response ({} bytes)", declaredContentLength);
                 result = EmptyVariable.INSTANCE;
                 actualContentLength = 0;
 
             } else {
-                scraper.getLogger().info("Getting response ({} bytes)...", declaredContentLength);
+                LOG.info("Getting response ({} bytes)...", declaredContentLength);
 
                 final byte[] responseBody = res.readBodyAsArray();
 
@@ -135,9 +134,9 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
                 actualContentLength = responseBody.length;
 
-                if (scraper.getLogger().isInfoEnabled()) {
-                    scraper.getLogger().info("Downloaded: " + url + ", mime type = " + mimeType + ", length = " + actualContentLength + "B.");
-                }
+                LOG.info("Downloaded: {}, mime type = {}, length = {}B.",
+                        new Object[] { url, mimeType, actualContentLength});
+
 
                 if (mimeType != null && !isTextMimeType(mimeType)) {
                     result = new NodeVariable(responseBody);

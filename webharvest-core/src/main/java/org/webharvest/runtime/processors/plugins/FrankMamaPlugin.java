@@ -6,6 +6,7 @@ import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
+@Deprecated
 public class FrankMamaPlugin extends WebHarvestPlugin {
 
     @Override

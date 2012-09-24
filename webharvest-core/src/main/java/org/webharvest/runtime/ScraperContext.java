@@ -40,7 +40,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -60,14 +59,12 @@ import static java.text.MessageFormat.format;
  */
 public class ScraperContext implements DynamicScopeContext {
 
-    public final Logger log;
-
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
+
     protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
     public ScraperContext(Scraper scraper) {
         variablesNamesStack.push(new HashSet<String>());
-        log = scraper.getLogger();
     }
 
     public void setLocalVar(String name, Object value) {

@@ -36,7 +36,16 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -48,20 +57,16 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Base processor that contains common processor logic.
  * All other processors extend this class.
  */
 public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
 
-    abstract public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
+    // TODO Consider making it a static logger
+    protected static final Logger LOG = LoggerFactory.getLogger(AbstractProcessor.class);
+
+    abstract protected Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
     protected TDef elementDef;
     private Map properties = new LinkedHashMap();
@@ -86,13 +91,14 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         if (scraperStatus == Scraper.STATUS_PAUSED) {
             final SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
             synchronized (scraper) {
-                scraper.getLogger().info("Execution paused [{}].", dateFormatter.format(new Date()));
+                LOG.info("Execution paused [{}].",
+                        dateFormatter.format(new Date()));
                 scraper.wait();
             }
 
 
             scraper.continueExecution();
-            scraper.getLogger().info("Execution continued [{}].", dateFormatter.format(new Date()));
+            LOG.info("Execution continued [{}].", dateFormatter.format(new Date()));
         }
 
         final long startTime = System.currentTimeMillis();
@@ -101,9 +107,10 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
 
         setProperty("ID", id);
 
-        if (scraper.getLogger().isInfoEnabled()) {
-            scraper.getLogger().info("{}{} starts processing...{}", new Object[]{
-                    CommonUtil.indent((scraper.getRunningLevel() - 1) * 4),
+        // FIXME Should we do it since its slf4j implementation?
+        if (LOG.isInfoEnabled()) {
+            LOG.info("{}{} starts processing...{}", new Object[]{
+                    CommonUtil.indent(scraper.getRunningLevel()),
                     getClass().getSimpleName(),
                     id != null ? "[ID=" + id + "] " : ""});
         }
@@ -124,9 +131,10 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
             writeDebugFile(result, id, scraper);
         }
 
-        if (scraper.getLogger().isInfoEnabled()) {
-            scraper.getLogger().info("{}{} processor executed in {}ms.{}", new Object[]{
-                    CommonUtil.indent((scraper.getRunningLevel() - 1) * 4),
+     // FIXME Should we do it since its slf4j implementation?
+        if (LOG.isInfoEnabled()) {
+            LOG.info("{}{} processor executed in {}ms. {}", new Object[]{
+                    CommonUtil.indent(scraper.getRunningLevel()),
                     getClass().getSimpleName(),
                     executionTime,
                     id != null ? "[ID=" + id + "] " : ""});
@@ -214,7 +222,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         try {
             FileUtils.writeByteArrayToFile(debugFile, data);
         } catch (IOException e) {
-            scraper.getLogger().warn(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
         }
     }
 

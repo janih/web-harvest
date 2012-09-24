@@ -76,7 +76,7 @@ public class FtpPlugin extends WebHarvestPlugin {
                 try {
                     ftpClient.disconnect();
                 } catch (IOException ioe) {
-                    scraper.getLogger().warn(ioe.getMessage(), ioe);
+                    LOG.warn(ioe.getMessage(), ioe);
                 }
             }
             ftpClient = null;

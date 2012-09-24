@@ -5,6 +5,7 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.Variable;
 
+@Deprecated
 public class FrankPlugin extends WebHarvestPlugin {
 
     @Override

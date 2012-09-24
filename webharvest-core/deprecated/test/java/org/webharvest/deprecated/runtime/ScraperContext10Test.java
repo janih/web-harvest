@@ -38,14 +38,12 @@
 
 package org.webharvest.deprecated.runtime;
 
-import org.slf4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
-import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
@@ -59,13 +57,9 @@ public class ScraperContext10Test extends UnitilsTestNG {
 
     Mock<Scraper> scraperMock;
 
-    @Dummy
-    Logger logger;
-
     @BeforeMethod
     public void before() {
-        scraperMock.returns(logger).getLogger();
-        scraperMock.returns(new HttpClientManager(logger)).getHttpClientManager();
+        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
         context = new ScraperContext10(scraperMock.getMock());
     }
 

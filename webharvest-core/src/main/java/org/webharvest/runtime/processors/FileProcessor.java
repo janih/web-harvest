@@ -182,9 +182,8 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
             try {
                 byte[] data = CommonUtil.readBytesFromFile(new File(fullPath));
-                if (scraper.getLogger().isInfoEnabled()) {
-                    scraper.getLogger().info("Binary file read processor: " + data.length + " bytes read.");
-                }
+                LOG.info("Binary file read processor: {} bytes read.",
+                        data.length);
                 return new NodeVariable(data);
             } catch (IOException e) {
                 throw new FileException("Error reading file: " + fullPath, e);
@@ -192,14 +191,17 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         } else {
             try {
                 String content = CommonUtil.readStringFromFile(new File(fullPath), charset);
-                if (scraper.getLogger().isInfoEnabled()) {
-                    scraper.getLogger().info("Text file read processor: " + (content == null ? 0 : content.length()) + " characters read.");
-                }
+                LOG.info("Text file read processor: {} characters read.",
+                        charCount(content));
                 return new NodeVariable(content);
             } catch (IOException e) {
                 throw new FileException("Error reading the file: " + fullPath, e);
             }
         }
+    }
+
+    private int charCount(final String content) {
+        return (content == null ? 0 : content.length());
     }
 
     public NodeVariable appendBinary(Variable body) {

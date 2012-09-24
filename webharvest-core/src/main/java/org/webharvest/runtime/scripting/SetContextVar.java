@@ -41,6 +41,9 @@ package org.webharvest.runtime.scripting;
 import bsh.CallStack;
 import bsh.Interpreter;
 import bsh.UtilEvalError;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.utils.CommonUtil;
 
@@ -54,12 +57,13 @@ import org.webharvest.utils.CommonUtil;
 @Deprecated
 public class SetContextVar {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SetContextVar.class);
+
     public static final String SCRAPER_VAR_NAME = "__" + Scraper.class.getName().replace(".", "_");
 
     public static void invoke(Interpreter interpreter, CallStack callstack, String name, Object value) throws UtilEvalError {
         final Scraper scraper = (Scraper) interpreter.getNameSpace().getVariable(SCRAPER_VAR_NAME);
-        scraper.getLogger().warn("SetContextVar is DEPRECATED! No need to use it anymore. " +
-                "All variables defined on the top level of the script block are propagated to the scraper context automatically.");
+        LOG.warn("SetContextVar is DEPRECATED! No need to use it anymore. All variables defined on the top level of the script block are propagated to the scraper context automatically.");
 
         scraper.getContext().setLocalVar(name, CommonUtil.createVariable(value));
     }

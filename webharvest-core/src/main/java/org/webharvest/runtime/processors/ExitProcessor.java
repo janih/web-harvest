@@ -1,5 +1,7 @@
 package org.webharvest.runtime.processors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.definition.ExitDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -25,9 +27,7 @@ public class ExitProcessor extends AbstractProcessor<ExitDef> {
                 message = "";
             }
             scraper.exitExecution(message);
-            if (scraper.getLogger().isInfoEnabled()) {
-                scraper.getLogger().info("Configuration exited: " + message);
-            }
+            LOG.info("Configuration exited: {}", message);
         }
 
         return EmptyVariable.INSTANCE;

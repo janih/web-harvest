@@ -93,11 +93,13 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             "\t\n" +
             "</config>";
 
-    private static Logger logger = Logger.getLogger(ConfigPanel.class);
+    private static Logger LOG = Logger.getLogger(ConfigPanel.class);
 
     static {
-        logger.addAppender(TextAreaAppender.INSTANCE);
+        LOG.addAppender(TextAreaAppender.INSTANCE);
         Logger.getLogger(Scraper.class).addAppender(TextAreaAppender.INSTANCE);
+        Logger.getLogger(AbstractProcessor.class).addAppender(TextAreaAppender.INSTANCE);
+        // TODO Register all loggers we want to trace messages in IDE log panel
     }
 
     private XmlEditorScrollPane xmlEditorScrollPane;
@@ -508,7 +510,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
             ide.setTabIcon(this, null);
         } catch (RuntimeException e) {
-            logger.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             ide.setTabIcon(this, ResourceManager.SMALL_ERROR_ICON);
             GuiUtils.showErrorMessage(e.getMessage());
             return false;
@@ -669,9 +671,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
-        if (this.scraper != null) {
-            this.scraper.getLogger().error(errorMessage + "\n" + writer.getBuffer().toString());
-        }
+
+        LOG.error(errorMessage + "\n" + writer.getBuffer().toString());
 
         if (settings.isShowFinishDialog()) {
             GuiUtils.showErrorMessage(errorMessage);

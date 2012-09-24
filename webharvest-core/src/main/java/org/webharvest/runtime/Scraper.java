@@ -63,10 +63,10 @@ import java.util.*;
 /**
  * Basic runtime class.
  */
-@SuppressWarnings({"UnusedDeclaration"})
+//@SuppressWarnings({"UnusedDeclaration"})
 public class Scraper {
 
-    private static final Logger logger = LoggerFactory.getLogger(Scraper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_RUNNING = 1;
@@ -119,7 +119,7 @@ public class Scraper {
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
 
-        this.httpClientManager = new HttpClientManager(logger);
+        this.httpClientManager = new HttpClientManager();
 
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
                 ? new ScraperContext10(this)
@@ -160,6 +160,7 @@ public class Scraper {
         }
     }
 
+    // TODO rbala Make it private. Currently used only by IncludeProcessor
     public Variable execute(List<IElementDef> ops) {
         this.setStatus(STATUS_RUNNING);
 
@@ -199,11 +200,12 @@ public class Scraper {
             listener.onExecutionEnd(this);
         }
 
-        if (logger.isInfoEnabled()) {
+        if (LOG.isInfoEnabled()) {
             if (this.status == STATUS_FINISHED) {
-                logger.info("Configuration executed in " + (System.currentTimeMillis() - startTime) + "ms.");
+                LOG.info("Configuration executed in {} ms.",
+                        (System.currentTimeMillis() - startTime));
             } else if (this.status == STATUS_STOPPED) {
-                logger.info("Configuration stopped!");
+                LOG.info("Configuration stopped!");
             }
         }
     }
@@ -270,25 +272,6 @@ public class Scraper {
 
     public void setDebug(boolean debug) {
         this.isDebugMode = debug;
-    }
-
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public AbstractProcessor getRunningProcessor() {
-        return runningProcessors.peek();
-    }
-
-    /**
-     * @param processor Processor whose parent is needed.
-     * @return Parent running processor of the specified running processor, or null if processor is
-     *         not currently running or if it is top running processor.
-     */
-    public AbstractProcessor getParentRunningProcessor(AbstractProcessor processor) {
-        List<AbstractProcessor> runningProcessorList = runningProcessors.getList();
-        int index = CommonUtil.findValueInCollection(runningProcessorList, processor);
-        return index > 0 ? runningProcessorList.get(index - 1) : null;
     }
 
     /**

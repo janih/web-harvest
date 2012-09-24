@@ -38,13 +38,11 @@
 
 package org.webharvest.runtime.processors;
 
-import org.slf4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
-import org.unitils.mock.annotation.Dummy;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.web.HttpClientManager;
@@ -61,13 +59,9 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNG {
     ScraperContext context;
     Mock<Scraper> scraperMock;
 
-    @Dummy
-    Logger logger;
-
     @BeforeMethod
     public void before() {
-        scraperMock.returns(logger).getLogger();
-        scraperMock.returns(new HttpClientManager(logger)).getHttpClientManager();
+        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
 
         context = new ScraperContext(scraperMock.getMock());
     }

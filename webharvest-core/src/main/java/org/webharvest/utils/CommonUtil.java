@@ -214,12 +214,27 @@ public class CommonUtil {
 
     private static AtomicReference<String> cachedBlankString = new AtomicReference<String>(StringUtils.repeat(" ", 128));
 
+    /**
+     * Helper method deciding about the indent for logger for currently
+     * invoked processor.
+     *
+     * @deprecated Provides unnecessary complexity for logging facility.
+     * @param length actually the currently invoked processor level
+     * @return
+     */
+    @Deprecated
     public static String indent(int length) {
+        // FIXME rbala (moved code responsible for computation of indent for particular nested processor level from AbstractProcessor
+        if (length < 1) {
+            return "";
+        }
+        final int level = ((length - 1) * 4);
+
         String blankString;
-        while ((blankString = cachedBlankString.get()).length() < length) {
+        while ((blankString = cachedBlankString.get()).length() < level) {
             cachedBlankString.compareAndSet(blankString, StringUtils.repeat(" ", (blankString.length() * 3) / 2 + 1));
         }
-        return blankString.substring(0, length);
+        return blankString.substring(0, level);
     }
 
     private static String encodeUrlParam(String value, String charset) throws UnsupportedEncodingException {

@@ -51,6 +51,7 @@ import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
@@ -70,19 +71,20 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 public class HttpClientManager {
 
+    private static final Logger LOG =
+        LoggerFactory.getLogger(HttpClientManager.class);
+
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1";
 
     static {
-        // registers default handling for https 
+        // registers default handling for https
         Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), 443));
     }
 
-    private final Logger logger;
     private final HttpClient client;
     private final HttpInfo httpInfo;
 
-    public HttpClientManager(Logger logger) {
-        this.logger = logger;
+    public HttpClientManager() {
         this.client = new HttpClient();
         this.httpInfo = new HttpInfo(client);
 
@@ -248,7 +250,7 @@ public class HttpClientManager {
                     throw new org.webharvest.exception.HttpException("IO error during HTTP execution for URL: " + url, e);
                 }
                 wasException = true;
-                logger.warn("Exception occurred during executing HTTP method {}: {}", method.getName(), e.getMessage());
+                LOG.warn("Exception occurred during executing HTTP method {}: {}", method.getName(), e.getMessage());
             }
 
             if (!wasException
@@ -265,7 +267,7 @@ public class HttpClientManager {
 
             final long delayBeforeRetry = (long) (retryDelay * (Math.pow(retryDelayFactor, retryAttempts - attemptsRemain)));
 
-            logger.warn("HTTP Status: {}; URL: [{}]; Waiting for {} second(s) before retrying (attempt {} of {})...", new Object[]{
+            LOG.warn("HTTP Status: {}; URL: [{}]; Waiting for {} second(s) before retrying (attempt {} of {})...", new Object[]{
                     method.getStatusLine(), url, MILLISECONDS.toSeconds(delayBeforeRetry), retryAttempts - attemptsRemain + 1, retryAttempts});
 
             Thread.sleep(delayBeforeRetry);

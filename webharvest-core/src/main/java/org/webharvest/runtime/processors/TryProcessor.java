@@ -68,9 +68,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                         ? new InterruptedException(e.getMessage())
                         : (InterruptedException) ExceptionUtils.getThrowableList(e).get(interruptedExceptionIndexInChain);
             }
-            if (scraper.getLogger().isInfoEnabled()) {
-                scraper.getLogger().info("Exception caught with try processor: " + e.getMessage());
-            }
+            LOG.info("Exception caught with try processor: {}", e.getMessage());
 
             return context.executeWithinNewContext(new Callable<Variable>() {
                 @Override

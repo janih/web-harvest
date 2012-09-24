@@ -38,13 +38,10 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
-import groovy.lang.MissingPropertyException;
-import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
-import org.unitils.mock.annotation.Dummy;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -59,16 +56,12 @@ import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPl
 @SuppressWarnings({"unchecked"})
 public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
 
-    @Dummy
-    Logger logger;
-
     ScraperContext context;
     Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
         context = new ScraperContext(scraperMock.getMock());
-        scraperMock.returns(logger).getLogger();
         scraperMock.returns(context).getContext();
         scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
     }

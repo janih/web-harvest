@@ -38,12 +38,10 @@
 
 package org.webharvest.runtime.processors;
 
-import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
-import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.runtime.Scraper;
@@ -69,14 +67,10 @@ public class ScriptProcessorTest extends UnitilsTestNG {
     Mock<ScriptEngineFactory> scriptEngineFactoryMock;
     Mock<ScriptEngine> engineMock;
 
-    @Dummy
-    Logger logger;
-
     @BeforeMethod
     public void before() {
         context = new ScraperContext(scraperMock.getMock());
-        scraperMock.returns(logger).getLogger();
-        scraperMock.returns(new HttpClientManager(logger)).getHttpClientManager();
+        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
         scraperMock.returns(context).getContext();
         scraperMock.returns(scriptEngineFactoryMock.getMock()).getScriptEngineFactory();
         scriptEngineFactoryMock.returns(engineMock.getMock()).getEngine(null);

@@ -41,6 +41,8 @@ package org.webharvest.deprecated.runtime;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -59,6 +61,8 @@ import static java.text.MessageFormat.format;
 
 public class ScraperContext10 implements DynamicScopeContext {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
+
     private static final String CALLER_PREFIX = "caller.";
 
     private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
@@ -67,10 +71,7 @@ public class ScraperContext10 implements DynamicScopeContext {
     public ScraperContext10(Scraper scraper) {
         this.stack.push(new HashMap<String, Variable>());
         this.scraper = scraper;
-        scraper.getLogger().warn("" +
-                "You are using the DEPRECATED scraper configuration version. " +
-                "We urge you to migrate to a newer one! " +
-                "Please visit http://web-harvest.sourceforge.net/release.php for details.");
+        LOG.warn("You are using the DEPRECATED scraper configuration version. We urge you to migrate to a newer one! Please visit http://web-harvest.sourceforge.net/release.php for details.");
     }
 
     @Override
