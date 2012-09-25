@@ -38,6 +38,8 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
@@ -45,11 +47,9 @@ import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
-
-import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
 public class SetVarPluginTest extends UnitilsTestNG {
@@ -59,7 +59,7 @@ public class SetVarPluginTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
+        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
 
         context = new ScraperContext(scraperMock.getMock());
         scraperMock.returns(context).getContext();

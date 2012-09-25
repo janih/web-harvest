@@ -83,9 +83,12 @@ public class BaseTemplater {
             endIndex = source.indexOf(VAR_END, startIndex);
 
             if (endIndex > startIndex) {
+                final ScriptSource scriptSource = new ScriptSource(
+                        source.substring(startIndex + VAR_START.length(),
+                                endIndex), language);
                 final Object resultObj = scraper.getScriptEngineFactory().
-                        getEngine(new ScriptSource(source.substring(startIndex + VAR_START.length(), endIndex), language)).
-                        evaluate(scraper.getContext());
+                        getEngine(scriptSource).
+                        evaluate(scraper.getContext(), scriptSource);
 
                 if (resultObj != null) {
                     result.add(resultObj);

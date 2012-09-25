@@ -1,6 +1,5 @@
 /*
- Copyright (c) 2006-2007, Vladimir Nikic
- All rights reserved.
+ Copyright (c) 2006-2012 the original author or authors.
 
  Redistribution and use of this software in source and binary forms,
  with or without modification, are permitted provided that the following
@@ -30,92 +29,32 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-
- You can contact Vladimir Nikic by sending e-mail to
- nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
- subject line.
- */
+*/
 
 package org.webharvest.runtime.scripting;
 
-import org.webharvest.exception.ScriptEngineException;
-import org.webharvest.exception.ScriptException;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.apache.commons.lang.ObjectUtils.defaultIfNull;
-
 /**
- * Created by IntelliJ IDEA.
- * User: awajda
- * Date: Sep 26, 2010
- * Time: 4:42:44 PM
+ * Factory creating {@link ScriptEngine} instances capable of executing
+ * provided {@link ScriptSource}. Along with {@link ScriptEngine} interface
+ * provides abstraction over scripting engine implementations.
+ *
+ * @see ScriptEngine
+ *
+ * @author Piotr Dyraga
+ * @since 2.1.0-SNAPSHOT
+ * @version %I%, %G%
  */
-public class ScriptEngineFactory {
+public interface ScriptEngineFactory {
 
-    private final ScriptingLanguage defaultScriptingLanguage;
-    private final Scraper scraper;
-
-    private Map<ScriptingLanguage, Map<String, ScriptEngine>> engineCachePerLanguage;
-
-    // todo: for backward compat only. Think about better way to reuse methods and functions between scripts.
-    public final BeanShellScriptEngine.BeanShellDelegate bsh;
-
-    public ScriptEngineFactory(ScriptingLanguage defaultScriptingLanguage, Scraper scraper) {
-        this.defaultScriptingLanguage = defaultScriptingLanguage;
-        this.scraper = scraper;
-        this.engineCachePerLanguage = new HashMap<ScriptingLanguage, Map<String, ScriptEngine>>();
-
-        // initialize cache for each language
-        for (ScriptingLanguage language : ScriptingLanguage.values()) {
-            engineCachePerLanguage.put(language, new HashMap<String, ScriptEngine>());
-        }
-
-        bsh = new BeanShellScriptEngine.BeanShellDelegate(scraper);
-    }
-
-    public ScriptEngine getEngine(ScriptSource scriptSource) {
-        final Map<String, ScriptEngine> engineCache = engineCachePerLanguage.get(getLanguageNotNull(scriptSource.getLanguage()));
-        final String key = createCacheKey(scriptSource.getSourceCode());
-
-        ScriptEngine engine = engineCache.get(key);
-        if (engine == null) {
-            engine = createEngine(scriptSource);
-            engineCache.put(key, engine);
-        }
-
-        return engine;
-    }
-
-    private ScriptEngine createEngine(ScriptSource scriptSource) {
-        try {
-            return getLanguageNotNull(scriptSource.getLanguage()).engineClass.
-                    getConstructor(String.class, ScriptEngineFactory.class).
-                    newInstance(scriptSource.getSourceCode(), this);
-        } catch (InstantiationException e) {
-            throw new ScriptEngineException(e);
-        } catch (IllegalAccessException e) {
-            throw new ScriptEngineException(e);
-        } catch (NoSuchMethodException e) {
-            throw new ScriptEngineException(e);
-        } catch (InvocationTargetException e) {
-            throw new ScriptException(e.getTargetException());
-        }
-    }
-
-    private String createCacheKey(String input) {
-        return input;
-    }
-
-    private ScriptingLanguage getLanguageNotNull(ScriptingLanguage language) {
-        return (ScriptingLanguage) defaultIfNull(language, defaultScriptingLanguage);
-    }
-
-    public Scraper getScraper() {
-        return scraper;
-    }
+    /**
+     * Returns {@link ScriptEngine} capable of executing provided
+     * {@link ScriptSource}.
+     *
+     * @param scriptSource
+     *            not {@code null} ScriptSource for which {@link ScriptEngine}
+     *            will be returned
+     * @return {@link ScriptEngine} capable of executing provided
+     *         {@link ScriptSource}.
+     */
+    ScriptEngine getEngine(ScriptSource scriptSource);
 }

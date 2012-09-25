@@ -39,9 +39,6 @@
 package org.webharvest.runtime.scripting;
 
 import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.scripting.impl.BeanShellScriptEngine;
-import org.webharvest.runtime.scripting.impl.GroovyScriptEngine;
-import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,15 +48,9 @@ import org.webharvest.runtime.scripting.impl.JavascriptScriptEngine;
  */
 public enum ScriptingLanguage {
 
-    BEANSHELL(BeanShellScriptEngine.class),
-    JAVASCRIPT(JavascriptScriptEngine.class),
-    GROOVY(GroovyScriptEngine.class);
-
-    public final Class<? extends ScriptEngine> engineClass;
-
-    ScriptingLanguage(Class<? extends ScriptEngine> engineClass) {
-        this.engineClass = engineClass;
-    }
+    BEANSHELL,
+    JAVASCRIPT,
+    GROOVY;
 
     public static ScriptingLanguage recognize(String name) {
         name = StringUtils.upperCase(StringUtils.trimToNull(name));

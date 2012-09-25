@@ -59,13 +59,12 @@ public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
             sourceCode += ("; " + BaseTemplater.evaluateToString(returnExpression, null, scraper));
         }
 
-        return CommonUtil.createVariable(
-                scraper.getScriptEngineFactory().
-                        getEngine(new ScriptSource(
-                                sourceCode,
-                                ScriptingLanguage.recognize(
-                                        BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)))).
-                        evaluate(context));
+        final ScriptSource scriptSource = new ScriptSource(sourceCode,
+                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(
+                        elementDef.getLanguage(), null, scraper)));
+
+        return CommonUtil.createVariable(scraper.getScriptEngineFactory()
+                .getEngine(scriptSource).evaluate(context, scriptSource));
     }
 
 }

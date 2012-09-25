@@ -78,7 +78,7 @@ public class ScriptProcessorTest extends UnitilsTestNG {
 
     @Test
     public void testExecute_defaultLang() throws Exception {
-        engineMock.returns("my val").evaluate(null);
+        engineMock.returns("my val").evaluate(context, null);
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
                 ProcessorTestUtils.<ScriptProcessor>processor("" +
@@ -91,7 +91,7 @@ public class ScriptProcessorTest extends UnitilsTestNG {
 
     @Test
     public void testExecute_specifiedLang() throws Exception {
-        engineMock.returns("my val").evaluate(null);
+        engineMock.returns("my val").evaluate(context, null);
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
                 ProcessorTestUtils.<ScriptProcessor>processor("" +
@@ -104,7 +104,7 @@ public class ScriptProcessorTest extends UnitilsTestNG {
 
     @Test
     public void testExecute_langGroovy() throws Exception {
-        engineMock.returns("my val").evaluate(null);
+        engineMock.returns("my val").evaluate(context, null);
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
                 ProcessorTestUtils.<ScriptProcessor>processor("" +
@@ -124,7 +124,7 @@ public class ScriptProcessorTest extends UnitilsTestNG {
                 returns(templaterMock.getMock()).
                 getEngine(new ScriptSource("myReturnExpr", null));
 
-        templaterMock.returns("my return code").evaluate(null);
+        templaterMock.returns("my return code").evaluate(context, null);
 
         ProcessorTestUtils.<ScriptProcessor>processor("" +
                 "<script return='${myReturnExpr}'><![CDATA[ some script here ]]></script>").

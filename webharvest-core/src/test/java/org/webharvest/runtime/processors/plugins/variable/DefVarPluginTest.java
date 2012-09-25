@@ -38,6 +38,9 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
@@ -45,12 +48,9 @@ import org.unitils.mock.Mock;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
-
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 @SuppressWarnings({"unchecked"})
 public class DefVarPluginTest extends UnitilsTestNG {
@@ -63,7 +63,7 @@ public class DefVarPluginTest extends UnitilsTestNG {
         context = new ScraperContext(scraperMock.getMock());
 
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
+        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test

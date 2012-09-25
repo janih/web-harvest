@@ -1,103 +1,63 @@
-/*  Copyright (c) 2006-2007, Vladimir Nikic
-    All rights reserved.
+/*
+ Copyright (c) 2006-2012 the original author or authors.
 
-    Redistribution and use of this software in source and binary forms,
-    with or without modification, are permitted provided that the following
-    conditions are met:
+ Redistribution and use of this software in source and binary forms,
+ with or without modification, are permitted provided that the following
+ conditions are met:
 
-    * Redistributions of source code must retain the above
-      copyright notice, this list of conditions and the
-      following disclaimer.
+ * Redistributions of source code must retain the above
+   copyright notice, this list of conditions and the
+   following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
-      copyright notice, this list of conditions and the
-      following disclaimer in the documentation and/or other
-      materials provided with the distribution.
+ * Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other
+   materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote 
-      products derived from this software without specific prior
-      written permission.
+ * The name of Web-Harvest may not be used to endorse or promote
+   products derived from this software without specific prior
+   written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-
-    You can contact Vladimir Nikic by sending e-mail to
-    nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
-    subject line.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
 */
+
 package org.webharvest.runtime.scripting;
 
-import org.webharvest.exception.BaseException;
-import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.variables.ScriptingVariable;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.KeyValuePair;
 
 /**
- * Abstract scripting engine.
+ * Interface providing scripting functionality. Allows for execution of scripts
+ * written in various languages. All scripting language engines supported by
+ * Web Harvest are expected to implement this interface.
+ *
+ * @author Piotr Dyraga
+ * @since 2.1.0-SNAPSHOT
+ * @version %I%, %G%
  */
-public abstract class ScriptEngine {
+public interface ScriptEngine {
 
-    protected final ScriptEngineFactory factory;
-
-    protected ScriptEngine(ScriptEngineFactory factory) {
-        this.factory = factory;
-    }
-
-    public Object evaluate(DynamicScopeContext context) {
-        try {
-            beforeEvaluation();
-
-            // push all variables from context to the scripter
-            for (KeyValuePair<Variable> pair : context) {
-                final Variable value = pair.getValue();
-                //todo: why not just unwrap every variable?
-                setEngineVariable(pair.getKey(), (value instanceof ScriptingVariable)
-                        ? value.getWrappedObject()
-                        : value);
-            }
-
-            final Object result = doEvaluate();
-
-            for (KeyValuePair<Object> pair : getEngineVariables()) {
-                final String varName = pair.getKey();
-                final Variable variable = (pair.getValue() instanceof Variable)
-                        ? (Variable) pair.getValue()
-                        : new ScriptingVariable(pair.getValue());
-                if (context.containsVar(varName)) {
-                    context.replaceExistingVar(varName, variable);
-                } else {
-                    context.setLocalVar(varName, variable);
-                }
-            }
-
-            return result;
-        } catch (BaseException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new ScriptException(e);
-        } finally {
-            afterEvaluation();
-        }
-    }
-
-    protected abstract void beforeEvaluation();
-
-    protected abstract void setEngineVariable(String name, Object value);
-
-    protected abstract Object doEvaluate();
-
-    protected abstract Iterable<KeyValuePair<Object>> getEngineVariables();
-
-    protected abstract void afterEvaluation();
+    /**
+     * Executes script provided in {@link ScriptSource}. Additionally, all
+     * variables defined in {@link DynamicScopeContext} are copied to the script
+     * engine context, so that they are accessible within the script.
+     *
+     * @param context
+     *            not {@code null} reference to the current
+     *            {@link DynamicScopeContext}
+     * @param script
+     *            not {@code null} {@link ScriptSource} representing script
+     *            which is going to be executed
+     * @return result of the script execution
+     */
+    Object evaluate(DynamicScopeContext context, ScriptSource script);
 }

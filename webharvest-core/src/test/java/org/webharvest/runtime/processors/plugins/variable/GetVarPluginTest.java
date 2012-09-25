@@ -38,6 +38,9 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import static java.util.Arrays.asList;
+import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,15 +50,12 @@ import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
-
-import static java.util.Arrays.asList;
-import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPlugin;
 
 public class GetVarPluginTest extends UnitilsTestNG {
 
@@ -65,7 +65,7 @@ public class GetVarPluginTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new ScriptEngineFactory(ScriptingLanguage.GROOVY, scraperMock.getMock())).getScriptEngineFactory();
+        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test

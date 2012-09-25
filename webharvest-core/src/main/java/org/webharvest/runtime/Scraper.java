@@ -36,6 +36,15 @@
 */
 package org.webharvest.runtime;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
@@ -48,17 +57,15 @@ import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
-import org.webharvest.utils.*;
+import org.webharvest.utils.ClassLoaderUtil;
+import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.*;
+import org.webharvest.utils.SystemUtilities;
 
 /**
  * Basic runtime class.
@@ -127,7 +134,7 @@ public class Scraper {
 
         initContext(context, this);
 
-        this.scriptEngineFactory = new ScriptEngineFactory(configuration.getScriptingLanguage(), this);
+        this.scriptEngineFactory = new JSRScriptEngineFactory(configuration.getScriptingLanguage());
     }
 
     public static void initContext(DynamicScopeContext context, Scraper scraper) {
