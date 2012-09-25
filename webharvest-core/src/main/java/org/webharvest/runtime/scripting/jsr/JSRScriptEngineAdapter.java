@@ -38,6 +38,7 @@ import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptSource;
+import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
@@ -90,7 +91,16 @@ public final class JSRScriptEngineAdapter implements ScriptEngine {
     private void copyVariables(final DynamicScopeContext context) {
         for (KeyValuePair<Variable> pair : context) {
             final Variable value = pair.getValue();
-            adaptee.put(pair.getKey(), value.getWrappedObject());
+
+            // FIXME: The inline condition below has been moved from the
+            // first web harvest implementation of script engines
+            // (org.webharvest.runtime.scripting.ScriptEngine abstract class);
+            // It was required to place it here for backward compatibility,
+            // however it would be neat if we just had value.getWrappedObject()
+            // invocation; this way we could use in scripts wrapped objects
+            // directly instead of manually unwrapping them...
+            adaptee.put(pair.getKey(), (value instanceof ScriptingVariable)
+                            ? value.getWrappedObject() : value);
         }
     }
 }

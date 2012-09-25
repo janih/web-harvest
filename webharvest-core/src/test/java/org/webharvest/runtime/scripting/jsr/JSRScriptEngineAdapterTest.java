@@ -81,8 +81,8 @@ public class JSRScriptEngineAdapterTest extends UnitilsTestNG {
         adapter.evaluate(mockContext.getMock(), scriptSource);
 
         mockContext.assertInvoked().iterator();
-        adaptee.assertInvoked().put(eq("var1name"), eq("var1value"));
-        adaptee.assertInvoked().put(eq("var2name"), eq("var2value"));
+        adaptee.assertInvoked().put(eq("var1name"), same(value1));
+        adaptee.assertInvoked().put(eq("var2name"), same(value2));
     }
 
     @Test
