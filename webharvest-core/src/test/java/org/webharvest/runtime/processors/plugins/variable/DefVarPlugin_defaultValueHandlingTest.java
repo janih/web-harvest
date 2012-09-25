@@ -54,7 +54,7 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 
 @SuppressWarnings({"unchecked"})
-public class DefVarPluginTest_defaultValueHandling extends UnitilsTestNG {
+public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
