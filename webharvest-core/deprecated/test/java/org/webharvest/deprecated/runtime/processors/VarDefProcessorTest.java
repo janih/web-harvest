@@ -42,6 +42,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.ProcessorTestUtils;
@@ -72,7 +73,9 @@ public class VarDefProcessorTest extends UnitilsTestNG {
     }
 
     private Variable invoke(String varDefXml) throws InterruptedException {
-        return ProcessorTestUtils.<VarDefProcessor>processor(varDefXml).
+        return ProcessorTestUtils.<VarDefProcessor>processor(
+                    XmlNodeTestUtils.createXmlNode(varDefXml,
+                        XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context);
     }
 

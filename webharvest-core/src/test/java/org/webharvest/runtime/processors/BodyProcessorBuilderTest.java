@@ -1,14 +1,11 @@
 package org.webharvest.runtime.processors;
 
-import java.io.StringReader;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.webharvest.definition.AbstractElementDef;
-import org.webharvest.definition.XmlNode;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.processors.BodyProcessor.Builder;
-import org.xml.sax.InputSource;
 
 public class BodyProcessorBuilderTest extends UnitilsTestNG {
 
@@ -28,8 +25,8 @@ public class BodyProcessorBuilderTest extends UnitilsTestNG {
         private class MockElementDef extends AbstractElementDef {
 
             protected MockElementDef() {
-                super(XmlNode.getInstance(
-                        new InputSource(new StringReader("<x/>"))), false);
+                super(XmlNodeTestUtils.createXmlNode("<empty/>",
+                        XmlNodeTestUtils.NAMESPACE_21), false);
             }
 
         }

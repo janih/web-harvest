@@ -45,6 +45,7 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -69,8 +70,9 @@ public class SetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_valueAsAttr() throws Exception {
         context.setLocalVar("name", new NodeVariable("World"));
 
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='greetings' value='Hello, ${name}!'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
         ReflectionAssert.assertReflectionEquals(
@@ -82,8 +84,9 @@ public class SetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_valueAsBody() throws Exception {
         context.setLocalVar("name", new NodeVariable("World"));
 
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='greetings'><template>Hello, ${name}!</template></set>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
         ReflectionAssert.assertReflectionEquals(
@@ -93,8 +96,9 @@ public class SetVarPluginTest extends UnitilsTestNG {
 
     @Test
     public void testExecutePlugin_bodyIgnoredWhenAttrSpecified() throws Exception {
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='x' value='actual'>ignored</set>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
         ReflectionAssert.assertReflectionEquals(
@@ -106,8 +110,9 @@ public class SetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_replace() throws Exception {
         context.setLocalVar("x", new NodeVariable("old"));
 
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='x' value='new'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
 
         ReflectionAssert.assertReflectionEquals(

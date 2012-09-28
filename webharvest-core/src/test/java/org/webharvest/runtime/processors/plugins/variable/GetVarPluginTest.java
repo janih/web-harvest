@@ -47,6 +47,7 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -74,7 +75,8 @@ public class GetVarPluginTest extends UnitilsTestNG {
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable(123),
-                createPlugin("<get var='x'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()));
+                createPlugin(XmlNodeTestUtils.createXmlNode("<get var='x'/>",
+                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock()));
 
         contextMock.assertInvoked().getVar("x");
     }
@@ -84,7 +86,8 @@ public class GetVarPluginTest extends UnitilsTestNG {
         contextMock.returns(EmptyVariable.INSTANCE).getVar("empty");
 
         Assert.assertSame(
-                createPlugin("<get var='empty'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
+                createPlugin(XmlNodeTestUtils.createXmlNode("<get var='empty'/>",
+                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
                 EmptyVariable.INSTANCE);
 
         contextMock.assertInvoked().getVar("empty");
@@ -102,7 +105,8 @@ public class GetVarPluginTest extends UnitilsTestNG {
                 iterator();
 
         Assert.assertEquals(
-                createPlugin("<get var='x${5+2}'/>", GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()),
+                createPlugin(XmlNodeTestUtils.createXmlNode("<get var='x${5+2}'/>",
+                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()),
                 v123);
 
         contextMock.assertInvoked().getVar("x7");
@@ -110,7 +114,8 @@ public class GetVarPluginTest extends UnitilsTestNG {
 
     @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notDefined() throws Exception {
-        createPlugin("<get var='not defined'/>", GetVarPlugin.class).executePlugin(null, contextMock.getMock());
+        createPlugin(XmlNodeTestUtils.createXmlNode("<get var='not defined'/>",
+                XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock());
     }
 
 }

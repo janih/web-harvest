@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2007 sp1 (http://www.altova.com) by vlada (vlada) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" targetNamespace="http://web-harvest.sourceforge.net/schema/1.0/config" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="config">
 		<xs:annotation>
 			<xs:documentation>Basic element - contains sequence of process descriptions</xs:documentation>

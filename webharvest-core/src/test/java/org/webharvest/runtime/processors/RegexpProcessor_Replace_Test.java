@@ -43,6 +43,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.web.HttpClientManager;
@@ -68,83 +69,90 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNG {
 
     @Test
     public void testExecute_fullMatch() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "[a111b222c333] => [111][222][333]");
     }
 
     @Test
     public void testExecute_notMatch() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(\\d+)$</regexp-pattern>" +
                 "  <regexp-source>xxx</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "xxx");
     }
 
     @Test
     public void testExecute_emptySource() throws Exception {
-        Assert.assertTrue(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertTrue(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source></regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).isEmpty());
     }
 
     @Test
     public void testExecute_1st_group_absent() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>b222c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "[b222c333] => [][222][333]");
     }
 
     @Test
     public void testExecute_2nd_group_absent() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "[a111c333] => [111][][333]");
     }
 
     @Test
     public void testExecute_3rd_group_absent() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "[a111b222] => [111][222][]");
     }
 
     @Test
     public void testExecute_replaceAll() throws Exception {
-        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor("" +
+        Assert.assertEquals(ProcessorTestUtils.<RegexpProcessor>processor(
+                XmlNodeTestUtils.createXmlNode("" +
                 "<regexp replace='yes'>" +
                 "  <regexp-pattern>\\d+</regexp-pattern>" +
                 "  <regexp-source>a111b222</regexp-source>" +
                 "  <regexp-result>|</regexp-result>" +
-                "</regexp>").
+                "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 execute(scraperMock.getMock(), context).toString(),
                 "a|b|");
     }

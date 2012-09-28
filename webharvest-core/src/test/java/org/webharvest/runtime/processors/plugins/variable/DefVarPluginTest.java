@@ -45,6 +45,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -69,22 +70,24 @@ public class DefVarPluginTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_existingValue() throws Exception {
         context.setLocalVar("some", new NodeVariable(123));
-        createPlugin("<def var='x' value='${some}'/>",
+        createPlugin(XmlNodeTestUtils.createXmlNode("<def var='x' value='${some}'/>",
+                    XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable(123), context.getVar("x"));
     }
 
     @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notExistingValue() throws Exception {
-        createPlugin("<def var='x' value='${notExistingVar}'/>",
+        createPlugin(XmlNodeTestUtils.createXmlNode("<def var='x' value='${notExistingVar}'/>",
+                    XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
     @Test
     public void testExecutePlugin_valueAsAttr() throws Exception {
         context.setLocalVar("name", new NodeVariable("World"));
-        createPlugin(
-                "<def var='greetings' value='Hello, ${name}!'/>",
+        createPlugin(XmlNodeTestUtils.createXmlNode(
+                "<def var='greetings' value='Hello, ${name}!'/>", XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("Hello, World!"), context.getVar("greetings"));
     }
@@ -92,16 +95,16 @@ public class DefVarPluginTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_valueAsBody() throws Exception {
         context.setLocalVar("name", new NodeVariable("World"));
-        createPlugin(
-                "<def var='greetings'><template>Hello, ${name}!</template></def>",
+        createPlugin(XmlNodeTestUtils.createXmlNode(
+                "<def var='greetings'><template>Hello, ${name}!</template></def>", XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("Hello, World!"), context.getVar("greetings"));
     }
 
     @Test
     public void testExecutePlugin_bodyIgnoredWhenAttrSpecified() throws Exception {
-        createPlugin(
-                "<def var='x' value='actual'>ignored</def>",
+        createPlugin(XmlNodeTestUtils.createXmlNode(
+                "<def var='x' value='actual'>ignored</def>", XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("actual"), context.getVar("x"));
     }

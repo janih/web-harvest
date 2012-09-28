@@ -49,6 +49,7 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -77,8 +78,9 @@ public class ValueOfPluginTest extends UnitilsTestNG {
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("Hello, World!"),
-                createPlugin(
+                createPlugin(XmlNodeTestUtils.createXmlNode(
                         "<value-of expr='Hello, ${name}!'/>",
+                        XmlNodeTestUtils.NAMESPACE_21),
                         ValueOfPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
     }
 
@@ -91,7 +93,8 @@ public class ValueOfPluginTest extends UnitilsTestNG {
                 iterator();
 
         ReflectionAssert.assertReflectionEquals(listVar, createPlugin(
-                "<value-of expr='${list}'/>",
+                XmlNodeTestUtils.createXmlNode("<value-of expr='${list}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 ValueOfPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
     }
 }

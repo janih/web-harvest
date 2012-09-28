@@ -45,6 +45,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -68,21 +69,26 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
 
     @Test
     public void testExecutePlugin_default_notExistingValue() throws Exception {
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' value='${notExistingVar}' default='zzz'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("zzz"), context.getVar("x"));
     }
 
     @Test(expectedExceptions = ScriptException.class)
     public void testExecutePlugin_default_notResolvedVarInConcatenation() throws Exception {
-        createPlugin("<def var='x' value='a ${x} b' default='zzz'/>",
+        createPlugin(XmlNodeTestUtils.createXmlNode(
+                "<def var='x' value='a ${x} b' default='zzz'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
     @Test(expectedExceptions = ScriptException.class)
     public void testExecutePlugin_default_notResolvedVarInExpression() throws Exception {
-        createPlugin("<def var='x' value='${x+1}' default='zzz'/>",
+        createPlugin(XmlNodeTestUtils.createXmlNode(
+                "<def var='x' value='${x+1}' default='zzz'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
     }
 
@@ -90,8 +96,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     public void testExecutePlugin_default_emptyValue() throws Exception {
         context.setLocalVar("empty", EmptyVariable.INSTANCE);
         context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' value='${empty}' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -101,8 +108,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
         context.setLocalVar("empty", EmptyVariable.INSTANCE);
         context.setLocalVar("zzz", new NodeVariable("default value"));
         context.setLocalVar("x", new NodeVariable("some value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' value='${empty}' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -111,8 +119,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     public void testExecutePlugin_default_emptyBody_varNotEmpty() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
         context.setLocalVar("x", new NodeVariable("some value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'><empty/></def>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -120,8 +129,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_default_emptyValueAttribute() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' value='' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -130,8 +140,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     public void testExecutePlugin_default_syntacticSugar_varNotEmpty() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
         context.setLocalVar("x", new NodeVariable("some value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("some value"), context.getVar("x"));
     }
@@ -140,8 +151,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     public void testExecutePlugin_default_syntacticSugar_varIsEmpty() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
         context.setLocalVar("x", EmptyVariable.INSTANCE);
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -149,8 +161,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_default_syntacticSugar_varIsUndefined() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'/>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
@@ -158,8 +171,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_default_syntacticSugar_bodyNotEmpty() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'>body</def>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("body"), context.getVar("x"));
     }
@@ -167,8 +181,9 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_default_syntacticSugar_bodyIsEmpty() throws Exception {
         context.setLocalVar("zzz", new NodeVariable("default value"));
-        createPlugin(
+        createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<def var='x' default='${zzz}'><empty/></def>",
+                XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }

@@ -40,9 +40,6 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.XmlNode;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,10 +53,9 @@ public final class ProcessorTestUtils {
         DefinitionResolver.INSTANCE;
 
     @SuppressWarnings({"unchecked"})
-    public static <T extends AbstractProcessor> T processor(String xml) {
+    public static <T extends AbstractProcessor> T processor(XmlNode xml) {
         return (T) ProcessorResolver.createProcessor(
-                definitionResolver.createElementDefinition(
-                        XmlNode.getInstance(new InputSource(new StringReader(xml)))));
+                definitionResolver.createElementDefinition(xml));
     }
 
 }

@@ -42,15 +42,12 @@ import org.unitils.util.ReflectionUtils;
 import org.webharvest.definition.WebHarvestPluginDef;
 import org.webharvest.definition.XmlNode;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
 
 public class PluginTestUtils {
 
-    public static WebHarvestPlugin createPlugin(String xml, Class<? extends WebHarvestPlugin> clazz) {
+    public static WebHarvestPlugin createPlugin(XmlNode xml, Class<? extends WebHarvestPlugin> clazz) {
         final WebHarvestPlugin plugin = ReflectionUtils.createInstanceOfType(clazz, true);
-        plugin.setElementDef(new WebHarvestPluginDef(XmlNode.getInstance(new InputSource(new StringReader(xml))), clazz));
+        plugin.setElementDef(new WebHarvestPluginDef(xml, clazz));
         return plugin;
     }
 }
