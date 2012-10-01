@@ -5,16 +5,16 @@
     with or without modification, are permitted provided that the following
     conditions are met:
 
-    * Redistributions of source code must retain the above
+ * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
+ * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote
+ * The name of Web-Harvest may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
@@ -33,8 +33,12 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
-*/
+ */
 package org.webharvest.definition;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -50,28 +54,29 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-
-
 public class XmlParser extends DefaultHandler {
 
     protected static Logger log = LoggerFactory.getLogger(XmlParser.class);
 
-    XmlNode root;
+    ElementDefProxy rootDef;
+
+    XmlNode rootNode;
 
     // working stack of elements
-    private transient Stack<XmlNode> elementStack = new Stack<XmlNode>();
+    private Stack<XmlNode> elementStack = new Stack<XmlNode>();
+
     private Locator locator;
 
-    public static XmlNode parse(InputSource in) {
+    public static ElementDefProxy parse(InputSource in) {
         long startTime = System.currentTimeMillis();
 
         XmlParser handler = new XmlParser();
         try {
-            XmlUtil.getSAXParserFactory(false, true).newSAXParser().parse(in, handler);
+            XmlUtil.getSAXParserFactory(false, true).newSAXParser()
+                    .parse(in, handler);
 
-            log.info("XML parsed in " + (System.currentTimeMillis() - startTime) + "ms.");
+            log.info("XML parsed in "
+                    + (System.currentTimeMillis() - startTime) + "ms.");
 
         } catch (IOException e) {
             throw new ParserException(e.getMessage(), e);
@@ -81,13 +86,13 @@ public class XmlParser extends DefaultHandler {
             throw new ParserException(e.getMessage(), e);
         }
 
-        return handler.root;
+        //return handler.rootDef;
+        return new ElementDefProxy(handler.rootNode);
     }
 
     public XmlParser() {
         this.setDocumentLocator(new LocatorImpl());
     }
-
 
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
@@ -97,39 +102,49 @@ public class XmlParser extends DefaultHandler {
         return elementStack.isEmpty() ? null : elementStack.peek();
     }
 
-    public void characters(char[] ch, int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
         XmlNode currNode = getCurrentNode();
         if (currNode != null) {
             currNode.addElement(new String(ch, start, length));
         }
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+    public void startElement(String uri, String localName, String qName,
+            Attributes attributes) throws SAXException {
         final XmlNode currNode = getCurrentNode();
-        if (StringUtils.isEmpty(uri) || WHConstants.XMLNS_CORE_10_ALIASES.contains(uri)) {
-            // if there is no xmlns we assume it is the old WH-config schema, aka 1.0
+        if (StringUtils.isEmpty(uri)
+                || WHConstants.XMLNS_CORE_10_ALIASES.contains(uri)) {
+            // if there is no xmlns we assume it is the old WH-config schema,
+            // aka 1.0
             uri = WHConstants.XMLNS_CORE_10;
         }
         final XmlNode newNode = new XmlNode(localName, qName, uri, currNode);
-        newNode.setLocation(this.locator.getLineNumber(), this.locator.getColumnNumber());
+        newNode.setLocation(this.locator.getLineNumber(),
+                this.locator.getColumnNumber());
         elementStack.push(newNode);
 
         if (currNode == null) {
-            root = newNode;
+            this.rootNode = newNode;
         }
 
         final int attrsCount = attributes.getLength();
         for (int i = 0; i < attrsCount; i++) {
-            newNode.addAttribute(
-                    attributes.getLocalName(i),
+            newNode.addAttribute(attributes.getLocalName(i),
                     StringUtils.defaultIfEmpty(attributes.getURI(i), uri),
                     attributes.getValue(i));
         }
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElement(String uri, String localName, String qName)
+            throws SAXException {
         if (!elementStack.isEmpty()) {
-            getCurrentNode().flushText();
+            final XmlNode node = getCurrentNode();
+            // addElement(String) adds to temporary buffer. Now consolidate
+            // cached updates! String content as node elements (based on new
+            // line)
+            node.flushText();
+
             elementStack.pop();
         }
     }

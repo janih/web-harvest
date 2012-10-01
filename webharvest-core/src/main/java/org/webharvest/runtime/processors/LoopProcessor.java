@@ -49,7 +49,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -78,7 +78,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         this.setProperty("Filter", filter);
         this.setProperty("Empty", String.valueOf(isEmpty));
 
-        AbstractElementDef loopValueDef = elementDef.getLoopValueDef();
+        IElementDef loopValueDef = elementDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor.Builder(loopValueDef).build().
             run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
@@ -108,7 +108,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
                 }
 
                 // execute the loop body
-                AbstractElementDef bodyDef = elementDef.getLoopBodyDef();
+                IElementDef bodyDef = elementDef.getLoopBodyDef();
                 Variable loopResult = (bodyDef != null) ? new BodyProcessor.Builder(bodyDef).build().run(scraper, context) : EmptyVariable.INSTANCE;
                 debug(bodyDef, scraper, loopResult);
                 if (!isEmpty) {

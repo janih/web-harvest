@@ -37,13 +37,13 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.IElementDef;
-import org.webharvest.definition.WebHarvestPluginDef;
+import org.webharvest.definition.PluginDef;
 
 public class ProcessorResolver {
 
-    public static AbstractProcessor createProcessor(IElementDef elementDef) {
-        if (elementDef instanceof WebHarvestPluginDef) {
-            return ((WebHarvestPluginDef) elementDef).createPlugin();
+    public static Processor createProcessor(IElementDef elementDef) {
+        if (elementDef instanceof PluginDef) {
+            return ((PluginDef) elementDef).createPlugin();
 
         } else {
             throw new IllegalArgumentException("Unexpected element definition class: " + elementDef.getClass());

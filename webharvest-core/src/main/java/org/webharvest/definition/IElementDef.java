@@ -39,9 +39,32 @@ package org.webharvest.definition;
 /**
  * Marker for element definition.
  */
-public interface IElementDef {
-	
-	public IElementDef[] getOperationDefs();
-	public String getShortElementName();
+public interface IElementDef extends PluginDef {
+
+    // TODO Add javadoc
+    IElementDef[] getOperationDefs();
+
+    // TODO Add javadoc
+    String getShortElementName();
+
+    // TODO Add javadoc
+    // TODO Decide to keep it as a part of this interface or move somewhere else (associated with XmlNode)
+    String getId();
+
+    // TODO Add javadoc
+    // TODO Associated with element definition
+    String getBodyText();
+
+    // TODO Add javadoc
+    // TODO Associated with element definition
+    boolean hasOperations();
+
+    // TODO Add javadoc
+    // TODO Decide to keep it as a part of this interface or move somewhere else (associated with XmlNode)
+    int getLineNumber();
+
+    // TODO Add javadoc
+    // TODO Decide to keep it as a part of this interface or move somewhere else (associated with XmlNode)
+    int getColumnNumber();
 
 }

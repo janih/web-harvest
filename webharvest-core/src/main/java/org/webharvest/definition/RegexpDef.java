@@ -48,9 +48,9 @@ public class RegexpDef extends WebHarvestPluginDef {
     private String max;
     private String replace;
 
-    private AbstractElementDef regexpPatternDef;
-    private AbstractElementDef regexpSourceDef;
-    private AbstractElementDef regexpResultDef;
+    private IElementDef regexpPatternDef;
+    private IElementDef regexpSourceDef;
+    private IElementDef regexpResultDef;
     private String flagCaseInsensitive;
     private String flagMultiline;
     private String flagDotall;
@@ -70,15 +70,15 @@ public class RegexpDef extends WebHarvestPluginDef {
 
         XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
         definitionResolver.validate(regexpPatternDefNode);
-        regexpPatternDef = regexpPatternDefNode == null ? null : new WebHarvestPluginDef(regexpPatternDefNode, null);
+        regexpPatternDef = regexpPatternDefNode == null ? null : new ElementDefProxy(regexpPatternDefNode);
 
         XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
         definitionResolver.validate(regexpSourceDefNode);
-        regexpSourceDef = regexpSourceDefNode == null ? null : new WebHarvestPluginDef(regexpSourceDefNode, null);
+        regexpSourceDef = regexpSourceDefNode == null ? null : new ElementDefProxy(regexpSourceDefNode);
 
         XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
         definitionResolver.validate(regexpResultDefNode);
-        regexpResultDef = regexpResultDefNode == null ? null : new WebHarvestPluginDef(regexpResultDefNode, null);
+        regexpResultDef = regexpResultDefNode == null ? null : new ElementDefProxy(regexpResultDefNode);
     }
 
     public String getMax() {
@@ -109,15 +109,15 @@ public class RegexpDef extends WebHarvestPluginDef {
         return flagCanoneq;
     }
 
-    public AbstractElementDef getRegexpPatternDef() {
+    public IElementDef getRegexpPatternDef() {
         return regexpPatternDef;
     }
 
-    public AbstractElementDef getRegexpResultDef() {
+    public IElementDef getRegexpResultDef() {
         return regexpResultDef;
     }
 
-    public AbstractElementDef getRegexpSourceDef() {
+    public IElementDef getRegexpSourceDef() {
         return regexpSourceDef;
     }
 

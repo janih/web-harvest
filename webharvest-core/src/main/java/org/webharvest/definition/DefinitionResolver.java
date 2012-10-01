@@ -42,8 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,6 +56,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.CallParamProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.CaseProcessor;
+import org.webharvest.runtime.processors.ConstantProcessor;
 import org.webharvest.runtime.processors.EmptyProcessor;
 import org.webharvest.runtime.processors.ExitProcessor;
 import org.webharvest.runtime.processors.FileProcessor;
@@ -190,7 +189,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xquery", XQueryDef.class, XQueryProcessor.class, "xq-param,!xq-expression", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("xq-param", WebHarvestPluginDef.class, null, null, "!name,type,id",
+        registerInternalElement("xq-param", XQueryExternalParamDef.class, null, null, "!name,type,id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("xq-expression", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
@@ -204,7 +203,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("case", CaseDef.class, CaseProcessor.class, "!if,else", "id",
                 XMLNS_CORE_10, XMLNS_CORE);
-        registerInternalElement("if", WebHarvestPluginDef.class, null, null, "!condition,id",
+        registerInternalElement("if", IfDef.class, null, null, "!condition,id",
                 XMLNS_CORE_10, XMLNS_CORE);
         registerInternalElement("else", WebHarvestPluginDef.class, null, null, "id",
                 XMLNS_CORE_10, XMLNS_CORE);
@@ -396,9 +395,15 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
 
         //FIXME: use a better construction than this as soon as possible
         try {
-            return (IElementDef) elementInfo.getDefinitionClass().
+            final AbstractElementDef elementDef = (AbstractElementDef) elementInfo.getDefinitionClass().
                 getConstructor(XmlNode.class, Class.class).
                 newInstance(node, elementInfo.getProcessorClass());
+
+            for (final Object element : node.getElementList()) {
+                elementDef.add(toElementDef(element));
+            }
+
+            return elementDef;
         } catch (NoSuchMethodException e) {
             throw new ConfigurationException("Cannot create class instance: " +
                     elementInfo.getDefinitionClass() + "!", e);
@@ -415,6 +420,16 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
         } catch (IllegalAccessException e) {
             throw new ConfigurationException("Cannot create class instance: " +
                     elementInfo.getDefinitionClass() + "!", e);
+        }
+    }
+
+    private IElementDef toElementDef(final Object subject) {
+        if (subject instanceof XmlNode) {
+            // TODO Use a proxy instead of real definition
+            return createElementDefinition((XmlNode) subject);
+        } else {
+            // TODO Use a proxy instead of real definition
+            return new ConstantDef(subject.toString(), ConstantProcessor.class);
         }
     }
 

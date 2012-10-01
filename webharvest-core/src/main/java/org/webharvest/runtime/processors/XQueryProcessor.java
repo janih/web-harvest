@@ -50,7 +50,7 @@ import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
 
-import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XQueryDef;
 import org.webharvest.definition.XQueryExternalParamDef;
 import org.webharvest.exception.ScraperXQueryException;
@@ -92,7 +92,7 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
 
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        AbstractElementDef xqueryElementDef = elementDef.getXqDef();
+        IElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
         debug(xqueryElementDef, scraper, xq);
 

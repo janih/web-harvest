@@ -1,15 +1,13 @@
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.ConstantProcessor;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractElementDef implements IElementDef {
+import org.webharvest.runtime.processors.ConstantProcessor;
 
-    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+public abstract class AbstractElementDef implements IElementDef {
 
     protected XmlNode xmlNode;
     // sequence of operation definitions
@@ -28,19 +26,14 @@ public abstract class AbstractElementDef implements IElementDef {
 
             if (createBodyDefs) {
                 if (elementList != null && elementList.size() > 0) {
-                    for (Object element : elementList) {
-                        if (element instanceof XmlNode) {
-                            XmlNode currElementNode = (XmlNode) element;
-                            IElementDef def = definitionResolver
-                                    .createElementDefinition(currElementNode);
-                            if (def != null) {
-                                operationDefs.add(def);
-                            }
-                        } else {
+                    /*
+                    for (final Object element : elementList) {
+                        if (!(element instanceof XmlNode)) {
                             operationDefs.add(new ConstantDef(element.toString(),
                                     ConstantProcessor.class));
                         }
                     }
+                    */
                 } else {
                     body = node.getText();
                 }
@@ -49,6 +42,10 @@ public abstract class AbstractElementDef implements IElementDef {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean hasOperations() {
         return operationDefs != null && operationDefs.size() > 0;
     }
@@ -64,23 +61,45 @@ public abstract class AbstractElementDef implements IElementDef {
         return defs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getBodyText() {
         return body;
     }
 
+    @Override
     public String getId() {
         return xmlNode.getAttribute("id");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getShortElementName() {
         return xmlNode.getQName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getLineNumber() {
         return xmlNode.getLineNumber();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getColumnNumber() {
         return xmlNode.getColumnNumber();
     }
+
+    public void add(IElementDef element) {
+        operationDefs.add(element);
+    }
+
 }

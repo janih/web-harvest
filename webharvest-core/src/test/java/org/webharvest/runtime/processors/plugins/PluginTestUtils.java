@@ -38,16 +38,24 @@
 
 package org.webharvest.runtime.processors.plugins;
 
-import org.unitils.util.ReflectionUtils;
+import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.WebHarvestPluginDef;
 import org.webharvest.definition.XmlNode;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 
+@Deprecated
+// TODO Remove when processors architecture is ready. However currently we can hopefully use improved definition resolver.
 public class PluginTestUtils {
 
-    public static WebHarvestPlugin createPlugin(XmlNode xml, Class<? extends WebHarvestPlugin> clazz) {
-        final WebHarvestPlugin plugin = ReflectionUtils.createInstanceOfType(clazz, true);
-        plugin.setElementDef(new WebHarvestPluginDef(xml, clazz));
-        return plugin;
+    public static WebHarvestPlugin createPlugin(final XmlNode xml,
+            final Class<? extends WebHarvestPlugin> clazz) {
+        final WebHarvestPluginDef elementDef = createElementDefinition(xml);
+        return (WebHarvestPlugin) elementDef.createPlugin();
     }
+
+    private static WebHarvestPluginDef createElementDefinition(final XmlNode xml) {
+        return (WebHarvestPluginDef) DefinitionResolver.INSTANCE.
+            createElementDefinition(xml);
+    }
+
 }

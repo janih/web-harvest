@@ -81,17 +81,6 @@ public class XmlNode implements Serializable {
     private int columnNumber;
 
     /**
-     * Static method that creates node for specified input source which
-     * contains XML data
-     *
-     * @param in
-     * @return XmlNode instance
-     */
-    public static XmlNode getInstance(InputSource in) {
-        return XmlParser.parse(in);
-    }
-
-    /**
      * Constructor that defines name and connects to specified
      * parent element.
      *

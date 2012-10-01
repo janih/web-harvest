@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -60,11 +61,11 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
 
-        AbstractElementDef patternDef = elementDef.getRegexpPatternDef();
+        IElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
         debug(patternDef, scraper, patternVar);
 
-        AbstractElementDef sourceDef = elementDef.getRegexpSourceDef();
+        IElementDef sourceDef = elementDef.getRegexpSourceDef();
         Variable source = new BodyProcessor.Builder(sourceDef).build().
             run(scraper, context);
         debug(sourceDef, scraper, source);
@@ -133,7 +134,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
                     context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
                 }
 
-                AbstractElementDef resultDef = elementDef.getRegexpResultDef();
+                IElementDef resultDef = elementDef.getRegexpResultDef();
                 Variable result = getBodyTextContent(resultDef, scraper, context, true);
                 debug(resultDef, scraper, result);
 

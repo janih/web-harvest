@@ -42,20 +42,15 @@ import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.XmlNode;
 
 /**
- * Created by IntelliJ IDEA.
- * User: awajda
- * Date: Sep 22, 2010
- * Time: 10:55:31 PM
+ * Created by IntelliJ IDEA. User: awajda Date: Sep 22, 2010 Time: 10:55:31 PM
  */
 public final class ProcessorTestUtils {
 
-    private static DefinitionResolver definitionResolver =
-        DefinitionResolver.INSTANCE;
-
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public static <T extends AbstractProcessor> T processor(XmlNode xml) {
-        return (T) ProcessorResolver.createProcessor(
-                definitionResolver.createElementDefinition(xml));
+        return (T) ProcessorResolver
+                .createProcessor(DefinitionResolver.INSTANCE
+                        .createElementDefinition(xml));
     }
 
 }

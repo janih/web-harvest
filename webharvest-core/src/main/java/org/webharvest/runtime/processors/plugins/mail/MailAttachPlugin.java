@@ -1,20 +1,21 @@
 package org.webharvest.runtime.processors.plugins.mail;
 
+import java.io.IOException;
+
+import javax.activation.DataSource;
+
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.webharvest.WHConstants;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import javax.activation.DataSource;
-import java.io.IOException;
 
 /**
  * Mail attachment plugin - can be used only inside mail plugin.
@@ -26,7 +27,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        AbstractProcessor processor = scraper.getRunningProcessorOfType(MailPlugin.class);
+        Processor processor = scraper.getRunningProcessorOfType(MailPlugin.class);
         if (processor != null) {
             MailPlugin mailPlugin = (MailPlugin) processor;
             Email email = mailPlugin.getEmail();

@@ -36,18 +36,22 @@
 */
 package org.webharvest.definition;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.processors.ConstantProcessor;
-import org.webharvest.runtime.scripting.ScriptingLanguage;
-import org.xml.sax.InputSource;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.xml.sax.InputSource;
 
 /**
  * Basic configuration.
@@ -114,7 +118,9 @@ public class ScraperConfiguration {
 
     private void createFromInputStream(InputSource in) {
         // loads configuration from input stream to the internal structure
-        final XmlNode node = XmlNode.getInstance(in);
+        final ElementDefProxy def = XmlParser.parse(in);
+        final XmlNode node = def.getNode();
+
 
         this.namespaceURI = node.getUri();
         this.charset = StringUtils.defaultIfEmpty(node.getAttribute("charset"), DEFAULT_CHARSET);
@@ -123,11 +129,7 @@ public class ScraperConfiguration {
                 ScriptingLanguage.recognize(node.getAttribute("scriptlang")),
                 DEFAULT_SCRIPTING_LANGUAGE);
 
-        for (Object element : node.getElementList()) {
-            operations.add((element instanceof XmlNode)
-                    ? definitionResolver.createElementDefinition((XmlNode) element)
-                    : new ConstantDef(element.toString(), ConstantProcessor.class));
-        }
+        operations.addAll(Arrays.asList(def.getOperationDefs()));
     }
 
     public List<IElementDef> getOperations() {

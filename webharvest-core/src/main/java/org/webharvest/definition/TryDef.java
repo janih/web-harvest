@@ -45,26 +45,26 @@ public class TryDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private AbstractElementDef tryBodyDef;
-    private AbstractElementDef catchValueDef;
+    private IElementDef tryBodyDef;
+    private IElementDef catchValueDef;
 
     public TryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(tryBodyDefNode);
-        this.tryBodyDef = tryBodyDefNode == null ? null : new WebHarvestPluginDef(tryBodyDefNode, null);
+        this.tryBodyDef = tryBodyDefNode == null ? null : new ElementDefProxy(tryBodyDefNode);
 
         XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
         definitionResolver.validate(catchValueDefNode);
-        this.catchValueDef = catchValueDefNode == null ? null : new WebHarvestPluginDef(catchValueDefNode, null);
+        this.catchValueDef = catchValueDefNode == null ? null : new ElementDefProxy(catchValueDefNode);
     }
 
-    public AbstractElementDef getTryBodyDef() {
+    public IElementDef getTryBodyDef() {
         return tryBodyDef;
     }
 
-    public AbstractElementDef getCatchValueDef() {
+    public IElementDef getCatchValueDef() {
         return catchValueDef;
     }
 

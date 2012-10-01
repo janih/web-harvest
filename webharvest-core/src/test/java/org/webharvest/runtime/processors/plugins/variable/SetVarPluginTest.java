@@ -48,6 +48,7 @@ import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -83,12 +84,10 @@ public class SetVarPluginTest extends UnitilsTestNG {
     @Test
     public void testExecutePlugin_valueAsBody() throws Exception {
         context.setLocalVar("name", new NodeVariable("World"));
-
         createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='greetings'><template>Hello, ${name}!</template></set>",
                 XmlNodeTestUtils.NAMESPACE_21),
                 SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
-
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("Hello, World!"),
                 context.getVar("greetings"));

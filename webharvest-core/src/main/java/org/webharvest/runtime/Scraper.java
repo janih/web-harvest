@@ -55,6 +55,7 @@ import org.webharvest.exception.DatabaseException;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
@@ -95,7 +96,7 @@ public class Scraper {
     private HttpClientManager httpClientManager;
 
     // stack of running processors
-    private transient Stack<AbstractProcessor> runningProcessors = new Stack<AbstractProcessor>();
+    private transient Stack<Processor> runningProcessors = new Stack<Processor>();
 
     // stack of running functions
     private transient Stack<CallProcessor> runningFunctions = new Stack<CallProcessor>();
@@ -178,7 +179,7 @@ public class Scraper {
 
         try {
             for (IElementDef elementDef : ops) {
-                AbstractProcessor processor = ProcessorResolver.createProcessor(elementDef);
+                Processor processor = ProcessorResolver.createProcessor(elementDef);
                 if (processor != null) {
                     processor.run(this, context);
                 }
@@ -285,11 +286,11 @@ public class Scraper {
      * @param processorClazz Class of enclosing running processor.
      * @return Parent running processor in the tree of specified class, or null if it doesn't exist.
      */
-    public AbstractProcessor getRunningProcessorOfType(Class processorClazz) {
-        List<AbstractProcessor> runningProcessorList = runningProcessors.getList();
-        ListIterator<AbstractProcessor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
+    public Processor getRunningProcessorOfType(Class processorClazz) {
+        List<Processor> runningProcessorList = runningProcessors.getList();
+        ListIterator<Processor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
         while (listIterator.hasPrevious()) {
-            AbstractProcessor curr = listIterator.previous();
+            Processor curr = listIterator.previous();
             if (processorClazz.equals(curr.getClass())) {
                 return curr;
             }
@@ -331,7 +332,7 @@ public class Scraper {
         }
     }
 
-    public void setExecutingProcessor(AbstractProcessor processor) {
+    public void setExecutingProcessor(Processor processor) {
         runningProcessors.push(processor);
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onNewProcessorExecution(this, processor);

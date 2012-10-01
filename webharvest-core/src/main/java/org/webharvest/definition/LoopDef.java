@@ -50,19 +50,19 @@ public class LoopDef extends WebHarvestPluginDef {
     private String index;
     private String filter;
     private String empty;
-    private AbstractElementDef loopValueDef;
-    private AbstractElementDef loopBodyDef;
+    private IElementDef loopValueDef;
+    private IElementDef loopBodyDef;
 
     public LoopDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
         definitionResolver.validate(loopValueDefNode);
-        this.loopValueDef = loopValueDefNode == null ? null : new WebHarvestPluginDef(loopValueDefNode, null);
+        this.loopValueDef = loopValueDefNode == null ? null : new ElementDefProxy(loopValueDefNode);
 
         XmlNode loopBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
         definitionResolver.validate(loopBodyDefNode);
-        this.loopBodyDef = loopBodyDefNode == null ? null : new WebHarvestPluginDef(loopBodyDefNode, null);
+        this.loopBodyDef = loopBodyDefNode == null ? null : new ElementDefProxy(loopBodyDefNode);
 
         this.maxloops = xmlNode.getAttribute("maxloops");
         this.item = xmlNode.getAttribute("item");
@@ -91,11 +91,11 @@ public class LoopDef extends WebHarvestPluginDef {
         return empty;
     }
 
-    public AbstractElementDef getLoopValueDef() {
+    public IElementDef getLoopValueDef() {
         return loopValueDef;
     }
 
-    public AbstractElementDef getLoopBodyDef() {
+    public IElementDef getLoopBodyDef() {
         return loopBodyDef;
     }
 

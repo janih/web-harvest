@@ -40,6 +40,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -54,7 +55,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         try {
-            AbstractElementDef tryBodyDef = elementDef.getTryBodyDef();
+            IElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor.Builder(tryBodyDef).build().
                 run(scraper, context);
             debug(tryBodyDef, scraper, result);
@@ -74,7 +75,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                 @Override
                 public Variable call() throws Exception {
                     context.setLocalVar("_error", CommonUtil.createVariable(e));
-                    final AbstractElementDef catchValueDef = elementDef.getCatchValueDef();
+                    final IElementDef catchValueDef = elementDef.getCatchValueDef();
                     final Variable res =
                         new BodyProcessor.Builder(catchValueDef).build().
                             run(scraper, context);

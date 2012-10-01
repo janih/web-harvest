@@ -36,8 +36,8 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.CaseDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.IfDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -66,7 +66,7 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
             }
         }
 
-        AbstractElementDef elseDef = elementDef.getElseDef();
+        IElementDef elseDef = elementDef.getElseDef();
         if (elseDef != null) {
             Variable elseResult = new BodyProcessor.Builder(elseDef).build().
                 run(scraper, context);

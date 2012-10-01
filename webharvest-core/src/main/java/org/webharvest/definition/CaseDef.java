@@ -36,10 +36,10 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
-
 import java.util.Iterator;
 import java.util.List;
+
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 /**
  * Definition of case processor.
@@ -49,7 +49,7 @@ public class CaseDef extends WebHarvestPluginDef {
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     private IfDef[] ifDefs;
-    private AbstractElementDef elseDef;
+    private IElementDef elseDef;
 
     public CaseDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
@@ -64,20 +64,20 @@ public class CaseDef extends WebHarvestPluginDef {
             while (it.hasNext()) {
                 XmlNode currParamNode = (XmlNode) it.next();
                 definitionResolver.validate(currParamNode);
-                ifDefs[index++] = new IfDef(currParamNode, processorClass);
+                ifDefs[index++] = (IfDef) definitionResolver.createElementDefinition(currParamNode);
             }
         }
 
         XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
         definitionResolver.validate(elseDefNode);
-        elseDef = elseDefNode == null ? null : new WebHarvestPluginDef(elseDefNode, null);
+        elseDef = elseDefNode == null ? null : new ElementDefProxy(elseDefNode);
     }
 
     public IfDef[] getIfDefs() {
         return ifDefs;
     }
 
-    public AbstractElementDef getElseDef() {
+    public IElementDef getElseDef() {
         return elseDef;
     }
 

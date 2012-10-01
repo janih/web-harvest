@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -61,7 +62,7 @@ import org.webharvest.utils.KeyValuePair;
  * Base processor that contains common processor logic.
  * All other processors extend this class.
  */
-public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
+public abstract class AbstractProcessor<TDef extends IElementDef> implements Processor<TDef> {
 
     // TODO Consider making it a static logger
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractProcessor.class);
@@ -77,6 +78,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
     /**
      * Wrapper for the execute method. Adds controlling and logging logic.
      */
+    @Override
     public Variable run(final Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final int scraperStatus = scraper.getStatus();
 
@@ -155,7 +157,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected void debug(AbstractElementDef elementDef, Scraper scraper, Variable variable) {
+    protected void debug(IElementDef elementDef, Scraper scraper, Variable variable) {
         String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper) : null;
 
         if (scraper.isDebugMode() && id != null) {
@@ -165,7 +167,7 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context,
+    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef == null) {
             return null;
@@ -184,24 +186,26 @@ public abstract class AbstractProcessor<TDef extends AbstractElementDef> {
         }
     }
 
-    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
+    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(AbstractElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return getBodyTextContent(elementDef, scraper, context, false);
     }
 
     /**
-     * Sets appropriate element definition to the processor.
-     *
-     * @param elementDef
-     *            the element definition
+     * {@inheritDoc}
      */
+    @Override
     public void setElementDef(final TDef elementDef) {
         this.elementDef = elementDef;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TDef getElementDef() {
         return elementDef;
     }

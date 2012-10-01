@@ -1,10 +1,10 @@
 package org.webharvest.definition;
 
+import java.util.Map;
+
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.processors.AbstractProcessor;
-import org.webharvest.runtime.processors.WebHarvestPlugin;
-
-import java.util.Map;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of all plugin processors.
@@ -38,7 +38,11 @@ public class WebHarvestPluginDef extends AbstractElementDef {
         return xmlNode.getAttributes(uri);
     }
 
-    public AbstractProcessor createPlugin() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Processor createPlugin() {
         if (pluginClass != null) {
             try {
                 AbstractProcessor plugin = pluginClass.newInstance();

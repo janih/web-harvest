@@ -45,27 +45,27 @@ public class XsltDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private AbstractElementDef xmlDef;
+    private IElementDef xmlDef;
 
-    private AbstractElementDef stylesheetDef;
+    private IElementDef stylesheetDef;
 
     public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
         super(xmlNode, false, processorClass);
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
         definitionResolver.validate(xmlDefNode);
-        xmlDef = xmlDefNode == null ? null : new WebHarvestPluginDef(xmlDefNode, null);
+        xmlDef = xmlDefNode == null ? null : new ElementDefProxy(xmlDefNode);
 
         XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
         definitionResolver.validate(stylesheetDefNode);
-        stylesheetDef = stylesheetDefNode == null ? null : new WebHarvestPluginDef(stylesheetDefNode, null);
+        stylesheetDef = stylesheetDefNode == null ? null : new ElementDefProxy(stylesheetDefNode);
     }
 
-    public AbstractElementDef getStylesheetDef() {
+    public IElementDef getStylesheetDef() {
         return stylesheetDef;
     }
 
-    public AbstractElementDef getXmlDef() {
+    public IElementDef getXmlDef() {
         return xmlDef;
     }
 

@@ -1,8 +1,8 @@
 package org.webharvest.runtime;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
-
 import java.util.Map;
+
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * @author Vladimir Nikic
@@ -16,12 +16,12 @@ public interface ScraperRuntimeListener {
 
     public void onExecutionContinued(Scraper scraper);
 
-    public void onNewProcessorExecution(Scraper scraper, AbstractProcessor processor);
-    
+    public void onNewProcessorExecution(Scraper scraper, Processor processor);
+
     public void onExecutionEnd(Scraper scraper);
 
-    public void onProcessorExecutionFinished(Scraper scraper, AbstractProcessor processor, Map properties);
+    public void onProcessorExecutionFinished(Scraper scraper, Processor processor, Map properties);
 
     public void onExecutionError(Scraper scraper, Exception e);
-    
+
 }

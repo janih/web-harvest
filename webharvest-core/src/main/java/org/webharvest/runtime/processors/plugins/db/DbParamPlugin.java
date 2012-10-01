@@ -3,7 +3,7 @@ package org.webharvest.runtime.processors.plugins.db;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -20,7 +20,7 @@ public class DbParamPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        AbstractProcessor processor = scraper.getRunningProcessorOfType(DatabasePlugin.class);
+        Processor processor = scraper.getRunningProcessorOfType(DatabasePlugin.class);
         if (processor != null) {
             DatabasePlugin databasePlugin = (DatabasePlugin) processor;
             String type = evaluateAttribute("type", scraper);

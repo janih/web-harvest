@@ -36,7 +36,18 @@
 */
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.AbstractElementDef;
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XsltDef;
 import org.webharvest.exception.XsltException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -44,23 +55,17 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
-import java.io.StringWriter;
-
 /**
  * XSLT processor.
  */
 public class XsltProcessor extends AbstractProcessor<XsltDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        final AbstractElementDef xsltElementDef = elementDef.getXmlDef();
+        final IElementDef xsltElementDef = elementDef.getXmlDef();
         Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
         debug(xsltElementDef, scraper, xmlStr);
 
-        AbstractElementDef stylesheetElementDef = elementDef.getStylesheetDef();
+        IElementDef stylesheetElementDef = elementDef.getStylesheetDef();
         Variable stylesheetStr = getBodyTextContent(stylesheetElementDef, scraper, context, true);
         debug(stylesheetElementDef, scraper, stylesheetStr);
 

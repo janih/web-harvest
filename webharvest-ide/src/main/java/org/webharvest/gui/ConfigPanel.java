@@ -36,6 +36,47 @@
 */
 package org.webharvest.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import org.apache.log4j.Logger;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.AbstractElementDef;
@@ -48,28 +89,9 @@ import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.xml.sax.InputSource;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.URL;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Single panel containing XML configuration.
@@ -160,7 +182,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     private DefaultTreeModel treeModel;
     private TreeNodeInfo selectedNodeInfo;
     private JTextArea logTextArea;
-    private Map<IElementDef, TreeNodeInfo> nodeInfos = new Hashtable<IElementDef, TreeNodeInfo>();
+    // Indexed by source line number for particular element def
+    private Map<Integer, TreeNodeInfo> nodeInfos = new Hashtable<Integer, TreeNodeInfo>();
     private NodeRenderer nodeRenderer = new NodeRenderer();
 
     private JSplitPane bottomSplitter;
@@ -455,7 +478,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                 // constant text is not interesting to be in the visual tree
                 if (!(elementDef instanceof ConstantDef)) {
                     TreeNodeInfo treeNodeInfo = new TreeNodeInfo(elementDef);
-                    this.nodeInfos.put(treeNodeInfo.getElementDef(), treeNodeInfo);
+                    this.nodeInfos.put(treeNodeInfo.getElementDef().getLineNumber(), treeNodeInfo);
                     DefaultMutableTreeNode node = treeNodeInfo.getNode();
                     this.treeModel.insertNodeInto(node, root, root.getChildCount());
                     createNodes(node, elementDef.getOperationDefs());
@@ -546,10 +569,14 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onNewProcessorExecution(Scraper scraper, AbstractProcessor processor) {
-        final AbstractElementDef elementDef = processor.getElementDef();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onNewProcessorExecution(Scraper scraper, Processor processor) {
+        final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
-            TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef);
+            TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
             if (nodeInfo != null) {
                 nodeInfo.increaseExecutionCount();
                 setExecutingNode(nodeInfo);
@@ -637,10 +664,14 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 //        releaseScraper();
     }
 
-    public void onProcessorExecutionFinished(Scraper scraper, AbstractProcessor processor, Map properties) {
-        final AbstractElementDef elementDef = processor.getElementDef();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onProcessorExecutionFinished(Scraper scraper, Processor processor, Map properties) {
+        final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
-            TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef);
+            TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
             if (nodeInfo != null) {
                 nodeInfo.setProperties(properties);
                 if (nodeInfo == this.selectedNodeInfo) {
@@ -788,7 +819,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             Object userObject = treeNode.getUserObject();
             if (userObject instanceof TreeNodeInfo) {
                 TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
-                AbstractElementDef elementDef = (AbstractElementDef) treeNodeInfo.getElementDef();
+                IElementDef elementDef =  treeNodeInfo.getElementDef();
                 int lineNumber = elementDef.getLineNumber();
                 int columnNumber = elementDef.getColumnNumber();
 

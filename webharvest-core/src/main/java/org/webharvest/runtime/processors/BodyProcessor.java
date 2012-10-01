@@ -1,6 +1,5 @@
 package org.webharvest.runtime.processors;
 
-import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -14,7 +13,7 @@ import java.util.concurrent.Callable;
 /**
  * Processor which executes only body and returns variables list.
  */
-public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
+public class BodyProcessor extends AbstractProcessor<IElementDef> {
 
     public Variable execute(final Scraper scraper,
             final DynamicScopeContext context) throws InterruptedException {
@@ -53,7 +52,7 @@ public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
 
     /**
      * A builder responsible for creating instance of {@link BodyProcessor} and
-     * completing it with appropriate {@link AbstractElementDef}.
+     * completing it with appropriate {@link IElementDef}.
      *
      * @author mczapiewski
      * @since 2.1-SNAPSHOT
@@ -61,17 +60,17 @@ public class BodyProcessor extends AbstractProcessor<AbstractElementDef> {
      */
     public static final class Builder {
 
-        private final AbstractElementDef elementDef;
+        private final IElementDef elementDef;
 
         /**
-         * Default builder constructor which accepts {@link AbstractElementDef}
+         * Default builder constructor which accepts {@link IElementDef}
          * for {@link BodyProcessor}. Specified element definition should not be
          * null.
          *
          * @param elementDef
-         *            an instance of {@link AbstractElementDef}
+         *            an instance of {@link IElementDef}
          */
-        public Builder(final AbstractElementDef elementDef) {
+        public Builder(final IElementDef elementDef) {
             this.elementDef = elementDef;
         }
 

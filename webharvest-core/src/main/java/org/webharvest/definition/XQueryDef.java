@@ -36,10 +36,10 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
-
 import java.util.Iterator;
 import java.util.List;
+
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 /**
  * Definition of XQuery processor.
@@ -48,7 +48,7 @@ public class XQueryDef extends WebHarvestPluginDef {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
-    private AbstractElementDef xqDef;
+    private IElementDef xqDef;
 
     private XQueryExternalParamDef[] externalParamDefs;
 
@@ -57,7 +57,7 @@ public class XQueryDef extends WebHarvestPluginDef {
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
         definitionResolver.validate(xqDefNode);
-        xqDef = xqDefNode == null ? null : new WebHarvestPluginDef(xqDefNode, null);
+        xqDef = xqDefNode == null ? null : new ElementDefProxy(xqDefNode);
 
         List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
 
@@ -70,12 +70,12 @@ public class XQueryDef extends WebHarvestPluginDef {
             while (it.hasNext()) {
                 XmlNode currParamNode =  (XmlNode) it.next();
                 definitionResolver.validate(currParamNode);
-                externalParamDefs[index++] = new XQueryExternalParamDef(currParamNode, processorClass);
+                externalParamDefs[index++] = (XQueryExternalParamDef) definitionResolver.createElementDefinition(currParamNode);
             }
         }
     }
 
-    public AbstractElementDef getXqDef() {
+    public IElementDef getXqDef() {
         return xqDef;
     }
 
