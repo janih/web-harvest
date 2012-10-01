@@ -41,6 +41,8 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.component.*;
+import org.webharvest.gui.settings.db.DatabaseDriversPanel;
+import org.webharvest.gui.settings.db.DatabaseDriversPresenter;
 import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
@@ -456,6 +458,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         tabbedPane.addTab("General", null, generalPanel, null);
         tabbedPane.addTab("View", null, viewPanel, null);
         tabbedPane.addTab("Plugins", null, pluginsPanel, null);
+        tabbedPane.addTab("DB drivers", null, createDBDriversPanel(), null);
 
         contentPane.add(tabbedPane, BorderLayout.CENTER);
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
@@ -463,6 +466,16 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         updateControls();
 
         this.pack();
+    }
+
+    // FIXME: we need more versatile (IoC-like) solution
+    private JPanel createDBDriversPanel() {
+        final DatabaseDriversPanel panel = new DatabaseDriversPanel();
+        final DatabaseDriversPresenter presenter =
+            new DatabaseDriversPresenter(panel);
+        panel.setPresenter(presenter);
+
+        return panel;
     }
 
     private void fillValues() {
