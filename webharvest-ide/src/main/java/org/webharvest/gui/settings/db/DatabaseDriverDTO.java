@@ -62,6 +62,15 @@ public final class DatabaseDriverDTO {
     }
 
     /**
+     * Returns driver's location.
+     *
+     * @return driver's location
+     */
+    public String getLocation() {
+        return this.location;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

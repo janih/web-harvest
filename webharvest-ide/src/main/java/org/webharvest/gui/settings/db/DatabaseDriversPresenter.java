@@ -33,6 +33,11 @@
 
 package org.webharvest.gui.settings.db;
 
+import java.io.File;
+
+import org.webharvest.runtime.database.DefaultDriverManager;
+import org.webharvest.runtime.database.DriverManager;
+
 /**
  * Default implementation of MVP's {@link DatabaseDriversView.Presenter}
  * interface.
@@ -45,6 +50,8 @@ package org.webharvest.gui.settings.db;
  */
 public final class DatabaseDriversPresenter implements
         DatabaseDriversView.Presenter {
+
+    private final DriverManager driverManager = DefaultDriverManager.INSTANCE;
 
     private final DatabaseDriversView view;
 
@@ -69,9 +76,8 @@ public final class DatabaseDriversPresenter implements
      */
     @Override
     public void registerDriver(final DatabaseDriverDTO driver) {
-        // TODO: add registration logic
+        driverManager.addDriverResource(new File(driver.getLocation()).toURI());
         view.addToList(driver);
-
     }
 
     /**
@@ -79,7 +85,8 @@ public final class DatabaseDriversPresenter implements
      */
     @Override
     public void unregisterDriver(final DatabaseDriverDTO driver) {
-        // TODO: add unregistration logic
+        driverManager.removeDriverResource(
+                new File(driver.getLocation()).toURI());
         view.removeFromList(driver);
     }
 }

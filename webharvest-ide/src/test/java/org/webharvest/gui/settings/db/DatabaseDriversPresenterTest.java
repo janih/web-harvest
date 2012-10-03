@@ -1,28 +1,41 @@
 package org.webharvest.gui.settings.db;
 
-import static org.unitils.mock.ArgumentMatchers.same;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.same;
+
+import java.io.File;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
-import org.unitils.mock.Mock;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.RegularMock;
+import org.unitils.inject.annotation.InjectInto;
+import org.unitils.inject.annotation.TestedObject;
+import org.webharvest.runtime.database.DriverManager;
 
 public class DatabaseDriversPresenterTest extends UnitilsTestNG {
 
-    private Mock<DatabaseDriversView> mockView;
+    private static final String LOCATION = "/tmp/driver.jar";
+
+    @RegularMock
+    @InjectInto(property = "driverManager")
+    private DriverManager mockDriverManager;
+
+    @RegularMock
+    private DatabaseDriversView mockView;
 
     private DatabaseDriverDTO dto;
 
-    /**
-     * class under the test
-     */
+    @TestedObject
     private DatabaseDriversPresenter presenter;
 
     @BeforeMethod
     public void setUp() {
-        this.dto = new DatabaseDriverDTO("/tmp/driver.jar");
-        this.presenter = new DatabaseDriversPresenter(mockView.getMock());
+        this.dto = new DatabaseDriverDTO(LOCATION);
+        this.presenter = new DatabaseDriversPresenter(mockView);
     }
 
     @AfterMethod
@@ -37,16 +50,26 @@ public class DatabaseDriversPresenterTest extends UnitilsTestNG {
     }
 
     @Test
-    public void isRegisteredDriverAddedToList() {
+    public void testRegisterDriver() {
+        mockView.addToList(same(dto));
+        expectLastCall();
+        mockDriverManager.addDriverResource(eq(new File(LOCATION).toURI()));
+        expectLastCall();
+
+        EasyMockUnitils.replay();
+
         presenter.registerDriver(dto);
-        mockView.assertInvoked().addToList(same(dto));
-        mockView.assertNotInvoked().addToList(null); // only one invocation
     }
 
     @Test
-    public void isUnregisteredDriverRemovedFromList() {
+    public void testUnregisterDriver() {
+        mockView.removeFromList(same(dto));
+        expectLastCall();
+        mockDriverManager.removeDriverResource(eq(new File(LOCATION).toURI()));
+        expectLastCall();
+
+        EasyMockUnitils.replay();
+
         presenter.unregisterDriver(dto);
-        mockView.assertInvoked().removeFromList(same(dto));
-        mockView.assertNotInvoked().removeFromList(null); // only one invocation
     }
 }
