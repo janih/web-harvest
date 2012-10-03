@@ -73,7 +73,7 @@
     <properties>
         <saxon.version>9.1.0.8</saxon.version>
         <slf4j.version>1.6.3</slf4j.version>
-        <unitils.version>[3.1,)</unitils.version>
+        <unitils.version>[3.3,)</unitils.version>
     </properties>
 
     <modules>
@@ -221,6 +221,11 @@
         <dependency>
             <groupId>org.unitils</groupId>
             <artifactId>unitils-inject</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-easymock</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
