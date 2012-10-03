@@ -43,6 +43,8 @@ import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.database.DefaultDriverManager;
+import org.webharvest.runtime.database.DriverManager;
 import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
@@ -150,6 +152,8 @@ public class CommandLine {
                 }
             }
 
+            parseDatabaseDrivers(params);
+
             final String configLowercase = configFilePath.toLowerCase();
 
             final Scraper scraper = new Scraper(configLowercase.startsWith("http://") || configLowercase.startsWith("https://")
@@ -197,6 +201,18 @@ public class CommandLine {
         }
     }
 
+    private static void parseDatabaseDrivers(final Map<String, String> params) {
+        final String drivers = params.get("dbdrivers");
+        final DriverManager driverManager = DefaultDriverManager.INSTANCE;
+
+        if (!CommonUtil.isEmpty(drivers)) {
+            for (String driverLocation : CommonUtil.tokenize(drivers, ",")) {
+                driverManager.addDriverResource(
+                        new File(driverLocation).toURI());
+            }
+        }
+    }
+
     private static void printHelp() {
         System.out.println("");
         System.out.println("To open Web-Harvest GUI:");
@@ -212,6 +228,7 @@ public class CommandLine {
         System.out.println("             [loglevel=<level>]");
         System.out.println("             [logpropsfile=<path>]");
         System.out.println("             [plugins=<plugin-class1>[:<uri1>][,<plugin-class2>[:<uri2>]]...]");
+        System.out.println("             [dbdrivers=<jar-uri1>[,<jar-uri2>]...]");
         System.out.println("             [#var1=<value1> [#var2=<value2>...]]");
         System.out.println("");
         System.out.println("   -h            - shows this help.");
@@ -228,6 +245,7 @@ public class CommandLine {
         System.out.println("   logpropsfile  - file path to custom Log4J properties. If specified, loglevel is ignored.");
         System.out.println("   plugins       - comma-separated list of pairs <plugin-class>[:<uri>], where <plugin-class> is full plugin class name," +
                 "and URI is an XML namespace in which this plugin is declared. If URI is not specified the default WebHarvest schema is assumed.");
+        System.out.println("   dbdrivers     - comma-separated list of JAR locations containing database drivers");
         System.out.println("   #varN, valueN - specify initial variables of the Web-Harvest context. To be recognized, ");
         System.out.println("                   each variable name must have prefix #. ");
     }
