@@ -108,6 +108,10 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
         return CommonUtil.getIntValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
+    protected double evaluateAttributeAsDouble(String attName, double defaultValue, Scraper scraper) {
+        return CommonUtil.getDoubleValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
+    }
+
     /**
      * Executes body of plugin processor
      *
