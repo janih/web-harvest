@@ -1,10 +1,16 @@
 package org.webharvest.definition;
 
+import static org.testng.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.*;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.unitils.mock.core.proxy.ProxyInvocation;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -35,14 +41,13 @@ public class AnnotatedPluginsPostProcessorTest extends UnitilsTestNG {
     @Test
     public void testPostProcess() {
         postProcessor.postProcess(mockConfigurbleResolver.getMock());
-
-        mockConfigurbleResolver.assertInvoked().registerPlugin(
-                ValidPlugin.class, TARGET_NAMESPACE);
-        mockConfigurbleResolver.assertNotInvoked().registerPlugin(null, null);
+        mockConfigurbleResolver.assertInvoked().registerPlugin(notNull(ElementInfo.class), TARGET_NAMESPACE);
+        mockConfigurbleResolver.assertNotInvoked().registerPlugin((ElementInfo) null, null);
     }
 
     @Autoscanned
     @TargetNamespace(TARGET_NAMESPACE)
+    @Definition("foo")
     static class ValidPlugin extends MockAbstractPlugin {
     }
 
@@ -55,12 +60,13 @@ public class AnnotatedPluginsPostProcessorTest extends UnitilsTestNG {
     class NotWebHarvestPlugin {
     }
 
-    abstract static class MockAbstractPlugin extends WebHarvestPlugin {
+    @Autoscanned
+    @TargetNamespace(TARGET_NAMESPACE)
+    static class MissingDefinitionForPlugin extends MockAbstractPlugin {
 
-        @Override
-        public String getName() {
-            throw new UnsupportedOperationException("not supported by mock");
-        }
+    }
+
+    abstract static class MockAbstractPlugin extends WebHarvestPlugin {
 
         @Override
         public Variable executePlugin(final Scraper scraper,

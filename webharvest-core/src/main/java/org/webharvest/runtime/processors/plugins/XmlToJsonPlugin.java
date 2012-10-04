@@ -6,6 +6,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
+import org.webharvest.annotation.Definition;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -18,6 +19,7 @@ import org.webharvest.runtime.variables.Variable;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("xml-to-json")
 public class XmlToJsonPlugin extends WebHarvestPlugin {
 
     public String getName() {

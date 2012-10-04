@@ -36,11 +36,17 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.CaseDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.IfDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -49,6 +55,13 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Conditional processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "case", validAttributes = { "id" },
+        validSubprocessors = { "if", "else" }, requiredSubprocessors = "if",
+        definitionClass = CaseDef.class)
 public class CaseProcessor extends AbstractProcessor<CaseDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {

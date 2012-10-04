@@ -4,6 +4,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.webharvest.annotation.Definition;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("database")
 public class DatabasePlugin extends WebHarvestPlugin {
 
     private class DbParamInfo {

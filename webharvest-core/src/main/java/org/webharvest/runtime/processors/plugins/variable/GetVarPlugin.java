@@ -40,6 +40,9 @@ package org.webharvest.runtime.processors.plugins.variable;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 
+import java.text.MessageFormat;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -48,10 +51,10 @@ import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 
-import java.text.MessageFormat;
-
 @Autoscanned
 @TargetNamespace(XMLNS_CORE)
+@Definition(value="get", validAttributes={"var"},
+        requiredAttributes="var", body=false)
 public class GetVarPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
@@ -68,24 +71,6 @@ public class GetVarPlugin extends WebHarvestPlugin {
         this.setProperty("Var", varName);
 
         return value;
-    }
-
-    public String getName() {
-        return "get";
-    }
-
-    public String[] getValidAttributes() {
-        return getRequiredAttributes();
-    }
-
-    @Override
-    public String[] getRequiredAttributes() {
-        return new String[]{ATTR_VAR};
-    }
-
-    @Override
-    public boolean hasBody() {
-        return false;
     }
 
 }

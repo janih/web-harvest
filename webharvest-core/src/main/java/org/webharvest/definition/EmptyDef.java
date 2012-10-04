@@ -45,9 +45,10 @@ import org.webharvest.runtime.processors.AbstractProcessor;
 public class EmptyDef extends WebHarvestPluginDef {
 
     public EmptyDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-    	super(xmlNode, processorClass);
+        super(xmlNode, processorClass);
     }
 
+    @Override
     public String getShortElementName() {
         return "empty";
     }

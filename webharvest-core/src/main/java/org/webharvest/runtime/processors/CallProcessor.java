@@ -36,22 +36,36 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 /**
  * Function call processor.
  */
+/**
+ * Function call processor.
+ */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE })
+@Definition(value = "call", validAttributes = { "id", "name" },
+        requiredAttributes = "name", definitionClass = CallDef.class)
 public class CallProcessor extends AbstractProcessor<CallDef> {
 
     private Variable functionResult = new NodeVariable("");

@@ -36,21 +36,33 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
 /**
  * OnError processor - sets .
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "try", validAttributes = { "id" },
+        validSubprocessors = { "body", "catch" },
+        requiredAttributes = { "body", "catch" }, definitionClass = TryDef.class )
 public class TryProcessor extends AbstractProcessor<TryDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {

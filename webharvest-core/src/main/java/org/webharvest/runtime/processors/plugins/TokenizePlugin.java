@@ -3,6 +3,7 @@ package org.webharvest.runtime.processors.plugins;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -16,6 +17,7 @@ import org.webharvest.utils.CommonUtil;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("tokenize")
 public class TokenizePlugin extends WebHarvestPlugin {
 
     public String getName() {

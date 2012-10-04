@@ -1,10 +1,10 @@
 package org.webharvest.definition;
 
 import static org.testng.AssertJUnit.assertFalse;
+
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
-import org.webharvest.runtime.processors.WebHarvestPlugin;
 
 public class AbstractRefreshableResolverTest extends UnitilsTestNG {
 
@@ -36,8 +36,7 @@ public class AbstractRefreshableResolverTest extends UnitilsTestNG {
         extends AbstractRefreshableResolver {
 
         @Override
-        public void registerPlugin(
-                final Class< ? extends WebHarvestPlugin > pluginClass,
+        public void registerPlugin(final ElementInfo elementInfo,
                 final String namespace) {
             throw new UnsupportedOperationException("TEST MOCK");
         }

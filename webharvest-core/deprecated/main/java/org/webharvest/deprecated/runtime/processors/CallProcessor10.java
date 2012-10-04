@@ -37,15 +37,27 @@
  */
 package org.webharvest.deprecated.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import java.util.concurrent.Callable;
+
+import org.webharvest.annotation.Definition;
+import org.webharvest.definition.CallDef;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.processors.CallProcessor;
-
-import java.util.concurrent.Callable;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 
 /**
  * Function call processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE_10 })
+@Definition(value = "call", validAttributes = { "id", "name" },
+        requiredAttributes = "name", definitionClass = CallDef.class)
 public class CallProcessor10 extends CallProcessor {
 
     @Override

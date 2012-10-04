@@ -5,16 +5,16 @@
     with or without modification, are permitted provided that the following
     conditions are met:
 
-    * Redistributions of source code must retain the above
+ * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
+ * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote
+ * The name of Web-Harvest may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
@@ -33,15 +33,21 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
-*/
+ */
 package org.webharvest.runtime.processors;
+
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.FileDef;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Types;
@@ -62,25 +68,42 @@ import java.util.regex.PatternSyntaxException;
 /**
  * File processor.
  */
+// TODO Add unit test
+// TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "file", validAttributes = { "id", "path", "action", "type",
+        "charset", "listfilter", "listfiles", "listdirs", "listrecursive" },
+        requiredAttributes="path", definitionClass = FileDef.class)
 public class FileProcessor extends AbstractProcessor<FileDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(Scraper scraper, DynamicScopeContext context)
+            throws InterruptedException {
         String workingDir = scraper.getWorkingDir();
 
-        String action = BaseTemplater.evaluateToString(elementDef.getAction(), null, scraper);
-        String filePath = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);
-        String type = BaseTemplater.evaluateToString(elementDef.getType(), null, scraper);
-        String charset = BaseTemplater.evaluateToString(elementDef.getCharset(), null, scraper);
+        String action = BaseTemplater.evaluateToString(elementDef.getAction(),
+                null, scraper);
+        String filePath = BaseTemplater.evaluateToString(elementDef.getPath(),
+                null, scraper);
+        String type = BaseTemplater.evaluateToString(elementDef.getType(),
+                null, scraper);
+        String charset = BaseTemplater.evaluateToString(
+                elementDef.getCharset(), null, scraper);
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
-        String listFilter = BaseTemplater.evaluateToString(elementDef.getListFilter(), null, scraper);
-        String listFiles = BaseTemplater.evaluateToString(elementDef.getListFiles(), null, scraper);
+        String listFilter = BaseTemplater.evaluateToString(
+                elementDef.getListFilter(), null, scraper);
+        String listFiles = BaseTemplater.evaluateToString(
+                elementDef.getListFiles(), null, scraper);
         boolean isListFiles = CommonUtil.getBooleanValue(listFiles, true);
-        String listDirs = BaseTemplater.evaluateToString(elementDef.getListDirs(), null, scraper);
+        String listDirs = BaseTemplater.evaluateToString(
+                elementDef.getListDirs(), null, scraper);
         boolean isListDirs = CommonUtil.getBooleanValue(listDirs, true);
-        String listRecursive = BaseTemplater.evaluateToString(elementDef.getListRecursive(), null, scraper);
-        boolean isListRecursive = CommonUtil.getBooleanValue(listRecursive, false);
+        String listRecursive = BaseTemplater.evaluateToString(
+                elementDef.getListRecursive(), null, scraper);
+        boolean isListRecursive = CommonUtil.getBooleanValue(listRecursive,
+                false);
 
         this.setProperty("Action", action);
         this.setProperty("File Path", filePath);
@@ -94,17 +117,22 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
         // depending on file acton calls appropriate method
         if ("write".equalsIgnoreCase(action)) {
-            return executeFileWrite(false, scraper, context, fullPath, type, charset);
+            return executeFileWrite(false, scraper, context, fullPath, type,
+                    charset);
         } else if ("append".equalsIgnoreCase(action)) {
-            return executeFileWrite(true, scraper, context, fullPath, type, charset);
+            return executeFileWrite(true, scraper, context, fullPath, type,
+                    charset);
         } else if ("list".equalsIgnoreCase(action)) {
-            return executeFileList(filePath, listFilter, isListFiles, isListDirs, isListRecursive);
+            return executeFileList(filePath, listFilter, isListFiles,
+                    isListDirs, isListRecursive);
         } else {
             return executeFileRead(fullPath, type, charset, scraper);
         }
     }
 
-    private Variable executeFileList(String filePath, final String listFilter, final boolean listFiles, final boolean listDirs, final boolean listRecursive) {
+    private Variable executeFileList(String filePath, final String listFilter,
+            final boolean listFiles, final boolean listDirs,
+            final boolean listRecursive) {
         final File dir = new File(filePath);
         if (!dir.exists()) {
             throw new FileException("Directory \"" + dir + "\" doesn't exist!");
@@ -112,18 +140,23 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
             throw new FileException("\"" + dir + "\" is not directory!");
         }
 
-        return new NodeVariable(IteratorUtils.filteredIterator(new FileListIterator(dir, listRecursive), new Predicate() {
-            private final CommandPromptFilenameFilter filenameFilter = new CommandPromptFilenameFilter(listFilter);
+        return new NodeVariable(IteratorUtils.filteredIterator(
+                new FileListIterator(dir, listRecursive), new Predicate() {
+                    private final CommandPromptFilenameFilter filenameFilter = new CommandPromptFilenameFilter(
+                            listFilter);
 
-            @Override public boolean evaluate(Object object) {
-                final File file = (File) object;
-                return (file.isDirectory() && listDirs || file.isFile() && listFiles)
-                        && filenameFilter.accept(null, file.getName());
-            }
-        }));
+                    @Override
+                    public boolean evaluate(Object object) {
+                        final File file = (File) object;
+                        return (file.isDirectory() && listDirs || file.isFile()
+                                && listFiles)
+                                && filenameFilter.accept(null, file.getName());
+                    }
+                }));
     }
 
-    private Collection<File> listFiles(File directory, FilenameFilter filter, boolean recurse) {
+    private Collection<File> listFiles(File directory, FilenameFilter filter,
+            boolean recurse) {
         List<File> files = new ArrayList<File>();
         File[] entries = directory.listFiles();
         if (entries != null) {
@@ -140,10 +173,12 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
     }
 
     /**
-     * Writing content to the specified file.
-     * If parameter "append" is true, then append content, otherwise write
+     * Writing content to the specified file. If parameter "append" is true,
+     * then append content, otherwise write
      */
-    private Variable executeFileWrite(boolean append, Scraper scraper, DynamicScopeContext context, String fullPath, String type, String charset) throws InterruptedException {
+    private Variable executeFileWrite(boolean append, Scraper scraper,
+            DynamicScopeContext context, String fullPath, String type,
+            String charset) throws InterruptedException {
         Variable result;
 
         try {
@@ -154,8 +189,8 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
             byte[] data;
 
             if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
-                Variable bodyListVar = new BodyProcessor.Builder(elementDef).
-                    build().execute(scraper, context);
+                Variable bodyListVar = new BodyProcessor.Builder(elementDef)
+                        .build().execute(scraper, context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {
@@ -171,14 +206,16 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
             return result;
         } catch (IOException e) {
-            throw new FileException("Error writing data to file: " + fullPath, e);
+            throw new FileException("Error writing data to file: " + fullPath,
+                    e);
         }
     }
 
     /**
      * Reading the specified file.
      */
-    private Variable executeFileRead(String fullPath, String type, String charset, Scraper scraper) {
+    private Variable executeFileRead(String fullPath, String type,
+            String charset, Scraper scraper) {
         if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
             try {
                 byte[] data = CommonUtil.readBytesFromFile(new File(fullPath));
@@ -190,12 +227,14 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
             }
         } else {
             try {
-                String content = CommonUtil.readStringFromFile(new File(fullPath), charset);
+                String content = CommonUtil.readStringFromFile(new File(
+                        fullPath), charset);
                 LOG.info("Text file read processor: {} characters read.",
                         charCount(content));
                 return new NodeVariable(content);
             } catch (IOException e) {
-                throw new FileException("Error reading the file: " + fullPath, e);
+                throw new FileException("Error reading the file: " + fullPath,
+                        e);
             }
         }
     }
@@ -220,7 +259,8 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
                 } else {
                     byte[] newResult = new byte[result.length + bytes.length];
                     System.arraycopy(result, 0, newResult, 0, result.length);
-                    System.arraycopy(bytes, 0, newResult, result.length, bytes.length);
+                    System.arraycopy(bytes, 0, newResult, result.length,
+                            bytes.length);
                     result = newResult;
                 }
             }
@@ -239,18 +279,18 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
                 for (int i = 0; i < filter.length(); i++) {
                     char ch = filter.charAt(i);
                     switch (ch) {
-                        case '.':
-                            buffer.append("\\.");
-                            break;
-                        case '*':
-                            buffer.append(".*");
-                            break;
-                        case '?':
-                            buffer.append(".");
-                            break;
-                        default:
-                            buffer.append(ch);
-                            break;
+                    case '.':
+                        buffer.append("\\.");
+                        break;
+                    case '*':
+                        buffer.append(".*");
+                        break;
+                    case '?':
+                        buffer.append(".");
+                        break;
+                    default:
+                        buffer.append(ch);
+                        break;
                     }
                 }
                 try {

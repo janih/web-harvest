@@ -36,12 +36,18 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.lang.BooleanUtils;
 import org.htmlcleaner.*;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HtmlToXmlDef;
 import org.webharvest.exception.ParserException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -52,6 +58,17 @@ import java.io.IOException;
 /**
  * HTML to XML processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "html-to-xml", validAttributes = { "id", "outputtype",
+        "advancedxmlescape", "usecdata", "specialentities", "unicodechars",
+        "nbsp-to-sp", "omitunknowntags", "treatunknowntagsascontent",
+        "omitdeprtags", "treatdeprtagsascontent", "omitxmldecl", "omitcomments",
+        "omithtmlenvelope", "useemptyelementtags", "allowmultiwordattributes",
+        "allowhtmlinsideattributes", "namespacesaware", "hyphenreplacement",
+        "prunetags", "booleanatts" }, definitionClass=HtmlToXmlDef.class)
 public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {

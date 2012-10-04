@@ -214,22 +214,22 @@ public class AutoCompleter {
      * @return Array of suggested values for specified attribute - used for auto-completion in IDE.
      */
     private static String[] getAttributeValueSuggestions(ElementInfo elementInfo, String attributeName) {
-        if (elementInfo.getPlugin() != null) {
-            return elementInfo.getPlugin().getAttributeValueSuggestions(attributeName);
-        } else {
-            if (attrValuesProperties != null && attributeName != null) {
-                String key = elementInfo.getName().toLowerCase() + "." + attributeName.toLowerCase();
-                String values = attrValuesProperties.getProperty(key);
-                if ("*charset".equalsIgnoreCase(values)) {
-                    Set<String> charsetKeys = Charset.availableCharsets().keySet();
-                    return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
-                } else if ("*mime".equalsIgnoreCase(values)) {
-                    return WHConstants.MIME_TYPES;
-                } else {
-                    return CommonUtil.tokenize(values, ",");
-                }
-            }
+       if (attrValuesProperties != null && attributeName != null) {
+           String key = elementInfo.getName().toLowerCase() + "." + attributeName.toLowerCase();
+           String values = attrValuesProperties.getProperty(key);
+           if ("*charset".equalsIgnoreCase(values)) {
+               Set<String> charsetKeys = Charset.availableCharsets().keySet();
+
+               return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
+           } else if ("*mime".equalsIgnoreCase(values)) {
+
+               return WHConstants.MIME_TYPES;
+           } else {
+
+               return CommonUtil.tokenize(values, ",");
+           }
         }
+
         return null;
     }
 

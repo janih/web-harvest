@@ -40,6 +40,7 @@ package org.webharvest.runtime.processors.plugins.variable;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -50,11 +51,9 @@ import org.webharvest.runtime.variables.Variable;
  */
 @Autoscanned
 @TargetNamespace(XMLNS_CORE)
+@Definition(value="def", validAttributes={"var", "value", "default"},
+        requiredAttributes="var")
 public class DefVarPlugin extends AbstractVariableModifierPlugin {
-
-    public DefVarPlugin() {
-        super("def");
-    }
 
     @Override
     protected void doExecute(DynamicScopeContext context, String varName, Variable value) {

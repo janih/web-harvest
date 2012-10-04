@@ -4,6 +4,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.apache.commons.mail.*;
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -24,6 +25,7 @@ import java.util.Set;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("mail")
 public class MailPlugin extends WebHarvestPlugin {
 
     public static DataSource createDataSourceOfVariable(Variable variable, String charset, String mimeType) throws IOException {

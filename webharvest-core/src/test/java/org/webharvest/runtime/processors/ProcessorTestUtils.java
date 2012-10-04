@@ -47,7 +47,7 @@ import org.webharvest.definition.XmlNode;
 public final class ProcessorTestUtils {
 
     @SuppressWarnings({ "unchecked" })
-    public static <T extends AbstractProcessor> T processor(XmlNode xml) {
+    public static <T extends Processor> T processor(XmlNode xml) {
         return (T) ProcessorResolver
                 .createProcessor(DefinitionResolver.INSTANCE
                         .createElementDefinition(xml));

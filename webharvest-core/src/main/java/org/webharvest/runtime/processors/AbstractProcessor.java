@@ -47,7 +47,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;

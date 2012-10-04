@@ -3,6 +3,8 @@ package org.webharvest.runtime.processors.plugins.zip;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import org.webharvest.annotation.Definition;
+import org.webharvest.definition.WebHarvestPluginDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -20,6 +22,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("zip")
 public class ZipPlugin extends WebHarvestPlugin {
 
     private ZipOutputStream zipOutStream = null;

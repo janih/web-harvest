@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.webharvest.runtime.processors.ConstantProcessor;
-
 public abstract class AbstractElementDef implements IElementDef {
 
     protected XmlNode xmlNode;
@@ -15,6 +13,7 @@ public abstract class AbstractElementDef implements IElementDef {
     // text content if no nested operation definitions
     protected String body;
 
+    // TODO Do we really need createBodyDefs parameter? If not remove this constructor
     protected AbstractElementDef(XmlNode node, boolean createBodyDefs) {
         if (node == null) {
             throw new IllegalArgumentException("XmlNode must not be null.");
@@ -26,14 +25,7 @@ public abstract class AbstractElementDef implements IElementDef {
 
             if (createBodyDefs) {
                 if (elementList != null && elementList.size() > 0) {
-                    /*
-                    for (final Object element : elementList) {
-                        if (!(element instanceof XmlNode)) {
-                            operationDefs.add(new ConstantDef(element.toString(),
-                                    ConstantProcessor.class));
-                        }
-                    }
-                    */
+                    // TODO Fix as soon as possible
                 } else {
                     body = node.getText();
                 }

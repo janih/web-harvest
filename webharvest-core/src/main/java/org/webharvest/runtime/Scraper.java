@@ -52,7 +52,6 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.exception.DatabaseException;
-import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.Processor;
@@ -343,7 +342,7 @@ public class Scraper {
         this.runningProcessors.pop();
     }
 
-    public void processorFinishedExecution(AbstractProcessor processor, Map properties) {
+    public void processorFinishedExecution(final Processor processor, Map properties) {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onProcessorExecutionFinished(this, processor, properties);
         }

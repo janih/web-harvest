@@ -60,12 +60,6 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     private static final Pattern identifierExprPattern = Pattern.compile("\\$\\{\\s*(\\w*)\\s*\\}");
 
-    private final String name;
-
-    protected AbstractVariableModifierPlugin(String name) {
-        this.name = name;
-    }
-
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final String varName = getAttributes().get(ATTR_VAR);
         final String valueExpr = getAttributes().get(ATTR_VALUE);
@@ -126,16 +120,4 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     protected abstract void doExecute(DynamicScopeContext context, String varName, Variable value);
 
-    public String getName() {
-        return name;
-    }
-
-    public String[] getValidAttributes() {
-        return new String[]{ATTR_VAR, ATTR_VALUE, ATTR_DEFAULT};
-    }
-
-    @Override
-    public String[] getRequiredAttributes() {
-        return new String[]{ATTR_VAR};
-    }
 }

@@ -36,13 +36,12 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.WHConstants;
-import org.webharvest.runtime.processors.AbstractProcessor;
-import org.webharvest.runtime.processors.WebHarvestPlugin;
-
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+
+import org.webharvest.WHConstants;
+import org.webharvest.runtime.processors.AbstractProcessor;
 
 /**
  * @author Vladimir Nikic
@@ -67,13 +66,16 @@ public class ElementInfo {
 
     private boolean allTagsAllowed;
 
-    // pluging instance for this element, if element represents Web-Harvest plugin
-    private WebHarvestPlugin plugin = null;
+    private boolean isInternal;
+
+    private Class[] dependantProcessors;
 
     public ElementInfo(String name,
                        Class<? extends IElementDef> definitionClass,
                        Class<? extends AbstractProcessor> processorClass,
-                       String validTags, String validAtts) {
+                       String validTags, String validAtts,
+                       final boolean isInternal,
+                       final Class[] dependantProcessors) {
         this.name = name;
         this.definitionClass = definitionClass;
         this.processorClass = processorClass;
@@ -108,6 +110,9 @@ public class ElementInfo {
                 this.attsSet.add(token);
             }
         }
+
+        this.isInternal = isInternal;
+        this.dependantProcessors = dependantProcessors;
     }
 
     /**
@@ -167,11 +172,12 @@ public class ElementInfo {
         return allTagsAllowed;
     }
 
-    public void setPlugin(WebHarvestPlugin plugin) {
-        this.plugin = plugin;
+    public boolean isInternal() {
+        return isInternal;
     }
 
-    public WebHarvestPlugin getPlugin() {
-        return plugin;
+    public Class[] getDependantProcessors() {
+        return dependantProcessors;
     }
+
 }

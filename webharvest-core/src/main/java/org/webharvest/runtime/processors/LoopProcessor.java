@@ -36,6 +36,9 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,10 +52,13 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -63,6 +69,15 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Loop list processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "loop",
+        validAttributes = { "id", "item", "index", "maxloops", "filter",
+        "empty" }, validSubprocessors = { "list", "body" },
+        requiredSubprocessors = { "list", "body"},
+        definitionClass = LoopDef.class )
 public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {

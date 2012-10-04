@@ -36,6 +36,9 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -47,17 +50,28 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XsltDef;
 import org.webharvest.exception.XsltException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
 /**
  * XSLT processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "xslt", validAttributes = "id",
+        validSubprocessors = {"xml", "stylesheet"},
+        requiredSubprocessors = { "xml", "stylesheet" },
+        definitionClass = XsltDef.class)
 public class XsltProcessor extends AbstractProcessor<XsltDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {

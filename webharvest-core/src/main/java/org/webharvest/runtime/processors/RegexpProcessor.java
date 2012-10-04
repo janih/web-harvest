@@ -36,6 +36,9 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,11 +46,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.AbstractElementDef;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -57,6 +62,16 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Regular expression replace processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "regexp", validAttributes = { "id", "replace", "max",
+        "flag-caseinsensitive", "flag-multiline", "flag-dotall",
+        "flag-unicodecase", "flag-canoneq" }, validSubprocessors = {
+        "regexp-pattern", "regexp-source", "regexp-result" },
+        requiredSubprocessors = { "regexp-pattern", "regexp-source"},
+        definitionClass = RegexpDef.class )
 public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {

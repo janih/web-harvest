@@ -6,6 +6,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -21,6 +22,7 @@ import java.io.IOException;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition("ftp")
 public class FtpPlugin extends WebHarvestPlugin {
 
     FTPClient ftpClient;

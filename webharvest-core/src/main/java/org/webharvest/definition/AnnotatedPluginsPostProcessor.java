@@ -42,6 +42,9 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.annotation.Definition;
+import org.webharvest.annotation.ElementInfoFactory;
+import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -109,11 +112,13 @@ public final class AnnotatedPluginsPostProcessor implements
             final ConfigurableResolver resolver) {
         final TargetNamespace targetNamespace = plugin.getAnnotation(
                 TargetNamespace.class);
+        final ElementInfo elementInfo =
+                ElementInfoFactory.getElementInfo(plugin);
 
         for (String namespace : targetNamespace.value()) {
             LOGGER.info("Registering plugin {} under namespace {}",
                     plugin.getCanonicalName(), namespace);
-            resolver.registerPlugin(plugin, namespace);
+            resolver.registerPlugin(elementInfo, namespace);
         }
     }
 
@@ -146,8 +151,11 @@ public final class AnnotatedPluginsPostProcessor implements
     private Set<Class< ? extends WebHarvestPlugin >> filterCandidates(
             final Set<Class< ? >> candidates) {
         final Predicate validCandidatePredicate = PredicateUtils.andPredicate(
-                new SubtypePredicate(WebHarvestPlugin.class),
-                new AnnotatedTypePredicate(TargetNamespace.class));
+                // TODO Use Processor interface instead
+                new SubtypePredicate(AbstractProcessor.class),
+                PredicateUtils.andPredicate(
+                        new AnnotatedTypePredicate(TargetNamespace.class),
+                        new AnnotatedTypePredicate(Definition.class)));
 
         final Set<Class< ? extends WebHarvestPlugin >> validCandidates =
             new HashSet<Class < ? extends WebHarvestPlugin >>();

@@ -40,6 +40,7 @@ package org.webharvest.runtime.processors.plugins;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -48,6 +49,8 @@ import org.webharvest.runtime.variables.Variable;
 
 @Autoscanned
 @TargetNamespace(XMLNS_CORE)
+@Definition(value="sleep",validAttributes="milliseconds",
+        requiredAttributes="milliseconds", body=false)
 public class SleepPlugin extends WebHarvestPlugin {
 
     private static final String MILLISECONDS_ATT_NAME = "milliseconds";
@@ -59,24 +62,6 @@ public class SleepPlugin extends WebHarvestPlugin {
             Thread.sleep(millis);
         }
         return EmptyVariable.INSTANCE;
-    }
-
-    public String getName() {
-        return "sleep";
-    }
-
-    public String[] getValidAttributes() {
-        return getRequiredAttributes();
-    }
-
-    @Override
-    public String[] getRequiredAttributes() {
-        return new String[]{MILLISECONDS_ATT_NAME};
-    }
-
-    @Override
-    public boolean hasBody() {
-        return false;
     }
 
 }

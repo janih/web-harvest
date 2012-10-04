@@ -36,11 +36,16 @@
 */
 package org.webharvest.deprecated.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.VarDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 
@@ -50,6 +55,12 @@ import org.webharvest.runtime.variables.Variable;
  * @deprecated Use <get> or <value-of> instead
  */
 @Deprecated
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE_10 })
+@Definition(value = "var", validAttributes = { "id", "name"},
+      requiredAttributes = "name", definitionClass = VarDef.class)
 public class VarProcessor extends AbstractProcessor<VarDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) {

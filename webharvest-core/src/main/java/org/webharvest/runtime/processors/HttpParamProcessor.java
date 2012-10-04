@@ -5,16 +5,16 @@
     with or without modification, are permitted provided that the following
     conditions are met:
 
-    * Redistributions of source code must retain the above
+ * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
+ * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote
+ * The name of Web-Harvest may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
@@ -33,13 +33,19 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
-*/
+ */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpParamDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -48,24 +54,43 @@ import org.webharvest.utils.CommonUtil;
 /**
  * Variable definition http param processor.
  */
+// TODO Add unit test
+// TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "http-param", validAttributes = { "id", "name", "isfile",
+        "filename", "contenttype" }, requiredAttributes = "name",
+        definitionClass = HttpParamDef.class)
 public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
-        String isFileStr = BaseTemplater.evaluateToString(elementDef.getIsfile(), null, scraper);
+    public Variable execute(Scraper scraper, DynamicScopeContext context)
+            throws InterruptedException {
+        String name = BaseTemplater.evaluateToString(elementDef.getName(),
+                null, scraper);
+        String isFileStr = BaseTemplater.evaluateToString(
+                elementDef.getIsfile(), null, scraper);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);
-        String fileName = BaseTemplater.evaluateToString(elementDef.getFilename(), null, scraper);
-        String contentType = BaseTemplater.evaluateToString(elementDef.getContenttype(), null, scraper);
+        String fileName = BaseTemplater.evaluateToString(
+                elementDef.getFilename(), null, scraper);
+        String contentType = BaseTemplater.evaluateToString(
+                elementDef.getContenttype(), null, scraper);
 
         HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
         if (httpProcessor != null) {
-            httpProcessor.addHttpParam(name, isFile, fileName, contentType, new BodyProcessor.Builder(elementDef).build().execute(scraper, context));
+            httpProcessor.addHttpParam(
+                    name,
+                    isFile,
+                    fileName,
+                    contentType,
+                    new BodyProcessor.Builder(elementDef).build().execute(
+                            scraper, context));
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);
             this.setProperty("Content Type", contentType);
         } else {
-            throw new HttpException("Usage of http-param processor is not allowed outside of http processor!");
+            throw new HttpException(
+                    "Usage of http-param processor is not allowed outside of http processor!");
         }
 
         return EmptyVariable.INSTANCE;

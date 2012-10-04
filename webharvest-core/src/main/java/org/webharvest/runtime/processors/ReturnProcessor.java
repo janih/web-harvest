@@ -36,15 +36,27 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ReturnDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
 /**
  * Function's return value processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "return", validAttributes = "id",
+        definitionClass = ReturnDef.class)
 public class ReturnProcessor extends AbstractProcessor<ReturnDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {

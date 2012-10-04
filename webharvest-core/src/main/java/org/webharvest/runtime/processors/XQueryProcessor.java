@@ -36,6 +36,9 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,7 @@ import net.sf.saxon.query.StaticQueryContext;
 import net.sf.saxon.query.XQueryExpression;
 import net.sf.saxon.trans.XPathException;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XQueryDef;
 import org.webharvest.definition.XQueryExternalParamDef;
@@ -57,6 +61,8 @@ import org.webharvest.exception.ScraperXQueryException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
@@ -66,6 +72,14 @@ import org.webharvest.utils.XmlUtil;
 /**
  * XQuery processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "xquery", validAttributes = { "id" },
+        validSubprocessors = { "xq-param", "xq-expression" },
+        requiredSubprocessors = "xq-expression",
+        definitionClass = XQueryDef.class)
 public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
 
     public static final Set<String> ALLOWED_PARAM_TYPES = new TreeSet<String>();

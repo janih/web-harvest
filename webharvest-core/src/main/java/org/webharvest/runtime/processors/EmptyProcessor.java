@@ -5,16 +5,16 @@
     with or without modification, are permitted provided that the following
     conditions are met:
 
-    * Redistributions of source code must retain the above
+ * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
+ * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote
+ * The name of Web-Harvest may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
@@ -33,21 +33,39 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
-*/
+ */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.EmptyDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
 /**
  * Empty processor = executes body and returns empty variable.
  */
+// TODO Add unit test
+// TODO Add javadoc
+
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "empty", validAttributes = "id",
+        definitionClass = EmptyDef.class)
 public class EmptyProcessor extends AbstractProcessor<EmptyDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Variable execute(Scraper scraper, DynamicScopeContext context)
+            throws InterruptedException {
         new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
 
         return EmptyVariable.INSTANCE;

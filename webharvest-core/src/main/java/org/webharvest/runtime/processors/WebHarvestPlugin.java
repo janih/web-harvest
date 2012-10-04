@@ -49,80 +49,7 @@ import java.util.Map;
 /**
  * Base for all user-defined plugins.
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPluginDef> {
-
-    private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
-
-    /**
-     * Defines name of the processor. Should be valid identifier.
-     * Processor's tag will use this name. For example, if this name is
-     * "myprocessor" in config file it will be used as &lt;myprocessor...&gt;...&lt;/myprocessor&gt;
-     *
-     * @return Name of the processor
-     */
-    public abstract String getName();
-
-    /**
-     * This method should return all possible attribute names for the plugin processor.
-     *
-     * @return Array of attribute names
-     */
-    public String[] getValidAttributes() {
-        return new String[]{};
-    }
-
-    /**
-     * This method should return all mandatory attribute names for the plugin processor.
-     *
-     * @return Array of attribute names
-     */
-    public String[] getRequiredAttributes() {
-        return new String[]{};
-    }
-
-    /**
-     * This method should return all names of all allowed processors inside the body of
-     * this processor plugin. If null is returned, then all subprocessors are allowed.
-     *
-     * @return Array of allowed subprocessor names (case insensitive)
-     */
-    public String[] getValidSubprocessors() {
-        return null;
-    }
-
-    /**
-     * This method should return all mandatory subprocessor names, or in other words all
-     * mandatory subtags that must be present in the body of this processor plugin.
-     *
-     * @return Array of mandatory subprocessor names
-     */
-    public String[] getRequiredSubprocessors() {
-        return new String[]{};
-    }
-
-    /**
-     * Defines dependant subprocessors that are used inside this plugin and that will
-     * automatically be registered with this plugin.
-     *
-     * @return Array of subprocessor classes
-     */
-    public Class[] getDependantProcessors() {
-        return EMPTY_CLASS_ARRAY;
-    }
-
-    /**
-     * @param attributeName Name of plugin attribute
-     * @return Array of valuee suggestions for specified attribute (this is used for auto-complete feature in IDE).
-     *         null means nothing to suggest.
-     */
-    public String[] getAttributeValueSuggestions(String attributeName) {
-        return null;
-    }
-
-    public boolean hasBody() {
-        return true;
-    }
 
     public final Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         // pre processing
@@ -144,53 +71,11 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      */
     public abstract Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
-    public String getTagDesc() {
-        if (!hasBody()) {
-            return "";
-        }
-
-        String[] validSubprocessors = getValidSubprocessors();
-        if (validSubprocessors == null) {
-            return null;
-        }
-
-        String requiredTags[] = getRequiredSubprocessors();
-
-        StringBuilder result = new StringBuilder();
-        for (String subProcessor : validSubprocessors) {
-            if (result.length() != 0) {
-                result.append(',');
-            }
-            if (CommonUtil.existsInStringArray(requiredTags, subProcessor, true)) {
-                result.append('!');
-            }
-            result.append(subProcessor);
-        }
-        return result.toString();
-    }
-
-    public String getAttributeDesc() {
-        String[] validAtts = getValidAttributes();
-        if (validAtts == null) {
-            return "id";
-        }
-
-        String requiredAtts[] = getRequiredAttributes();
-
-        StringBuilder result = new StringBuilder("id,");
-        for (String attr : validAtts) {
-            if (CommonUtil.existsInStringArray(requiredAtts, attr, true)) {
-                result.append('!');
-            }
-            result.append(attr);
-            result.append(",");
-        }
-        return result.toString();
-    }
-
     /**
      * @return Map of attributes of this plugin
      */
+    @Deprecated
+    // FIXME We can use definition object directly
     protected Map<String, String> getAttributes() {
         return elementDef.getAttributes();
     }
@@ -198,7 +83,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
     /**
      * @return Map of attributes of this plugin
      */
-    protected Map<String, String> getAttributes(String uri) {
+    private Map<String, String> getAttributes(String uri) {
         return elementDef.getAttributes(uri);
     }
 
@@ -207,7 +92,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @param scraper
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
-    protected String evaluateAttribute(String attName, String uri, Scraper scraper) {
+    private String evaluateAttribute(String attName, String uri, Scraper scraper) {
         return BaseTemplater.evaluateToString(getAttributes(uri).get(attName), null, scraper);
     }
 
@@ -215,46 +100,12 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
         return evaluateAttribute(attName, elementDef.getUri(), scraper);
     }
 
-    /**
-     * @param attName      Name of attribute
-     * @param defaultValue
-     * @param scraper
-     * @return Value of specified attribute as boolean, or default value if it cannot be recognized as valid boolean
-     */
-    protected boolean evaluateAttributeAsBoolean(String attName, String uri, boolean defaultValue, Scraper scraper) {
-        return CommonUtil.getBooleanValue(evaluateAttribute(attName, uri, scraper), defaultValue);
-    }
-
     protected boolean evaluateAttributeAsBoolean(String attName, boolean defaultValue, Scraper scraper) {
         return CommonUtil.getBooleanValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
-    /**
-     * @param attName      Name of attribute
-     * @param defaultValue
-     * @param scraper
-     * @return Value of specified attribute as integer, or default value if it cannot be recognized as valid integer
-     */
-    protected int evaluateAttributeAsInteger(String attName, String uri, int defaultValue, Scraper scraper) {
-        return CommonUtil.getIntValue(evaluateAttribute(attName, uri, scraper), defaultValue);
-    }
-
     protected int evaluateAttributeAsInteger(String attName, int defaultValue, Scraper scraper) {
         return CommonUtil.getIntValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
-    }
-
-    /**
-     * @param attName      Name of attribute
-     * @param defaultValue
-     * @param scraper
-     * @return Value of specified attribute as double, or default value if it cannot be recognized as valid double
-     */
-    protected double evaluateAttributeAsDouble(String attName, String uri, double defaultValue, Scraper scraper) {
-        return CommonUtil.getDoubleValue(evaluateAttribute(attName, uri, scraper), defaultValue);
-    }
-
-    protected double evaluateAttributeAsDouble(String attName, double defaultValue, Scraper scraper) {
-        return CommonUtil.getDoubleValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
     }
 
     /**

@@ -36,9 +36,15 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.TemplateDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -48,6 +54,12 @@ import org.webharvest.runtime.variables.Variable;
  * Template processor. Responsible for replacing marked portions of the
  * text with evaluated expressions.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "template", validAttributes = { "id", "language" },
+        definitionClass = TemplateDef.class)
 public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {

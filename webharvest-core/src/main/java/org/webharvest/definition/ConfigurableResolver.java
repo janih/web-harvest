@@ -41,6 +41,7 @@ import org.webharvest.runtime.processors.WebHarvestPlugin;
  * register resolver post processors and to register custom web harvest plugins.
  *
  * @author Piotr Dyraga
+ * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
  */
@@ -64,13 +65,14 @@ public interface ConfigurableResolver {
     void refresh();
 
     /**
-     * Register provided {@link WebHarvestPlugin} under the given XML namespace.
+     * Register provided {@link WebHarvestPlugin} based on information provided
+     * by specified {@link ElementInfo}.
      *
-     * @param pluginClass
-     *            web harvest plugin class which is going to be registered
+     * @param elementInfo
+     *            web harvest plugin definition needed to succeed registration.
      * @param namespace
-     *            XML namespace under which plugin is going to be registered
+     *            XML namespace under which plugin is going to be registered.
      */
-    void registerPlugin(Class< ? extends WebHarvestPlugin > pluginClass,
-            String namespace);
+    void registerPlugin(ElementInfo elementInfo, String namespace);
+
 }

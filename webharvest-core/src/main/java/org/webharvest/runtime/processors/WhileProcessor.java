@@ -36,11 +36,17 @@
 */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.WhileDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -54,6 +60,11 @@ import java.util.List;
 /**
  * Conditional processor.
  */
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "while", validAttributes = { "id", "condition", "index", "maxloops", "empty" }, requiredAttributes = "condition", definitionClass = WhileDef.class)
 public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {

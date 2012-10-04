@@ -40,6 +40,7 @@ package org.webharvest.runtime.processors.plugins;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 
+import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -48,6 +49,8 @@ import org.webharvest.runtime.variables.Variable;
 
 @Autoscanned
 @TargetNamespace(XMLNS_CORE)
+@Definition(value="value-of", validAttributes="expr", requiredAttributes="expr",
+        body=false)
 public class ValueOfPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_EXPRESSION = "expr";
@@ -56,24 +59,6 @@ public class ValueOfPlugin extends WebHarvestPlugin {
         final String expression = getAttributes().get(ATTR_EXPRESSION);
         setProperty("Expression", expression);
         return BaseTemplater.evaluateToVariable(expression, null, scraper);
-    }
-
-    public String getName() {
-        return "value-of";
-    }
-
-    public String[] getValidAttributes() {
-        return getRequiredAttributes();
-    }
-
-    @Override
-    public String[] getRequiredAttributes() {
-        return new String[]{ATTR_EXPRESSION};
-    }
-
-    @Override
-    public boolean hasBody() {
-        return false;
     }
 
 }

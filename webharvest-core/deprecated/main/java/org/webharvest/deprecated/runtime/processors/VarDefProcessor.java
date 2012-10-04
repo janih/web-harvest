@@ -37,12 +37,17 @@
  */
 package org.webharvest.deprecated.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
 import org.apache.commons.lang.ObjectUtils;
+import org.webharvest.annotation.Definition;
 import org.webharvest.definition.VarDefDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.BodyProcessor;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -54,6 +59,12 @@ import org.webharvest.utils.CommonUtil;
  * @deprecated Use either DefProcessor or SetProcessor
  */
 @Deprecated
+//TODO Add unit test
+//TODO Add javadoc
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE_10 })
+@Definition(value = "var-def", validAttributes = { "id", "name", "overwrite" },
+        requiredAttributes = "name", definitionClass = VarDefDef.class)
 public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
