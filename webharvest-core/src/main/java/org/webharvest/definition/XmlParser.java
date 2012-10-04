@@ -39,11 +39,13 @@ package org.webharvest.definition;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
+import org.webharvest.definition.validation.SchemaComponentFactory;
 import org.webharvest.exception.ParserException;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.XmlUtil;
@@ -51,6 +53,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
@@ -72,8 +75,9 @@ public class XmlParser extends DefaultHandler {
 
         XmlParser handler = new XmlParser();
         try {
-            XmlUtil.getSAXParserFactory(false, true).newSAXParser()
-                    .parse(in, handler);
+            final SAXParserFactory factory = XmlUtil.getSAXParserFactory(false, true);
+            factory.setSchema(SchemaComponentFactory.getSchemaFactory().getSchema());
+            factory.newSAXParser().parse(in, handler);
 
             log.info("XML parsed in "
                     + (System.currentTimeMillis() - startTime) + "ms.");
@@ -147,6 +151,22 @@ public class XmlParser extends DefaultHandler {
 
             elementStack.pop();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warning (final SAXParseException e) throws SAXException {
+        log.warn(e.getMessage());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error (final SAXParseException e) throws SAXException {
+        throw e;
     }
 
 }

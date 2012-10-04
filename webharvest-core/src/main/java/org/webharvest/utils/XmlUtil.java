@@ -1,18 +1,13 @@
 package org.webharvest.utils;
 
-import net.sf.saxon.Configuration;
-import net.sf.saxon.om.Item;
-import net.sf.saxon.om.SequenceIterator;
-import net.sf.saxon.query.DynamicQueryContext;
-import net.sf.saxon.query.StaticQueryContext;
-import net.sf.saxon.query.XQueryExpression;
-import net.sf.saxon.trans.XPathException;
-import org.w3c.dom.Document;
-import org.webharvest.runtime.RuntimeConfig;
-import org.webharvest.runtime.variables.ListVariable;
-import org.webharvest.runtime.variables.NodeVariable;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,13 +23,28 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import net.sf.saxon.Configuration;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.om.SequenceIterator;
+import net.sf.saxon.query.DynamicQueryContext;
+import net.sf.saxon.query.StaticQueryContext;
+import net.sf.saxon.query.XQueryExpression;
+import net.sf.saxon.trans.XPathException;
+
+import org.w3c.dom.Document;
+import org.webharvest.definition.validation.ResourcePathToURITransformer;
+import org.webharvest.definition.validation.SchemaComponentFactory;
+import org.webharvest.definition.validation.SchemaResolver;
+import org.webharvest.definition.validation.SchemaResourcesPostProcessor;
+import org.webharvest.definition.validation.SchemaSource;
+import org.webharvest.definition.validation.TransformerPair;
+import org.webharvest.definition.validation.URIToSchemaSourceTransformer;
+import org.webharvest.runtime.RuntimeConfig;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.NodeVariable;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * XML utils - contains common logic for XML handling
@@ -44,6 +54,19 @@ public class XmlUtil {
     private static final Map<Integer, SAXParserFactory> saxParserFactoryMap;
 
     static {
+        /* Resolving core XML schemas for version 1.0, 2.0 and 2.1. */
+        final SchemaResolver schemaResolver =
+            SchemaComponentFactory.getSchemaResolver();
+        schemaResolver.addPostProcessor(
+                new SchemaResourcesPostProcessor<String>(
+                        new TransformerPair<String, URI, SchemaSource>(
+                                new ResourcePathToURITransformer(),
+                                new URIToSchemaSourceTransformer()),
+                        "/config.xsd", "/wh-core-2.0.xsd",
+                        "/wh-core-2.1-loose.xsd"));
+        schemaResolver.refresh();
+
+
         final HashMap<Integer, SAXParserFactory> map = new HashMap<Integer, SAXParserFactory>();
         SAXParserFactory factory;
 
