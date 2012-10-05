@@ -1169,6 +1169,15 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="omitxmldecl" use="optional" default="false"
+          type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Tells whether to skip XML declaration. The value must be true or
+              false.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
