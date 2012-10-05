@@ -260,33 +260,6 @@ public class XmlNode implements Serializable {
         return elementList;
     }
 
-    /**
-     * Prints instance in treelike form to the default output.
-     * Useful for testing.
-     */
-    public void print() {
-        print(0);
-    }
-
-    private void print(int level) {
-        for (int i = 0; i < level; i++) {
-            System.out.print("     ");
-        }
-        System.out.print(name + ": " + attributes + ": TEXT = [" + textBuff + "]\n");
-
-        for (Serializable element : elementList) {
-            if (element instanceof XmlNode) {
-                XmlNode childNode = (XmlNode) element;
-                childNode.print(level + 1);
-            } else {
-                for (int i = 0; i <= level; i++) {
-                    System.out.print("     ");
-                }
-                System.out.println((String) element);
-            }
-        }
-    }
-
     public void setLocation(int lineNumber, int columnNumber) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
