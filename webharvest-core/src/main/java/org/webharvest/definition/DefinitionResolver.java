@@ -236,10 +236,8 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
 
         final ElementInfo elementInfo = getElementInfo(nodeName, nodeUri);
         if (elementInfo == null || elementInfo.getDefinitionClass() == null) {
-            throw new ConfigurationException("Unexpected configuration element: " + node.getQName() + "!");
+            throw new ConfigurationException("Unexpected configuration element (URI, name): (" + nodeUri + "," + nodeName + ")!");
         }
-
-        validate(node);
 
         //FIXME: use a better construction than this as soon as possible
         try {
@@ -287,6 +285,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
      *
      * @param node node
      */
+    @Deprecated //Feature request #26: validation should base on XML schema
     public void validate(XmlNode node) {
         if (node == null) {
             return;
