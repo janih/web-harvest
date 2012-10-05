@@ -5,9 +5,7 @@ import static org.testng.AssertJUnit.fail;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -87,40 +85,18 @@ public class DefaultDriverManagerTest {
     /**
      * Mock {@link Driver} implementation. It is available on test's classpath.
      */
-    static class MockClasspathDriver implements Driver {
+    static class MockClasspathDriver extends AbstractMockedDriver {
 
         public static String URL_ACCEPTED = "jdbc:dummydb:myhost";
 
         @Override
-        public Connection connect(final String url, final Properties info)
+        protected String getURLAccepted() {
+            return URL_ACCEPTED;
+        }
+
+        @Override
+        protected Connection doConnect(final String url, final Properties info)
                 throws SQLException {
-            throw new UnsupportedOperationException("TEST MOCK");
-        }
-
-        @Override
-        public boolean acceptsURL(final String url) throws SQLException {
-            return (URL_ACCEPTED.equals(url));
-        }
-
-        @Override
-        public DriverPropertyInfo[] getPropertyInfo(
-                final String url, final Properties info)
-                throws SQLException {
-            throw new UnsupportedOperationException("TEST MOCK");
-        }
-
-        @Override
-        public int getMajorVersion() {
-            throw new UnsupportedOperationException("TEST MOCK");
-        }
-
-        @Override
-        public int getMinorVersion() {
-            throw new UnsupportedOperationException("TEST MOCK");
-        }
-
-        @Override
-        public boolean jdbcCompliant() {
             throw new UnsupportedOperationException("TEST MOCK");
         }
     }
