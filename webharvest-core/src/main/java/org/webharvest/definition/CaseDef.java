@@ -63,13 +63,11 @@ public class CaseDef extends WebHarvestPluginDef {
             int index = 0;
             while (it.hasNext()) {
                 XmlNode currParamNode = (XmlNode) it.next();
-                definitionResolver.validate(currParamNode);
                 ifDefs[index++] = (IfDef) definitionResolver.createElementDefinition(currParamNode);
             }
         }
 
         XmlNode elseDefNode = xmlNode.getFirstSubnode(new ElementName("else", xmlNode.getUri()));
-        definitionResolver.validate(elseDefNode);
         elseDef = elseDefNode == null ? null : new ElementDefProxy(elseDefNode);
     }
 

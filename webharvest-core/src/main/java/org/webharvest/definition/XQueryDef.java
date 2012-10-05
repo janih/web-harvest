@@ -56,7 +56,6 @@ public class XQueryDef extends WebHarvestPluginDef {
         super(xmlNode, false, processorClass);
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
-        definitionResolver.validate(xqDefNode);
         xqDef = xqDefNode == null ? null : new ElementDefProxy(xqDefNode);
 
         List<XmlNode> listOfExternalParamNodes = xmlNode.getSubnodes(new ElementName("xq-param", xmlNode.getUri()));
@@ -69,7 +68,6 @@ public class XQueryDef extends WebHarvestPluginDef {
             int index = 0;
             while (it.hasNext()) {
                 XmlNode currParamNode =  (XmlNode) it.next();
-                definitionResolver.validate(currParamNode);
                 externalParamDefs[index++] = (XQueryExternalParamDef) definitionResolver.createElementDefinition(currParamNode);
             }
         }

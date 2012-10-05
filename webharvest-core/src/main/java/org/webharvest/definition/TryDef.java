@@ -43,8 +43,6 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class TryDef extends WebHarvestPluginDef {
 
-    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
-
     private IElementDef tryBodyDef;
     private IElementDef catchValueDef;
 
@@ -52,11 +50,9 @@ public class TryDef extends WebHarvestPluginDef {
         super(xmlNode, false, processorClass);
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));
-        definitionResolver.validate(tryBodyDefNode);
         this.tryBodyDef = tryBodyDefNode == null ? null : new ElementDefProxy(tryBodyDefNode);
 
         XmlNode catchValueDefNode = xmlNode.getFirstSubnode(new ElementName("catch", xmlNode.getUri()));
-        definitionResolver.validate(catchValueDefNode);
         this.catchValueDef = catchValueDefNode == null ? null : new ElementDefProxy(catchValueDefNode);
     }
 
@@ -71,7 +67,6 @@ public class TryDef extends WebHarvestPluginDef {
     public String getShortElementName() {
         return "try";
     }
-
 
     public IElementDef[] getOperationDefs() {
         IElementDef[] result = new IElementDef[2];

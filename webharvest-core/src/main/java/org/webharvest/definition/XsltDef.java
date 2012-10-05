@@ -43,8 +43,6 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class XsltDef extends WebHarvestPluginDef {
 
-    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
-
     private IElementDef xmlDef;
 
     private IElementDef stylesheetDef;
@@ -53,11 +51,9 @@ public class XsltDef extends WebHarvestPluginDef {
         super(xmlNode, false, processorClass);
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
-        definitionResolver.validate(xmlDefNode);
         xmlDef = xmlDefNode == null ? null : new ElementDefProxy(xmlDefNode);
 
         XmlNode stylesheetDefNode = xmlNode.getFirstSubnode(new ElementName("stylesheet", xmlNode.getUri()));
-        definitionResolver.validate(stylesheetDefNode);
         stylesheetDef = stylesheetDefNode == null ? null : new ElementDefProxy(stylesheetDefNode);
     }
 

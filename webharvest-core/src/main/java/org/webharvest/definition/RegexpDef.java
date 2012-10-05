@@ -69,15 +69,12 @@ public class RegexpDef extends WebHarvestPluginDef {
         this.flagCanoneq = xmlNode.getAttribute("flag-canoneq");
 
         XmlNode regexpPatternDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-pattern", xmlNode.getUri()));
-        definitionResolver.validate(regexpPatternDefNode);
         regexpPatternDef = regexpPatternDefNode == null ? null : new ElementDefProxy(regexpPatternDefNode);
 
         XmlNode regexpSourceDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-source", xmlNode.getUri()));
-        definitionResolver.validate(regexpSourceDefNode);
         regexpSourceDef = regexpSourceDefNode == null ? null : new ElementDefProxy(regexpSourceDefNode);
 
         XmlNode regexpResultDefNode = xmlNode.getFirstSubnode(new ElementName("regexp-result", xmlNode.getUri()));
-        definitionResolver.validate(regexpResultDefNode);
         regexpResultDef = regexpResultDefNode == null ? null : new ElementDefProxy(regexpResultDefNode);
     }
 

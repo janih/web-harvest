@@ -45,9 +45,7 @@ import java.util.Set;
 import org.webharvest.AlreadyBoundException;
 import org.webharvest.annotation.ElementInfoFactory;
 import org.webharvest.exception.ConfigurationException;
-import org.webharvest.exception.ErrMsg;
 import org.webharvest.exception.PluginException;
-import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.ConstantProcessor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.utils.Assert;
@@ -58,6 +56,7 @@ import org.webharvest.utils.ClassLoaderUtil;
  * parsed xml nodes from Web-Harvest configurations.
  *
  * @author Vladimir Nikic
+ * @author Robert Bala
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DefinitionResolver extends AbstractRefreshableResolver {
@@ -276,68 +275,6 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
         } else {
             // TODO Use a proxy instead of real definition
             return new ConstantDef(subject.toString(), ConstantProcessor.class);
-        }
-    }
-
-    /**
-     * Validates specified xml node with appropriate element info instance.
-     * If validation fails, an runtime exception is thrown.
-     *
-     * @param node node
-     */
-    @Deprecated //Feature request #26: validation should base on XML schema
-    public void validate(XmlNode node) {
-        if (node == null) {
-            return;
-        }
-
-        final String uri = node.getUri();
-
-        final ElementInfo elementInfo = getElementInfo(node.getName(), uri);
-
-        if (elementInfo == null) {
-            return;
-        }
-
-        // checks if tag contains all required subelements
-        for (String tag : elementInfo.getRequiredTagsSet()) {
-            if (node.getElement(tag) == null) {
-                throw new ConfigurationException(ErrMsg.missingTag(node.getName(), tag));
-            }
-        }
-
-        final boolean areAllTagsAllowed = elementInfo.areAllTagsAllowed();
-        final Set<ElementName> allTagNameSet =
-            getElementsRegistry().listBound();
-        final Set<String> tags = elementInfo.getTagsSet();
-
-        // check if element contains only allowed subelements
-        for (ElementName elementName : node.getElementNameSet()) {
-            if ((!areAllTagsAllowed && (!tags.contains(elementName.getName()) || !uri.equals(node.getUri()))) ||
-                    (areAllTagsAllowed && !allTagNameSet.contains(elementName))
-                    ) {
-                throw new ConfigurationException(ErrMsg.invalidTag(node.getName(), elementName.toString()));
-            }
-        }
-
-        // checks if tag contains all required attributes
-        for (String att : elementInfo.getRequiredAttsSet()) {
-            if (node.getAttribute(uri, att) == null) {
-                throw new ConfigurationException(ErrMsg.missingAttribute(node.getName(), att));
-            }
-        }
-
-        final Set<String> atts = elementInfo.getAttsSet();
-
-        // check if element contains only allowed attributes
-        for (XmlAttribute att : node.getAllAttributes()) {
-            String attUri = att.getUri();
-            String attName = att.getName();
-            if (!atts.contains(attName) || !uri.equals(attUri)) {
-                if (!elementInfo.getNsAttsSet().contains(attUri)) {
-                    throw new ConfigurationException(ErrMsg.invalidAttribute(node.getName(), attName));
-                }
-            }
         }
     }
 

@@ -36,12 +36,15 @@
 */
 package org.webharvest.definition;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-
-import java.io.Serializable;
-import java.util.*;
 
 public class XmlNode implements Serializable {
 
@@ -130,13 +133,6 @@ public class XmlNode implements Serializable {
     }
 
     /**
-     * @return Parent node or null if instance is root node.
-     */
-    public XmlNode getParent() {
-        return parent;
-    }
-
-    /**
      * Adds new attribute with specified name and value.
      *
      * @param name
@@ -156,26 +152,6 @@ public class XmlNode implements Serializable {
     public Map<String, String> getAttributes(String uri) {
         Map<String, String> attsForUri = attributes.get(uri);
         return attsForUri != null ? attsForUri : new HashMap<String, String>();
-    }
-
-    public Map<String, String> getAttributes() {
-        return getAttributes(uri);
-    }
-
-    public List<XmlAttribute> getAllAttributes() {
-        List<XmlAttribute> all = new ArrayList<XmlAttribute>();
-        for (Map.Entry<String, Map<String, String>> entry : attributes.entrySet()) {
-            String currAttUri = entry.getKey();
-            Map<String, String> atts = entry.getValue();
-            if (atts != null) {
-                for (Map.Entry<String, String> att : atts.entrySet()) {
-                    String currAttName = att.getKey();
-                    String currAttValue = att.getValue();
-                    all.add(new XmlAttribute(currAttName, currAttUri, currAttValue));
-                }
-            }
-        }
-        return all;
     }
 
     public String getAttribute(String uri, String attName) {
@@ -232,14 +208,6 @@ public class XmlNode implements Serializable {
             }
             tmpBuf.delete(0, tmpBuf.length());
         }
-    }
-
-    public Set<ElementName> getElementNameSet() {
-        return elements.keySet();
-    }
-
-    public Object getElement(String name) {
-        return elements.get(new ElementName(name, uri));
     }
 
     /**
