@@ -1634,12 +1634,19 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="security" type="xs:string">
+        <xs:attribute name="security">
           <xs:annotation>
             <xs:documentation>
-               SMTP server security type: none, ssl or tsl
+               SMTP server security type: none, ssl or tls.
             </xs:documentation>
           </xs:annotation>
+          <xs:simpleType>
+           <xs:restriction base="xs:string">
+             <xs:enumeration value="none"/>
+             <xs:enumeration value="ssl"/>
+             <xs:enumeration value="tls"/>
+           </xs:restriction>
+          </xs:simpleType>
         </xs:attribute>
       </xs:extension>
     </xs:complexContent>
