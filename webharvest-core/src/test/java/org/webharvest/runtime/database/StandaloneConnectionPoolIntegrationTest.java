@@ -136,6 +136,11 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
         EasyMockUnitils.verify();
     }
 
+    @Test(expectedExceptions = UnsupportedOperationException.class)
+    public void doesNotSupportRetrievalByName() throws Exception {
+        pool.getConnection("jdbc/myConnHook");
+    }
+
     static class MockDriver extends AbstractMockedDriver {
 
         static final String URL = "jdbc:my://naughty:3306/url";

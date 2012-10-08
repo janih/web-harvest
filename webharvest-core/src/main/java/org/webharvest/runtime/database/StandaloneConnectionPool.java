@@ -99,6 +99,15 @@ public final class StandaloneConnectionPool extends
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Connection getConnection(final String name) {
+        throw new UnsupportedOperationException(
+                "Does not support retrieval of connection by name");
+    }
+
+    /**
      * Reacts on the end of configuration execution releasing all pooled
      * database connections.
      *

@@ -48,6 +48,19 @@ import java.sql.Connection;
 public interface ConnectionFactory {
 
     /**
+     * Returns SQL {@link Connection} instance available under the given name
+     * (for example under JNDI name within Java EE container). If no
+     * {@link Connection} has been bound to the provided name, then
+     * {@link DatabaseException} containing root cause is thrown.
+     *
+     * @param name
+     *            name to which connection is bound
+     * @return ready for use {@link Connection} instance bound to the given
+     *         name, never {@code null}
+     */
+    Connection getConnection(String name);
+
+    /**
      * Returns SQL {@link Connection} instance configured according to provided
      * parameters.
      *
