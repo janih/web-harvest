@@ -33,6 +33,9 @@
 
 package org.webharvest.runtime.database;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -69,9 +72,9 @@ public final class StandaloneConnectionPool extends
     private static final Logger LOG = LoggerFactory.getLogger(
             StandaloneConnectionPool.class);
 
-    private ConnectionsRegistry registry = new ConnectionsRegistry();
+    private final ConnectionsRegistry registry = new ConnectionsRegistry();
 
-    private DriverManager driverManager = DefaultDriverManager.INSTANCE;
+    private final DriverManager driverManager = DefaultDriverManager.INSTANCE;
 
     /**
      * {@inheritDoc}
@@ -81,9 +84,10 @@ public final class StandaloneConnectionPool extends
             final String username, final String password) {
 
         final String connectionKey = getConnectionKey(driver, url, username);
-        Connection connection = registry.lookup(connectionKey);
+        ConnectionProxy connection = registry.lookup(connectionKey);
         if (connection == null) {
-            connection = createNewConnection(driver, url, username, password);
+            connection = createConnectionProxy(createNewConnection(
+                    driver, url, username, password));
             try {
                 registry.bind(connectionKey, connection);
             } catch (AlreadyBoundException e) {
@@ -144,7 +148,7 @@ public final class StandaloneConnectionPool extends
         LOG.info("Releasing all database connections...");
         for (String key : registry.listBound()) {
             try {
-                registry.lookup(key).close();
+                registry.lookup(key).getTargetConnection().close();
             } catch (SQLException e) {
                 LOG.warn("Exception occurred during database connection "
                         + "closing", e);
@@ -153,11 +157,54 @@ public final class StandaloneConnectionPool extends
         LOG.info("Connections released.");
     }
 
+    private ConnectionProxy createConnectionProxy(final Connection delegate) {
+        return (ConnectionProxy) Proxy.newProxyInstance(
+                ClassLoader.getSystemClassLoader(),
+                new Class< ? >[] {ConnectionProxy.class},
+                new ConnectionProxyInvocationHandler(delegate));
+    }
+
     /**
-     * Registry binding string-based key with database {@link Connection}
-     * instance.
+     * Registry binding string-based key with proxied database
+     * {@link Connection} instance.
      */
-    private final class ConnectionsRegistry extends
-            AbstractRegistry<String, Connection> {
+    private static final class ConnectionsRegistry extends
+            AbstractRegistry<String, ConnectionProxy> {
+    }
+
+    /**
+     * Dynamic proxy {@link InvocationHandler}. Suppress calls to
+     * {@link Connection#close()} method as well as implements
+     * {@link ConnectionProxy#getTargetConnection()} method returning proxied
+     * delegate instance.
+     * <p/>
+     * Connection close is suppressed to make it possible to reuse existing
+     * connections and because only the pool itself should decide when to close
+     * the connection.
+     */
+    private static final class ConnectionProxyInvocationHandler implements
+            InvocationHandler {
+
+        private final Connection delegate;
+
+        public ConnectionProxyInvocationHandler(final Connection delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Object invoke(final Object proxy, final Method method,
+                final Object[] args) throws Throwable {
+
+            if (ConnectionProxy.class.getMethod("getTargetConnection")
+                    .equals(method)) {
+                return this.delegate;
+            }
+
+            if (Connection.class.getMethod("close")
+                    .equals(method)) {
+                return null;
+            }
+            return method.invoke(delegate, args);
+        }
     }
 }

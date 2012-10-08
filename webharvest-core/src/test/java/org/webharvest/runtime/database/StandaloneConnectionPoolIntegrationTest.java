@@ -77,9 +77,9 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
                 MockDriver2.class.getName(),
                 MockDriver2.URL, MockDriver2.USER, MockDriver2.PASSWORD);
 
-        connection1.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection1).getTargetConnection().close();
         EasyMock.expectLastCall();
-        connection2.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection2).getTargetConnection().close();
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
@@ -96,9 +96,9 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
                 MockDriver2.class.getName(),
                 MockDriver2.URL, MockDriver2.USER, MockDriver2.PASSWORD);
 
-        connection1.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection1).getTargetConnection().close();
         EasyMock.expectLastCall();
-        connection2.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection2).getTargetConnection().close();
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
@@ -115,13 +115,24 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
                 MockDriver2.class.getName(),
                 MockDriver2.URL, MockDriver2.USER, MockDriver2.PASSWORD);
 
-        connection1.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection1).getTargetConnection().close();
         EasyMock.expectLastCall().andThrow(new SQLException("TEST"));
-        connection2.close(); // we now it's mock created by MockDriver
+        ((ConnectionProxy) connection2).getTargetConnection().close();
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
         pool.onExecutionEnd(null);
+        EasyMockUnitils.verify();
+    }
+
+    @Test
+    public void connectionCloseIsSuppresed() throws Exception {
+        final Connection connection = pool.getConnection(
+                MockDriver.class.getName(),
+                MockDriver.URL, MockDriver.USER, MockDriver.PASSWORD);
+
+        EasyMockUnitils.replay();
+        connection.close();
         EasyMockUnitils.verify();
     }
 
