@@ -70,7 +70,7 @@ public class FtpPlugin extends WebHarvestPlugin {
 
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            return executeBody(scraper, scraper.getContext());
+            return executeBody(scraper, context);
         } catch (IOException e) {
             throw new FtpPluginException(e);
         } finally {

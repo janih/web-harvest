@@ -37,7 +37,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
             setProperty("Path", path);
             setProperty("Charset", charset);
 
-            Variable body = executeBody(scraper, scraper.getContext());
+            Variable body = executeBody(scraper, context);
 
             try {
                 ByteArrayInputStream stream = new ByteArrayInputStream(body.toBinary(charset));
