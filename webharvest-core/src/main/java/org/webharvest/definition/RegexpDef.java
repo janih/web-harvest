@@ -58,7 +58,7 @@ public class RegexpDef extends WebHarvestPluginDef {
     private String flagCanoneq;
 
     public RegexpDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         this.max = xmlNode.getAttribute("max");
         this.replace = xmlNode.getAttribute("replace");

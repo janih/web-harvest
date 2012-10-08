@@ -7,19 +7,19 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class ExitDef extends WebHarvestPluginDef {
 
-	private String condition;
-	private String message;
+    private String condition;
+    private String message;
 
     public ExitDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         this.condition = xmlNode.getAttribute("condition");
         this.message = xmlNode.getAttribute("message");
     }
 
     public String getCondition() {
-		return condition;
-	}
+        return condition;
+    }
 
     public String getMessage() {
         return message;

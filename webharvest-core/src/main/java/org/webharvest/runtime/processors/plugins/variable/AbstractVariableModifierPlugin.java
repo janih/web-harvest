@@ -98,7 +98,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
         if (value.isEmpty()
                 && StringUtils.isEmpty(valueExpr)
-                && StringUtils.isEmpty(elementDef.getBodyText())
+                // FIXME rbala remove when confirmed useless && StringUtils.isEmpty(elementDef.getBodyText())
                 && !elementDef.hasOperations()
                 && StringUtils.isNotEmpty(defaultExpr)
                 ) {

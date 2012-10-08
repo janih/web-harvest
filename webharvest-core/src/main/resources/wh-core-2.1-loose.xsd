@@ -669,7 +669,7 @@
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="charset" use="optional"
-          default="default configuration's charset" type="xs:string">
+          default="UTF-8" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Charset used if body is converted from binary to text value.
@@ -773,7 +773,7 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute name="charset" use="optional"
-          default="[Default charset for config]" type="xs:string">
+          default="UTF-8" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Charset for text files. Has no effect if type is binary.
@@ -836,7 +836,7 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute name="charset" use="optional"
-          default="[Default charset for config]" type="xs:string">
+          default="UTF-8" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Defines encoding of the HTTP response content. Has no effect if
@@ -1308,7 +1308,7 @@
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="language" use="optional"
-          default="Default scripting language if defined in config element, or beanshell if nothing is defined."
+          default="beanshell"
           type="xs:string">
           <xs:annotation>
             <xs:documentation>
@@ -1334,7 +1334,7 @@
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="language" use="optional"
-          default="Default config language" type="xs:string">
+          default="beanshell" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Defines which scripting engine is used in the processor.
@@ -1613,7 +1613,7 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="charset" type="xs:string">
+        <xs:attribute name="charset" type="xs:string" default="UTF-8">
           <xs:annotation>
             <xs:documentation>
                Charset of the email.
@@ -1697,7 +1697,7 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute name="charset" use="optional"
-            default="default configuration's charset" type="xs:string">
+            default="UTF-8" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Charset of text file inside zip archive.

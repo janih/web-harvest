@@ -51,6 +51,10 @@ import java.util.Map;
  */
 public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPluginDef> {
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         // pre processing
         final Variable variable = executePlugin(scraper, context);
@@ -64,11 +68,12 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * be used for multiple executions, creator of plugin is responsible for initiating
      * local variables at the beginning of this method.
      *
-     *
+     * @deprecated Use execute(...) instead
      * @param scraper
      * @param context
      * @return Instance of variable as result of execution.
      */
+    @Deprecated
     public abstract Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
     /**

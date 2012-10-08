@@ -53,10 +53,6 @@ public interface IElementDef extends PluginDef {
 
     // TODO Add javadoc
     // TODO Associated with element definition
-    String getBodyText();
-
-    // TODO Add javadoc
-    // TODO Associated with element definition
     boolean hasOperations();
 
     // TODO Add javadoc

@@ -52,7 +52,6 @@ import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
@@ -168,9 +167,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
     protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
-        if (elementDef == null) {
-            return null;
-        } else if (elementDef.hasOperations()) {
+        if (elementDef.hasOperations()) {
             BodyProcessor bodyProcessor =
                 new BodyProcessor.Builder(elementDef).build();
             if (properties != null) {
@@ -178,11 +175,10 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
                     bodyProcessor.setProperty(property.getKey(), property.getValue());
                 }
             }
-            Variable body = registerExecution ? bodyProcessor.run(scraper, context) : bodyProcessor.execute(scraper, context);
-            return new NodeVariable(body == null ? "" : body.toString());
-        } else {
-            return new NodeVariable(elementDef.getBodyText());
+            return registerExecution ? bodyProcessor.run(scraper, context) : bodyProcessor.execute(scraper, context);
         }
+
+        return EmptyVariable.INSTANCE;
     }
 
     protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {

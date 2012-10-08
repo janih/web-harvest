@@ -47,7 +47,7 @@ public class VarDef extends WebHarvestPluginDef {
     private String name;
 
     public VarDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         this.name = StringUtils.trim(xmlNode.getAttribute("name"));
     }

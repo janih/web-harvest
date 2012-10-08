@@ -52,7 +52,7 @@ public class CaseDef extends WebHarvestPluginDef {
     private IElementDef elseDef;
 
     public CaseDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         List<XmlNode> ifNodesList = xmlNode.getSubnodes(new ElementName("if", xmlNode.getUri()));
         int size = ifNodesList == null ? 0 : ifNodesList.size();

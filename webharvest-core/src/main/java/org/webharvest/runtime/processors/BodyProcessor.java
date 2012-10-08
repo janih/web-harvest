@@ -19,9 +19,6 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
             final DynamicScopeContext context) throws InterruptedException {
         final IElementDef[] defs = elementDef.getOperationDefs();
 
-        if (defs.length == 0) {
-            return CommonUtil.createVariable(elementDef.getBodyText());
-        }
         if (defs.length == 1) {
             return context.executeWithinNewContext(new Callable<Variable>() {
                 @Override

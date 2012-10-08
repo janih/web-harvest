@@ -171,7 +171,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
         registerPlugin(ClassLoaderUtil.getPluginClass(className), WebHarvestPluginDef.class, false, uri);
     }
 
-    public void unregisterPlugin(Class pluginClass, String uri) {
+    private void unregisterPlugin(Class pluginClass, String uri) {
         if (pluginClass != null) {
             unregisterPlugin(pluginClass.getName(), uri);
         }
@@ -200,6 +200,7 @@ public class DefinitionResolver extends AbstractRefreshableResolver {
         return externalPlugins.containsKey(new PluginClassKey(className, uri));
     }
 
+    @Deprecated
     public boolean isPluginRegistered(Class pluginClass, String uri) {
         return pluginClass != null && isPluginRegistered(pluginClass.getName(), uri);
     }

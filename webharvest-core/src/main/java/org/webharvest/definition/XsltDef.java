@@ -48,7 +48,7 @@ public class XsltDef extends WebHarvestPluginDef {
     private IElementDef stylesheetDef;
 
     public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));
         xmlDef = xmlDefNode == null ? null : new ElementDefProxy(xmlDefNode);

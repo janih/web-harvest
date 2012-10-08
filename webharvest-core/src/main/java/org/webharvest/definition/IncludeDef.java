@@ -46,7 +46,7 @@ public class IncludeDef extends WebHarvestPluginDef {
     private String path;
 
     public IncludeDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         this.path = xmlNode.getAttribute("path");
     }

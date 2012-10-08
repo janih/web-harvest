@@ -16,15 +16,7 @@ public class WebHarvestPluginDef extends AbstractElementDef {
 
     public WebHarvestPluginDef(final XmlNode xmlNode,
             Class<? extends AbstractProcessor> pluginClass) {
-        this(xmlNode, true, pluginClass);
-    }
-
-    @Deprecated
-    // FIXME Do we really need createBodyDefs parameter? If not remove this constructor
-    public WebHarvestPluginDef(final XmlNode xmlNode,
-            final boolean createBodyDefs,
-            Class<? extends AbstractProcessor> pluginClass) {
-        super(xmlNode, createBodyDefs);
+        super(xmlNode);
         this.pluginClass = pluginClass;
     }
 

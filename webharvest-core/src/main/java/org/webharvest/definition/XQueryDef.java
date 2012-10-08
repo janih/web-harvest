@@ -53,7 +53,7 @@ public class XQueryDef extends WebHarvestPluginDef {
     private XQueryExternalParamDef[] externalParamDefs;
 
     public XQueryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));
         xqDef = xqDefNode == null ? null : new ElementDefProxy(xqDefNode);

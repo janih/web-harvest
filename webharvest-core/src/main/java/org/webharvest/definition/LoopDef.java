@@ -54,7 +54,7 @@ public class LoopDef extends WebHarvestPluginDef {
     private IElementDef loopBodyDef;
 
     public LoopDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-        super(xmlNode, false, processorClass);
+        super(xmlNode, processorClass);
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));
         this.loopValueDef = loopValueDefNode == null ? null : new ElementDefProxy(loopValueDefNode);

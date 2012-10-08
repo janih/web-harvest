@@ -1,37 +1,22 @@
 package org.webharvest.definition;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class AbstractElementDef implements IElementDef {
 
-    protected XmlNode xmlNode;
+    // TODO Make it private
+    protected final XmlNode xmlNode;
     // sequence of operation definitions
-    protected List<IElementDef> operationDefs = new ArrayList<IElementDef>();
-    // text content if no nested operation definitions
-    protected String body;
+    private final List<IElementDef> operationDefs = new ArrayList<IElementDef>();
 
     // TODO Do we really need createBodyDefs parameter? If not remove this constructor
-    protected AbstractElementDef(XmlNode node, boolean createBodyDefs) {
+    protected AbstractElementDef(XmlNode node) {
         if (node == null) {
             throw new IllegalArgumentException("XmlNode must not be null.");
         }
         this.xmlNode = node;
-
-        if (node != XmlNode.NULL) {
-            List<Serializable> elementList = node.getElementList();
-
-            if (createBodyDefs) {
-                if (elementList != null && elementList.size() > 0) {
-                    // TODO Fix as soon as possible
-                } else {
-                    body = node.getText();
-                }
-            }
-        }
-
     }
 
     /**
@@ -51,14 +36,6 @@ public abstract class AbstractElementDef implements IElementDef {
         }
 
         return defs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getBodyText() {
-        return body;
     }
 
     @Override

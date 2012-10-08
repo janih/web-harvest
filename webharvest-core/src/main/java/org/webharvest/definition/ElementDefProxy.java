@@ -37,11 +37,6 @@ public class ElementDefProxy implements IElementDef {
     }
 
     @Override
-    public String getBodyText() {
-        return getDelegate().getBodyText();
-    }
-
-    @Override
     public boolean hasOperations() {
         return getDelegate().hasOperations();
     }
