@@ -36,18 +36,6 @@
 */
 package org.webharvest;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.PropertyConfigurator;
-import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.exception.PluginException;
-import org.webharvest.gui.Ide;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.database.DefaultDriverManager;
-import org.webharvest.runtime.database.DriverManager;
-import org.webharvest.utils.CommonUtil;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -55,6 +43,24 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.swing.SwingUtilities;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.PropertyConfigurator;
+import org.webharvest.definition.DefinitionResolver;
+import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.exception.PluginException;
+import org.webharvest.gui.Ide;
+import org.webharvest.ioc.ScraperFactory;
+import org.webharvest.ioc.ScraperModule;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.database.DefaultDriverManager;
+import org.webharvest.runtime.database.DriverManager;
+import org.webharvest.utils.CommonUtil;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * Startup class  for Web-Harvest.
@@ -89,10 +95,14 @@ public class CommandLine {
     public static void main(String[] args) throws IOException {
         Map<String, String> params = getArgValue(args);
 
+        // FIXME rbala until the end of refactoring accoasited with 2.1 v we have to use ScraperFactory as temporary solution.
+        // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
+        final Injector injector = Guice.createInjector(new ScraperModule());
+
         if (params.size() == 0) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    new Ide().createAndShowGUI();
+                    new Ide(injector).createAndShowGUI();
                 }
             });
         } else if (params.containsKey("-h") || params.containsKey("/h")) {
@@ -154,12 +164,17 @@ public class CommandLine {
 
             parseDatabaseDrivers(params);
 
+            // FIXME rbala until the end of refactoring accoasited with 2.1 v we have to use ScraperFactory as temporary solution.
+            // FIXME rbala although temporary solution it is duplicated (ConfigPanel and Ide)
+            final ScraperFactory factory = injector.getInstance(ScraperFactory.class);
+
             final String configLowercase = configFilePath.toLowerCase();
 
-            final Scraper scraper = new Scraper(configLowercase.startsWith("http://") || configLowercase.startsWith("https://")
-                    ? new ScraperConfiguration(new URL(configFilePath))
-                    : new ScraperConfiguration(configFilePath),
-                    workingDir);
+            final ScraperConfiguration configuration = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
+                    ? factory.createConfiguration(new URL(configFilePath))
+                    : factory.createConfiguration(configFilePath);
+
+            final Scraper scraper = factory.createScraper(configuration, workingDir);
 
             String isDebug = params.get("debug");
             if (CommonUtil.isBooleanTrue(isDebug)) {

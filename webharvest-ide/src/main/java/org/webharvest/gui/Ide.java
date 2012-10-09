@@ -41,25 +41,61 @@ package org.webharvest.gui;
  * Date: Apr 17, 2007
  */
 
-import org.webharvest.gui.component.FixedSizeButton;
-import org.webharvest.gui.component.GCPanel;
-import org.webharvest.gui.component.MenuElements;
-import org.webharvest.gui.component.WHPopupMenu;
-import org.webharvest.runtime.Scraper;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
+import org.webharvest.gui.component.FixedSizeButton;
+import org.webharvest.gui.component.GCPanel;
+import org.webharvest.gui.component.MenuElements;
+import org.webharvest.gui.component.WHPopupMenu;
+import org.webharvest.ioc.ScraperFactory;
+import org.webharvest.runtime.Scraper;
+
+import com.google.inject.Injector;
 
 public class Ide extends JFrame implements ActionListener, ChangeListener {
 
@@ -107,6 +143,10 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         }
     }
 
+    public final ScraperFactory scraperFactory;
+
+    public final Injector injector;
+
     // map of sets, each containing common GUI components connected with the same command
     private Map commandSets = new HashMap();
 
@@ -136,7 +176,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     /**
      * Constructor.
      */
-    public Ide() {
+    public Ide(final Injector injector) {
         super("Web-Harvest");
 
         GuiUtils.init(this);
@@ -150,6 +190,12 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         this.settingsDialog = new SettingsDialog(this);
         this.runParamsDialog = new RunParamsDialog(this);
         this.findReplaceDialog = new FindReplaceDialog(this);
+
+        // FIXME rbala Temporary solution until end of 2.1 refactoring
+        this.scraperFactory = injector.getInstance(ScraperFactory.class);
+
+        // FIXME rbala Temporary solution until end of 2.1 refactoring
+        this.injector = injector;
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.webharvest.ioc;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 // TODO Add javadoc
 // TODO Add unit test
@@ -11,7 +12,8 @@ public final class ScraperModule extends AbstractModule {
      */
     @Override
     protected void configure() {
-        // TODO Auto-generated method stub
+        install(new FactoryModuleBuilder().
+                build(ScraperFactory.class));
     }
 
 }

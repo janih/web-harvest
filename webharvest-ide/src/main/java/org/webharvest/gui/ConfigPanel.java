@@ -86,12 +86,16 @@ import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
+import org.webharvest.ioc.ScraperFactory;
+import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.xml.sax.InputSource;
+
+import com.google.inject.Guice;
 
 /**
  * Single panel containing XML configuration.
@@ -504,7 +508,10 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
             refreshTree();
             InputSource in = new InputSource(new StringReader(xmlPane.getText()));
-            ScraperConfiguration scraperConfiguration = new ScraperConfiguration(in);
+
+            // FIXME rbala until the end of refactoring accoasited with 2.1 v we have to use ScraperFactory as temporary solution.
+            // FIXME rbala although temporary solution it is duplicated (CommandLine)
+            ScraperConfiguration scraperConfiguration = ide.scraperFactory.createConfiguration(in);
             setScraperConfiguration(scraperConfiguration);
         } catch (IOException e) {
             GuiUtils.showErrorMessage(e.getMessage());
@@ -751,7 +758,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             boolean ok = refreshTree();
             if (ok) {
                 Settings settings = ide.getSettings();
-                this.scraper = new Scraper(this.scraperConfiguration, settings.getWorkingPath());
+
+                this.scraper =  ide.scraperFactory.createScraper(this.scraperConfiguration, settings.getWorkingPath());
                 this.scraper.addVariablesToContext(initParams);
                 if (settings.isProxyEnabled()) {
                     HttpClientManager httpClientManager = scraper.getHttpClientManager();

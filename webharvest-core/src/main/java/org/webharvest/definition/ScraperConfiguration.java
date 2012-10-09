@@ -53,6 +53,9 @@ import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.xml.sax.InputSource;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 /**
  * Basic configuration.
  */
@@ -76,11 +79,19 @@ public class ScraperConfiguration {
     private String namespaceURI;
 
     /**
+     * Default class constructor needed by Guice FactoryModuleBuilder
+     */
+    ScraperConfiguration() {
+        // Do nothing
+    }
+
+    /**
      * Creates configuration instance loaded from the specified input stream.
      *
      * @param in
      */
-    public ScraperConfiguration(InputSource in) {
+    @AssistedInject
+    public ScraperConfiguration(@Assisted InputSource in) {
         createFromInputStream(in);
 
     }
@@ -91,7 +102,9 @@ public class ScraperConfiguration {
      * @param sourceFile
      * @throws FileNotFoundException
      */
-    public ScraperConfiguration(File sourceFile) throws FileNotFoundException {
+    @AssistedInject
+    public ScraperConfiguration(@Assisted File sourceFile)
+            throws FileNotFoundException {
         this.sourceFile = sourceFile;
         createFromInputStream(new InputSource(new FileReader(sourceFile)));
     }
@@ -101,7 +114,9 @@ public class ScraperConfiguration {
      *
      * @param sourceFilePath
      */
-    public ScraperConfiguration(String sourceFilePath) throws FileNotFoundException {
+    @AssistedInject
+    public ScraperConfiguration(@Assisted String sourceFilePath)
+            throws FileNotFoundException {
         this(new File(sourceFilePath));
     }
 
@@ -111,9 +126,12 @@ public class ScraperConfiguration {
      * @param sourceUrl
      * @throws IOException
      */
-    public ScraperConfiguration(URL sourceUrl) throws IOException {
+    @AssistedInject
+    public ScraperConfiguration(@Assisted URL sourceUrl)
+            throws IOException {
         this.url = sourceUrl.toString();
-        createFromInputStream(new InputSource(new InputStreamReader(sourceUrl.openStream())));
+        createFromInputStream(new InputSource(
+                new InputStreamReader(sourceUrl.openStream())));
     }
 
     private void createFromInputStream(InputSource in) {

@@ -49,7 +49,6 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.runtime.database.ConnectionFactory;
-import org.webharvest.runtime.database.JNDIConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
@@ -64,6 +63,9 @@ import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
+
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 /**
  * Basic runtime class.
@@ -117,7 +119,9 @@ public class Scraper {
      * @param configuration
      * @param workingDir
      */
-    public Scraper(ScraperConfiguration configuration, String workingDir) {
+    @Inject
+    public Scraper(@Assisted ScraperConfiguration configuration,
+            @Assisted String workingDir) {
         this.configuration = configuration;
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
