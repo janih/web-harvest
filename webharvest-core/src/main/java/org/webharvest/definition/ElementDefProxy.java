@@ -1,8 +1,5 @@
 package org.webharvest.definition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.webharvest.runtime.processors.Processor;
 
 public class ElementDefProxy implements IElementDef {
@@ -22,7 +19,6 @@ public class ElementDefProxy implements IElementDef {
     @Override
     public IElementDef[] getOperationDefs() {
          return getDelegate().getOperationDefs();
-        //return elements.toArray(new IElementDef[elements.size()]);
     }
 
     @Override
