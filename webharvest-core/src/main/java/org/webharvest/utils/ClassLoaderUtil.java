@@ -1,15 +1,9 @@
 package org.webharvest.utils;
 
 import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,24 +72,6 @@ public final class ClassLoaderUtil {
 
     private static boolean isJar(final File file) {
         return file.getName().toLowerCase().endsWith(".jar");
-    }
-
-
-    public static void registerJDBCDriver(final String driverClassName)
-            throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
-        if (rootClassLoader == null) {
-            defineRootLoader();
-        }
-
-        DriverManager.registerDriver((Driver) Proxy.newProxyInstance(
-                ClassLoader.getSystemClassLoader(),
-                new Class<?>[]{Driver.class},
-                new InvocationHandler() {
-                    final Driver driver = (Driver) Class.forName(driverClassName, true, rootClassLoader).newInstance();
-                    @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return method.invoke(driver, args);
-                    }
-                }));
     }
 
     public static Class< ? > getPluginClass(String fullClassName)

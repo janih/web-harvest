@@ -36,9 +36,6 @@
 */
 package org.webharvest.runtime;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +48,9 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
-import org.webharvest.exception.DatabaseException;
+import org.webharvest.runtime.database.ConnectionFactory;
+import org.webharvest.runtime.database.JNDIConnectionFactory;
+import org.webharvest.runtime.database.StandaloneConnectionPool;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.Processor;
@@ -62,7 +61,6 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
-import org.webharvest.utils.ClassLoaderUtil;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
@@ -87,6 +85,7 @@ public class Scraper {
     private String workingDir;
     private DynamicScopeContext context;
     private ScriptEngineFactory scriptEngineFactory;
+    private final ConnectionFactory connectionFactory;
 
     private RuntimeConfig runtimeConfig;
 
@@ -105,9 +104,6 @@ public class Scraper {
 
     // stack of running http processors
     private transient Stack<HttpProcessor> runningHttpProcessors = new Stack<HttpProcessor>();
-
-    // pool of used database connections
-    Map<String, Connection> dbPool = new HashMap<String, Connection>();
 
     private List<ScraperRuntimeListener> scraperRuntimeListeners = new LinkedList<ScraperRuntimeListener>();
 
@@ -134,7 +130,17 @@ public class Scraper {
 
         initContext(context, this);
 
-        this.scriptEngineFactory = new JSRScriptEngineFactory(configuration.getScriptingLanguage());
+        this.scriptEngineFactory = new JSRScriptEngineFactory(
+                configuration.getScriptingLanguage());
+
+        this.connectionFactory = createDatabaseConnectionFactory();
+    }
+
+    protected ConnectionFactory createDatabaseConnectionFactory() {
+        // return new JNDIConnectionFactory();
+        final StandaloneConnectionPool pool = new StandaloneConnectionPool();
+        addRuntimeListener(pool);
+        return pool;
     }
 
     public static void initContext(DynamicScopeContext context, Scraper scraper) {
@@ -186,8 +192,6 @@ public class Scraper {
         } catch (InterruptedException e) {
             setStatus(STATUS_STOPPED);
             Thread.currentThread().interrupt();
-        } finally {
-            releaseDBConnections();
         }
 
         return EmptyVariable.INSTANCE;
@@ -301,34 +305,8 @@ public class Scraper {
         return runtimeConfig;
     }
 
-    /**
-     * Get connection from the connection pool, and first create one if necessery
-     *
-     * @param jdbc       Name of JDBC class
-     * @param connection JDBC connection string
-     * @param username   Username
-     * @param password   Password
-     * @return JDBC connection used to access database
-     */
-    public Connection getConnection(String jdbc, String connection, String username, String password) {
-        try {
-            String poolKey = jdbc + "-" + connection + "-" + username + "-" + password;
-            Connection conn = dbPool.get(poolKey);
-            if (conn == null) {
-                ClassLoaderUtil.registerJDBCDriver(jdbc);
-                conn = DriverManager.getConnection(connection, username, password);
-                dbPool.put(poolKey, conn);
-            }
-            return conn;
-        } catch (ClassNotFoundException e) {
-            throw new DatabaseException(e);
-        } catch (SQLException e) {
-            throw new DatabaseException(e);
-        } catch (InstantiationException e) {
-            throw new DatabaseException(e);
-        } catch (IllegalAccessException e) {
-            throw new DatabaseException(e);
-        }
+    public ConnectionFactory getConnectionFactory() {
+        return this.connectionFactory ;
     }
 
     public void setExecutingProcessor(Processor processor) {
@@ -408,22 +386,6 @@ public class Scraper {
         // inform al listeners that execution is continued
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionError(this, e);
-        }
-    }
-
-    /**
-     * Releases all DB connections from the pool.
-     */
-    public void releaseDBConnections() {
-        for (Connection connection : dbPool.values()) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    // There is nothing we can do with this.
-                    // We must ignore this exception to let the rest connections in the pool to get a chance to be released.
-                }
-            }
         }
     }
 
