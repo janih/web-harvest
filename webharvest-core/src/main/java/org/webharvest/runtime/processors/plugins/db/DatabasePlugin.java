@@ -3,6 +3,15 @@ package org.webharvest.runtime.processors.plugins.db;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.dbutils.DbUtils;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.DatabaseException;
@@ -15,10 +24,6 @@ import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Support for database operations.
@@ -49,7 +54,6 @@ public class DatabasePlugin extends WebHarvestPlugin {
         String connection = evaluateAttribute("connection", scraper);
         String username = evaluateAttribute("username", scraper);
         String password = evaluateAttribute("password", scraper);
-        int maxRows = evaluateAttributeAsInteger("max", -1, scraper);
         boolean isAutoCommit = evaluateAttributeAsBoolean("autocommit", true, scraper);
 
         Connection conn = scraper.getConnectionFactory().getConnection(
@@ -110,7 +114,7 @@ public class DatabasePlugin extends WebHarvestPlugin {
                 }
 
                 int rowCount = 0;
-                while (resultSet.next() && (maxRows < 0 || rowCount < maxRows)) {
+                while (resultSet.next()) {
                     Object rowData[] = new Object[columnCount];
                     for (int i = 0; i < columnCount; i++) {
                         switch (colDescs[i].getType()) {
@@ -173,7 +177,6 @@ public class DatabasePlugin extends WebHarvestPlugin {
                 "connection",
                 "username",
                 "password",
-                "max",
                 "autocommit"};
     }
 
