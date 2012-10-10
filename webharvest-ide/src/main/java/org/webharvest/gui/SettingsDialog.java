@@ -43,6 +43,8 @@ import org.webharvest.exception.PluginException;
 import org.webharvest.gui.component.*;
 import org.webharvest.gui.settings.db.DatabaseDriversPanel;
 import org.webharvest.gui.settings.db.DatabaseDriversPresenter;
+import org.webharvest.gui.settings.validation.XmlSchemasPanel;
+import org.webharvest.gui.settings.validation.XmlSchemasPresenter;
 import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
@@ -458,6 +460,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         tabbedPane.addTab("General", null, generalPanel, null);
         tabbedPane.addTab("View", null, viewPanel, null);
         tabbedPane.addTab("Plugins", null, pluginsPanel, null);
+        tabbedPane.addTab("XML schemas", null, createXmlSchemasPanel(), null);
         tabbedPane.addTab("DB drivers", null, createDBDriversPanel(), null);
 
         contentPane.add(tabbedPane, BorderLayout.CENTER);
@@ -473,6 +476,14 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         final DatabaseDriversPanel panel = new DatabaseDriversPanel();
         final DatabaseDriversPresenter presenter =
             new DatabaseDriversPresenter(panel);
+        panel.setPresenter(presenter);
+
+        return panel;
+    }
+
+    private JPanel createXmlSchemasPanel() {
+        final XmlSchemasPanel panel = new XmlSchemasPanel();
+        final XmlSchemasPresenter presenter = new XmlSchemasPresenter(panel);
         panel.setPresenter(presenter);
 
         return panel;
