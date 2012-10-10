@@ -36,12 +36,22 @@
 */
 package org.webharvest.gui;
 
+import org.webharvest.TransformationException;
+import org.webharvest.Transformer;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
+import org.webharvest.definition.validation.SchemaResolver;
+import org.webharvest.definition.validation.SchemaResolverPostProcessor;
+import org.webharvest.definition.validation.SchemaSource;
+import org.webharvest.definition.validation.TransformerPair;
+import org.webharvest.definition.validation.URIToSchemaSourceTransformer;
 import org.webharvest.exception.PluginException;
+import org.webharvest.gui.settings.validation.FilePathToURITransformer;
+import org.webharvest.gui.settings.validation.XmlSchemaDTO;
 import org.webharvest.utils.CommonUtil;
 
 import java.io.*;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +60,8 @@ import java.util.Properties;
  * @author Vladimir Nikic
  * Date: Apr 27, 2007
  */
-public class Settings implements Serializable {
+//TODO This class should be refactored, because its complexity is too high.
+public class Settings implements Serializable, SchemaResolverPostProcessor {
 
     private static final String CONFIG_FILE_PATH_OLD = System.getProperty("java.io.tmpdir") + "/webharvest.config";
     private static final String CONFIG_FILE_PATH = System.getProperty("java.io.tmpdir") + "/webharvest.properties";
@@ -81,10 +92,18 @@ public class Settings implements Serializable {
     // array of plugins
     private PluginInfo plugins[] = {};
 
+    // array of XML schemas
+    private XmlSchemaDTO xmlSchemas[] = {};
+
     // list of recently open files
     private List recentFiles = new LinkedList();
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
+    private final Transformer<String, SchemaSource> schemaTransformer =
+        new TransformerPair<String, URI, SchemaSource>(
+                new FilePathToURITransformer(),
+                new URIToSchemaSourceTransformer());
 
     public Settings() {
         try {
@@ -231,6 +250,30 @@ public class Settings implements Serializable {
         this.plugins = plugins;
     }
 
+    /**
+     * Returns array of {@link XmlSchemaDTO}s read for the properties file.
+     *
+     * @return array of {@link XmlSchemaDTO}s read for the properties file.
+     */
+    public XmlSchemaDTO[] getXmlSchemas() {
+        return xmlSchemas;
+    }
+
+    /**
+     * Sets array of {@link XmlSchemaDTO}s defining XML schemas for custom
+     * plugins.
+     *
+     * @param xmlSchemas
+     *            array of {@link XmlSchemaDTO}s; must be not-{@code null}
+     */
+    public void setXmlSchemas(final XmlSchemaDTO[] xmlSchemas) {
+        if (xmlSchemas == null) {
+            throw new IllegalArgumentException(
+                    "Array of XmlSchemaDTOs must not be null.");
+        }
+        this.xmlSchemas = xmlSchemas;
+    }
+
     public List getRecentFiles() {
         return recentFiles;
     }
@@ -310,6 +353,13 @@ public class Settings implements Serializable {
             props.setProperty("plugin" + i + ".uri", String.valueOf(plugins[i].getUri()));
         }
 
+        final XmlSchemaDTO[] schemas = getXmlSchemas();
+        props.setProperty("schema.count", String.valueOf(schemas.length));
+        for (int i = 0; i < schemas.length; i++) {
+            props.setProperty("schema" + i + ".location",
+                    String.valueOf(schemas[i].getLocation()));
+        }
+
         props.setProperty("recentfiles.count", String.valueOf(recentFiles.size()));
         for (int i = 0; i < recentFiles.size(); i++) {
             props.setProperty("recentfile" + i, String.valueOf(recentFiles.get(i)));
@@ -380,6 +430,16 @@ public class Settings implements Serializable {
                 e.printStackTrace();
             }
         }
+
+        // load from properties file information about XML schemas
+        final int schemaCount =
+            CommonUtil.getIntValue(props.getProperty("schema.count"), 0);
+        final XmlSchemaDTO[] schemas = new XmlSchemaDTO[schemaCount];
+        for (int i = 0; i < schemaCount; i++) {
+            schemas[i] =
+                new XmlSchemaDTO(props.getProperty("schema" + i + ".location"));
+        }
+        setXmlSchemas(schemas);
 
         int recentFileCount = CommonUtil.getIntValue(props.getProperty("recentfiles.count"), 0);
         recentFiles.clear();
@@ -461,6 +521,25 @@ public class Settings implements Serializable {
             writeToFile();
         } catch (IOException e) {
             // ignore
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void postProcess(final SchemaResolver resolver) {
+        if (resolver == null) {
+            throw new IllegalArgumentException(
+                    "SchemaResolver must not be null.");
+        }
+        for (final XmlSchemaDTO schema : xmlSchemas) {
+            try {
+                resolver.registerSchemaSource(
+                        schemaTransformer.transform(schema.getLocation()));
+            } catch (final TransformationException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

@@ -41,6 +41,8 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.component.*;
+import org.webharvest.gui.settings.SettingsManager;
+import org.webharvest.gui.settings.SimpleSettingsManager;
 import org.webharvest.gui.settings.db.DatabaseDriversPanel;
 import org.webharvest.gui.settings.db.DatabaseDriversPresenter;
 import org.webharvest.gui.settings.validation.XmlSchemasPanel;
@@ -66,6 +68,8 @@ import java.util.*;
 public class SettingsDialog extends CommonDialog implements ChangeListener {
 
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
+
+    private SettingsManager settingsManager = new SimpleSettingsManager();
 
     /**
      * List model implementation for the list of plugins.
@@ -486,6 +490,8 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         final XmlSchemasPresenter presenter = new XmlSchemasPresenter(panel);
         panel.setPresenter(presenter);
 
+        settingsManager.addSettingsAware(presenter);
+
         return panel;
     }
 
@@ -516,6 +522,8 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         for (PluginInfo plugin : plugins) {
             pluginListModel.addElement(plugin, false);
         }
+
+        settingsManager.loadSettings(settings);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -590,6 +598,8 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
             plugins[i] = (PluginInfo) pluginListModel.get(i);
         }
         settings.setPlugins(plugins);
+
+        settingsManager.updateSettings(settings);
 
         try {
             settings.writeToFile();

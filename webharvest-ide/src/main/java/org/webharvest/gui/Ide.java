@@ -88,6 +88,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.webharvest.definition.validation.SchemaComponentFactory;
+import org.webharvest.definition.validation.SchemaResolver;
 import org.webharvest.gui.component.FixedSizeButton;
 import org.webharvest.gui.component.GCPanel;
 import org.webharvest.gui.component.MenuElements;
@@ -196,6 +198,13 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
 
         // FIXME rbala Temporary solution until end of 2.1 refactoring
         this.injector = injector;
+
+        // FIXME Probably it is a temporary solution for loading of XML schemas
+        // from the settings.
+        final SchemaResolver resolver =
+            SchemaComponentFactory.getSchemaResolver();
+        resolver.addPostProcessor(settings);
+        resolver.refresh();
     }
 
     /**

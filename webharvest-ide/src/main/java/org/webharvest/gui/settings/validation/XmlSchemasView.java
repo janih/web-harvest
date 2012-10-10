@@ -55,17 +55,6 @@ public interface XmlSchemasView {
         void registerSchema(XmlSchemaDTO schema);
 
         /**
-         * Registers XML schema collection represented by the provided DTOs.
-         * When this method is completed, web harvest is fully capable of
-         * validation of configuration using all schemas registered.
-         *
-         * @param schemas
-         *            collection of DTOs representing XML schemas which is going
-         *            to be registered; must not be {@code null}
-         */
-        void registerSchemas(Set<XmlSchemaDTO> schemas);
-
-        /**
          * Unregisters XML schema represented by the provided DTO. When this
          * method is completed, web harvest can no longer validate configuration
          * using this XML schema.

@@ -1,14 +1,14 @@
 package org.webharvest.gui.settings.validation;
 
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertEquals;
 import static org.easymock.EasyMock.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.tools.ant.filters.StringInputStream;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -17,9 +17,8 @@ import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
-import org.webharvest.Transformer;
 import org.webharvest.definition.validation.SchemaResolver;
-import org.webharvest.definition.validation.SchemaSource;
+import org.webharvest.gui.Settings;
 
 public class XmlSchemasPresenterTest extends UnitilsTestNG {
 
@@ -30,10 +29,6 @@ public class XmlSchemasPresenterTest extends UnitilsTestNG {
     @RegularMock
     @InjectInto(property = "schemaResolver")
     private SchemaResolver mockSchemaResolver;
-
-    @RegularMock
-    @InjectInto(property = "transformer")
-    private Transformer<String, SchemaSource> mockTransformer;
 
     @RegularMock
     private XmlSchemasView mockView;
@@ -73,47 +68,12 @@ public class XmlSchemasPresenterTest extends UnitilsTestNG {
     public void testRegisterSchema() {
         final XmlSchemaDTO dto = new XmlSchemaDTO(SAMPLE_OTHER_LOCATION);
 
-        mockSchemaResolver.refresh();
-        expectLastCall();
         mockView.addToList(same(dto));
         expectLastCall();
 
         EasyMockUnitils.replay();
 
         presenter.registerSchema(dto);
-    }
-
-    @Test(expectedExceptions=IllegalArgumentException.class)
-    public void testRegisterSchemasIfNullSet() {
-        presenter.registerSchemas(null);
-    }
-
-    @Test
-    public void testRegisterExistingSchemas() {
-        EasyMockUnitils.replay();
-
-        presenter.registerSchemas(new HashSet<XmlSchemaDTO>(
-                Arrays.asList(new XmlSchemaDTO(SAMPLE_LOCATION))));
-    }
-
-    @Test
-    public void testRegisterSchemas() {
-        final XmlSchemaDTO dto1 = new XmlSchemaDTO(SAMPLE_OTHER_LOCATION);
-        final XmlSchemaDTO dto2 = new XmlSchemaDTO(SAMPLE_ANOTHER_LOCATION);
-        final Set<XmlSchemaDTO> dtos = new LinkedHashSet<XmlSchemaDTO>();
-        dtos.add(dto1);
-        dtos.add(dto2);
-
-        mockSchemaResolver.refresh();
-        expectLastCall();
-        mockView.addToList(same(dto1));
-        expectLastCall();
-        mockView.addToList(same(dto2));
-        expectLastCall();
-
-        EasyMockUnitils.replay();
-
-        presenter.registerSchemas(dtos);
     }
 
     @Test(expectedExceptions=IllegalArgumentException.class)
@@ -132,8 +92,6 @@ public class XmlSchemasPresenterTest extends UnitilsTestNG {
     public void testUnregisterSchema() {
         final XmlSchemaDTO dto = new XmlSchemaDTO(SAMPLE_LOCATION);
 
-        mockSchemaResolver.refresh();
-        expectLastCall();
         mockView.removeFromList(same(dto));
         expectLastCall();
 
@@ -143,23 +101,67 @@ public class XmlSchemasPresenterTest extends UnitilsTestNG {
     }
 
     @Test(expectedExceptions=IllegalArgumentException.class)
-    public void testPostProcessIfNullResolver() {
-        presenter.postProcess(null);
+    public void testOnLoadIfNullSettings() {
+        presenter.onLoad(null);
     }
 
     @Test
-    public void testPostProcess() throws Exception {
-        final SchemaSource schemaSource = new SchemaSource(
-                new StringInputStream("Dummy"), "dummyId");
+    public void testOnLoad() {
+        final XmlSchemaDTO dto1 = new XmlSchemaDTO(SAMPLE_OTHER_LOCATION);
+        final XmlSchemaDTO dto2 = new XmlSchemaDTO(SAMPLE_ANOTHER_LOCATION);
+        final Settings mockSettings = new MockSettings(dto1, dto2);
 
-        expect(mockTransformer.transform(eq(SAMPLE_LOCATION)))
-            .andReturn(schemaSource);
-        mockSchemaResolver.registerSchemaSource(same(schemaSource));
+        mockView.addToList(same(dto1));
+        expectLastCall();
+        mockView.addToList(same(dto2));
         expectLastCall();
 
         EasyMockUnitils.replay();
 
-        presenter.postProcess(mockSchemaResolver);
+        presenter.onLoad(mockSettings);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void testOnUpdateIfNullSettings() {
+        presenter.onUpdate(null);
+    }
+
+    @Test
+    public void testOnUpdate() {
+        final Settings mockSettings = new MockSettings();
+
+        mockSchemaResolver.refresh();
+        expectLastCall();
+
+        EasyMockUnitils.replay();
+
+        presenter.onUpdate(mockSettings);
+
+        final XmlSchemaDTO[] schemas = mockSettings.getXmlSchemas();
+        assertNotNull("Returned schema array is null.", schemas);
+        assertEquals("Incorrect size of schema array", 1, schemas.length);
+        assertEquals("Unexpected location of the schema.", SAMPLE_LOCATION,
+                schemas[0].getLocation());
+    }
+
+    private class MockSettings extends Settings {
+
+        private XmlSchemaDTO[] schemas;
+
+        public MockSettings(XmlSchemaDTO...schemas) {
+            this.schemas = schemas;
+        }
+
+        @Override
+        public XmlSchemaDTO[] getXmlSchemas() {
+            return schemas;
+        }
+
+        @Override
+        public void setXmlSchemas(final XmlSchemaDTO[] xmlSchemas) {
+            this.schemas = xmlSchemas;
+        }
+
     }
 
 }
