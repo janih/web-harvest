@@ -64,6 +64,7 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
@@ -82,6 +83,9 @@ public class Scraper {
     public static final int STATUS_STOPPED = 4;
     public static final int STATUS_ERROR = 5;
     public static final int STATUS_EXIT = 6;
+
+    @Inject
+    private EventBus eventBus;
 
     private ScraperConfiguration configuration;
     private String workingDir;
