@@ -15,6 +15,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.easymock.EasyMockUnitils;
+import org.webharvest.events.ScraperExecutionEndEvent;
+import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.exception.DatabaseException;
 
 public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
@@ -83,7 +85,7 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
-        pool.onExecutionError(null, null);
+        pool.onExecutionError(new ScraperExecutionErrorEvent(null, null));
         EasyMockUnitils.verify();
     }
 
@@ -102,7 +104,7 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
-        pool.onExecutionEnd(null);
+        pool.onExecutionEnd(new ScraperExecutionEndEvent(null));
         EasyMockUnitils.verify();
     }
 
@@ -121,7 +123,7 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
-        pool.onExecutionEnd(null);
+        pool.onExecutionEnd(new ScraperExecutionEndEvent(null));
         EasyMockUnitils.verify();
     }
 

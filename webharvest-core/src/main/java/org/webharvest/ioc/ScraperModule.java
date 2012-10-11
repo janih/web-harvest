@@ -5,7 +5,6 @@ import org.webharvest.runtime.database.StandaloneConnectionPool;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
@@ -24,8 +23,8 @@ public final class ScraperModule extends AbstractModule {
         install(new FactoryModuleBuilder().
                 build(ScraperFactory.class));
         bindScope(ScrapingScope.class, scraperScope);
-        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class).in(scraperScope);
-        //.in(Singleton.class); //FIXME: do we need custom scope (Scraper's lifetime scope)?
+        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class)
+            .in(scraperScope);
         bind(EventBus.class).toInstance(eventBus);
         bindListener(Matchers.any(), new EventBusTypeListener(eventBus));
         // Make our scope instance injectable

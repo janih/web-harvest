@@ -49,11 +49,12 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
+import org.webharvest.events.ScraperExecutionEndEvent;
+import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.ioc.AttributeHolder;
 import org.webharvest.ioc.ScraperScope;
 import org.webharvest.runtime.database.ConnectionFactory;
-import org.webharvest.runtime.database.StandaloneConnectionPool;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.Processor;
@@ -152,15 +153,6 @@ public class Scraper implements AttributeHolder {
 
         this.scriptEngineFactory = new JSRScriptEngineFactory(
                 configuration.getScriptingLanguage());
-
-        //this.connectionFactory = createDatabaseConnectionFactory();
-    }
-
-    protected ConnectionFactory createDatabaseConnectionFactory() {
-        // return new JNDIConnectionFactory();
-        final StandaloneConnectionPool pool = new StandaloneConnectionPool();
-        addRuntimeListener(pool);
-        return pool;
     }
 
     public static void initContext(DynamicScopeContext context, Scraper scraper) {
@@ -239,6 +231,7 @@ public class Scraper implements AttributeHolder {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionEnd(this);
         }
+        eventBus.post(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {
             if (this.status == STATUS_FINISHED) {
@@ -416,6 +409,7 @@ public class Scraper implements AttributeHolder {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionError(this, e);
         }
+        eventBus.post(new ScraperExecutionErrorEvent(this, e));
     }
 
     public ScriptEngineFactory getScriptEngineFactory() {

@@ -43,9 +43,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.AbstractRegistry;
 import org.webharvest.AlreadyBoundException;
+import org.webharvest.events.ScraperExecutionEndEvent;
+import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.exception.DatabaseException;
-import org.webharvest.runtime.AbstractScraperRuntimeListener;
-import org.webharvest.runtime.Scraper;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Default, standalone {@link ConnectionFactory} interface implementation. It
@@ -66,8 +68,7 @@ import org.webharvest.runtime.Scraper;
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
  */
-public final class StandaloneConnectionPool extends
-        AbstractScraperRuntimeListener implements ConnectionFactory {
+public final class StandaloneConnectionPool implements ConnectionFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(
             StandaloneConnectionPool.class);
@@ -111,11 +112,11 @@ public final class StandaloneConnectionPool extends
      * Reacts on the end of configuration execution releasing all pooled
      * database connections.
      *
-     * @param scraper
-     *            {@inheritDoc}
+     * @param event
+     *            {@link ScraperExecutionEndEvent} occurred
      */
-    @Override
-    public void onExecutionEnd(final Scraper scraper) {
+    @Subscribe
+    public void onExecutionEnd(final ScraperExecutionEndEvent event) {
         releaseAllConnections();
     }
 
@@ -123,11 +124,11 @@ public final class StandaloneConnectionPool extends
      * Reacts on the configuration execution error releasing all pooled database
      * connections.
      *
-     * @param scraper
-     *            {@inheritDoc}
+     * @param event
+     *            {@link ScraperExecutionErrorEvent} occurred
      */
-    @Override
-    public void onExecutionError(final Scraper scraper, final Exception e) {
+    @Subscribe
+    public void onExecutionError(final ScraperExecutionErrorEvent event) {
         releaseAllConnections();
     }
 

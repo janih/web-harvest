@@ -7,6 +7,9 @@ import org.webharvest.runtime.processors.Processor;
 /**
  * @author Vladimir Nikic
  * Date: Apr 20, 2007
+ *
+ * @deprecated Use event sourcing instead
+ *
  */
 public interface ScraperRuntimeListener {
 
