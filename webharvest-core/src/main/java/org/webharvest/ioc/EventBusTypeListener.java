@@ -17,10 +17,16 @@ import com.google.inject.spi.TypeListener;
  * @see TypeListener
  * @see EventBus
  */
+// FIXME rbala Is it necessary to create unit test?
 public final class EventBusTypeListener implements TypeListener {
 
     // FIXME rbala I could not find solution that allows to inject event bus as singleton (since type listener is not created by Guice)
-    private final EventBus eventBus = new EventBus();
+    private final EventBus eventBus;
+
+    public EventBusTypeListener(final EventBus eventBus) {
+        // FIXME rbala Should we check against null pointer?
+        this.eventBus = eventBus;
+    }
 
     /**
      * {@inheritDoc}
