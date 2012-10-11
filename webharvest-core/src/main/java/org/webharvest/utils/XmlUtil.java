@@ -63,7 +63,8 @@ public class XmlUtil {
                                 new ResourcePathToURITransformer(),
                                 new URIToSchemaSourceTransformer()),
                         "/config.xsd", "/wh-core-2.0.xsd",
-                        "/wh-core-2.1-loose.xsd"));
+                        "/wh-core-2.1-loose.xsd",
+                        "/wh-jndi-2.1.xsd"));
         schemaResolver.refresh();
 
 
