@@ -8,24 +8,29 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 
 // TODO Add javadoc
 // TODO Add unit test
 public final class ScraperModule extends AbstractModule {
-
-    private final EventBus eventBus = new EventBus();
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void configure() {
+        final ScraperScope scraperScope = new ScraperScope();
+        final EventBus eventBus = new EventBus();
         install(new FactoryModuleBuilder().
                 build(ScraperFactory.class));
-        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class).
-            in(Singleton.class); //FIXME: do we need custom scope (Scraper's lifetime scope)?
+        bindScope(ScrapingScope.class, scraperScope);
+        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class).in(scraperScope);
+        //.in(Singleton.class); //FIXME: do we need custom scope (Scraper's lifetime scope)?
         bind(EventBus.class).toInstance(eventBus);
         bindListener(Matchers.any(), new EventBusTypeListener(eventBus));
+        // Make our scope instance injectable
+        bind(ScraperScope.class).annotatedWith(Names.named("scraperScope")).
+            toInstance(scraperScope);
     }
 
 }

@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,9 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
+import org.webharvest.events.ProcessorStartEvent;
+import org.webharvest.ioc.AttributeHolder;
+import org.webharvest.ioc.ScraperScope;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
 import org.webharvest.runtime.processors.CallProcessor;
@@ -66,13 +70,14 @@ import org.webharvest.utils.SystemUtilities;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 
 /**
  * Basic runtime class.
  */
-//@SuppressWarnings({"UnusedDeclaration"})
-public class Scraper {
+public class Scraper implements AttributeHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
@@ -91,7 +96,9 @@ public class Scraper {
     private String workingDir;
     private DynamicScopeContext context;
     private ScriptEngineFactory scriptEngineFactory;
-    private final ConnectionFactory connectionFactory;
+
+    @Inject
+    private Provider<ConnectionFactory> connectionFactory;
 
     private RuntimeConfig runtimeConfig;
 
@@ -117,6 +124,11 @@ public class Scraper {
 
     private String message = null;
 
+    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
+
+
+    @Inject @Named("scraperScope") ScraperScope scope;
+
     /**
      * Constructor.
      *
@@ -141,7 +153,7 @@ public class Scraper {
         this.scriptEngineFactory = new JSRScriptEngineFactory(
                 configuration.getScriptingLanguage());
 
-        this.connectionFactory = createDatabaseConnectionFactory();
+        //this.connectionFactory = createDatabaseConnectionFactory();
     }
 
     protected ConnectionFactory createDatabaseConnectionFactory() {
@@ -206,6 +218,15 @@ public class Scraper {
     }
 
     public void execute() {
+        scope.enter(this);
+        try {
+            executeInternal();
+        } finally {
+            scope.exit();
+        }
+    }
+
+    private void executeInternal() {
         long startTime = System.currentTimeMillis();
 
         execute(configuration.getOperations());
@@ -314,7 +335,7 @@ public class Scraper {
     }
 
     public ConnectionFactory getConnectionFactory() {
-        return this.connectionFactory ;
+        return this.connectionFactory.get() ;
     }
 
     public void setExecutingProcessor(Processor processor) {
@@ -400,4 +421,52 @@ public class Scraper {
     public ScriptEngineFactory getScriptEngineFactory() {
         return scriptEngineFactory;
     }
+
+
+    private void handleProcessorStartEvent(final ProcessorStartEvent event) {
+        // TODO Provide iplementation
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getAttribute(final Object key) {
+        return attributes.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasAttribute(final Object key) {
+        return attributes.containsKey(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void putAttribute(final Object key, final Object value) {
+        attributes.put(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Object> getAttributes() {
+        // FIXME rbala What should go there?
+        return attributes.keySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getAttributeLock() {
+        return this.attributes;
+    }
+
 }
