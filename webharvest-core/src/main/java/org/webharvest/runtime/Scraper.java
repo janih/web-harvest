@@ -128,7 +128,7 @@ public class Scraper implements AttributeHolder {
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
 
-    @Inject @Named("scraperScope") ScraperScope scope;
+    @Inject ScraperScope scope;
 
     /**
      * Constructor.

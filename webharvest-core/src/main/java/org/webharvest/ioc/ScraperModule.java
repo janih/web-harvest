@@ -5,31 +5,32 @@ import org.webharvest.runtime.database.StandaloneConnectionPool;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scope;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.name.Names;
 
 // TODO Add javadoc
 // TODO Add unit test
 public final class ScraperModule extends AbstractModule {
+
+    private static final Scope SCRAPER_SCOPE = new ScraperScope();
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void configure() {
-        final ScraperScope scraperScope = new ScraperScope();
+        bindScope(ScrapingScope.class, SCRAPER_SCOPE);
+        // Make our scope instance injectable
+        bind(ScraperScope.class).toInstance((ScraperScope) SCRAPER_SCOPE);
+
         final EventBus eventBus = new EventBus();
-        install(new FactoryModuleBuilder().
-                build(ScraperFactory.class));
-        bindScope(ScrapingScope.class, scraperScope);
-        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class)
-            .in(scraperScope);
         bind(EventBus.class).toInstance(eventBus);
         bindListener(Matchers.any(), new EventBusTypeListener(eventBus));
-        // Make our scope instance injectable
-        bind(ScraperScope.class).annotatedWith(Names.named("scraperScope")).
-            toInstance(scraperScope);
-    }
 
+        install(new FactoryModuleBuilder().build(ScraperFactory.class));
+
+        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class)
+            .in(ScrapingScope.class);
+    }
 }
