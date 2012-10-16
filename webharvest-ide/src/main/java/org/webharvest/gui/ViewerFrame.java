@@ -36,30 +36,76 @@
 */
 package org.webharvest.gui;
 
-import net.sf.saxon.trans.XPathException;
-import org.webharvest.WHConstants;
-import org.webharvest.exception.ScriptException;
-import org.webharvest.gui.component.*;
-import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.RuntimeConfig;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.templaters.BaseTemplater;
-import org.webharvest.runtime.variables.ListVariable;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.*;
-import org.xml.sax.InputSource;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLEditorKit;
+
+import net.sf.saxon.trans.XPathException;
+
+import org.webharvest.WHConstants;
+import org.webharvest.exception.ScriptException;
+import org.webharvest.gui.component.CommonButton;
+import org.webharvest.gui.component.DropDownButton;
+import org.webharvest.gui.component.DropDownButtonListener;
+import org.webharvest.gui.component.EditableComboBox;
+import org.webharvest.gui.component.MenuElements;
+import org.webharvest.gui.component.ProportionalSplitPane;
+import org.webharvest.gui.component.SmallButton;
+import org.webharvest.gui.component.WHCheckBox;
+import org.webharvest.gui.component.WHScrollPane;
+import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.RuntimeConfig;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
+import org.webharvest.runtime.templaters.BaseTemplater;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.KeyValuePair;
+import org.webharvest.utils.XmlUtil;
+import org.webharvest.utils.XmlValidator;
+import org.xml.sax.InputSource;
 
 /**
  * @author Vladimir Nikic
@@ -138,7 +184,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
      * @param value
      * @param nodeInfo
      */
-    public ViewerFrame(final Scraper scraper, final String propertyName, final Object value, final TreeNodeInfo nodeInfo, final int viewIndex) {
+    public ViewerFrame(final WebScraper scraper, final String propertyName, final Object value, final TreeNodeInfo nodeInfo, final int viewIndex) {
         if (propertyName == null) {
             setTitle("Runtime Value Viewer");
         } else {

@@ -89,6 +89,7 @@ import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
+import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager;
@@ -199,7 +200,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
     private XmlTextPane xmlPane;
     private JTree tree;
-    private Scraper scraper;
+    private WebScraper scraper;
     private PropertiesGrid propertiesGrid;
 
     // tree popup menu items
@@ -768,7 +769,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             if (ok) {
                 Settings settings = ide.getSettings();
 
-                this.scraper.addVariablesToContext(initParams);
+                this.scraper.getContext().setLocalVar(initParams);
                 if (settings.isProxyEnabled()) {
                     HttpClientManager httpClientManager = scraper.getHttpClientManager();
 
@@ -801,7 +802,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public Scraper getScraper() {
+    public WebScraper getScraper() {
         return scraper;
     }
 

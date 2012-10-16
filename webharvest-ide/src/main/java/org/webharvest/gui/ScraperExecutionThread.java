@@ -36,19 +36,20 @@
 */
 package org.webharvest.gui;
 
-import org.webharvest.runtime.Scraper;
+import javax.swing.JTextArea;
 
-import javax.swing.*;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 
 /**
  * Thread which executes scraper configuration
  */
 public class ScraperExecutionThread extends Thread {
 
-    private Scraper scraper;
+    private WebScraper scraper;
     private JTextArea logTextArea;
 
-    public ScraperExecutionThread(Scraper scraper, JTextArea logTextArea) {
+    public ScraperExecutionThread(WebScraper scraper, JTextArea logTextArea) {
         this.scraper = scraper;
         this.logTextArea = logTextArea;
     }

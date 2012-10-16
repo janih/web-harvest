@@ -1,15 +1,9 @@
 package org.webharvest.ioc;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
-import org.xml.sax.InputSource;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
@@ -56,7 +50,9 @@ public final class ScraperModule extends AbstractModule {
         bind(MessagePublisher.class).to(EventBusProxy.class).
             in(Singleton.class);
 
-        install(new FactoryModuleBuilder().build(ScraperFactory.class));
+        install(new FactoryModuleBuilder().
+                implement(WebScraper.class, Scraper.class).
+                build(ScraperFactory.class));
     }
 
 }

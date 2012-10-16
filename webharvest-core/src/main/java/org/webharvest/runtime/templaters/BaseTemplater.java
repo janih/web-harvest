@@ -36,17 +36,18 @@
 */
 package org.webharvest.runtime.templaters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Simple templater - replaces ${expression} sequences in string with evaluated expressions.
@@ -57,12 +58,12 @@ public class BaseTemplater {
     public static String VAR_START = "${";
     public static String VAR_END = "}";
 
-    public static String evaluateToString(String source, ScriptingLanguage language, Scraper scraper) {
+    public static String evaluateToString(String source, ScriptingLanguage language, WebScraper scraper) {
         final Variable result = evaluateToVariable(source, language, scraper);
         return result.isEmpty() ? null : result.toString();
     }
 
-    public static Variable evaluateToVariable(String source, ScriptingLanguage language, Scraper scraper) {
+    public static Variable evaluateToVariable(String source, ScriptingLanguage language, WebScraper scraper) {
         if (source == null) {
             return EmptyVariable.INSTANCE;
         }

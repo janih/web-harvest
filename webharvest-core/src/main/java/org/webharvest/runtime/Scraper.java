@@ -57,6 +57,7 @@ import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.ioc.AttributeHolder;
 import org.webharvest.ioc.ConfigModule;
+import org.webharvest.ioc.FakeNotifier;
 import org.webharvest.ioc.MessagePublisher;
 import org.webharvest.ioc.ScraperScope;
 import org.webharvest.ioc.WorkingDir;
@@ -139,6 +140,9 @@ public class Scraper implements AttributeHolder, WebScraper {
     private String message = null;
 
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
+
+    @Inject
+    private Provider<FakeNotifier> notifier;
 
     @Inject ScraperScope scope;
 
@@ -260,7 +264,7 @@ public class Scraper implements AttributeHolder, WebScraper {
         scope.enter(this);
         try {
 
-
+            notifier.get().sendEvent();
 
 
             executeInternal();

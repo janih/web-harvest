@@ -53,14 +53,12 @@ import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
-import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.DefaultDriverManager;
 import org.webharvest.runtime.database.DriverManager;
 import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 
 /**
  * Startup class  for Web-Harvest.
@@ -167,7 +165,7 @@ public class CommandLine {
                         getInstance(ScraperFactory.class);
 
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
-            final Scraper scraper = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
+            final WebScraper scraper = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
                     ? factory.create(new URL(configFilePath))
                     : factory.create(configFilePath);
 
@@ -202,7 +200,8 @@ public class CommandLine {
                 if (key.startsWith("#")) {
                     String varName = key.substring(1);
                     if (varName.length() > 0) {
-                        scraper.addVariableToContext(varName, entry.getValue());
+                        scraper.getContext().setLocalVar(varName,
+                                entry.getValue());
                     }
                 }
             }
