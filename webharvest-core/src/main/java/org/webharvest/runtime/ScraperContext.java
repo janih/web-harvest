@@ -159,4 +159,15 @@ public class ScraperContext implements DynamicScopeContext {
             throw new VariableException(format("Invalid identifier ''{0}''", identifier));
         }
     }
+
+    @Override
+    // TODO Add unit test
+    public void setLocalVar(final Map<String, Object> map) {
+        // FIXME rbala code moved from Scraper object. Refactore ASAP
+        if (map != null) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                setLocalVar(entry.getKey(), entry.getValue());
+            }
+        }
+    }
 }

@@ -94,7 +94,6 @@ import org.webharvest.gui.component.FixedSizeButton;
 import org.webharvest.gui.component.GCPanel;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.WHPopupMenu;
-import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.runtime.Scraper;
 
 import com.google.inject.Injector;
@@ -145,10 +144,6 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         }
     }
 
-    public final ScraperFactory scraperFactory;
-
-    public final Injector injector;
-
     // map of sets, each containing common GUI components connected with the same command
     private Map commandSets = new HashMap();
 
@@ -178,7 +173,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     /**
      * Constructor.
      */
-    public Ide(final Injector injector) {
+    public Ide() {
         super("Web-Harvest");
 
         GuiUtils.init(this);
@@ -192,12 +187,6 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         this.settingsDialog = new SettingsDialog(this);
         this.runParamsDialog = new RunParamsDialog(this);
         this.findReplaceDialog = new FindReplaceDialog(this);
-
-        // FIXME rbala Temporary solution until end of 2.1 refactoring
-        this.scraperFactory = injector.getInstance(ScraperFactory.class);
-
-        // FIXME rbala Temporary solution until end of 2.1 refactoring
-        this.injector = injector;
 
         // FIXME Probably it is a temporary solution for loading of XML schemas
         // from the settings.

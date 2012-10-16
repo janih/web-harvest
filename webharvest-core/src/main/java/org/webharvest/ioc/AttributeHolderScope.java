@@ -85,9 +85,9 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
                     if ((current == null) && !ah.hasAttribute(key)) {
                         current = outer.get();
                         ah.putAttribute(key, current);
-                        System.out.println("%%%%%%%% PUT IN SCOPE" + current.getClass().getSimpleName() + "%%%%%%%%");
+                        System.out.println("%%%%%%%% PUT IN SCOPE " + current.getClass().getSimpleName() + "%%%%%%%%");
                     } else {
-                        System.out.println("%%%%%%%% FOUND IN SCOPE" + current.getClass().getSimpleName() + "%%%%%%%%");
+                        System.out.println("%%%%%%%% FOUND IN SCOPE " + current.getClass().getSimpleName() + "%%%%%%%%");
                     }
 
 

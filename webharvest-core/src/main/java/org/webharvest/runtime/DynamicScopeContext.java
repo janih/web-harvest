@@ -41,6 +41,7 @@ package org.webharvest.runtime;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -53,7 +54,11 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     Variable getVar(String name);
 
-    void setLocalVar(String key, Variable value);
+    void setLocalVar(String name, Variable value);
+
+    void setLocalVar(String name, Object value);
+
+    void setLocalVar(Map<String, Object> map);
 
     <R> R executeWithinNewContext(Callable<R> callable) throws InterruptedException;
 

@@ -29,12 +29,19 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package org.webharvest.ioc;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.JNDIConnectionFactory;
+import org.xml.sax.InputSource;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
@@ -55,20 +62,50 @@ import com.google.inject.util.Modules;
  */
 public final class EnterpriseModule implements Module {
 
-    private static final Module INSTANCE = Modules.override(
-            new ScraperModule()).with(new AbstractModule() {
-                @Override
-                protected void configure() {
-                    bind(ConnectionFactory.class)
-                    .to(JNDIConnectionFactory.class).in(Singleton.class);
-                }
-            });
+    private final Module module;
+
+    // TODO Add documentation
+    // TODO Add unit test
+    // FIXME rbala I'm not convinced this is good idea
+    public EnterpriseModule(final URL config, final String workingDir)
+            throws IOException {
+        this(new ScraperModule(config, workingDir));
+    }
+
+    // TODO Add documentation
+    // TODO Add unit test
+    // FIXME rbala I'm not convinced this is good idea
+    public EnterpriseModule(final String config, final String workingDir)
+            throws FileNotFoundException {
+        this(new ScraperModule(config, workingDir));
+    }
+
+    // TODO Add documentation
+    // TODO Add unit test
+    // FIXME rbala I'm not convinced this is good idea
+    public EnterpriseModule(final InputSource config, final String workingDir) {
+        this(new ScraperModule(config, workingDir));
+    }
+
+    // TODO Add documentation
+    // TODO Add unit test
+    // FIXME rbala I'm not convinced this is good idea
+    private EnterpriseModule(final Module module) {
+        this.module = Modules.override(module).with(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ConnectionFactory.class).to(JNDIConnectionFactory.class)
+                        .in(Singleton.class);
+            }
+        });
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void configure(final Binder binder) {
-        INSTANCE.configure(binder);
+        module.configure(binder);
     }
+
 }

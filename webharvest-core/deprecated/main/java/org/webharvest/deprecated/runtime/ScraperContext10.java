@@ -47,6 +47,7 @@ import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
 
@@ -161,6 +162,29 @@ public class ScraperContext10 implements DynamicScopeContext {
     protected void checkIdentifier(String identifier) {
         if (StringUtils.isBlank(identifier)) {
             throw new VariableException(format("Invalid identifier ''{0}''", identifier));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    // TODO Missing unit test
+    public void setLocalVar(final String name, final Object value) {
+        setLocalVar(name, CommonUtil.createVariable(value));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    // TODO Missing unit test
+    public void setLocalVar(final Map<String, Object> map) {
+        // FIXME rbala code moved from Scraper object. Refactore ASAP
+        if (map != null) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                setLocalVar(entry.getKey(), entry.getValue());
+            }
         }
     }
 }

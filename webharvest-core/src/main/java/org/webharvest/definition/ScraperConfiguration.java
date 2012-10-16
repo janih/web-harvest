@@ -50,11 +50,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.ioc.ConfigSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.xml.sax.InputSource;
 
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 /**
  * Basic configuration.
@@ -90,8 +91,8 @@ public class ScraperConfiguration {
      *
      * @param in
      */
-    @AssistedInject
-    public ScraperConfiguration(@Assisted InputSource in) {
+    @Inject
+    public ScraperConfiguration(@ConfigSource InputSource in) {
         createFromInputStream(in);
 
     }
@@ -102,7 +103,7 @@ public class ScraperConfiguration {
      * @param sourceFile
      * @throws FileNotFoundException
      */
-    @AssistedInject
+    @Deprecated
     public ScraperConfiguration(@Assisted File sourceFile)
             throws FileNotFoundException {
         this.sourceFile = sourceFile;
@@ -114,7 +115,7 @@ public class ScraperConfiguration {
      *
      * @param sourceFilePath
      */
-    @AssistedInject
+    @Deprecated
     public ScraperConfiguration(@Assisted String sourceFilePath)
             throws FileNotFoundException {
         this(new File(sourceFilePath));
@@ -126,7 +127,7 @@ public class ScraperConfiguration {
      * @param sourceUrl
      * @throws IOException
      */
-    @AssistedInject
+    @Deprecated
     public ScraperConfiguration(@Assisted URL sourceUrl)
             throws IOException {
         this.url = sourceUrl.toString();

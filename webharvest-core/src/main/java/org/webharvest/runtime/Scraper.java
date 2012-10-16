@@ -49,11 +49,14 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
+import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
-import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.ioc.AttributeHolder;
+import org.webharvest.ioc.FakeNotifier;
+import org.webharvest.ioc.MessagePublisher;
 import org.webharvest.ioc.ScraperScope;
+import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.HttpProcessor;
@@ -69,16 +72,14 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
 
-import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.name.Named;
 
 /**
  * Basic runtime class.
  */
-public class Scraper implements AttributeHolder {
+public class Scraper implements AttributeHolder, WebScraper {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
@@ -91,7 +92,7 @@ public class Scraper implements AttributeHolder {
     public static final int STATUS_EXIT = 6;
 
     @Inject
-    private EventBus eventBus;
+    private MessagePublisher eventBus;
 
     private ScraperConfiguration configuration;
     private String workingDir;
@@ -127,7 +128,6 @@ public class Scraper implements AttributeHolder {
 
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
-
     @Inject ScraperScope scope;
 
     /**
@@ -137,8 +137,8 @@ public class Scraper implements AttributeHolder {
      * @param workingDir
      */
     @Inject
-    public Scraper(@Assisted ScraperConfiguration configuration,
-            @Assisted String workingDir) {
+    public Scraper(final ScraperConfiguration configuration,
+            @WorkingDir final String workingDir) {
         this.configuration = configuration;
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
@@ -167,7 +167,9 @@ public class Scraper implements AttributeHolder {
      *
      * @param name
      * @param value
+     * @deprecated Use {@link DynamicScopeContext#setLocalVar(String, Object)} instead
      */
+    @Deprecated
     public void addVariableToContext(String name, Object value) {
         this.context.setLocalVar(name, CommonUtil.createVariable(value));
     }
@@ -176,7 +178,9 @@ public class Scraper implements AttributeHolder {
      * Add all map values to the context.
      *
      * @param map
+     * @deprecated Use {@link DynamicScopeContext#setLocalVar(Map)} instead.
      */
+    @Deprecated
     public void addVariablesToContext(Map<String, Object> map) {
         if (map != null) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -231,7 +235,7 @@ public class Scraper implements AttributeHolder {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionEnd(this);
         }
-        eventBus.post(new ScraperExecutionEndEvent(this));
+        eventBus.publish(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {
             if (this.status == STATUS_FINISHED) {
@@ -409,7 +413,7 @@ public class Scraper implements AttributeHolder {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionError(this, e);
         }
-        eventBus.post(new ScraperExecutionErrorEvent(this, e));
+        eventBus.publish(new ScraperExecutionErrorEvent(this, e));
     }
 
     public ScriptEngineFactory getScriptEngineFactory() {
@@ -417,9 +421,10 @@ public class Scraper implements AttributeHolder {
     }
 
 
-    private void handleProcessorStartEvent(final ProcessorStartEvent event) {
-        // TODO Provide iplementation
-        throw new UnsupportedOperationException();
+    @Subscribe
+    public void handleProcessorStartEvent(final ProcessorStartEvent event) {
+
+        LOG.info("Received en event!!! {}", event);
     }
 
     /**

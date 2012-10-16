@@ -79,14 +79,12 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.log4j.Logger;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.AbstractElementDef;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
-import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
@@ -509,10 +507,12 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             refreshTree();
             InputSource in = new InputSource(new StringReader(xmlPane.getText()));
 
-            // FIXME rbala until the end of refactoring accoasited with 2.1 v we have to use ScraperFactory as temporary solution.
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            ScraperConfiguration scraperConfiguration = ide.scraperFactory.createConfiguration(in);
-            setScraperConfiguration(scraperConfiguration);
+            this.scraper = Guice.createInjector(new ScraperModule(in,
+                    ide.getSettings().getWorkingPath())).
+                        getInstance(Scraper.class);
+
+            setScraperConfiguration(scraper.getConfiguration());
         } catch (IOException e) {
             GuiUtils.showErrorMessage(e.getMessage());
         }
@@ -532,7 +532,11 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         String xmlContent = this.xmlPane.getText();
         InputSource in = new InputSource(new StringReader(xmlContent));
         try {
-            ScraperConfiguration scraperConfiguration = new ScraperConfiguration(in);
+            // FIXME rbala although temporary solution it is duplicated (CommandLine)
+            this.scraper = Guice.createInjector(new ScraperModule(in,
+                    ide.getSettings().getWorkingPath())).
+                        getInstance(Scraper.class);
+            ScraperConfiguration scraperConfiguration = scraper.getConfiguration();
             scraperConfiguration.setSourceFile(this.configDocument.getFile());
             scraperConfiguration.setUrl(this.configDocument.getUrl());
 
@@ -759,7 +763,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             if (ok) {
                 Settings settings = ide.getSettings();
 
-                this.scraper =  ide.scraperFactory.createScraper(this.scraperConfiguration, settings.getWorkingPath());
                 this.scraper.addVariablesToContext(initParams);
                 if (settings.isProxyEnabled()) {
                     HttpClientManager httpClientManager = scraper.getHttpClientManager();

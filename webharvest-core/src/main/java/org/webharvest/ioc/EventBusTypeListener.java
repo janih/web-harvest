@@ -1,6 +1,14 @@
 package org.webharvest.ioc;
 
+import java.lang.reflect.Method;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
@@ -20,13 +28,8 @@ import com.google.inject.spi.TypeListener;
 // FIXME rbala Is it necessary to create unit test?
 public final class EventBusTypeListener implements TypeListener {
 
-    // FIXME rbala I could not find solution that allows to inject event bus as singleton (since type listener is not created by Guice)
-    private final EventBus eventBus;
-
-    public EventBusTypeListener(final EventBus eventBus) {
-        // FIXME rbala Should we check against null pointer?
-        this.eventBus = eventBus;
-    }
+    private static final Logger LOG = LoggerFactory.
+        getLogger(EventBusTypeListener.class);
 
     /**
      * {@inheritDoc}
@@ -34,11 +37,29 @@ public final class EventBusTypeListener implements TypeListener {
     @Override
      public <I> void hear(final TypeLiteral<I> typeLiteral,
              final TypeEncounter<I> typeEncounter) {
-         typeEncounter.register(new InjectionListener<I>() {
-             public void afterInjection(final I i) {
-                 eventBus.register(i);
-             }
-         });
+
+        for (final Method method : typeLiteral.getRawType().
+                getDeclaredMethods()) {
+            // If one of the class's methods is annotated to receive events then
+            // register it to event bus
+            if (method.isAnnotationPresent(Subscribe.class)) {
+                typeEncounter.register(new InjectionListener<I>() {
+                    public void afterInjection(final I i) {
+                        Factory.get().register(i);
+                    }
+                });
+            }
+        }
      }
+
+    public static class Factory {
+
+        @Inject private static Provider<EventBus> provider;
+
+        public static EventBus get() {
+            return provider.get();
+        }
+
+    }
 
 }

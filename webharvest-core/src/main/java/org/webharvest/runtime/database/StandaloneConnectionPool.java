@@ -117,6 +117,7 @@ public final class StandaloneConnectionPool implements ConnectionFactory {
      */
     @Subscribe
     public void onExecutionEnd(final ScraperExecutionEndEvent event) {
+        System.out.println("POOL: " + this);
         releaseAllConnections();
     }
 
