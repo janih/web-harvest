@@ -85,6 +85,7 @@ import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
+import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
@@ -94,6 +95,7 @@ import org.webharvest.runtime.web.HttpClientManager;
 import org.xml.sax.InputSource;
 
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * Single panel containing XML configuration.
@@ -211,6 +213,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     private JMenuItem logSelectAllMenuItem;
     private JMenuItem logClearAllMenuItem;
 
+    private final Injector injector;
+
     /**
      * Constructor of the panel - initializes parent Ide instance and name of the document.
      *
@@ -219,6 +223,10 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
      */
     public ConfigPanel(final Ide ide, String name) {
         super(new BorderLayout());
+
+        // FIXME rbala although temporary solution it is duplicated (CommandLine)
+        this.injector = Guice.createInjector(
+                new ScraperModule(ide.getSettings().getWorkingPath()));
 
         this.ide = ide;
 
@@ -508,9 +516,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             InputSource in = new InputSource(new StringReader(xmlPane.getText()));
 
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            this.scraper = Guice.createInjector(new ScraperModule(in,
-                    ide.getSettings().getWorkingPath())).
-                        getInstance(Scraper.class);
+            this.scraper = injector.getInstance(ScraperFactory.class).create(in);
 
             setScraperConfiguration(scraper.getConfiguration());
         } catch (IOException e) {
@@ -533,9 +539,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         InputSource in = new InputSource(new StringReader(xmlContent));
         try {
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            this.scraper = Guice.createInjector(new ScraperModule(in,
-                    ide.getSettings().getWorkingPath())).
-                        getInstance(Scraper.class);
+            this.scraper = injector.getInstance(ScraperFactory.class).create(in);
+
             ScraperConfiguration scraperConfiguration = scraper.getConfiguration();
             scraperConfiguration.setSourceFile(this.configDocument.getFile());
             scraperConfiguration.setUrl(this.configDocument.getUrl());

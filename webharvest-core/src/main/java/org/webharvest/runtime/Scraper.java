@@ -36,6 +36,9 @@
 */
 package org.webharvest.runtime;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +56,7 @@ import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.ioc.AttributeHolder;
+import org.webharvest.ioc.ConfigModule;
 import org.webharvest.ioc.MessagePublisher;
 import org.webharvest.ioc.ScraperScope;
 import org.webharvest.ioc.WorkingDir;
@@ -70,10 +74,14 @@ import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
+import org.xml.sax.InputSource;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Provider;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 /**
  * Basic runtime class.
@@ -134,15 +142,46 @@ public class Scraper implements AttributeHolder, WebScraper {
 
     @Inject ScraperScope scope;
 
+    // TODO Missing documentation
+    // TODO Missing unit test
+    // FIXME rbala temporary solution?
+    @AssistedInject
+    public Scraper(final Injector injector, @WorkingDir final String workingDir,
+            @Assisted final URL config) throws IOException {
+        this(injector.createChildInjector(new ConfigModule(config)).
+            getInstance(ScraperConfiguration.class), workingDir);
+    }
+
+    // TODO Missing documentation
+    // TODO Missing unit test
+    // FIXME rbala temporary solution?
+    @AssistedInject
+    public Scraper(final Injector injector, @WorkingDir final String workingDir,
+            @Assisted final String config) throws FileNotFoundException {
+        this(injector.createChildInjector(new ConfigModule(config)).
+            getInstance(ScraperConfiguration.class), workingDir);
+    }
+
+    // TODO Missing documentation
+    // TODO Missing unit test
+    // FIXME rbala temporary solution?
+    @AssistedInject
+    public Scraper(final Injector injector, @WorkingDir final String workingDir,
+            @Assisted final InputSource config) {
+        this(injector.createChildInjector(new ConfigModule(config)).
+            getInstance(ScraperConfiguration.class), workingDir);
+    }
+
     /**
      * Constructor.
      *
      * @param configuration
      * @param workingDir
+     * @deprecated as public constructor make it private.
      */
-    @Inject
+    @Deprecated
     public Scraper(final ScraperConfiguration configuration,
-            @WorkingDir final String workingDir) {
+            final String workingDir) {
         this.configuration = configuration;
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
@@ -220,6 +259,10 @@ public class Scraper implements AttributeHolder, WebScraper {
     public void execute() {
         scope.enter(this);
         try {
+
+
+
+
             executeInternal();
         } finally {
             scope.exit();

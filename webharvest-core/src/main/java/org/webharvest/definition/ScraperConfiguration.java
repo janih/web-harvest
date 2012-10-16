@@ -62,8 +62,6 @@ import com.google.inject.assistedinject.Assisted;
  */
 public class ScraperConfiguration {
 
-    private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
-
     public static final String DEFAULT_CHARSET = "UTF-8";
     private static final ScriptingLanguage DEFAULT_SCRIPTING_LANGUAGE = ScriptingLanguage.BEANSHELL;
 
@@ -78,13 +76,6 @@ public class ScraperConfiguration {
     private File sourceFile;
     private String url;
     private String namespaceURI;
-
-    /**
-     * Default class constructor needed by Guice FactoryModuleBuilder
-     */
-    ScraperConfiguration() {
-        // Do nothing
-    }
 
     /**
      * Creates configuration instance loaded from the specified input stream.

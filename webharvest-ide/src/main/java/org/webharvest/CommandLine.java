@@ -51,6 +51,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
+import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.database.DefaultDriverManager;
@@ -161,13 +162,14 @@ public class CommandLine {
 
             final String configLowercase = configFilePath.toLowerCase();
 
-            // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
-            final Module module = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
-                    ? new ScraperModule(new URL(configFilePath), workingDir)
-                    : new ScraperModule(configFilePath, workingDir);
+            final ScraperFactory factory = Guice.createInjector(
+                    new ScraperModule(workingDir)).
+                        getInstance(ScraperFactory.class);
 
-            final Scraper scraper =
-                    Guice.createInjector(module).getInstance(Scraper.class);
+            // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
+            final Scraper scraper = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
+                    ? factory.create(new URL(configFilePath))
+                    : factory.create(configFilePath);
 
             String isDebug = params.get("debug");
             if (CommonUtil.isBooleanTrue(isDebug)) {
