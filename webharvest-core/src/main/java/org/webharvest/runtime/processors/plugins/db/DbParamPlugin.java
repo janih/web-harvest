@@ -1,10 +1,16 @@
 package org.webharvest.runtime.processors.plugins.db;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import org.webharvest.annotation.Definition;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.processors.plugins.Autoscanned;
+import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -13,7 +19,10 @@ import org.webharvest.utils.CommonUtil;
 /**
  * DB param plugin - can be used only inside database plugin.
  */
-public class DbParamPlugin extends WebHarvestPlugin {
+@Autoscanned
+@TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
+@Definition(value = "db-param", validAttributes = { "type" })
+public final class DbParamPlugin extends WebHarvestPlugin {
 
     public String getName() {
         return "db-param";
