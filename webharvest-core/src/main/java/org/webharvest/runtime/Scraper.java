@@ -53,7 +53,6 @@ import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.ioc.AttributeHolder;
-import org.webharvest.ioc.FakeNotifier;
 import org.webharvest.ioc.MessagePublisher;
 import org.webharvest.ioc.ScraperScope;
 import org.webharvest.ioc.WorkingDir;

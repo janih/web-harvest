@@ -1,44 +1,47 @@
 package org.webharvest.ioc;
 
+import java.util.Stack;
+
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
 /**
- * A {@code Scope} that uses an {@link AttributeHolder} as the backing store
- * for it's scoped objects.
+ * A {@code Scope} that uses an {@link AttributeHolder} as the backing store for
+ * its scoped objects. {@link AttributeHolderScope} supports nested scopes, that
+ * is, client code can enter scope as many times as required. Nested scopes are
+ * separated from each other.
+ *
  * Based on work of Matthias Treydte <waldheinz at gmail.com>.
  *
  * @author Robert Bala
+ * @author Piotr Dyraga
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
  */
 public class AttributeHolderScope<AHT extends AttributeHolder>
         implements Scope, Provider<AHT> {
 
-    private final ThreadLocal<AHT> holder = new ThreadLocal<AHT>();
+    private final ThreadLocal<Stack<AHT>> holder =
+        new ThreadLocal<Stack<AHT>>() {
+            protected java.util.Stack<AHT> initialValue() {
+                return new Stack<AHT>();
+            };
+    };
 
     /**
      * Lets the current {@code Thread} enter this {@code Scope}.
      *
-     * @param holder the {@link AttributeHolder} instance for the {@code Scope}
-     * @throws IllegalStateException if the current {@code Thread} is already
-     *      in this {@code Scope}
+     * @param holder
+     *            the {@link AttributeHolder} instance for the {@code Scope}
      */
     public void enter(final AHT holder) {
         if (holder == null) {
             throw new IllegalArgumentException();
         }
 
-        if (this.holder.get() != null) {
-            throw new IllegalStateException("already in "
-                    + getClass().getSimpleName() + " scope");
-        }
-
-        System.out.println("******************** Entering scope!!!");
-
-        this.holder.set(holder);
+        this.holder.get().add(holder);
     }
 
     /**
@@ -49,7 +52,7 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
      */
     public void exit() throws OutOfScopeException {
         assertInScope();
-        this.holder.remove();
+        this.holder.get().pop();
     }
 
     /**
@@ -62,7 +65,7 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
     @Override
     public AHT get() throws OutOfScopeException {
         assertInScope();
-        return this.holder.get();
+        return this.holder.get().peek();
     }
 
     @Override
@@ -73,11 +76,9 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
 
             @Override
             public T get() {
-                 System.out.println("******************** Attempt to get from scope!!!");
-
                 assertInScope();
 
-                final AttributeHolder ah = holder.get();
+                final AttributeHolder ah = holder.get().peek();
 
                 synchronized (ah.getAttributeLock()) {
                     T current = (T) ah.getAttribute(key);
@@ -85,12 +86,7 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
                     if ((current == null) && !ah.hasAttribute(key)) {
                         current = outer.get();
                         ah.putAttribute(key, current);
-                        System.out.println("%%%%%%%% PUT IN SCOPE " + current.getClass().getSimpleName() + "%%%%%%%%");
-                    } else {
-                        System.out.println("%%%%%%%% FOUND IN SCOPE " + current.getClass().getSimpleName() + "%%%%%%%%");
                     }
-
-
 
                     return current;
                 }
@@ -107,10 +103,9 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
     }
 
     private void assertInScope() throws OutOfScopeException {
-        if (holder.get() == null) {
+        if (holder.get().isEmpty()) {
             throw new OutOfScopeException("not in "
                     + getClass().getSimpleName()); //NOI18N
         }
     }
-
 }
