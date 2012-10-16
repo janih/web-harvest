@@ -88,7 +88,6 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
-        scraper.setRunningHttpProcessor(this);
 
         final String url = BaseTemplater.evaluateToString(elementDef.getUrl(),
                 null, scraper);
@@ -145,8 +144,6 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
             final long declaredContentLength = res.getContentLength();
             final long actualContentLength;
-
-            scraper.removeRunningHttpProcessor();
 
             Variable result;
 

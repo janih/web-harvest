@@ -130,9 +130,6 @@ public class Scraper implements AttributeHolder, WebScraper {
     // params that are proceeded to calling function
     private transient Map<String, Variable> functionParams = new HashMap<String, Variable>();
 
-    // stack of running http processors
-    private transient Stack<HttpProcessor> runningHttpProcessors = new Stack<HttpProcessor>();
-
     private List<ScraperRuntimeListener> scraperRuntimeListeners = new LinkedList<ScraperRuntimeListener>();
 
     private volatile int status = STATUS_READY;
@@ -338,18 +335,6 @@ public class Scraper implements AttributeHolder, WebScraper {
         this.functionParams.clear();
     }
 
-    public HttpProcessor getRunningHttpProcessor() {
-        return runningHttpProcessors.peek();
-    }
-
-    public void setRunningHttpProcessor(HttpProcessor httpProcessor) {
-        runningHttpProcessors.push(httpProcessor);
-    }
-
-    public void removeRunningHttpProcessor() {
-        runningHttpProcessors.pop();
-    }
-
     public int getRunningLevel() {
         return runningProcessors.size() + 1;
     }
@@ -363,16 +348,19 @@ public class Scraper implements AttributeHolder, WebScraper {
     }
 
     /**
-     * @param processorClazz Class of enclosing running processor.
-     * @return Parent running processor in the tree of specified class, or null if it doesn't exist.
+     * @param processorClazz
+     *            Class of enclosing running processor.
+     * @return Parent running processor in the tree of specified class, or null
+     *         if it doesn't exist.
      */
-    public Processor getRunningProcessorOfType(Class processorClazz) {
+    public final <T extends Processor< ? >> T getRunningProcessorOfType(
+            final Class<T> processorClazz) {
         List<Processor> runningProcessorList = runningProcessors.getList();
         ListIterator<Processor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
         while (listIterator.hasPrevious()) {
-            Processor curr = listIterator.previous();
+            final Processor< ? > curr = listIterator.previous();
             if (processorClazz.equals(curr.getClass())) {
-                return curr;
+                return processorClazz.cast(curr);
             }
         }
         return null;

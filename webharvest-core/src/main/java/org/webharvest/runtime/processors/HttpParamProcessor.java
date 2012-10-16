@@ -75,7 +75,8 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
         String contentType = BaseTemplater.evaluateToString(
                 elementDef.getContenttype(), null, scraper);
 
-        HttpProcessor httpProcessor = scraper.getRunningHttpProcessor();
+        final HttpProcessor httpProcessor =
+            scraper.getRunningProcessorOfType(HttpProcessor.class);
         if (httpProcessor != null) {
             httpProcessor.addHttpParam(
                     name,
