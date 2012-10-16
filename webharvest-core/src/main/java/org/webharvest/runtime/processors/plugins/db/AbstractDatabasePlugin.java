@@ -209,10 +209,6 @@ public abstract class AbstractDatabasePlugin extends WebHarvestPlugin {
 
     }
 
-    public Class[] getDependantProcessors() {
-        return new Class[] {DbParamPlugin.class};
-    }
-
     void addDbParam(final Variable value, final String type) {
         if (dbParams == null) {
             dbParams = new ArrayList<DbParamInfo>();
