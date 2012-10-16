@@ -98,6 +98,11 @@ public class Scraper implements AttributeHolder, WebScraper {
     private DynamicScopeContext context;
     private ScriptEngineFactory scriptEngineFactory;
 
+    // FIXME: [pdyraga] It would be neat to decouple Scraper from
+    // ConnectionFactory. In order to achieve it, we need scoped dependency
+    // injection to work with processors (database plugin). Since currently
+    // we can't provide this functionality, we are not able to get rid of
+    // ConnectionFactory from here.
     @Inject
     private Provider<ConnectionFactory> connectionFactory;
 
@@ -330,8 +335,16 @@ public class Scraper implements AttributeHolder, WebScraper {
         return runtimeConfig;
     }
 
+    /**
+     * @deprecated It would be neat to decouple Scraper from ConnectionFactory.
+     *             In order to achieve it, we need scoped dependency injection
+     *             to work with processors (database plugin). Since currently we
+     *             can't provide this functionality, we are not able to get rid
+     *             of ConnectionFactory from here.
+     */
+    @Deprecated
     public ConnectionFactory getConnectionFactory() {
-        return this.connectionFactory.get() ;
+        return this.connectionFactory.get();
     }
 
     public void setExecutingProcessor(Processor processor) {
