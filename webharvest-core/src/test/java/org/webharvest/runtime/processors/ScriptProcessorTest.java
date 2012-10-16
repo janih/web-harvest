@@ -38,6 +38,8 @@
 
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.runtime.scripting.ScriptingLanguage.GROOVY;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
@@ -51,9 +53,6 @@ import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.variables.NodeVariable;
-import org.webharvest.runtime.web.HttpClientManager;
-
-import static org.webharvest.runtime.scripting.ScriptingLanguage.GROOVY;
 
 /**
  * Created by IntelliJ IDEA.
@@ -71,7 +70,6 @@ public class ScriptProcessorTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         context = new ScraperContext(scraperMock.getMock());
-        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
         scraperMock.returns(context).getContext();
         scraperMock.returns(scriptEngineFactoryMock.getMock()).getScriptEngineFactory();
         scriptEngineFactoryMock.returns(engineMock.getMock()).getEngine(null);

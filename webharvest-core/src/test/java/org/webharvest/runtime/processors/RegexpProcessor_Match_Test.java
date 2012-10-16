@@ -46,7 +46,6 @@ import org.unitils.mock.Mock;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
-import org.webharvest.runtime.web.HttpClientManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,8 +61,6 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
-
         context = new ScraperContext(scraperMock.getMock());
     }
 

@@ -38,6 +38,8 @@
 
 package org.webharvest.deprecated.runtime.processors;
 
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
@@ -48,9 +50,6 @@ import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.ProcessorTestUtils;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.runtime.web.HttpClientManager;
-
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -67,8 +66,6 @@ public class VarDefProcessorTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
-
         context = new ScraperContext(scraperMock.getMock());
     }
 

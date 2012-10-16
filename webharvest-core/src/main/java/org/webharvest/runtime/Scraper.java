@@ -63,7 +63,6 @@ import org.webharvest.ioc.ScraperScope;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
-import org.webharvest.runtime.processors.HttpProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
