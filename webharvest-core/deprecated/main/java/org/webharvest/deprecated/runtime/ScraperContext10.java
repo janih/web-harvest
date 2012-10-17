@@ -60,6 +60,7 @@ import java.util.concurrent.Callable;
 
 import static java.text.MessageFormat.format;
 
+@Deprecated
 public class ScraperContext10 implements DynamicScopeContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
@@ -67,11 +68,11 @@ public class ScraperContext10 implements DynamicScopeContext {
     private static final String CALLER_PREFIX = "caller.";
 
     private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
-    private Scraper scraper;
+    private String[] systemVariables = new String[0];
 
-    public ScraperContext10(Scraper scraper) {
+    public ScraperContext10(final String... systemVariables) {
         this.stack.push(new HashMap<String, Variable>());
-        this.scraper = scraper;
+        this.systemVariables = systemVariables;
         LOG.warn("You are using the DEPRECATED scraper configuration version. We urge you to migrate to a newer one! Please visit http://web-harvest.sourceforge.net/release.php for details.");
     }
 
@@ -130,8 +131,11 @@ public class ScraperContext10 implements DynamicScopeContext {
     public <R> R executeFunctionCall(Callable<R> callable) throws InterruptedException {
         // Here the context shifts.
         try {
-            stack.push(new HashMap<String, Variable>());
-            Scraper.initContext(this, scraper);
+            final Map<String, Variable> newCRT =
+                new HashMap<String, Variable>();
+            rewriteSystemVariables(stack.peek(), newCRT);
+            stack.push(newCRT);
+
             return callable.call();
 
         } catch (InterruptedException e) {
@@ -146,6 +150,18 @@ public class ScraperContext10 implements DynamicScopeContext {
         }
     }
 
+    /**
+     * It's very ugly solution, however, the only one that allows to do not
+     * affect other components (such as the Scraper class) with bad design of
+     * old function call processor / scraper context.
+     */
+    private void rewriteSystemVariables(final Map<String, Variable> oldCRT,
+            final Map<String, Variable> newCRT) {
+        for (String sysVar : this.systemVariables) {
+            System.out.println("REWRITING: " + sysVar);
+            newCRT.put(sysVar, oldCRT.get(sysVar));
+        }
+    }
 
     @Override
     @SuppressWarnings({"unchecked"})

@@ -107,7 +107,7 @@ public class Scraper implements WebScraper {
 
     private ScraperConfiguration configuration;
     private String workingDir;
-    private DynamicScopeContext context;
+    private final DynamicScopeContext context;
     private ScriptEngineFactory scriptEngineFactory;
 
     // FIXME: [pdyraga] It would be neat to decouple Scraper from
@@ -237,7 +237,7 @@ public class Scraper implements WebScraper {
         this.httpClientManager = new HttpClientManager();
 
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
-                ? new ScraperContext10(this)
+                ? new ScraperContext10("sys", "http")
                 : new ScraperContext(this);
 
         this.scriptEngineFactory = new JSRScriptEngineFactory(
@@ -246,13 +246,10 @@ public class Scraper implements WebScraper {
 
     @PostConstruct
     public void initContext() {
-        initContext(context, this);
-    }
-
-    @Deprecated
-    public static void initContext(DynamicScopeContext context, Scraper scraper) {
-        context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(scraper)));
-        context.setLocalVar("http", new ScriptingVariable(scraper.getHttpClientManager().getHttpInfo()));
+        this.context.setLocalVar("sys", new ScriptingVariable(
+                new SystemUtilities(this)));
+        this.context.setLocalVar("http", new ScriptingVariable(
+                httpClientManager.getHttpInfo()));
     }
 
     /**

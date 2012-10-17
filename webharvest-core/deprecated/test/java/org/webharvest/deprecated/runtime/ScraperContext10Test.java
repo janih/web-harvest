@@ -47,20 +47,23 @@ import org.unitils.mock.Mock;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
+import org.webharvest.utils.SystemUtilities;
 
 import java.util.concurrent.Callable;
 
 public class ScraperContext10Test extends UnitilsTestNG {
 
     @TestedObject
-    ScraperContext10 context;
+    private ScraperContext10 context;
 
-    Mock<Scraper> scraperMock;
+    private Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(new HttpClientManager()).getHttpClientManager();
-        context = new ScraperContext10(scraperMock.getMock());
+        context = new ScraperContext10("sys", "http");
+
+        context.setLocalVar("http", new HttpClientManager().getHttpInfo());
+        context.setLocalVar("sys", new SystemUtilities(scraperMock.getMock()));
     }
 
     @Test
