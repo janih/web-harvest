@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,10 +50,12 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.DefaultDriverManager;
 import org.webharvest.runtime.database.DriverManager;
@@ -90,7 +93,7 @@ public class CommandLine {
         return getArgValue(args, false);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
         Map<String, String> params = getArgValue(args);
 
         if (params.size() == 0) {
@@ -160,18 +163,29 @@ public class CommandLine {
 
             final String configLowercase = configFilePath.toLowerCase();
 
-            final ScraperFactory factory = Guice.createInjector(
+            final HarvestLoadCallback callback = new HarvestLoadCallback() {
+
+                @Override
+                public void onSuccess(final List<IElementDef> elements) {
+                    // TODO Auto-generated method stub
+
+                }
+
+            };
+
+            // FIXME rbala although temporary solution it is duplicated (CommandLine)
+            final Harvest harvest = Guice.createInjector(
                     new ScraperModule(workingDir)).
-                        getInstance(ScraperFactory.class);
+                        getInstance(Harvest.class);
 
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
-            final WebScraper scraper = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
-                    ? factory.create(new URL(configFilePath))
-                    : factory.create(configFilePath);
+            final Harvester harvester = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
+                    ? harvest.getHarvester(new URL(configFilePath), callback)
+                    : harvest.getHarvester(configFilePath, callback);
 
             String isDebug = params.get("debug");
             if (CommonUtil.isBooleanTrue(isDebug)) {
-                scraper.setDebug(true);
+                harvester.getScraper().setDebug(true);
             }
 
             String proxyHost = params.get("proxyhost");
@@ -179,9 +193,9 @@ public class CommandLine {
                 String proxyPort = params.get("proxyport");
                 if (proxyPort != null && !"".equals(proxyPort)) {
                     int port = Integer.parseInt(proxyPort);
-                    scraper.getHttpClientManager().setHttpProxy(proxyHost, port);
+                    harvester.getScraper().getHttpClientManager().setHttpProxy(proxyHost, port);
                 } else {
-                    scraper.getHttpClientManager().setHttpProxy(proxyHost);
+                    harvester.getScraper().getHttpClientManager().setHttpProxy(proxyHost);
                 }
             }
 
@@ -190,23 +204,29 @@ public class CommandLine {
                 String proxyPassword = params.get("proxypassword");
                 String proxyNTHost = params.get("proxynthost");
                 String proxyNTDomain = params.get("proxyntdomain");
-                scraper.getHttpClientManager().setHttpProxyCredentials(proxyUser, proxyPassword, proxyNTHost, proxyNTDomain);
+                harvester.getScraper().getHttpClientManager().setHttpProxyCredentials(proxyUser, proxyPassword, proxyNTHost, proxyNTDomain);
             }
 
-            // adds initial variables to the scraper's content, if any
-            Map<String, String> caseSensitiveParams = getArgValue(args, true);
-            for (Map.Entry<String, String> entry : caseSensitiveParams.entrySet()) {
-                final String key = entry.getKey();
-                if (key.startsWith("#")) {
-                    String varName = key.substring(1);
-                    if (varName.length() > 0) {
-                        scraper.getContext().setLocalVar(varName,
-                                entry.getValue());
+            harvester.execute(new Harvester.ContextInitCallback() {
+
+                @Override
+                public void onSuccess(DynamicScopeContext context) {
+                    // adds initial variables to the scraper's content, if any
+                    Map<String, String> caseSensitiveParams = getArgValue(args, true);
+                    for (Map.Entry<String, String> entry : caseSensitiveParams.entrySet()) {
+                        final String key = entry.getKey();
+                        if (key.startsWith("#")) {
+                            String varName = key.substring(1);
+                            if (varName.length() > 0) {
+                                context.setLocalVar(varName,
+                                        entry.getValue());
+                            }
+                        }
                     }
                 }
-            }
 
-            scraper.execute();
+            });
+
         }
     }
 

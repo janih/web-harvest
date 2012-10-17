@@ -100,7 +100,7 @@ public class ConfigDocument implements DocumentListener {
     }
 
     // implementation of methods from DocumentListener interface
-    
+
     public void changedUpdate(DocumentEvent e) {
         updateDocumentChanged(true);
     }
@@ -169,13 +169,13 @@ public class ConfigDocument implements DocumentListener {
                     String msg = "File \"" + file.getAbsolutePath() + "\" already exists.\nAre you sure you want to overwrite it?";
                     boolean toContinue = GuiUtils.showWarningQuestionBox(msg, false) == JOptionPane.YES_OPTION;
 
-                    // if user choose not to overwrite existing file, then give up 
+                    // if user choose not to overwrite existing file, then give up
                     if (!toContinue) {
                         return;
                     }
                 }
 
-                configPanel.setConfigFile(file);
+                //configPanel.setConfigFile(file);
             }
         }
 
@@ -195,7 +195,7 @@ public class ConfigDocument implements DocumentListener {
 
 
     /**
-     * Warn user that document is changed but changes are not saved, and saving. 
+     * Warn user that document is changed but changes are not saved, and saving.
      * @return True if not canceled by user, false otherwise.
      */
     public boolean offerToSaveIfChanged() {
@@ -219,7 +219,7 @@ public class ConfigDocument implements DocumentListener {
         JTabbedPane tabbedPane = ide.getTabbedPane();
 
         int index = ide.findTabIndex(this.configPanel);
-        
+
         // if tab containing this document is found
         if (index >= 0) {
             tabbedPane.setTitleAt(index, this.name);
@@ -259,5 +259,5 @@ public class ConfigDocument implements DocumentListener {
         this.xmlPane = null;
         this.file = null;
     }
-    
+
 }

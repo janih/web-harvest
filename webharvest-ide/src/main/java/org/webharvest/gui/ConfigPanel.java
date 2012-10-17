@@ -78,15 +78,17 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.log4j.Logger;
+import org.webharvest.Harvest;
+import org.webharvest.HarvestLoadCallback;
+import org.webharvest.Harvester;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
-import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.WebScraper;
@@ -96,7 +98,6 @@ import org.webharvest.runtime.web.HttpClientManager;
 import org.xml.sax.InputSource;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 /**
  * Single panel containing XML configuration.
@@ -161,7 +162,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                         TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
                         Map properties = treeNodeInfo.getProperties();
                         Object value = properties == null ? null : properties.get(WHConstants.VALUE_PROPERTY_NAME);
-                        final ViewerFrame viewerFrame = new ViewerFrame(scraper, WHConstants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
+                        final ViewerFrame viewerFrame = new ViewerFrame(harvester.getScraper(), WHConstants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 viewerFrame.setVisible(true);
@@ -181,8 +182,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
     private Ide ide;
 
-    private ScraperConfiguration scraperConfiguration;
-
     private DefaultMutableTreeNode topNode;
     private DefaultTreeModel treeModel;
     private TreeNodeInfo selectedNodeInfo;
@@ -200,7 +199,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
     private XmlTextPane xmlPane;
     private JTree tree;
-    private WebScraper scraper;
     private PropertiesGrid propertiesGrid;
 
     // tree popup menu items
@@ -214,7 +212,9 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     private JMenuItem logSelectAllMenuItem;
     private JMenuItem logClearAllMenuItem;
 
-    private final Injector injector;
+    private final Harvest harvest;
+
+    private Harvester harvester;
 
     /**
      * Constructor of the panel - initializes parent Ide instance and name of the document.
@@ -226,8 +226,9 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         super(new BorderLayout());
 
         // FIXME rbala although temporary solution it is duplicated (CommandLine)
-        this.injector = Guice.createInjector(
-                new ScraperModule(ide.getSettings().getWorkingPath()));
+        this.harvest = Guice.createInjector(
+                new ScraperModule(ide.getSettings().getWorkingPath())).
+                    getInstance(Harvest.class);
 
         this.ide = ide;
 
@@ -447,8 +448,8 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     private void updateControls() {
         boolean viewAllowed = false;
 
-        if (this.scraper != null) {
-            viewAllowed = this.scraper.getStatus() != Scraper.STATUS_READY;
+        if (this.harvester != null) {
+            viewAllowed = this.harvester.getScraper().getStatus() != Scraper.STATUS_READY;
         }
 
         this.textViewMenuItem.setEnabled(viewAllowed);
@@ -517,9 +518,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             InputSource in = new InputSource(new StringReader(xmlPane.getText()));
 
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            this.scraper = injector.getInstance(ScraperFactory.class).create(in);
-
-            setScraperConfiguration(scraper.getConfiguration());
+            loadHarvester(in);
         } catch (IOException e) {
             GuiUtils.showErrorMessage(e.getMessage());
         }
@@ -540,13 +539,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         InputSource in = new InputSource(new StringReader(xmlContent));
         try {
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            this.scraper = injector.getInstance(ScraperFactory.class).create(in);
-
-            ScraperConfiguration scraperConfiguration = scraper.getConfiguration();
-            scraperConfiguration.setSourceFile(this.configDocument.getFile());
-            scraperConfiguration.setUrl(this.configDocument.getUrl());
-
-            setScraperConfiguration(scraperConfiguration);
+            loadHarvester(in);
 
             ide.setTabIcon(this, null);
         } catch (RuntimeException e) {
@@ -559,22 +552,27 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         return true;
     }
 
-    private void setScraperConfiguration(ScraperConfiguration scraperConfiguration) {
-        this.scraperConfiguration = scraperConfiguration;
+    private void loadHarvester(final InputSource in) {
+        this.harvester = harvest.getHarvester(in, new HarvestLoadCallback() {
 
-        java.util.List<IElementDef> operationDefs = scraperConfiguration.getOperations();
-        IElementDef[] defs = new IElementDef[operationDefs.size()];
-        Iterator<IElementDef> it = operationDefs.iterator();
-        int index = 0;
-        while (it.hasNext()) {
-            defs[index++] = it.next();
-        }
+            @Override
+            public void onSuccess(final List<IElementDef> elements) {
+                IElementDef[] defs = new IElementDef[elements.size()];
+                Iterator<IElementDef> it = elements.iterator();
+                int index = 0;
+                while (it.hasNext()) {
+                    defs[index++] = it.next();
+                }
 
-        this.topNode.removeAllChildren();
-        this.nodeInfos.clear();
-        createNodes(this.topNode, defs);
-        this.treeModel.reload();
-        expandTree();
+                ConfigPanel.this.topNode.removeAllChildren();
+                ConfigPanel.this.nodeInfos.clear();
+                createNodes(ConfigPanel.this.topNode, defs);
+                ConfigPanel.this.treeModel.reload();
+                expandTree();
+
+            }
+
+        });
     }
 
     /**
@@ -758,20 +756,30 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     }
 
     public void runConfiguration() {
-        if (this.scraper != null && this.scraper.getStatus() == Scraper.STATUS_PAUSED) {
-            synchronized (this.scraper) {
-                this.scraper.notifyAll();
+        if (this.harvester != null && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
+            synchronized (this.harvester) {
+                this.harvester.getScraper().notifyAll();
             }
 
             ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
-        } else if (this.scraper == null || this.scraper.getStatus() != Scraper.STATUS_RUNNING) {
+        } else if (this.harvester == null || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {
             boolean ok = refreshTree();
             if (ok) {
                 Settings settings = ide.getSettings();
 
-                this.scraper.getContext().setLocalVar(initParams);
+                final Harvester.ContextInitCallback callback =
+                        new Harvester.ContextInitCallback() {
+
+                    @Override
+                    public void onSuccess(final DynamicScopeContext context) {
+                        context.setLocalVar(initParams);
+                        // TODO Auto-generated method stub
+
+                    }
+                };
+
                 if (settings.isProxyEnabled()) {
-                    HttpClientManager httpClientManager = scraper.getHttpClientManager();
+                    HttpClientManager httpClientManager = harvester.getScraper().getHttpClientManager();
 
                     int proxyPort = settings.getProxyPort();
                     String proxyServer = settings.getProxyServer();
@@ -790,25 +798,25 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                     }
                 }
 
-                this.scraper.setDebug(true);
+                this.harvester.getScraper().setDebug(true);
                 this.logTextArea.setText(null);
-                this.scraper.addRuntimeListener(this);
+                this.harvester.getScraper().addRuntimeListener(this);
 
                 ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
 
                 // starts scrapping in separate thread
-                new ScraperExecutionThread(this.scraper, this.logTextArea).start();
+                new ScraperExecutionThread(this.harvester, callback, this.logTextArea).start();
             }
         }
     }
 
     public WebScraper getScraper() {
-        return scraper;
+        return (harvester != null) ? harvester.getScraper() : null;
     }
 
     public synchronized int getScraperStatus() {
-        if (this.scraper != null) {
-            return this.scraper.getStatus();
+        if (this.harvester != null) {
+            return this.harvester.getScraper().getStatus();
         }
 
         return -1;
@@ -819,14 +827,14 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     }
 
     public synchronized void stopScraperExecution() {
-        if (this.scraper != null) {
-            this.scraper.stopExecution();
+        if (this.harvester != null) {
+            this.harvester.getScraper().stopExecution();
         }
     }
 
     public synchronized void pauseScraperExecution() {
-        if (this.scraper != null) {
-            this.scraper.pauseExecution();
+        if (this.harvester != null) {
+            this.harvester.getScraper().pauseExecution();
             ide.setTabIcon(this, ResourceManager.SMALL_PAUSED_ICON);
         }
     }
@@ -896,12 +904,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         return xmlEditorScrollPane;
     }
 
-    public void setConfigFile(File file) {
-        if (this.scraperConfiguration != null) {
-            this.scraperConfiguration.setSourceFile(file);
-        }
-    }
-
     public ConfigDocument getConfigDocument() {
         return configDocument;
     }
@@ -948,15 +950,14 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         if (this.configDocument != null) {
             this.configDocument.dispose();
         }
-        if (this.scraper != null) {
-            this.scraper.removeRuntimeListener(this);
-            this.scraper = null;
+        if (this.harvester != null) {
+            this.harvester.getScraper().removeRuntimeListener(this);
+            this.harvester = null;
         }
 
         this.xmlPane.removeCaretListener(this);
         this.tree.removeTreeSelectionListener(this);
 
-        this.scraperConfiguration = null;
         this.ide = null;
         this.tree = null;
         this.treeModel = null;

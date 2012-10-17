@@ -108,4 +108,5 @@ public class AttributeHolderScope<AHT extends AttributeHolder>
                     + getClass().getSimpleName()); //NOI18N
         }
     }
+
 }

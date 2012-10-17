@@ -36,6 +36,7 @@
 */
 package org.webharvest.runtime;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -44,7 +45,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -57,11 +57,11 @@ import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
-import org.webharvest.ioc.AttributeHolder;
+import org.webharvest.ioc.ConfigDir;
 import org.webharvest.ioc.ConfigModule;
 import org.webharvest.ioc.FakeNotifier;
-import org.webharvest.ioc.MessagePublisher;
 import org.webharvest.ioc.ScraperScope;
+import org.webharvest.ioc.Scraping;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
@@ -78,9 +78,11 @@ import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
 import org.xml.sax.InputSource;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -88,7 +90,7 @@ import com.google.inject.assistedinject.AssistedInject;
 /**
  * Basic runtime class.
  */
-public class Scraper implements AttributeHolder, WebScraper {
+public class Scraper implements WebScraper {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
@@ -101,7 +103,7 @@ public class Scraper implements AttributeHolder, WebScraper {
     public static final int STATUS_EXIT = 6;
 
     @Inject
-    private MessagePublisher eventBus;
+    private EventBus eventBus;
 
     private ScraperConfiguration configuration;
     private String workingDir;
@@ -137,21 +139,19 @@ public class Scraper implements AttributeHolder, WebScraper {
 
     private String message = null;
 
-    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
-
     @Inject
     private Provider<FakeNotifier> notifier;
 
-    @Inject ScraperScope scope;
+    private @Inject ScraperScope scope;
 
     // TODO Missing documentation
     // TODO Missing unit test
     // FIXME rbala temporary solution?
     @AssistedInject
     public Scraper(final Injector injector, @WorkingDir final String workingDir,
-            @Assisted final URL config) throws IOException {
-        this(injector.createChildInjector(new ConfigModule(config)).
-            getInstance(ScraperConfiguration.class), workingDir);
+            @ConfigDir final String configDir, @Assisted final URL config)
+                throws IOException {
+        this(new InjectorHelper(injector, config, configDir), workingDir);
     }
 
     // TODO Missing documentation
@@ -159,9 +159,9 @@ public class Scraper implements AttributeHolder, WebScraper {
     // FIXME rbala temporary solution?
     @AssistedInject
     public Scraper(final Injector injector, @WorkingDir final String workingDir,
-            @Assisted final String config) throws FileNotFoundException {
-        this(injector.createChildInjector(new ConfigModule(config)).
-            getInstance(ScraperConfiguration.class), workingDir);
+            @ConfigDir final String configDir, @Assisted final String config)
+                throws FileNotFoundException {
+        this(new InjectorHelper(injector, config, configDir), workingDir);
     }
 
     // TODO Missing documentation
@@ -169,9 +169,55 @@ public class Scraper implements AttributeHolder, WebScraper {
     // FIXME rbala temporary solution?
     @AssistedInject
     public Scraper(final Injector injector, @WorkingDir final String workingDir,
+            @ConfigDir final String configDir,
             @Assisted final InputSource config) {
-        this(injector.createChildInjector(new ConfigModule(config)).
-            getInstance(ScraperConfiguration.class), workingDir);
+        this(new InjectorHelper(injector, config, configDir), workingDir);
+    }
+
+    // TODO Missing documentation
+    // TODO Missing unit test
+    // FIXME rbala temporary solution?
+    private Scraper(final InjectorHelper injector, final String workingDir) {
+        this(injector.getConfig(), workingDir);
+    }
+
+    final static class InjectorHelper {
+
+        private final Injector injector;
+
+        private final String configDir;
+
+        public InjectorHelper(final Injector injector, final URL config,
+                final String configDir) throws IOException {
+            this(injector, new ConfigModule(config), configDir);
+        }
+
+        public InjectorHelper(final Injector injector, final String config,
+                final String configDir) throws FileNotFoundException {
+            this(injector, new ConfigModule(config), configDir);
+        }
+
+        public InjectorHelper(final Injector injector,
+                final InputSource config, final String configDir) {
+            this(injector, new ConfigModule(config), configDir);
+        }
+
+        private InjectorHelper(final Injector injector, final Module module,
+                final String configDir) {
+            this.injector = injector.createChildInjector(module);
+            this.configDir = configDir;
+        }
+
+        public ScraperConfiguration getConfig() {
+            final ScraperConfiguration config = injector.
+                getInstance(ScraperConfiguration.class);
+            if (configDir != null) {
+                config.setSourceFile(new File(configDir));
+            }
+
+            return config;
+        }
+
     }
 
     /**
@@ -262,17 +308,23 @@ public class Scraper implements AttributeHolder, WebScraper {
         return EmptyVariable.INSTANCE;
     }
 
+    @Scraping
     public void execute() {
+        /*
         scope.enter(this);
         try {
+
+        */
 
             notifier.get().sendEvent();
 
 
             executeInternal();
+            /*
         } finally {
             scope.exit();
         }
+        */
     }
 
     private void executeInternal() {
@@ -288,7 +340,7 @@ public class Scraper implements AttributeHolder, WebScraper {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionEnd(this);
         }
-        eventBus.publish(new ScraperExecutionEndEvent(this));
+        eventBus.post(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {
             if (this.status == STATUS_FINISHED) {
@@ -465,7 +517,7 @@ public class Scraper implements AttributeHolder, WebScraper {
         for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
             listener.onExecutionError(this, e);
         }
-        eventBus.publish(new ScraperExecutionErrorEvent(this, e));
+        eventBus.post(new ScraperExecutionErrorEvent(this, e));
     }
 
     public ScriptEngineFactory getScriptEngineFactory() {
@@ -474,50 +526,8 @@ public class Scraper implements AttributeHolder, WebScraper {
 
 
     @Subscribe
-    public void handleProcessorStartEvent(final ProcessorStartEvent event) {
-
-        LOG.info("Received en event!!! {}", event);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getAttribute(final Object key) {
-        return attributes.get(key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasAttribute(final Object key) {
-        return attributes.containsKey(key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void putAttribute(final Object key, final Object value) {
-        attributes.put(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Object> getAttributes() {
-        // FIXME rbala What should go there?
-        return attributes.keySet();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getAttributeLock() {
-        return this.attributes;
+    public void handle(final ProcessorStartEvent event) {
+        LOG.info("Received en event!!! {} {}", this, event);
     }
 
 }

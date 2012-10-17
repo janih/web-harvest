@@ -38,28 +38,30 @@ package org.webharvest.gui;
 
 import javax.swing.JTextArea;
 
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.WebScraper;
+import org.webharvest.Harvester;
 
 /**
  * Thread which executes scraper configuration
  */
 public class ScraperExecutionThread extends Thread {
 
-    private WebScraper scraper;
+    private Harvester harvester;
     private JTextArea logTextArea;
+    private Harvester.ContextInitCallback callback;
 
-    public ScraperExecutionThread(WebScraper scraper, JTextArea logTextArea) {
-        this.scraper = scraper;
+    public ScraperExecutionThread(Harvester harvester,
+            Harvester.ContextInitCallback callback, JTextArea logTextArea) {
+        this.harvester = harvester;
         this.logTextArea = logTextArea;
+        this.callback = callback;
     }
 
     public void run() {
         try {
             TextAreaAppender.setCurrentLogArea(logTextArea);
-            scraper.execute();
+            harvester.execute(callback);
         } catch (RuntimeException e) {
-            scraper.informListenersAboutError(e);
+            harvester.getScraper().informListenersAboutError(e);
         }
     }
 

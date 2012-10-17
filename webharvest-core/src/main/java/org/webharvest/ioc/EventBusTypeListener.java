@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
@@ -37,29 +35,27 @@ public final class EventBusTypeListener implements TypeListener {
     @Override
      public <I> void hear(final TypeLiteral<I> typeLiteral,
              final TypeEncounter<I> typeEncounter) {
-
+        // TODO rbala Refactor as soon as possible. Ugly code (the whole method)
+        boolean qualifies = false;
         for (final Method method : typeLiteral.getRawType().
                 getDeclaredMethods()) {
             // If one of the class's methods is annotated to receive events then
             // register it to event bus
-            if (method.isAnnotationPresent(Subscribe.class)) {
-                typeEncounter.register(new InjectionListener<I>() {
-                    public void afterInjection(final I i) {
-                        Factory.get().register(i);
-                    }
-                });
+            qualifies = method.isAnnotationPresent(Subscribe.class);
+            if (qualifies) {
+                break;
             }
+
+        }
+        if (qualifies) {
+            typeEncounter.register(new InjectionListener<I>() {
+                public void afterInjection(final I i) {
+                    InjectorHelper.getInjector().
+                        getInstance(EventBus.class).register(i);
+                    LOG.info("Subscribed to events {}", i);
+                }
+            });
         }
      }
-
-    public static class Factory {
-
-        @Inject private static Provider<EventBus> provider;
-
-        public static EventBus get() {
-            return provider.get();
-        }
-
-    }
 
 }
