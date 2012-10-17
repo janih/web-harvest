@@ -46,6 +46,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
@@ -192,12 +194,16 @@ public class Scraper implements AttributeHolder, WebScraper {
                 ? new ScraperContext10(this)
                 : new ScraperContext(this);
 
-        initContext(context, this);
-
         this.scriptEngineFactory = new JSRScriptEngineFactory(
                 configuration.getScriptingLanguage());
     }
 
+    @PostConstruct
+    public void initContext() {
+        initContext(context, this);
+    }
+
+    @Deprecated
     public static void initContext(DynamicScopeContext context, Scraper scraper) {
         context.setLocalVar("sys", new ScriptingVariable(new SystemUtilities(scraper)));
         context.setLocalVar("http", new ScriptingVariable(scraper.getHttpClientManager().getHttpInfo()));

@@ -32,6 +32,8 @@ public final class ScraperModule extends AbstractModule {
      */
     @Override
     protected void configure() {
+        bindListener(Matchers.any(), new PostConstructListener());
+
         bindConstant().annotatedWith(WorkingDir.class).to(workingDir);
 
         bindScope(ScrapingScope.class, SCRAPER_SCOPE);
