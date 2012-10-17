@@ -62,7 +62,7 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
         scraperMock.returns(context).getContext();
         scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }

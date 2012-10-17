@@ -63,7 +63,7 @@ public class SetVarPluginTest extends UnitilsTestNG {
     public void before() {
         scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
 
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
         scraperMock.returns(context).getContext();
     }
 

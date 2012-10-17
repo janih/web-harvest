@@ -38,6 +38,15 @@
 
 package org.webharvest.runtime;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
+
+import java.util.Arrays;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -49,12 +58,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
-
-import java.util.Arrays;
-import java.util.concurrent.Callable;
-
-import static org.testng.Assert.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 
 /**
@@ -70,12 +73,9 @@ public class ScraperContextTest extends UnitilsTestNG {
     @Dummy
     private Variable dummyVar;
 
-    @Dummy
-    Scraper scraper;
-
     @BeforeMethod
     public void before() {
-        context = new ScraperContext(scraper);
+        context = new ScraperContext();
     }
 
     @Test

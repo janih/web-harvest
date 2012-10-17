@@ -238,7 +238,7 @@ public class Scraper implements WebScraper {
 
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
                 ? new ScraperContext10("sys", "http")
-                : new ScraperContext(this);
+                : new ScraperContext();
 
         this.scriptEngineFactory = new JSRScriptEngineFactory(
                 configuration.getScriptingLanguage());

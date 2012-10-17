@@ -61,7 +61,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
     }
 
     @Test

@@ -63,7 +63,7 @@ public class ScraperContext implements DynamicScopeContext {
 
     protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
-    public ScraperContext(Scraper scraper) {
+    public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
     }
 

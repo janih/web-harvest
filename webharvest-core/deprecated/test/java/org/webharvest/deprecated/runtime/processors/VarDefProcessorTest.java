@@ -66,7 +66,7 @@ public class VarDefProcessorTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
     }
 
     private Variable invoke(String varDefXml) throws InterruptedException {

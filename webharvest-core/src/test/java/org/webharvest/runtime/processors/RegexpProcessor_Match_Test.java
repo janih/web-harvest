@@ -61,7 +61,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNG {
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext(scraperMock.getMock());
+        context = new ScraperContext();
     }
 
     @Test
