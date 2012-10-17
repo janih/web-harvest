@@ -199,10 +199,6 @@ public class SystemUtilities {
         return scraper.getWorkingDir();
     }
 
-    public String getCurrentDir() {
-        return scraper.getConfiguration().getSourceFile().getParentFile().getAbsolutePath();
-    }
-
     public void error(String message) {
         throw new UserException(message);
     }
