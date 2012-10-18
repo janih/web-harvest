@@ -32,7 +32,7 @@ public final class DbParamPlugin extends WebHarvestPlugin {
         Processor processor = scraper.getRunningProcessorOfType(DatabasePlugin.class);
         if (processor != null) {
             DatabasePlugin databasePlugin = (DatabasePlugin) processor;
-            String type = evaluateAttribute("type", scraper);
+            String type = evaluateAttribute("type", context);
             Variable body = executeBody(scraper, context);
             if (CommonUtil.isEmptyString(type)) {
                 type = "text";

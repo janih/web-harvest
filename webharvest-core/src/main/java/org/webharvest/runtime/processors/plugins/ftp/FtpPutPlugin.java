@@ -28,8 +28,8 @@ public class FtpPutPlugin extends WebHarvestPlugin {
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();
 
-            String path = CommonUtil.nvl( evaluateAttribute("path", scraper), "" );
-            String charset = CommonUtil.nvl( evaluateAttribute("charset", scraper), "" );
+            String path = CommonUtil.nvl( evaluateAttribute("path", context), "" );
+            String charset = CommonUtil.nvl( evaluateAttribute("charset", context), "" );
             if (CommonUtil.isEmptyString(charset)) {
                 charset = scraper.getConfiguration().getCharset();
             }

@@ -26,12 +26,12 @@ public final class DatabasePlugin extends AbstractDatabasePlugin {
      */
     @Override
     protected Connection obtainConnection(final Scraper scraper) {
-        final String jdbc = evaluateAttribute("jdbcclass", scraper);
-        final String connection = evaluateAttribute("connection", scraper);
-        final String username = evaluateAttribute("username", scraper);
-        final String password = evaluateAttribute("password", scraper);
+        final String jdbc = evaluateAttribute("jdbcclass", scraper.getContext());
+        final String connection = evaluateAttribute("connection", scraper.getContext());
+        final String username = evaluateAttribute("username", scraper.getContext());
+        final String password = evaluateAttribute("password", scraper.getContext());
         final boolean isAutoCommit = evaluateAttributeAsBoolean("autocommit",
-                true, scraper);
+                true, scraper.getContext());
 
         final Connection conn = scraper.getConnectionFactory().getConnection(
                 jdbc, connection, username, password);

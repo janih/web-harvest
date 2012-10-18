@@ -30,11 +30,11 @@ public class FtpListPlugin extends WebHarvestPlugin {
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();
 
-            String path = CommonUtil.nvl( evaluateAttribute("path", scraper), "" );
-            boolean listFiles = evaluateAttributeAsBoolean("listfiles", true, scraper);
-            boolean listDirs = evaluateAttributeAsBoolean("listdirs", true, scraper);
-            boolean listLinks = evaluateAttributeAsBoolean("listlinks", true, scraper);
-            String listFilter = CommonUtil.nvl( evaluateAttribute("listfilter", scraper), "" );
+            String path = CommonUtil.nvl( evaluateAttribute("path", context), "" );
+            boolean listFiles = evaluateAttributeAsBoolean("listfiles", true, context);
+            boolean listDirs = evaluateAttributeAsBoolean("listdirs", true, context);
+            boolean listLinks = evaluateAttributeAsBoolean("listlinks", true, context);
+            String listFilter = CommonUtil.nvl( evaluateAttribute("listfilter", context), "" );
 
             Pattern pattern = null;
             if ( !CommonUtil.isEmptyString(listFilter) ) {

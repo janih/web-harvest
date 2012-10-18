@@ -97,24 +97,24 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @param scraper
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
-    private String evaluateAttribute(String attName, String uri, Scraper scraper) {
-        return BaseTemplater.evaluateToString(getAttributes(uri).get(attName), null, scraper.getContext());
+    private String evaluateAttribute(String attName, String uri, DynamicScopeContext context) {
+        return BaseTemplater.evaluateToString(getAttributes(uri).get(attName), null, context);
     }
 
-    protected String evaluateAttribute(String attName, Scraper scraper) {
-        return evaluateAttribute(attName, elementDef.getUri(), scraper);
+    protected String evaluateAttribute(String attName, DynamicScopeContext context) {
+        return evaluateAttribute(attName, elementDef.getUri(), context);
     }
 
-    protected boolean evaluateAttributeAsBoolean(String attName, boolean defaultValue, Scraper scraper) {
-        return CommonUtil.getBooleanValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
+    protected boolean evaluateAttributeAsBoolean(String attName, boolean defaultValue, DynamicScopeContext context) {
+        return CommonUtil.getBooleanValue(evaluateAttribute(attName, elementDef.getUri(), context), defaultValue);
     }
 
-    protected int evaluateAttributeAsInteger(String attName, int defaultValue, Scraper scraper) {
-        return CommonUtil.getIntValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
+    protected int evaluateAttributeAsInteger(String attName, int defaultValue, DynamicScopeContext context) {
+        return CommonUtil.getIntValue(evaluateAttribute(attName, elementDef.getUri(), context), defaultValue);
     }
 
-    protected double evaluateAttributeAsDouble(String attName, double defaultValue, Scraper scraper) {
-        return CommonUtil.getDoubleValue(evaluateAttribute(attName, elementDef.getUri(), scraper), defaultValue);
+    protected double evaluateAttributeAsDouble(String attName, double defaultValue, DynamicScopeContext context) {
+        return CommonUtil.getDoubleValue(evaluateAttribute(attName, elementDef.getUri(), context), defaultValue);
     }
 
     /**

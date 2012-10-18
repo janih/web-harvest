@@ -26,11 +26,11 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         ZipPlugin zipPlugin = (ZipPlugin) scraper.getRunningProcessorOfType(ZipPlugin.class);
         if (zipPlugin != null) {
-            String name = evaluateAttribute("name", scraper);
+            String name = evaluateAttribute("name", context);
             if (CommonUtil.isEmptyString(name)) {
                 throw new ZipPluginException("Name of zip entry cannot be empty!");
             }
-            String charset = evaluateAttribute("charset", scraper);
+            String charset = evaluateAttribute("charset", context);
             if (CommonUtil.isEmptyString(charset)) {
                 charset = scraper.getConfiguration().getCharset();
             }

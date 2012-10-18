@@ -25,12 +25,12 @@ public class TokenizePlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        String delimiters = evaluateAttribute("delimiters", scraper);
+        String delimiters = evaluateAttribute("delimiters", context);
         if ( delimiters == null || "".equals(delimiters) ) {
             delimiters = "\n\r";
         }
-        boolean trimTokens = evaluateAttributeAsBoolean("trimtokens", true, scraper);
-        boolean allowWmptyTokens = evaluateAttributeAsBoolean("allowemptytokens", false, scraper);
+        boolean trimTokens = evaluateAttributeAsBoolean("trimtokens", true, context);
+        boolean allowWmptyTokens = evaluateAttributeAsBoolean("allowemptytokens", false, context);
         String text =  executeBody(scraper, context).toString();
 
         this.setProperty("Delimiters", delimiters);

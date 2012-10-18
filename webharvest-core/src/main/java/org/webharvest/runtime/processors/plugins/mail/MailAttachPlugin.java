@@ -32,12 +32,12 @@ public class MailAttachPlugin extends WebHarvestPlugin {
             MailPlugin mailPlugin = (MailPlugin) processor;
             Email email = mailPlugin.getEmail();
             if (email instanceof HtmlEmail) {
-                String attachmentName = evaluateAttribute("name", scraper);
+                String attachmentName = evaluateAttribute("name", context);
                 if (CommonUtil.isEmptyString(attachmentName)) {
                     attachmentName = mailPlugin.getNextAttachmentName();
                 }
-                String mimeType = evaluateAttribute("mimetype", scraper);
-                boolean isInline = evaluateAttributeAsBoolean("inline", false, scraper);
+                String mimeType = evaluateAttribute("mimetype", context);
+                boolean isInline = evaluateAttributeAsBoolean("inline", false, context);
                 HtmlEmail htmlEmail = (HtmlEmail) email;
                 Variable bodyVar = executeBody(scraper, context);
                 try {

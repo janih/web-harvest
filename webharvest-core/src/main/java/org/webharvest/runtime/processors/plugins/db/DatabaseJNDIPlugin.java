@@ -71,7 +71,7 @@ public final class DatabaseJNDIPlugin extends AbstractDatabasePlugin {
      */
     @Override
     protected Connection obtainConnection(final Scraper scraper) {
-        final String jndiHook = evaluateAttribute(JNDI_NAME_ATTRIBUTE, scraper);
+        final String jndiHook = evaluateAttribute(JNDI_NAME_ATTRIBUTE, scraper.getContext());
         return scraper.getConnectionFactory().getConnection(jndiHook);
     }
 }

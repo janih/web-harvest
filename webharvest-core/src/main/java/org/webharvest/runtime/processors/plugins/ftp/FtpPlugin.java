@@ -32,12 +32,12 @@ public class FtpPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        String server = CommonUtil.nvl(evaluateAttribute("server", scraper), "");
-        int port = evaluateAttributeAsInteger("port", 21, scraper);
-        String username = CommonUtil.nvl(evaluateAttribute("username", scraper), "");
-        String password = CommonUtil.nvl(evaluateAttribute("password", scraper), "");
-        String account = CommonUtil.nvl(evaluateAttribute("account", scraper), "");
-        String remoteDir = CommonUtil.nvl(evaluateAttribute("remotedir", scraper), "");
+        String server = CommonUtil.nvl(evaluateAttribute("server", context), "");
+        int port = evaluateAttributeAsInteger("port", 21, context);
+        String username = CommonUtil.nvl(evaluateAttribute("username", context), "");
+        String password = CommonUtil.nvl(evaluateAttribute("password", context), "");
+        String account = CommonUtil.nvl(evaluateAttribute("account", context), "");
+        String remoteDir = CommonUtil.nvl(evaluateAttribute("remotedir", context), "");
 
         setProperty("Server", server);
         setProperty("Port", port);

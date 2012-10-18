@@ -46,44 +46,44 @@ public class MailPlugin extends WebHarvestPlugin {
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         email = null;
 
-        boolean isHtml = "html".equalsIgnoreCase(evaluateAttribute("type", scraper));
+        boolean isHtml = "html".equalsIgnoreCase(evaluateAttribute("type", context));
         if (isHtml) {
             email = new HtmlEmail();
         } else {
             email = new SimpleEmail();
         }
 
-        email.setHostName( evaluateAttribute("smtp-host", scraper) );
-        email.setSmtpPort( evaluateAttributeAsInteger("smtp-port", 25, scraper) );
+        email.setHostName( evaluateAttribute("smtp-host", context) );
+        email.setSmtpPort( evaluateAttributeAsInteger("smtp-port", 25, context) );
 
         try {
-            email.setFrom( evaluateAttribute("from", scraper) );
+            email.setFrom( evaluateAttribute("from", context) );
         } catch (EmailException e) {
             throw new MailPluginException("Invalid \"from\" email address!", e);
         }
 
-        for ( String replyTo:  CommonUtil.tokenize(evaluateAttribute("reply-to", scraper), ",") ) {
+        for ( String replyTo:  CommonUtil.tokenize(evaluateAttribute("reply-to", context), ",") ) {
             try {
                 email.addReplyTo(replyTo);
             } catch (EmailException e) {
                 throw new MailPluginException("Invalid \"reply-to\" email address!", e);
             }
         }
-        for ( String to:  CommonUtil.tokenize(evaluateAttribute("to", scraper), ",") ) {
+        for ( String to:  CommonUtil.tokenize(evaluateAttribute("to", context), ",") ) {
             try {
                 email.addTo(to);
             } catch (EmailException e) {
                 throw new MailPluginException("Invalid \"to\" email address!", e);
             }
         }
-        for ( String cc:  CommonUtil.tokenize(evaluateAttribute("cc", scraper), ",") ) {
+        for ( String cc:  CommonUtil.tokenize(evaluateAttribute("cc", context), ",") ) {
             try {
                 email.addCc(cc);
             } catch (EmailException e) {
                 throw new MailPluginException("Invalid \"cc\" email address!", e);
             }
         }
-        for ( String bcc:  CommonUtil.tokenize(evaluateAttribute("bcc", scraper), ",") ) {
+        for ( String bcc:  CommonUtil.tokenize(evaluateAttribute("bcc", context), ",") ) {
             try {
                 email.addBcc(bcc);
             } catch (EmailException e) {
@@ -91,22 +91,22 @@ public class MailPlugin extends WebHarvestPlugin {
             }
         }
 
-        email.setSubject( evaluateAttribute("subject", scraper) );
+        email.setSubject( evaluateAttribute("subject", context) );
 
-        String username = evaluateAttribute("username", scraper);
-        String password = evaluateAttribute("password", scraper);
+        String username = evaluateAttribute("username", context);
+        String password = evaluateAttribute("password", context);
         if ( !CommonUtil.isEmptyString(username) ) {
             email.setAuthentication(username, password);
         }
 
-        String security = evaluateAttribute("security", scraper);
+        String security = evaluateAttribute("security", context);
         if ("tls".equals(security)) {
             email.setTLS(true);
         } else if ("ssl".equals(security)) {
             email.setSSL(true);
         }
 
-        String charset = evaluateAttribute("charset", scraper);
+        String charset = evaluateAttribute("charset", context);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();
         }

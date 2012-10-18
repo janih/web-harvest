@@ -56,7 +56,7 @@ public class SleepPlugin extends WebHarvestPlugin {
     private static final String MILLISECONDS_ATT_NAME = "milliseconds";
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, scraper);
+        final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, context);
         setProperty("Milliseconds", millis);
         if (millis > 0) {
             Thread.sleep(millis);

@@ -24,7 +24,7 @@ public class FtpRmdirPlugin extends WebHarvestPlugin {
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();
 
-            String path = CommonUtil.nvl( evaluateAttribute("path", scraper), "" );
+            String path = CommonUtil.nvl( evaluateAttribute("path", context), "" );
 
             setProperty("Path", path);
 

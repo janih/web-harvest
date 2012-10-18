@@ -29,7 +29,7 @@ public class JsonToXmlPlugin extends WebHarvestPlugin {
         try {
             return new NodeVariable(XML.toString(
                     new JSONObject(executeBody(scraper, context).toString()),
-                    evaluateAttribute(ATTR_ROOT_TAG_NAME, scraper)));
+                    evaluateAttribute(ATTR_ROOT_TAG_NAME, context)));
         } catch (JSONException e) {
             throw new PluginException("Error converting JSON to XML: " + e.getMessage());
         }
