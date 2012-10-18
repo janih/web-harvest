@@ -9,8 +9,11 @@ import java.sql.SQLException;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
+
+import com.google.inject.Inject;
 
 /**
  * Support for database operations.
@@ -20,6 +23,9 @@ import org.webharvest.runtime.processors.plugins.TargetNamespace;
 @Definition(value = "database", validAttributes = {
         "connection", "jdbcclass", "username", "password", "autocommit" })
 public final class DatabasePlugin extends AbstractDatabasePlugin {
+
+    @Inject
+    private ConnectionFactory connectionFactory;
 
     /**
      * {@inheritDoc}
@@ -33,8 +39,8 @@ public final class DatabasePlugin extends AbstractDatabasePlugin {
         final boolean isAutoCommit = evaluateAttributeAsBoolean("autocommit",
                 true, scraper.getContext());
 
-        final Connection conn = scraper.getConnectionFactory().getConnection(
-                jdbc, connection, username, password);
+        final Connection conn = connectionFactory.getConnection(jdbc,
+                connection, username, password);
         try {
             conn.setAutoCommit(isAutoCommit);
         } catch (SQLException cause) {

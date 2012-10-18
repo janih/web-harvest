@@ -53,7 +53,6 @@ import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.ioc.WorkingDir;
-import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
@@ -67,7 +66,6 @@ import org.webharvest.utils.SystemUtilities;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -92,14 +90,6 @@ public class Scraper implements WebScraper {
     private ScraperConfiguration configuration;
     private String workingDir;
     private final DynamicScopeContext context;
-
-    // FIXME: [pdyraga] It would be neat to decouple Scraper from
-    // ConnectionFactory. In order to achieve it, we need scoped dependency
-    // injection to work with processors (database plugin). Since currently
-    // we can't provide this functionality, we are not able to get rid of
-    // ConnectionFactory from here.
-    @Inject
-    private Provider<ConnectionFactory> connectionFactory;
 
     private RuntimeConfig runtimeConfig;
 
@@ -302,18 +292,6 @@ public class Scraper implements WebScraper {
 
     public RuntimeConfig getRuntimeConfig() {
         return runtimeConfig;
-    }
-
-    /**
-     * @deprecated It would be neat to decouple Scraper from ConnectionFactory.
-     *             In order to achieve it, we need scoped dependency injection
-     *             to work with processors (database plugin). Since currently we
-     *             can't provide this functionality, we are not able to get rid
-     *             of ConnectionFactory from here.
-     */
-    @Deprecated
-    public ConnectionFactory getConnectionFactory() {
-        return this.connectionFactory.get();
     }
 
     public void setExecutingProcessor(Processor processor) {

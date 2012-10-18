@@ -37,8 +37,11 @@ import java.sql.Connection;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
+
+import com.google.inject.Inject;
 
 /**
  * Web Harvest plugin supporting database operations within JNDI - enabled
@@ -66,12 +69,15 @@ public final class DatabaseJNDIPlugin extends AbstractDatabasePlugin {
      */
     public static final String JNDI_NAME_ATTRIBUTE = "name";
 
+    @Inject
+    private ConnectionFactory connectionFactory;
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Connection obtainConnection(final Scraper scraper) {
         final String jndiHook = evaluateAttribute(JNDI_NAME_ATTRIBUTE, scraper.getContext());
-        return scraper.getConnectionFactory().getConnection(jndiHook);
+        return connectionFactory.getConnection(jndiHook);
     }
 }
