@@ -9,7 +9,9 @@ import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.ProvisionException;
 import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
@@ -47,14 +49,37 @@ public class PostConstructListenerTest {
             protected void configure() {
                 bindListener(Matchers.any(), new PostConstructListener());
 
-                bind(WithMisplacedPostConstruct.class).in(Singleton.class);
+                bind(HavingPostConstructWithArgs.class).in(Singleton.class);
             }
         });
         try {
-            injector.getInstance(WithMisplacedPostConstruct.class);
+            injector.getInstance(HavingPostConstructWithArgs.class);
             fail("ProvisionException expected");
         } catch (ProvisionException e) {
             //ok, expected
+        }
+    }
+
+    /**
+     * @PostConstruct method should not delcare checked exceptions.
+     * In case of runtime exception occurred, it should be rethrown.
+     */
+    @Test
+    public void rethrowsRuntimeException() {
+        final Injector injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bindListener(Matchers.any(), new PostConstructListener());
+
+                bind(WithRuntimeExceptionThrown.class).in(Singleton.class);
+            }
+        });
+        try {
+            injector.getInstance(WithRuntimeExceptionThrown.class);
+            fail("ProvisionException expected");
+        } catch (ProvisionException e) {
+            //ok, expected
+            assertTrue(e.getCause() instanceof IllegalArgumentException);
         }
     }
 
@@ -77,11 +102,18 @@ public class PostConstructListenerTest {
         }
     }
 
-    private static class WithMisplacedPostConstruct {
+    private static class HavingPostConstructWithArgs {
         @PostConstruct
         public void methodWithParameters(final String param1,
                 final String param2) {
             // should not be called
+        }
+    }
+
+    private static class WithRuntimeExceptionThrown {
+        @PostConstruct
+        public void iWillThrowRuntimeException() {
+            throw new IllegalArgumentException("TEST");
         }
     }
 }

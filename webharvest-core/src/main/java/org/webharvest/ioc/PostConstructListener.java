@@ -33,6 +33,7 @@
 
 package org.webharvest.ioc;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -108,9 +109,19 @@ public final class PostConstructListener implements TypeListener {
         public void afterInjection(final I injectee) {
             try {
                 method.invoke(injectee);
-            } catch (Exception cause) {
+            } catch (IllegalAccessException cause) {
                 throw new ConfigurationException(Arrays.asList(new Message(
                         cause, "Misplaced @PostConstruct annotation")));
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    // @PostConstruct methods should not declare checked
+                    // exceptions, so in case of exception during @PostConstruct
+                    // annotation it should be handled here
+                    throw (RuntimeException) e.getCause();
+                }
+                throw new ConfigurationException(Arrays.asList(new Message(
+                        e.getCause(),
+                        "@PostConstruct method thrown checked exception")));
             }
         }
     }
