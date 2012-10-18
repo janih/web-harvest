@@ -44,6 +44,7 @@ import java.util.concurrent.Callable;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.CallDef;
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -53,6 +54,8 @@ import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
+
+import com.google.inject.Inject;
 
 /**
  * Function call processor.
@@ -68,11 +71,14 @@ import org.webharvest.runtime.variables.Variable;
         requiredAttributes = "name", definitionClass = CallDef.class)
 public class CallProcessor extends AbstractProcessor<CallDef> {
 
+	@Inject
+	private ScraperConfiguration configuration;
+	
     private Variable functionResult = new NodeVariable("");
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
-        final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
+        final FunctionDef functionDef = configuration.getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);
 

@@ -52,6 +52,8 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
+import com.google.inject.Inject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -69,6 +71,9 @@ import java.net.URL;
         requiredAttributes = "path", definitionClass = IncludeDef.class)
 public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
 
+    @Inject
+    private ScraperConfiguration configuration;
+
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 
@@ -79,7 +84,6 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
         path = CommonUtil.adaptFilename(path);
         String fullPath = path;
 
-        ScraperConfiguration configuration = scraper.getConfiguration();
         File originalFile = configuration.getSourceFile();
         String originalUrl = configuration.getUrl();
         if (originalFile != null) {

@@ -43,6 +43,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.FileDef;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -54,6 +55,8 @@ import org.webharvest.runtime.variables.Types;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.FileListIterator;
+
+import com.google.inject.Inject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,6 +80,9 @@ import java.util.regex.PatternSyntaxException;
         requiredAttributes="path", definitionClass = FileDef.class)
 public class FileProcessor extends AbstractProcessor<FileDef> {
 
+    @Inject
+    private ScraperConfiguration configuration;
+
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
         String workingDir = scraper.getWorkingDir();
@@ -90,7 +96,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         String charset = BaseTemplater.evaluateToString(
                 elementDef.getCharset(), null, context);
         if (charset == null) {
-            charset = scraper.getConfiguration().getCharset();
+            charset = configuration.getCharset();
         }
         String listFilter = BaseTemplater.evaluateToString(
                 elementDef.getListFilter(), null, context);

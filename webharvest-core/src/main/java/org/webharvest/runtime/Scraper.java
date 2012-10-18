@@ -192,10 +192,6 @@ public class Scraper implements WebScraper {
         return context;
     }
 
-    public ScraperConfiguration getConfiguration() {
-        return configuration;
-    }
-
     public String getWorkingDir() {
         return this.workingDir;
     }

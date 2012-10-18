@@ -1,12 +1,15 @@
 package org.webharvest.runtime.processors.plugins.ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+
+import com.google.inject.Inject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +21,9 @@ import java.util.Set;
  * Ftp Put plugin - can be used only inside ftp plugin for storing file to remote directory.
  */
 public class FtpPutPlugin extends WebHarvestPlugin {
+
+    @Inject
+    private ScraperConfiguration configuration;
 
     public String getName() {
         return "ftp-put";
@@ -31,7 +37,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
             String path = CommonUtil.nvl( evaluateAttribute("path", context), "" );
             String charset = CommonUtil.nvl( evaluateAttribute("charset", context), "" );
             if (CommonUtil.isEmptyString(charset)) {
-                charset = scraper.getConfiguration().getCharset();
+                charset = configuration.getCharset();
             }
 
             setProperty("Path", path);

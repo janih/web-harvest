@@ -39,6 +39,7 @@ package org.webharvest.runtime.processors;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpDef;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -53,6 +54,8 @@ import org.webharvest.runtime.web.HttpParamInfo;
 import org.webharvest.runtime.web.HttpResponseWrapper;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
+
+import com.google.inject.Inject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -82,6 +85,9 @@ import static org.webharvest.utils.CommonUtil.getBooleanValue;
 public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
     private static final String HTML_META_CHARSET_REGEX = "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')\\s*/?>)";
+
+    @Inject
+    private ScraperConfiguration configuration;
 
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
@@ -121,7 +127,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         String charset = specifiedCharset;
 
         if (charset == null) {
-            charset = scraper.getConfiguration().getCharset();
+            charset = configuration.getCharset();
         }
 
         final String encodedUrl = CommonUtil.encodeUrl(url, charset);

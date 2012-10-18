@@ -1,6 +1,5 @@
 package org.webharvest.runtime;
 
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.web.HttpClientManager;
 
 // TODO Missing documentation
@@ -14,9 +13,6 @@ public interface WebScraper {
 
     // TODO Missing documentation
     void execute();
-
-    @Deprecated
-    ScraperConfiguration getConfiguration();
 
     @Deprecated
     void setDebug(boolean debug);

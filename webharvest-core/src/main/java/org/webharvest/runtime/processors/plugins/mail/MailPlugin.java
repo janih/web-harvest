@@ -5,6 +5,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.apache.commons.mail.*;
 import org.webharvest.annotation.Definition;
+import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -13,6 +14,8 @@ import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+
+import com.google.inject.Inject;
 
 import javax.activation.DataSource;
 import java.io.IOException;
@@ -27,6 +30,9 @@ import java.util.Set;
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 @Definition("mail")
 public class MailPlugin extends WebHarvestPlugin {
+
+    @Inject
+    private ScraperConfiguration configuration;
 
     public static DataSource createDataSourceOfVariable(Variable variable, String charset, String mimeType) throws IOException {
         if (variable != null) {
@@ -108,7 +114,7 @@ public class MailPlugin extends WebHarvestPlugin {
 
         String charset = evaluateAttribute("charset", context);
         if (CommonUtil.isEmptyString(charset)) {
-            charset = scraper.getConfiguration().getCharset();
+            charset = configuration.getCharset();
         }
         email.setCharset(charset);
 
