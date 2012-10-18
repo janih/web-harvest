@@ -68,9 +68,9 @@ import java.util.List;
 public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
-        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
-        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, scraper);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
+        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, context);
+        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, context);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, context), false);
 
 
         final List<Object> resultList = new ArrayList<Object>();
@@ -81,7 +81,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
             context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
         }
 
-        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
+        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, context);
 
         setProperty("Condition", condition);
         setProperty("Index", index);
@@ -103,7 +103,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
                 context.setLocalVar(index, new NodeVariable(String.valueOf(i)));
             }
 
-            condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
+            condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, context);
         }
 
         return isEmpty ? EmptyVariable.INSTANCE : new ListVariable(resultList);

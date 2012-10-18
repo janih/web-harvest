@@ -81,11 +81,11 @@ import org.webharvest.utils.CommonUtil;
 public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
-        final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, scraper);
-        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, scraper);
-        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, scraper);
-        final String filter = BaseTemplater.evaluateToString(elementDef.getFilter(), null, scraper);
-        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, scraper), false);
+        final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, context);
+        final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, context);
+        final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, context);
+        final String filter = BaseTemplater.evaluateToString(elementDef.getFilter(), null, context);
+        final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, context), false);
 
         this.setProperty("Item", item);
         this.setProperty("Index", index);

@@ -66,14 +66,14 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(),
-                null, scraper);
+                null, context);
         String isFileStr = BaseTemplater.evaluateToString(
-                elementDef.getIsfile(), null, scraper);
+                elementDef.getIsfile(), null, context);
         boolean isFile = CommonUtil.getBooleanValue(isFileStr, false);
         String fileName = BaseTemplater.evaluateToString(
-                elementDef.getFilename(), null, scraper);
+                elementDef.getFilename(), null, context);
         String contentType = BaseTemplater.evaluateToString(
-                elementDef.getContenttype(), null, scraper);
+                elementDef.getContenttype(), null, context);
 
         final HttpProcessor httpProcessor =
             scraper.getRunningProcessorOfType(HttpProcessor.class);

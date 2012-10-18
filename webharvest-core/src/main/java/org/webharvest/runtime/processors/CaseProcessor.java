@@ -69,7 +69,7 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
 
         if (ifDefs != null) {
             for (IfDef ifDef : ifDefs) {
-                String condition = BaseTemplater.evaluateToString(ifDef.getCondition(), null, scraper);
+                String condition = BaseTemplater.evaluateToString(ifDef.getCondition(), null, context);
                 if (CommonUtil.isBooleanTrue(condition)) {
                     Variable ifResult = new BodyProcessor.Builder(ifDef).
                         build().run(scraper, context);

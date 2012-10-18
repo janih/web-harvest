@@ -98,7 +98,7 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @return Value of specified attribute, or null if attribute doesn't exist
      */
     private String evaluateAttribute(String attName, String uri, Scraper scraper) {
-        return BaseTemplater.evaluateToString(getAttributes(uri).get(attName), null, scraper);
+        return BaseTemplater.evaluateToString(getAttributes(uri).get(attName), null, scraper.getContext());
     }
 
     protected String evaluateAttribute(String attName, Scraper scraper) {

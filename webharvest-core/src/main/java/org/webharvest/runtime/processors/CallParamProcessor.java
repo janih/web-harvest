@@ -60,7 +60,7 @@ import org.webharvest.runtime.variables.Variable;
 public class CallParamProcessor extends AbstractProcessor<CallParamDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
+        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         Variable variable = new BodyProcessor.Builder(elementDef).build().
             execute(scraper, context);
 

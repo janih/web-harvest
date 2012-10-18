@@ -26,13 +26,13 @@ import org.webharvest.utils.CommonUtil;
 public class ExitProcessor extends AbstractProcessor<ExitDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
-        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, scraper);
+        String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, context);
         if (condition == null || "".equals(condition)) {
             condition = "true";
         }
 
         if (CommonUtil.isBooleanTrue(condition)) {
-            String message = BaseTemplater.evaluateToString(elementDef.getMessage(), null, scraper);
+            String message = BaseTemplater.evaluateToString(elementDef.getMessage(), null, context);
             if (message == null) {
                 message = "";
             }

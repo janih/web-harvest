@@ -90,33 +90,33 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
             throws InterruptedException {
 
         final String url = BaseTemplater.evaluateToString(elementDef.getUrl(),
-                null, scraper);
+                null, context);
         final String method = BaseTemplater.evaluateToString(
-                elementDef.getMethod(), null, scraper);
+                elementDef.getMethod(), null, context);
         final Boolean followRedirects = getBooleanValue(
                 BaseTemplater.evaluateToString(elementDef.getFollowRedirects(),
-                        null, scraper), true);
+                        null, context), true);
         final String contentType = BaseTemplater.evaluateToString(
-                elementDef.getContentType(), null, scraper);
+                elementDef.getContentType(), null, context);
         final String specifiedCharset = BaseTemplater.evaluateToString(
-                elementDef.getCharset(), null, scraper);
+                elementDef.getCharset(), null, context);
         final String username = BaseTemplater.evaluateToString(
-                elementDef.getUsername(), null, scraper);
+                elementDef.getUsername(), null, context);
         final String password = BaseTemplater.evaluateToString(
-                elementDef.getPassword(), null, scraper);
+                elementDef.getPassword(), null, context);
         final String cookiePolicy = BaseTemplater.evaluateToString(
-                elementDef.getCookiePolicy(), null, scraper);
+                elementDef.getCookiePolicy(), null, context);
         final boolean skipResponseBody = getBooleanValue(
                 BaseTemplater.evaluateToString(
-                        elementDef.getIgnoreResponseBody(), null, scraper),
+                        elementDef.getIgnoreResponseBody(), null, context),
                 false);
 
         final int retryAttempts = BaseTemplater.evaluateToVariable(
-                elementDef.getRetryAttempts(), null, scraper).toInt();
+                elementDef.getRetryAttempts(), null, context).toInt();
         final long retryDelay = BaseTemplater.evaluateToVariable(
-                elementDef.getRetryDelay(), null, scraper).toLong();
+                elementDef.getRetryDelay(), null, context).toLong();
         final double retryDelayFactor = BaseTemplater.evaluateToVariable(
-                elementDef.getRetryDelayFactor(), null, scraper).toDouble();
+                elementDef.getRetryDelayFactor(), null, context).toDouble();
 
         String charset = specifiedCharset;
 

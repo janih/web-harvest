@@ -72,7 +72,7 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 
-        String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, scraper);
+        String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, context);
 
         this.setProperty("Path", path);
 

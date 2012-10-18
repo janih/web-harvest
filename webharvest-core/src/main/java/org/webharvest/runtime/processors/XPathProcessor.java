@@ -76,7 +76,7 @@ public class XPathProcessor extends AbstractProcessor<XPathDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
-        String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, scraper);
+        String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, context);
         if (expression != null) {
             this.setProperty("Expression", expression);
         }
@@ -85,7 +85,7 @@ public class XPathProcessor extends AbstractProcessor<XPathDef> {
         Map<String, String> evaluatedVarMap = new HashMap<String, String>();
         for ( Map.Entry<String, String> attEntry: varMap.entrySet() ) {
             String varName = attEntry.getKey();
-            String varValue = BaseTemplater.evaluateToString(attEntry.getValue(), null, scraper);
+            String varValue = BaseTemplater.evaluateToString(attEntry.getValue(), null, context);
             evaluatedVarMap.put(varName, varValue);
             this.setProperty(varName, varValue);
         }

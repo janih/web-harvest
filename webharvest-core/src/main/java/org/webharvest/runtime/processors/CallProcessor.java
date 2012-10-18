@@ -71,7 +71,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
     private Variable functionResult = new NodeVariable("");
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
-        String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
+        String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         final FunctionDef functionDef = scraper.getConfiguration().getFunctionDef(functionName);
 
         this.setProperty("Name", functionName);

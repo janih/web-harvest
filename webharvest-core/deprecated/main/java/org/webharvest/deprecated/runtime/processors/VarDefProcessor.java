@@ -71,8 +71,8 @@ public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
         final Variable var = new BodyProcessor.Builder(elementDef).build().
             execute(scraper, context);
 
-        final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
-        final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, scraper);
+        final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
+        final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, context);
         final boolean toOverwrite = (overwrite == null || CommonUtil.isBooleanTrue(overwrite));
 
         if (context.getVar(name) == null || toOverwrite) {

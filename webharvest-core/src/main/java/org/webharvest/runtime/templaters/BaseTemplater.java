@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.WebScraper;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -63,12 +63,12 @@ public class BaseTemplater {
     public static String VAR_START = "${";
     public static String VAR_END = "}";
 
-    public static String evaluateToString(String source, ScriptingLanguage language, WebScraper scraper) {
-        final Variable result = evaluateToVariable(source, language, scraper);
+    public static String evaluateToString(String source, ScriptingLanguage language, DynamicScopeContext context) {
+        final Variable result = evaluateToVariable(source, language, context);
         return result.isEmpty() ? null : result.toString();
     }
 
-    public static Variable evaluateToVariable(String source, ScriptingLanguage language, WebScraper scraper) {
+    public static Variable evaluateToVariable(String source, ScriptingLanguage language, DynamicScopeContext context) {
         if (source == null) {
             return EmptyVariable.INSTANCE;
         }
@@ -94,7 +94,7 @@ public class BaseTemplater {
                                 endIndex), language);
                 final Object resultObj = scriptEngineFactory.
                         getEngine(scriptSource).
-                        evaluate(scraper.getContext(), scriptSource);
+                        evaluate(context, scriptSource);
 
                 if (resultObj != null) {
                     result.add(resultObj);

@@ -69,12 +69,12 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
         String charset = BaseTemplater.evaluateToString(
-                elementDef.getCharset(), null, scraper);
+                elementDef.getCharset(), null, context);
         if (CommonUtil.isEmptyString(charset)) {
             charset = scraper.getConfiguration().getCharset();
         }
         String delimiter = BaseTemplater.evaluateToString(
-                elementDef.getDelimiter(), null, scraper);
+                elementDef.getDelimiter(), null, context);
         if (delimiter == null) {
             delimiter = "\n";
         }

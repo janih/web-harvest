@@ -103,7 +103,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         final long startTime = System.currentTimeMillis();
 
-        final String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, scraper) : null;
+        final String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, context) : null;
 
         setProperty("ID", id);
 
@@ -156,7 +156,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     }
 
     protected void debug(IElementDef elementDef, Scraper scraper, Variable variable) {
-        String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper) : null;
+        String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper.getContext()) : null;
 
         if (scraper.isDebugMode() && id != null) {
             if (variable != null) {

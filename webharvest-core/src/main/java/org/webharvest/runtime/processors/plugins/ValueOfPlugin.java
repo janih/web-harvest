@@ -58,7 +58,7 @@ public class ValueOfPlugin extends WebHarvestPlugin {
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
         final String expression = getAttributes().get(ATTR_EXPRESSION);
         setProperty("Expression", expression);
-        return BaseTemplater.evaluateToVariable(expression, null, scraper);
+        return BaseTemplater.evaluateToVariable(expression, null, context);
     }
 
 }

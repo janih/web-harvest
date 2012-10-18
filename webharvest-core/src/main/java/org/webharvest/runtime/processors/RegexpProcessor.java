@@ -85,14 +85,14 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
             run(scraper, context);
         debug(sourceDef, scraper, source);
 
-        String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, scraper);
+        String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, context);
         final boolean isReplace = CommonUtil.isBooleanTrue(replace);
 
-        boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagCaseInsensitive(), null, scraper), false);
-        boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagMultiline(), null, scraper), false);
-        boolean flagDotall = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagDotall(), null, scraper), true);
-        boolean flagUnicodecase = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagUnicodecase(), null, scraper), true);
-        boolean flagCanoneq = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagCanoneq(), null, scraper), false);
+        boolean flagCaseInsensitive = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagCaseInsensitive(), null, context), false);
+        boolean flagMultiline = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagMultiline(), null, context), false);
+        boolean flagDotall = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagDotall(), null, context), true);
+        boolean flagUnicodecase = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagUnicodecase(), null, context), true);
+        boolean flagCanoneq = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getFlagCanoneq(), null, context), false);
 
         this.setProperty("Is replacing", String.valueOf(isReplace));
         this.setProperty("Flag CaseInsensitive", String.valueOf(flagCaseInsensitive));
@@ -101,7 +101,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
         this.setProperty("Flag UnicodeCase", String.valueOf(flagUnicodecase));
         this.setProperty("Flag CanonEq", String.valueOf(flagCanoneq));
 
-        final double maxLoops = NumberUtils.toDouble(BaseTemplater.evaluateToString(elementDef.getMax(), null, scraper), WHConstants.DEFAULT_MAX_LOOPS);
+        final double maxLoops = NumberUtils.toDouble(BaseTemplater.evaluateToString(elementDef.getMax(), null, context), WHConstants.DEFAULT_MAX_LOOPS);
 
         this.setProperty("Max loops", String.valueOf(maxLoops));
 

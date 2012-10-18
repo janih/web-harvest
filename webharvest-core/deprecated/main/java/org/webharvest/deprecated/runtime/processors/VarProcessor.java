@@ -64,7 +64,7 @@ import org.webharvest.runtime.variables.Variable;
 public class VarProcessor extends AbstractProcessor<VarDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
-        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, scraper);
+        String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         this.setProperty("Name", name);
 
         Variable var = context.getVar(name);

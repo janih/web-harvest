@@ -77,7 +77,7 @@ public class GetVarPluginTest extends UnitilsTestNGExtension {
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable(123),
                 createPlugin(XmlNodeTestUtils.createXmlNode("<get var='x'/>",
-                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock()));
+                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
 
         contextMock.assertInvoked().getVar("x");
     }
@@ -88,7 +88,7 @@ public class GetVarPluginTest extends UnitilsTestNGExtension {
 
         Assert.assertSame(
                 createPlugin(XmlNodeTestUtils.createXmlNode("<get var='empty'/>",
-                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock()),
+                        XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()),
                 EmptyVariable.INSTANCE);
 
         contextMock.assertInvoked().getVar("empty");
@@ -116,7 +116,7 @@ public class GetVarPluginTest extends UnitilsTestNGExtension {
     @Test(expectedExceptions = VariableException.class)
     public void testExecutePlugin_notDefined() throws Exception {
         createPlugin(XmlNodeTestUtils.createXmlNode("<get var='not defined'/>",
-                XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock());
+                XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock());
     }
 
     /**

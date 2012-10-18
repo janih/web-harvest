@@ -65,8 +65,8 @@ public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         return new NodeVariable(BaseTemplater.evaluateToString(
                 getBodyTextContent(elementDef, scraper, context).toString(),
-                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, scraper)),
-                scraper));
+                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, context)),
+                context));
     }
 
 }

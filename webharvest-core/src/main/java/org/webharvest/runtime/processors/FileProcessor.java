@@ -82,26 +82,26 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         String workingDir = scraper.getWorkingDir();
 
         String action = BaseTemplater.evaluateToString(elementDef.getAction(),
-                null, scraper);
+                null, context);
         String filePath = BaseTemplater.evaluateToString(elementDef.getPath(),
-                null, scraper);
+                null, context);
         String type = BaseTemplater.evaluateToString(elementDef.getType(),
-                null, scraper);
+                null, context);
         String charset = BaseTemplater.evaluateToString(
-                elementDef.getCharset(), null, scraper);
+                elementDef.getCharset(), null, context);
         if (charset == null) {
             charset = scraper.getConfiguration().getCharset();
         }
         String listFilter = BaseTemplater.evaluateToString(
-                elementDef.getListFilter(), null, scraper);
+                elementDef.getListFilter(), null, context);
         String listFiles = BaseTemplater.evaluateToString(
-                elementDef.getListFiles(), null, scraper);
+                elementDef.getListFiles(), null, context);
         boolean isListFiles = CommonUtil.getBooleanValue(listFiles, true);
         String listDirs = BaseTemplater.evaluateToString(
-                elementDef.getListDirs(), null, scraper);
+                elementDef.getListDirs(), null, context);
         boolean isListDirs = CommonUtil.getBooleanValue(listDirs, true);
         String listRecursive = BaseTemplater.evaluateToString(
-                elementDef.getListRecursive(), null, scraper);
+                elementDef.getListRecursive(), null, context);
         boolean isListRecursive = CommonUtil.getBooleanValue(listRecursive,
                 false);
 
