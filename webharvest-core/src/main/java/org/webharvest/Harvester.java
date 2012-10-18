@@ -1,6 +1,7 @@
 package org.webharvest;
 
 import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.WebScraper;
 
 public interface Harvester {
@@ -19,5 +20,14 @@ public interface Harvester {
         void onSuccess(DynamicScopeContext context);
 
     }
+
+    @Deprecated
+    void addRuntimeListener(ScraperRuntimeListener listener);
+
+    @Deprecated
+    void removeRuntimeListener(ScraperRuntimeListener listener);
+
+    @Deprecated
+    void setDebug(boolean debug);
 
 }

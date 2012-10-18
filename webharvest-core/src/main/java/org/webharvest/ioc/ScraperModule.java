@@ -59,7 +59,7 @@ public final class ScraperModule extends AbstractModule {
         // Make our scope instance injectable
         bind(ScraperScope.class).toInstance((ScraperScope) SCRAPER_SCOPE);
 
-        bind(EventBus.class).in(Singleton.class);
+        bind(EventBus.class).in(ScrapingScope.class);
         bindListener(Matchers.any(), new EventBusTypeListener());
 
         requestStaticInjection(InjectorHelper.class);

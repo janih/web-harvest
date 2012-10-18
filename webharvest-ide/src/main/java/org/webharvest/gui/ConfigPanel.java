@@ -449,7 +449,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         boolean viewAllowed = false;
 
         if (this.harvester != null) {
-            viewAllowed = this.harvester.getScraper().getStatus() != Scraper.STATUS_READY;
+            viewAllowed = (harvester.getScraper() != null) && (harvester.getScraper().getStatus() != Scraper.STATUS_READY);
         }
 
         this.textViewMenuItem.setEnabled(viewAllowed);
@@ -756,13 +756,13 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     }
 
     public void runConfiguration() {
-        if (this.harvester != null && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
+        if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
             synchronized (this.harvester) {
                 this.harvester.getScraper().notifyAll();
             }
 
             ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
-        } else if (this.harvester == null || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {
+        } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {
             boolean ok = refreshTree();
             if (ok) {
                 Settings settings = ide.getSettings();
@@ -773,7 +773,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                     @Override
                     public void onSuccess(final DynamicScopeContext context) {
                         context.setLocalVar(initParams);
-                        // TODO Auto-generated method stub
 
                     }
                 };
@@ -798,9 +797,9 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
                     }
                 }
 
-                this.harvester.getScraper().setDebug(true);
+                this.harvester.setDebug(true);
                 this.logTextArea.setText(null);
-                this.harvester.getScraper().addRuntimeListener(this);
+                this.harvester.addRuntimeListener(this);
 
                 ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
 
@@ -815,7 +814,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
     }
 
     public synchronized int getScraperStatus() {
-        if (this.harvester != null) {
+        if ((this.harvester != null) && (harvester.getScraper() != null)) {
             return this.harvester.getScraper().getStatus();
         }
 
@@ -951,7 +950,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             this.configDocument.dispose();
         }
         if (this.harvester != null) {
-            this.harvester.getScraper().removeRuntimeListener(this);
+            this.harvester.removeRuntimeListener(this);
             this.harvester = null;
         }
 

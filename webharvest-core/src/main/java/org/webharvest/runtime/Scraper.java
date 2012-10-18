@@ -36,10 +36,6 @@
 */
 package org.webharvest.runtime;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,14 +50,8 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
-import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
-import org.webharvest.ioc.ConfigDir;
-import org.webharvest.ioc.ConfigModule;
-import org.webharvest.ioc.FakeNotifier;
-import org.webharvest.ioc.ScraperScope;
-import org.webharvest.ioc.Scraping;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
@@ -76,13 +66,9 @@ import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
-import org.xml.sax.InputSource;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -139,87 +125,6 @@ public class Scraper implements WebScraper {
 
     private String message = null;
 
-    @Inject
-    private Provider<FakeNotifier> notifier;
-
-    private @Inject ScraperScope scope;
-
-    // TODO Missing documentation
-    // TODO Missing unit test
-    // FIXME rbala temporary solution?
-    @AssistedInject
-    public Scraper(final Injector injector, @WorkingDir final String workingDir,
-            @ConfigDir final String configDir, @Assisted final URL config)
-                throws IOException {
-        this(new InjectorHelper(injector, config, configDir), workingDir);
-    }
-
-    // TODO Missing documentation
-    // TODO Missing unit test
-    // FIXME rbala temporary solution?
-    @AssistedInject
-    public Scraper(final Injector injector, @WorkingDir final String workingDir,
-            @ConfigDir final String configDir, @Assisted final String config)
-                throws FileNotFoundException {
-        this(new InjectorHelper(injector, config, configDir), workingDir);
-    }
-
-    // TODO Missing documentation
-    // TODO Missing unit test
-    // FIXME rbala temporary solution?
-    @AssistedInject
-    public Scraper(final Injector injector, @WorkingDir final String workingDir,
-            @ConfigDir final String configDir,
-            @Assisted final InputSource config) {
-        this(new InjectorHelper(injector, config, configDir), workingDir);
-    }
-
-    // TODO Missing documentation
-    // TODO Missing unit test
-    // FIXME rbala temporary solution?
-    private Scraper(final InjectorHelper injector, final String workingDir) {
-        this(injector.getConfig(), workingDir);
-    }
-
-    final static class InjectorHelper {
-
-        private final Injector injector;
-
-        private final String configDir;
-
-        public InjectorHelper(final Injector injector, final URL config,
-                final String configDir) throws IOException {
-            this(injector, new ConfigModule(config), configDir);
-        }
-
-        public InjectorHelper(final Injector injector, final String config,
-                final String configDir) throws FileNotFoundException {
-            this(injector, new ConfigModule(config), configDir);
-        }
-
-        public InjectorHelper(final Injector injector,
-                final InputSource config, final String configDir) {
-            this(injector, new ConfigModule(config), configDir);
-        }
-
-        private InjectorHelper(final Injector injector, final Module module,
-                final String configDir) {
-            this.injector = injector.createChildInjector(module);
-            this.configDir = configDir;
-        }
-
-        public ScraperConfiguration getConfig() {
-            final ScraperConfiguration config = injector.
-                getInstance(ScraperConfiguration.class);
-            if (configDir != null) {
-                config.setSourceFile(new File(configDir));
-            }
-
-            return config;
-        }
-
-    }
-
     /**
      * Constructor.
      *
@@ -227,9 +132,9 @@ public class Scraper implements WebScraper {
      * @param workingDir
      * @deprecated as public constructor make it private.
      */
-    @Deprecated
-    public Scraper(final ScraperConfiguration configuration,
-            final String workingDir) {
+    @AssistedInject
+    public Scraper(@Assisted final ScraperConfiguration configuration,
+            @WorkingDir final String workingDir) {
         this.configuration = configuration;
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
@@ -305,26 +210,7 @@ public class Scraper implements WebScraper {
         return EmptyVariable.INSTANCE;
     }
 
-    @Scraping
     public void execute() {
-        /*
-        scope.enter(this);
-        try {
-
-        */
-
-            notifier.get().sendEvent();
-
-
-            executeInternal();
-            /*
-        } finally {
-            scope.exit();
-        }
-        */
-    }
-
-    private void executeInternal() {
         long startTime = System.currentTimeMillis();
 
         execute(configuration.getOperations());
@@ -519,12 +405,6 @@ public class Scraper implements WebScraper {
 
     public ScriptEngineFactory getScriptEngineFactory() {
         return scriptEngineFactory;
-    }
-
-
-    @Subscribe
-    public void handle(final ProcessorStartEvent event) {
-        LOG.info("Received en event!!! {} {}", this, event);
     }
 
 }

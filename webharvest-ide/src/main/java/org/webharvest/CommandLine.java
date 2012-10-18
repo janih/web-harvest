@@ -185,7 +185,7 @@ public class CommandLine {
 
             String isDebug = params.get("debug");
             if (CommonUtil.isBooleanTrue(isDebug)) {
-                harvester.getScraper().setDebug(true);
+                harvester.setDebug(true);
             }
 
             String proxyHost = params.get("proxyhost");
