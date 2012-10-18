@@ -36,7 +36,7 @@ package org.webharvest.runtime.processors.plugins.db;
 import java.sql.Connection;
 
 import org.webharvest.annotation.Definition;
-import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -76,8 +76,8 @@ public final class DatabaseJNDIPlugin extends AbstractDatabasePlugin {
      * {@inheritDoc}
      */
     @Override
-    protected Connection obtainConnection(final Scraper scraper) {
-        final String jndiHook = evaluateAttribute(JNDI_NAME_ATTRIBUTE, scraper.getContext());
+    protected Connection obtainConnection(final DynamicScopeContext context) {
+        final String jndiHook = evaluateAttribute(JNDI_NAME_ATTRIBUTE, context);
         return connectionFactory.getConnection(jndiHook);
     }
 }

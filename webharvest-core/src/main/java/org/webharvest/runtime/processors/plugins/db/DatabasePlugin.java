@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.DatabaseException;
-import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -31,13 +31,13 @@ public final class DatabasePlugin extends AbstractDatabasePlugin {
      * {@inheritDoc}
      */
     @Override
-    protected Connection obtainConnection(final Scraper scraper) {
-        final String jdbc = evaluateAttribute("jdbcclass", scraper.getContext());
-        final String connection = evaluateAttribute("connection", scraper.getContext());
-        final String username = evaluateAttribute("username", scraper.getContext());
-        final String password = evaluateAttribute("password", scraper.getContext());
+    protected Connection obtainConnection(final DynamicScopeContext context) {
+        final String jdbc = evaluateAttribute("jdbcclass", context);
+        final String connection = evaluateAttribute("connection", context);
+        final String username = evaluateAttribute("username", context);
+        final String password = evaluateAttribute("password", context);
         final boolean isAutoCommit = evaluateAttributeAsBoolean("autocommit",
-                true, scraper.getContext());
+                true, context);
 
         final Connection conn = connectionFactory.getConnection(jdbc,
                 connection, username, password);

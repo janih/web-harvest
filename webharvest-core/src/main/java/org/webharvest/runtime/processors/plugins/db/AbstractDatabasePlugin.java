@@ -61,10 +61,10 @@ public abstract class AbstractDatabasePlugin extends WebHarvestPlugin {
      * Returns configured, ready for use database {@link Connection}
      *
      * @param scraper
-     *            instance of {@link Scraper} being executed
+     *            {@link DynamicScopeContext} instance of executed scraper
      * @return ready for use database {@link Connection}
      */
-    protected abstract Connection obtainConnection(Scraper scraper);
+    protected abstract Connection obtainConnection(DynamicScopeContext context);
 
     private class DbParamInfo {
         private Variable value;
@@ -85,7 +85,7 @@ public abstract class AbstractDatabasePlugin extends WebHarvestPlugin {
     public Variable executePlugin(final Scraper scraper,
             final DynamicScopeContext context) throws InterruptedException {
 
-        final Connection conn = obtainConnection(scraper);
+        final Connection conn = obtainConnection(context);
 
         Variable body = executeBody(scraper, context);
         String sql = body.toString();
