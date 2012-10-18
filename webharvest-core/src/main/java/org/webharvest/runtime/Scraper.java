@@ -144,35 +144,6 @@ public class Scraper implements WebScraper {
                 httpClientManager.getHttpInfo()));
     }
 
-    /**
-     * Adds parameter with specified name and value to the context.
-     * This way some predefined variables can be put in runtime context
-     * before execution starts.
-     *
-     * @param name
-     * @param value
-     * @deprecated Use {@link DynamicScopeContext#setLocalVar(String, Object)} instead
-     */
-    @Deprecated
-    public void addVariableToContext(String name, Object value) {
-        this.context.setLocalVar(name, CommonUtil.createVariable(value));
-    }
-
-    /**
-     * Add all map values to the context.
-     *
-     * @param map
-     * @deprecated Use {@link DynamicScopeContext#setLocalVar(Map)} instead.
-     */
-    @Deprecated
-    public void addVariablesToContext(Map<String, Object> map) {
-        if (map != null) {
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                this.context.setLocalVar(entry.getKey(), CommonUtil.createVariable(entry.getValue()));
-            }
-        }
-    }
-
     // TODO rbala Make it private. Currently used only by IncludeProcessor
     public Variable execute(List<IElementDef> ops) {
         this.setStatus(STATUS_RUNNING);
