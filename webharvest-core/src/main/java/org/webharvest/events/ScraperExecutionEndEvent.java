@@ -33,11 +33,11 @@
 
 package org.webharvest.events;
 
-import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 
 /**
- * Event informing that the execution of {@link Scraper} has been successfully
- * completed.
+ * Event informing that the execution of {@link WebScraper} has been
+ * successfully completed.
  *
  * @author Piotr Dyraga
  * @since 2.1.0-SNAPSHOT
@@ -45,25 +45,26 @@ import org.webharvest.runtime.Scraper;
  */
 public final class ScraperExecutionEndEvent {
 
-    private final Scraper scraper;
+    private final WebScraper scraper;
 
     /**
      * Constructs {@link ScraperExecutionEndEvent} accepting reference to
-     * {@link Scraper} which execution has been completed
+     * {@link WebScraper} which execution has been completed
      *
      * @param scraper
-     *            {@link Scraper} which execution has been completed
+     *            {@link WebScraper} which execution has been completed
      */
-    public ScraperExecutionEndEvent(final Scraper scraper) {
+    public ScraperExecutionEndEvent(final WebScraper scraper) {
         this.scraper = scraper;
     }
 
     /**
-     * Returns instance of {@link Scraper} which execution has been completed.
+     * Returns instance of {@link WebScraper} which execution has been
+     * completed.
      *
-     * @return {@link Scraper} executed
+     * @return {@link WebScraper} executed
      */
-    public Scraper getScraper() {
+    public WebScraper getScraper() {
         return this.scraper;
     }
 }

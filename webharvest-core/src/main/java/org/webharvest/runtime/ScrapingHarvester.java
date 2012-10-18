@@ -15,8 +15,11 @@ import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.Scraping;
 import org.xml.sax.InputSource;
 
+import com.google.common.eventbus.EventBus;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -28,7 +31,14 @@ public class ScrapingHarvester implements Harvester {
 
     private final ScraperConfiguration config;
 
+    @Inject
+    private RuntimeListenerAdapter listenerAdapter;
+
+    @Inject
+    private Provider<EventBus> eventBusProvider;
+
     // TODO rbala not needed when we finally get rid of getScraper() method
+    @Deprecated
     private WebScraper scraper;
 
     @Deprecated
@@ -40,6 +50,7 @@ public class ScrapingHarvester implements Harvester {
 
     // TODO Add documentation
     // TODO Add unit test
+    // FIXME rbala more then 4 parameters
     @AssistedInject
     public ScrapingHarvester(final Injector injector,
             final ScraperFactory scraperFactory,
@@ -52,6 +63,7 @@ public class ScrapingHarvester implements Harvester {
 
     // TODO Add documentation
     // TODO Add unit test
+    // FIXME rbala more then 4 parameters
     @AssistedInject
     public ScrapingHarvester(final Injector injector,
             final ScraperFactory scraperFactory,
@@ -65,6 +77,7 @@ public class ScrapingHarvester implements Harvester {
 
     // TODO Add documentation
     // TODO Add unit test
+    // FIXME rbala more then 4 parameters
     @AssistedInject
     public ScrapingHarvester(final Injector injector,
             final ScraperFactory scraperFactory,
@@ -76,6 +89,7 @@ public class ScrapingHarvester implements Harvester {
     }
 
     // TODO Add documentation
+    // FIXME rbala more then 4 parameters
     private ScrapingHarvester(final Injector injector,
             final ScraperFactory scraperFactory, final Module module,
             final HarvestLoadCallback loadCallback,
@@ -92,16 +106,17 @@ public class ScrapingHarvester implements Harvester {
     @Override
     @Scraping
     public DynamicScopeContext execute(final ContextInitCallback callback) {
-        this.scraper = scraperFactory.create(config);
+        final EventBus eventBus = eventBusProvider.get();
+        listenerAdapter.register(eventBus);
+        try {
+            this.scraper = scraperFactory.create(config);
+            callback.onSuccess(scraper.getContext());
+            scraper.execute();
 
-        for (final ScraperRuntimeListener listener : listeners) {
-            scraper.addRuntimeListener(listener);
+            return scraper.getContext();
+        } finally {
+            listenerAdapter.unregister(eventBus);
         }
-
-        callback.onSuccess(scraper.getContext());
-        scraper.execute();
-
-        return scraper.getContext();
     }
 
     /**
@@ -117,19 +132,13 @@ public class ScrapingHarvester implements Harvester {
     @Override
     @Deprecated
     public void addRuntimeListener(final ScraperRuntimeListener listener) {
-        listeners.add(listener);
-        if (scraper != null) {
-            scraper.addRuntimeListener(listener);
-        }
+        listenerAdapter.add(listener);
     }
 
     @Override
     @Deprecated
     public void removeRuntimeListener(final ScraperRuntimeListener listener) {
-        listeners.remove(listener);
-        if (scraper != null) {
-            scraper.removeRuntimeListener(listener);
-        }
+        listenerAdapter.remove(listener);
     }
 
     @Override

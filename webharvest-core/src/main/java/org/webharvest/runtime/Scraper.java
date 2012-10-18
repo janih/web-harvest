@@ -50,8 +50,13 @@ import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.deprecated.runtime.ScraperContext10;
+import org.webharvest.events.ProcessorStartEvent;
+import org.webharvest.events.ProcessorStopEvent;
+import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
+import org.webharvest.events.ScraperExecutionPausedEvent;
+import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.Processor;
@@ -105,8 +110,6 @@ public class Scraper implements WebScraper {
 
     // params that are proceeded to calling function
     private transient Map<String, Variable> functionParams = new HashMap<String, Variable>();
-
-    private List<ScraperRuntimeListener> scraperRuntimeListeners = new LinkedList<ScraperRuntimeListener>();
 
     private volatile int status = STATUS_READY;
 
@@ -175,9 +178,7 @@ public class Scraper implements WebScraper {
         this.setStatus(STATUS_RUNNING);
 
         // inform al listeners that execution is just about to start
-        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-            listener.onExecutionStart(this);
-        }
+        eventBus.post(new ScraperExecutionStartEvent(this));
 
         try {
             for (IElementDef elementDef : ops) {
@@ -204,9 +205,6 @@ public class Scraper implements WebScraper {
         }
 
         // inform al listeners that execution is finished
-        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-            listener.onExecutionEnd(this);
-        }
         eventBus.post(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {
@@ -296,9 +294,7 @@ public class Scraper implements WebScraper {
 
     public void setExecutingProcessor(Processor processor) {
         runningProcessors.push(processor);
-        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-            listener.onNewProcessorExecution(this, processor);
-        }
+        eventBus.post(new ProcessorStartEvent(this, processor));
     }
 
     public void finishExecutingProcessor() {
@@ -306,17 +302,7 @@ public class Scraper implements WebScraper {
     }
 
     public void processorFinishedExecution(final Processor processor, Map properties) {
-        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-            listener.onProcessorExecutionFinished(this, processor, properties);
-        }
-    }
-
-    public void addRuntimeListener(ScraperRuntimeListener listener) {
-        this.scraperRuntimeListeners.add(listener);
-    }
-
-    public void removeRuntimeListener(ScraperRuntimeListener listener) {
-        this.scraperRuntimeListeners.remove(listener);
+        eventBus.post(new ProcessorStopEvent(this, processor, properties));
     }
 
     public synchronized int getStatus() {
@@ -345,9 +331,7 @@ public class Scraper implements WebScraper {
             setStatus(STATUS_PAUSED);
 
             // inform al listeners that execution is paused
-            for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-                listener.onExecutionPaused(this);
-            }
+            eventBus.post(new ScraperExecutionPausedEvent(this));
         }
     }
 
@@ -356,9 +340,7 @@ public class Scraper implements WebScraper {
             setStatus(STATUS_RUNNING);
 
             // inform al listeners that execution is continued
-            for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-                listener.onExecutionContinued(this);
-            }
+            eventBus.post(new ScraperExecutionContinuedEvent(this));
         }
     }
 
@@ -369,9 +351,6 @@ public class Scraper implements WebScraper {
         setStatus(STATUS_ERROR);
 
         // inform al listeners that execution is continued
-        for (ScraperRuntimeListener listener : scraperRuntimeListeners) {
-            listener.onExecutionError(this, e);
-        }
         eventBus.post(new ScraperExecutionErrorEvent(this, e));
     }
 

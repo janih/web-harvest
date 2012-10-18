@@ -13,18 +13,18 @@ import org.webharvest.runtime.processors.Processor;
  */
 public interface ScraperRuntimeListener {
 
-    public void onExecutionStart(Scraper scraper);
+    public void onExecutionStart(WebScraper scraper);
 
-    public void onExecutionPaused(Scraper scraper);
+    public void onExecutionPaused(WebScraper scraper);
 
-    public void onExecutionContinued(Scraper scraper);
+    public void onExecutionContinued(WebScraper scraper);
 
-    public void onNewProcessorExecution(Scraper scraper, Processor processor);
+    public void onNewProcessorExecution(WebScraper scraper, Processor processor);
 
-    public void onExecutionEnd(Scraper scraper);
+    public void onExecutionEnd(WebScraper scraper);
 
-    public void onProcessorExecutionFinished(Scraper scraper, Processor processor, Map properties);
+    public void onProcessorExecutionFinished(WebScraper scraper, Processor processor, Map properties);
 
-    public void onExecutionError(Scraper scraper, Exception e);
+    public void onExecutionError(WebScraper scraper, Exception e);
 
 }

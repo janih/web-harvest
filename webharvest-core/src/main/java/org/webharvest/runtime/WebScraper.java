@@ -1,7 +1,6 @@
 package org.webharvest.runtime;
 
 import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.web.HttpClientManager;
 
 // TODO Missing documentation
@@ -26,12 +25,6 @@ public interface WebScraper {
     HttpClientManager getHttpClientManager();
 
     @Deprecated
-    void addRuntimeListener(ScraperRuntimeListener listener);
-
-    @Deprecated
-    void removeRuntimeListener(ScraperRuntimeListener listener);
-
-    @Deprecated
     void informListenersAboutError(Exception e);
 
     @Deprecated
@@ -39,5 +32,8 @@ public interface WebScraper {
 
     @Deprecated
     void pauseExecution();
+
+    @Deprecated
+    String getMessage();
 
 }

@@ -588,7 +588,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
      * {@inheritDoc}
      */
     @Override
-    public void onNewProcessorExecution(Scraper scraper, Processor processor) {
+    public void onNewProcessorExecution(WebScraper scraper, Processor processor) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
@@ -609,7 +609,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onExecutionStart(Scraper scraper) {
+    public void onExecutionStart(WebScraper scraper) {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
@@ -617,18 +617,18 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         this.ide.updateGUI();
     }
 
-    public void onExecutionContinued(Scraper scraper) {
+    public void onExecutionContinued(WebScraper scraper) {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
         this.ide.updateGUI();
     }
 
-    public void onExecutionPaused(Scraper scraper) {
+    public void onExecutionPaused(WebScraper scraper) {
         this.ide.updateGUI();
     }
 
-    public void onExecutionEnd(Scraper scraper) {
+    public void onExecutionEnd(WebScraper scraper) {
         final Settings settings = ide.getSettings();
         if (settings.isDynamicConfigLocate()) {
             this.xmlPane.setEditable(true);
@@ -683,7 +683,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
      * {@inheritDoc}
      */
     @Override
-    public void onProcessorExecutionFinished(Scraper scraper, Processor processor, Map properties) {
+    public void onProcessorExecutionFinished(WebScraper scraper, Processor processor, Map properties) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
@@ -706,7 +706,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onExecutionError(Scraper scraper, Exception e) {
+    public void onExecutionError(WebScraper scraper, Exception e) {
         final Settings settings = ide.getSettings();
         if (settings.isDynamicConfigLocate()) {
             this.xmlPane.setEditable(true);
@@ -757,7 +757,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
     public void runConfiguration() {
         if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
-            synchronized (this.harvester) {
+            synchronized (this.harvester.getScraper()) {
                 this.harvester.getScraper().notifyAll();
             }
 

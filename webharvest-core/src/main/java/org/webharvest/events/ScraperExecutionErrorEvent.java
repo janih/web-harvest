@@ -34,6 +34,7 @@
 package org.webharvest.events;
 
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.WebScraper;
 
 /**
  * Event informing that during the execution of {@link Scraper} some exception
@@ -46,31 +47,31 @@ import org.webharvest.runtime.Scraper;
  */
 public final class ScraperExecutionErrorEvent {
 
-    private final Scraper scraper;
+    private final WebScraper scraper;
 
     private final Exception exception;
 
     /**
-     * Event constructor accepting reference to {@link Scraper} being executed
+     * Event constructor accepting reference to {@link WebScraper} being executed
      * and {@link Exception} which occurred during the execution.
      *
      * @param scraper
-     *            reference to {@link Scraper} being executed
+     *            reference to {@link WebScraper} being executed
      * @param exception
      *            reference to the {@link Exception} occurred
      */
-    public ScraperExecutionErrorEvent(final Scraper scraper,
+    public ScraperExecutionErrorEvent(final WebScraper scraper,
             final Exception exception) {
         this.scraper = scraper;
         this.exception = exception;
     }
 
     /**
-     * Returns instance of {@link Scraper} which execution caused exception.
+     * Returns instance of {@link WebScraper} which execution caused exception.
      *
-     * @return reference to {@link Scraper}
+     * @return reference to {@link WebScraper}
      */
-    public Scraper getScraper() {
+    public WebScraper getScraper() {
         return this.scraper;
     }
 
