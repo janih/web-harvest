@@ -40,8 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.WebScraper;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -49,11 +49,16 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
+import com.google.inject.Inject;
+
 /**
  * Simple templater - replaces ${expression} sequences in string with evaluated expressions.
  * Specified script engine is used for evaluation.
  */
 public class BaseTemplater {
+
+    @Inject
+    public static ScriptEngineFactory scriptEngineFactory;
 
     public static String VAR_START = "${";
     public static String VAR_END = "}";
@@ -87,7 +92,7 @@ public class BaseTemplater {
                 final ScriptSource scriptSource = new ScriptSource(
                         source.substring(startIndex + VAR_START.length(),
                                 endIndex), language);
-                final Object resultObj = scraper.getScriptEngineFactory().
+                final Object resultObj = scriptEngineFactory.
                         getEngine(scriptSource).
                         evaluate(scraper.getContext(), scriptSource);
 

@@ -45,24 +45,24 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
 
 @SuppressWarnings({"unchecked"})
-public class SetVarPluginTest extends UnitilsTestNG {
+public class SetVarPluginTest extends UnitilsTestNGExtension {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
-
         context = new ScraperContext();
         scraperMock.returns(context).getContext();
     }
@@ -118,4 +118,13 @@ public class SetVarPluginTest extends UnitilsTestNG {
                 new NodeVariable("new"),
                 context.getVar("x"));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ScriptEngineFactory getScriptEngineFactory() {
+        return new JSRScriptEngineFactory(ScriptingLanguage.GROOVY);
+    }
+
 }

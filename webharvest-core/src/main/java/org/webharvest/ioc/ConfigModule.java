@@ -7,9 +7,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
+import org.webharvest.runtime.templaters.BaseTemplater;
 import org.xml.sax.InputSource;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 // TODO Add javadoc
@@ -44,9 +50,33 @@ public final class ConfigModule extends AbstractModule {
      */
     @Override
     protected void configure() {
-        bind(InputSource.class).annotatedWith(ConfigSource.class).
-            toInstance(config);
+        bind(InputSource.class).annotatedWith(ConfigSource.class).toInstance(
+                config);
         bind(ScraperConfiguration.class).in(Singleton.class);
+        bind(ScriptEngineFactory.class).to(JSRScriptEngineFactory.class).in(
+                Singleton.class);
+
+        // FIXME: This is a dirty trick replacing in InjectorHelper
+        // ScraperModule's injector by injector for ConfigModule which is a
+        // child module.
+        requestStaticInjection(InjectorHelper.class);
+
+        requestStaticInjection(BaseTemplater.class);
+    }
+
+    /**
+     * Provides {@link ScriptingLanguage} obtained from current
+     * {@link ScraperConfiguration}.
+     *
+     * @param configuration
+     *            current {@link ScraperConfiguration}
+     * @return {@link ScriptingLanguage} obtained from given configuration
+     */
+    @Provides
+    @Inject
+    public ScriptingLanguage getScriptingLanguage(
+            final ScraperConfiguration configuration) {
+        return configuration.getScriptingLanguage();
     }
 
 }

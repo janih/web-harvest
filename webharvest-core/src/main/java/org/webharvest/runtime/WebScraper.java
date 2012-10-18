@@ -20,9 +20,6 @@ public interface WebScraper {
     ScraperConfiguration getConfiguration();
 
     @Deprecated
-    ScriptEngineFactory getScriptEngineFactory();
-
-    @Deprecated
     void setDebug(boolean debug);
 
     @Deprecated

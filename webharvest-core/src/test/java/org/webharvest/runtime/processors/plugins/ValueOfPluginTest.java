@@ -49,9 +49,11 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.ListVariable;
@@ -59,7 +61,7 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.utils.KeyValuePair;
 
 @SuppressWarnings({"unchecked"})
-public class ValueOfPluginTest extends UnitilsTestNG {
+public class ValueOfPluginTest extends UnitilsTestNGExtension {
 
     Mock<ScraperContext> contextMock;
     Mock<Scraper> scraperMock;
@@ -67,7 +69,6 @@ public class ValueOfPluginTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test
@@ -96,5 +97,10 @@ public class ValueOfPluginTest extends UnitilsTestNG {
                 XmlNodeTestUtils.createXmlNode("<value-of expr='${list}'/>",
                 XmlNodeTestUtils.NAMESPACE_21),
                 ValueOfPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
+    }
+
+    @Override
+    protected ScriptEngineFactory getScriptEngineFactory() {
+        return new JSRScriptEngineFactory(ScriptingLanguage.GROOVY);
     }
 }

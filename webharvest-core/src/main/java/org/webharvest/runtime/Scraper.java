@@ -57,8 +57,6 @@ import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
-import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -94,7 +92,6 @@ public class Scraper implements WebScraper {
     private ScraperConfiguration configuration;
     private String workingDir;
     private final DynamicScopeContext context;
-    private ScriptEngineFactory scriptEngineFactory;
 
     // FIXME: [pdyraga] It would be neat to decouple Scraper from
     // ConnectionFactory. In order to achieve it, we need scoped dependency
@@ -144,9 +141,6 @@ public class Scraper implements WebScraper {
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
                 ? new ScraperContext10("sys", "http")
                 : new ScraperContext();
-
-        this.scriptEngineFactory = new JSRScriptEngineFactory(
-                configuration.getScriptingLanguage());
     }
 
     @PostConstruct
@@ -401,10 +395,6 @@ public class Scraper implements WebScraper {
             listener.onExecutionError(this, e);
         }
         eventBus.post(new ScraperExecutionErrorEvent(this, e));
-    }
-
-    public ScriptEngineFactory getScriptEngineFactory() {
-        return scriptEngineFactory;
     }
 
 }

@@ -45,17 +45,20 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 
 @SuppressWarnings({"unchecked"})
-public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
+public class DefVarPlugin_defaultValueHandlingTest
+        extends UnitilsTestNGExtension {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
@@ -64,7 +67,6 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
     public void before() {
         context = new ScraperContext();
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test
@@ -188,4 +190,11 @@ public class DefVarPlugin_defaultValueHandlingTest extends UnitilsTestNG {
         assertReflectionEquals(new NodeVariable("default value"), context.getVar("x"));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ScriptEngineFactory getScriptEngineFactory() {
+        return new JSRScriptEngineFactory(ScriptingLanguage.GROOVY);
+    }
 }

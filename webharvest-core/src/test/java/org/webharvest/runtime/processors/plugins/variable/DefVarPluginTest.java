@@ -43,18 +43,19 @@ import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPl
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.NodeVariable;
 
 @SuppressWarnings({"unchecked"})
-public class DefVarPluginTest extends UnitilsTestNG {
+public class DefVarPluginTest extends UnitilsTestNGExtension {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
@@ -64,7 +65,6 @@ public class DefVarPluginTest extends UnitilsTestNG {
         context = new ScraperContext();
 
         scraperMock.returns(context).getContext();
-        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test
@@ -107,5 +107,13 @@ public class DefVarPluginTest extends UnitilsTestNG {
                 "<def var='x' value='actual'>ignored</def>", XmlNodeTestUtils.NAMESPACE_21),
                 DefVarPlugin.class).executePlugin(scraperMock.getMock(), context);
         assertReflectionEquals(new NodeVariable("actual"), context.getVar("x"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ScriptEngineFactory getScriptEngineFactory() {
+        return new JSRScriptEngineFactory(ScriptingLanguage.GROOVY);
     }
 }

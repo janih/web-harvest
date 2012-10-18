@@ -42,8 +42,8 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -57,8 +57,7 @@ import org.webharvest.runtime.variables.Variable;
  * Date: Sep 17, 2010
  * Time: 10:05:46 AM
  */
-
-public class VarDefProcessorTest extends UnitilsTestNG {
+public class VarDefProcessorTest extends UnitilsTestNGExtension {
 
     Mock<Scraper> scraperMock;
 

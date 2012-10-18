@@ -45,11 +45,14 @@ import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+
+import com.google.inject.Inject;
 
 /**
  * Script processor - executes script defined in the body.
@@ -61,6 +64,9 @@ import org.webharvest.utils.CommonUtil;
 @Definition(value = "script", validAttributes = { "id", "language", "return" },
         definitionClass = ScriptDef.class)
 public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
+
+    @Inject
+    private ScriptEngineFactory scriptEngineFactory;
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
@@ -75,7 +81,7 @@ public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
                 ScriptingLanguage.recognize(BaseTemplater.evaluateToString(
                         elementDef.getLanguage(), null, scraper)));
 
-        return CommonUtil.createVariable(scraper.getScriptEngineFactory()
+        return CommonUtil.createVariable(scriptEngineFactory
                 .getEngine(scriptSource).evaluate(context, scriptSource));
     }
 

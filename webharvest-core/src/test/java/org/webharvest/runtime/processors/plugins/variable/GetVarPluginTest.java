@@ -47,10 +47,12 @@ import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -58,7 +60,7 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
-public class GetVarPluginTest extends UnitilsTestNG {
+public class GetVarPluginTest extends UnitilsTestNGExtension {
 
     Mock<ScraperContext> contextMock;
     Mock<Scraper> scraperMock;
@@ -66,7 +68,6 @@ public class GetVarPluginTest extends UnitilsTestNG {
     @BeforeMethod
     public void before() {
         scraperMock.returns(contextMock.getMock()).getContext();
-        scraperMock.returns(new JSRScriptEngineFactory(ScriptingLanguage.GROOVY)).getScriptEngineFactory();
     }
 
     @Test
@@ -116,6 +117,14 @@ public class GetVarPluginTest extends UnitilsTestNG {
     public void testExecutePlugin_notDefined() throws Exception {
         createPlugin(XmlNodeTestUtils.createXmlNode("<get var='not defined'/>",
                 XmlNodeTestUtils.NAMESPACE_21), GetVarPlugin.class).executePlugin(null, contextMock.getMock());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ScriptEngineFactory getScriptEngineFactory() {
+        return new JSRScriptEngineFactory(ScriptingLanguage.GROOVY);
     }
 
 }

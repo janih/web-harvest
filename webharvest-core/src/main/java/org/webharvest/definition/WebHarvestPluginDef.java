@@ -3,6 +3,7 @@ package org.webharvest.definition;
 import java.util.Map;
 
 import org.webharvest.exception.PluginException;
+import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 
@@ -41,6 +42,11 @@ public class WebHarvestPluginDef extends AbstractElementDef {
             try {
                 AbstractProcessor plugin = pluginClass.newInstance();
                 plugin.setElementDef(this);
+
+                //FIXME: This a temporary solution which is not neat, but
+                //helps with plugin's dependency injection (using Guice).
+                InjectorHelper.getInjector().injectMembers(plugin);
+
                 return plugin;
             } catch (InstantiationException e) {
                 throw new PluginException(e);

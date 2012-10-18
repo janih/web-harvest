@@ -44,6 +44,8 @@ import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 
+import com.google.inject.Inject;
+
 /**
  * {@link ScriptEngineFactory} implementation that creates script engines based
  * on JSR-223 specification. Under the hood, factory uses
@@ -75,6 +77,7 @@ public final class JSRScriptEngineFactory implements ScriptEngineFactory {
      * @param defaultLanguage
      *            default {@link ScriptingLanguage}; must not be {@code null}
      */
+    @Inject
     public JSRScriptEngineFactory(final ScriptingLanguage defaultLanguage) {
         if (defaultLanguage == null) {
             throw new IllegalArgumentException(

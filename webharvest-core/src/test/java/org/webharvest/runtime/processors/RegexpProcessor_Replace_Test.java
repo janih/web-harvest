@@ -43,6 +43,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -54,7 +55,7 @@ import org.webharvest.runtime.ScraperContext;
  * Time: 10:53:40 PM
  */
 
-public class RegexpProcessor_Replace_Test extends UnitilsTestNG {
+public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
