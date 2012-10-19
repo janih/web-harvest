@@ -60,7 +60,8 @@ import org.webharvest.runtime.variables.Variable;
 public class ReturnProcessor extends AbstractProcessor<ReturnDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        CallProcessor callProcessor = scraper.getRunningFunction();
+        CallProcessor callProcessor =
+            scraper.getRunningProcessorOfType(CallProcessor.class);
 
         if (callProcessor != null) {
             Variable returnValue = new BodyProcessor.Builder(elementDef).

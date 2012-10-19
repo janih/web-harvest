@@ -38,6 +38,7 @@ package org.webharvest.runtime.processors;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -71,9 +72,11 @@ import com.google.inject.Inject;
         requiredAttributes = "name", definitionClass = CallDef.class)
 public class CallProcessor extends AbstractProcessor<CallDef> {
 
-	@Inject
-	private ScraperConfiguration configuration;
-	
+    @Inject
+    private ScraperConfiguration configuration;
+
+    private Map<String, Variable> functionParams =
+        new HashMap<String, Variable>();
     private Variable functionResult = new NodeVariable("");
 
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
@@ -86,8 +89,6 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
             throw new FunctionException("Function \"" + functionName + "\" is undefined!");
         }
 
-        scraper.clearFunctionParams();
-
         // executes body of call processor
         new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
 
@@ -95,21 +96,14 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
 
             @Override
             public Object call() throws InterruptedException {
-                for (Map.Entry<String, Variable> entry : scraper.getFunctionParams().entrySet()) {
+                for (Map.Entry<String, Variable> entry : functionParams.entrySet()) {
                     context.setLocalVar(entry.getKey(), entry.getValue());
                 }
 
-                // adds this runtime info to the running functions stack
-                scraper.addRunningFunction(CallProcessor.this);
-                try {
-                    // executes body of function using new context
-                    new BodyProcessor.Builder(functionDef).build().
-                        execute(scraper, context);
-                    return null;
-                } finally {
-                    // remove running function from the stack
-                    scraper.removeRunningFunction();
-                }
+                // executes body of function using new context
+                new BodyProcessor.Builder(functionDef).build().
+                    execute(scraper, context);
+                return null;
             }
         });
 
@@ -132,6 +126,18 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
 
     public void setFunctionResult(Variable result) {
         this.functionResult = result;
+    }
+
+    /**
+     * Adds parameter of function which is going to call.
+     *
+     * @param name
+     *            name of the parameter
+     * @param value
+     *            value of the parameter
+     */
+    public void addFunctionParam(final String name, final Variable value) {
+        functionParams.put(name, value);
     }
 
 }

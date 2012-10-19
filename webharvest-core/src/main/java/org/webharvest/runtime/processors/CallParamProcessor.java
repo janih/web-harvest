@@ -64,7 +64,10 @@ public class CallParamProcessor extends AbstractProcessor<CallParamDef> {
         Variable variable = new BodyProcessor.Builder(elementDef).build().
             execute(scraper, context);
 
-        scraper.addFunctionParam(name, variable);
+        final CallProcessor parentProcessor =
+            scraper.getRunningProcessorOfType(CallProcessor.class);
+        parentProcessor.addFunctionParam(name, variable);
+
         this.setProperty("Name", name);
 
         return variable;

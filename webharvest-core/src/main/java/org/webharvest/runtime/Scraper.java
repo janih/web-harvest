@@ -57,7 +57,6 @@ import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.ioc.WorkingDir;
-import org.webharvest.runtime.processors.CallProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -103,12 +102,6 @@ public class Scraper implements WebScraper {
 
     // stack of running processors
     private transient Stack<Processor> runningProcessors = new Stack<Processor>();
-
-    // stack of running functions
-    private transient Stack<CallProcessor> runningFunctions = new Stack<CallProcessor>();
-
-    // params that are proceeded to calling function
-    private transient Map<String, Variable> functionParams = new HashMap<String, Variable>();
 
     private volatile int status = STATUS_READY;
 
@@ -190,30 +183,6 @@ public class Scraper implements WebScraper {
 
     public String getWorkingDir() {
         return this.workingDir;
-    }
-
-    public void addRunningFunction(CallProcessor callProcessor) {
-        runningFunctions.push(callProcessor);
-    }
-
-    public CallProcessor getRunningFunction() {
-        return runningFunctions.isEmpty() ? null : runningFunctions.peek();
-    }
-
-    public void removeRunningFunction() {
-        runningFunctions.pop();
-    }
-
-    public void addFunctionParam(String name, Variable value) {
-        this.functionParams.put(name, value);
-    }
-
-    public Map<String, Variable> getFunctionParams() {
-        return functionParams;
-    }
-
-    public void clearFunctionParams() {
-        this.functionParams.clear();
     }
 
     public int getRunningLevel() {
