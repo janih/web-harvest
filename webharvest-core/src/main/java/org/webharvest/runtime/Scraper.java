@@ -240,7 +240,14 @@ public class Scraper implements WebScraper {
         ListIterator<Processor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
         while (listIterator.hasPrevious()) {
             final Processor< ? > curr = listIterator.previous();
-            if (processorClazz.equals(curr.getClass())) {
+            //Verifies that processor class which is looked for equals class or
+            //super class of running processor. It is a temporary solution which
+            //allows to find instance of processor when given class is for
+            //example an abstract.
+            //TODO: Refactor whole logic of this method, because now it looks a
+            //little bit ugly.
+            if (processorClazz.equals(curr.getClass())
+                    || processorClazz.equals(curr.getClass().getSuperclass())) {
                 return processorClazz.cast(curr);
             }
         }
