@@ -234,7 +234,7 @@ public class Scraper implements WebScraper {
      * @return Parent running processor in the tree of specified class, or null
      *         if it doesn't exist.
      */
-    public final <T extends Processor< ? >> T getRunningProcessorOfType(
+    public <T extends Processor< ? >> T getRunningProcessorOfType(
             final Class<T> processorClazz) {
         List<Processor> runningProcessorList = runningProcessors.getList();
         ListIterator<Processor> listIterator = runningProcessorList.listIterator(runningProcessors.size());

@@ -368,6 +368,9 @@ public class HttpClientManager {
         return httpInfo;
     }
 
+    public HttpClient getHttpClient() {
+        return client;
+    }
 
     // ProxySettings class and its inner Builder class encapsulates logic
     // previously distributed across entire application;
