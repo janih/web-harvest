@@ -192,11 +192,6 @@ public class Scraper implements WebScraper {
         return this.workingDir;
     }
 
-    @Deprecated
-    public HttpClientManager getHttpClientManager() {
-        return httpClientManager.get();
-    }
-
     public void addRunningFunction(CallProcessor callProcessor) {
         runningFunctions.push(callProcessor);
     }

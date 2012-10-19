@@ -89,6 +89,9 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
     @Inject
     private ScraperConfiguration configuration;
 
+    @Inject
+    private HttpClientManager httpClientManager;
+
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
 
@@ -136,14 +139,13 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         final Variable bodyContent = new BodyProcessor.Builder(elementDef)
                 .build().execute(scraper, context);
 
-        HttpClientManager manager = scraper.getHttpClientManager();
-        manager.setCookiePolicy(cookiePolicy);
+        httpClientManager.setCookiePolicy(cookiePolicy);
 
         LOG.info("Executing method {}...", method);
 
         HttpResponseWrapper res = null;
         try {
-            res = manager.execute(method, followRedirects, contentType,
+            res = httpClientManager.execute(method, followRedirects, contentType,
                     encodedUrl, charset, username, password, bodyContent,
                     httpParams, httpHeaderMap, retryAttempts, retryDelay,
                     retryDelayFactor);

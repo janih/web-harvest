@@ -1,6 +1,5 @@
 package org.webharvest.runtime;
 
-import org.webharvest.runtime.web.HttpClientManager;
 
 // TODO Missing documentation
 public interface WebScraper {
@@ -18,9 +17,6 @@ public interface WebScraper {
     void setDebug(boolean debug);
 
     @Deprecated
-    HttpClientManager getHttpClientManager();
-
-    @Deprecated
     void informListenersAboutError(Exception e);
 
     @Deprecated
@@ -31,5 +27,4 @@ public interface WebScraper {
 
     @Deprecated
     String getMessage();
-
 }
