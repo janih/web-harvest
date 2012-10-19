@@ -35,6 +35,7 @@ package org.webharvest.ioc;
 
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.JNDIConnectionFactory;
+import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
@@ -61,13 +62,14 @@ public final class EnterpriseModule implements Module {
     // TODO Add unit test
     // FIXME rbala I'm not convinced this is good idea
     public EnterpriseModule(final String workingDir) {
-        this(new ScraperModule(workingDir));
+        this(new ScraperModule(workingDir),
+            new HttpModule(ProxySettings.NO_PROXY_SET));
     }
 
     // TODO Add documentation
     // TODO Add unit test
     // FIXME rbala I'm not convinced this is good idea
-    private EnterpriseModule(final Module module) {
+    private EnterpriseModule(final Module... module) {
         this.module = Modules.override(module).with(new AbstractModule() {
             @Override
             protected void configure() {
