@@ -46,6 +46,7 @@ import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.web.HttpClientManager;
+import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.SystemUtilities;
 
@@ -62,7 +63,8 @@ public class ScraperContext10Test extends UnitilsTestNG {
     public void before() {
         context = new ScraperContext10("sys", "http");
 
-        context.setLocalVar("http", new HttpClientManager().getHttpInfo());
+        context.setLocalVar("http", new HttpClientManager(
+                ProxySettings.NO_PROXY_SET).getHttpInfo());
         context.setLocalVar("sys", new SystemUtilities(context));
     }
 

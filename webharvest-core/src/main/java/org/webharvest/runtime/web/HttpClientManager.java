@@ -55,6 +55,8 @@ import org.slf4j.LoggerFactory;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
+import com.google.inject.Inject;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -84,13 +86,16 @@ public class HttpClientManager {
     private final HttpClient client;
     private final HttpInfo httpInfo;
 
-    public HttpClientManager() {
+    @Inject
+    public HttpClientManager(final ProxySettings proxySettings) {
         this.client = new HttpClient();
         this.httpInfo = new HttpInfo(client);
 
         final HttpClientParams clientParams = new HttpClientParams();
         clientParams.setBooleanParameter("http.protocol.allow-circular-redirects", true);
         this.client.setParams(clientParams);
+
+        proxySettings.apply(this.client);
     }
 
     public void setCookiePolicy(String cookiePolicy) {
@@ -111,40 +116,6 @@ public class HttpClientManager {
         } else {
             client.getParams().setCookiePolicy(cookiePolicy);
         }
-    }
-
-    /**
-     * Defines HTTP proxy for the client with specified host and port
-     *
-     * @param hostName
-     * @param hostPort
-     */
-    public void setHttpProxy(String hostName, int hostPort) {
-        client.getHostConfiguration().setProxyHost(new ProxyHost(hostName, hostPort));
-    }
-
-    /**
-     * Defines HTTP proxy for the client with specified host
-     *
-     * @param hostName
-     */
-    public void setHttpProxy(String hostName) {
-        client.getHostConfiguration().setProxyHost(new ProxyHost(hostName));
-    }
-
-
-    /**
-     * Defines user credentials for the HTTP proxy server
-     *
-     * @param username
-     * @param password
-     */
-    public void setHttpProxyCredentials(String username, String password, String host, String domain) {
-        Credentials credentials =
-                (host == null || domain == null || "".equals(host.trim()) || "".equals(domain.trim())) ?
-                        new UsernamePasswordCredentials(username, password) :
-                        new NTCredentials(username, password, host, domain);
-        client.getState().setProxyCredentials(AuthScope.ANY, credentials);
     }
 
     public HttpResponseWrapper execute(
@@ -393,12 +364,103 @@ public class HttpClientManager {
         return method;
     }
 
-    public HttpClient getHttpClient() {
-        return client;
-    }
-
     public HttpInfo getHttpInfo() {
         return httpInfo;
     }
 
+
+    // ProxySettings class and its inner Builder class encapsulates logic
+    // previously distributed across entire application;
+    // Now, we have one class responsible for performing proxy configuration
+    // - it's still too complex, but far better than the previous approach,
+    // when proxy configuration logic was shared between HttpClientManager,
+    // CommandLine or ConfigPanel...
+    public static final class ProxySettings {
+
+        public static final ProxySettings NO_PROXY_SET =
+            new ProxySettings(null);
+
+        private final ProxyHost proxyHost;
+        private Credentials proxyCredentials;
+
+        private ProxySettings(final ProxyHost proxyHost) {
+            this.proxyHost = proxyHost;
+        }
+
+        private void setProxyCredentials(final Credentials credentials) {
+            this.proxyCredentials = credentials;
+        }
+
+        void apply(final HttpClient httpClient) {
+            if (this == NO_PROXY_SET) {
+                return;
+            }
+            httpClient.getHostConfiguration().setProxyHost(proxyHost);
+            httpClient.getState().setProxyCredentials(AuthScope.ANY,
+                    this.proxyCredentials);
+        }
+
+        public static final class Builder {
+            private final String proxyHost;
+            private int proxyPort = -1;
+
+            // proxy credentials
+            private String proxyUsername;
+            private String proxyPassword;
+            private String proxyNTHost;
+            private String proxyNTDomain;
+
+            public Builder(final String proxyHost) {
+                if (proxyHost == null || "".equals(proxyHost)) {
+                    throw new IllegalArgumentException(
+                            "Proxy host is required");
+                }
+                this.proxyHost = proxyHost;
+            }
+
+            public Builder setProxyPort(int proxyPort) {
+                this.proxyPort = proxyPort;
+                return this;
+            }
+
+            public Builder setProxyCredentialsUsername(final String username) {
+                this.proxyUsername = username;
+                return this;
+            }
+
+            public Builder setProxyCredentialsPassword(final String password) {
+                this.proxyPassword = password;
+                return this;
+            }
+
+            public Builder setProxyCredentialsNTHost(final String proxyNTHost) {
+                this.proxyNTHost = proxyNTHost;
+                return this;
+            }
+
+            public Builder setProxyCredentialsNTDomain(
+                    final String proxyNTDomain) {
+                this.proxyNTDomain = proxyNTDomain;
+                return this;
+            }
+
+            public ProxySettings build() {
+                final ProxySettings settings = new ProxySettings(
+                        new ProxyHost(proxyHost, proxyPort));
+
+                if (proxyUsername != null) {
+                    settings.setProxyCredentials(createCredentials());
+                }
+
+                return settings;
+            }
+
+            private Credentials createCredentials() {
+                return (proxyNTHost == null || proxyNTDomain == null
+                        || "".equals(proxyNTHost.trim()) || "".equals(proxyNTDomain.trim())) ?
+                            new UsernamePasswordCredentials(proxyUsername, proxyPassword) :
+                            new NTCredentials(proxyUsername, proxyPassword, proxyNTHost, proxyNTDomain);
+            }
+        }
+    }
 }

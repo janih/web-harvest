@@ -95,6 +95,7 @@ import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
+import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -102,6 +103,7 @@ import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager;
+import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.xml.sax.InputSource;
 
 import com.google.common.eventbus.Subscribe;
@@ -220,8 +222,6 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     private JMenuItem logSelectAllMenuItem;
     private JMenuItem logClearAllMenuItem;
 
-    private final Harvest harvest;
-
     private Harvester harvester;
 
     /**
@@ -233,92 +233,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     public ConfigPanel(final Ide ide, String name) {
         super(new BorderLayout());
 
-        // FIXME rbala although temporary solution it is duplicated (CommandLine)
-        this.harvest = Guice.createInjector(
-                new ScraperModule(ide.getSettings().getWorkingPath())).
-                    getInstance(Harvest.class);
 
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ScraperExecutionStartEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ScraperExecutionStartEvent event) {
-                ConfigPanel.this.onExecutionStart(event.getScraper());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ScraperExecutionPausedEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ScraperExecutionPausedEvent event) {
-                ConfigPanel.this.onExecutionPaused(event.getScraper());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ScraperExecutionContinuedEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ScraperExecutionContinuedEvent event) {
-                ConfigPanel.this.onExecutionContinued(event.getScraper());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ScraperExecutionEndEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ScraperExecutionEndEvent event) {
-                ConfigPanel.this.onExecutionEnd(event.getScraper());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ScraperExecutionErrorEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ScraperExecutionErrorEvent event) {
-                ConfigPanel.this.onExecutionError(event.getScraper(),
-                        event.getException());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ProcessorStartEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ProcessorStartEvent event) {
-                ConfigPanel.this.onNewProcessorExecution(event.getScraper(),
-                        event.getProcessor());
-            }
-
-        });
-        // TODO rbala Possibly bind with Guice when finally created Swing module
-        harvest.addEventHandler(new EventHandler<ProcessorStopEvent>() {
-
-            @Override
-            @Subscribe
-            // TODO rbala Get rid of @Subscribe annotation
-            public void handle(final ProcessorStopEvent event) {
-                ConfigPanel.this.onProcessorExecutionFinished(
-                        event.getScraper(), event.getProcessor(),
-                        event.getProperties());
-            }
-
-        });
 
         this.ide = ide;
 
@@ -474,6 +389,97 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         }
 
         updateControls();
+    }
+
+    private Harvest createHarvest() {
+        // FIXME rbala although temporary solution it is duplicated (CommandLine)
+        final Harvest harvest = Guice.createInjector(
+                    new ScraperModule(ide.getSettings().getWorkingPath()),
+                    new HttpModule(loadProxySettings()))
+                .getInstance(Harvest.class);
+
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionStartEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionStartEvent event) {
+                ConfigPanel.this.onExecutionStart(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionPausedEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionPausedEvent event) {
+                ConfigPanel.this.onExecutionPaused(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionContinuedEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionContinuedEvent event) {
+                ConfigPanel.this.onExecutionContinued(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionEndEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionEndEvent event) {
+                ConfigPanel.this.onExecutionEnd(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionErrorEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionErrorEvent event) {
+                ConfigPanel.this.onExecutionError(event.getScraper(),
+                        event.getException());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ProcessorStartEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ProcessorStartEvent event) {
+                ConfigPanel.this.onNewProcessorExecution(event.getScraper(),
+                        event.getProcessor());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ProcessorStopEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ProcessorStopEvent event) {
+                ConfigPanel.this.onProcessorExecutionFinished(
+                        event.getScraper(), event.getProcessor(),
+                        event.getProperties());
+            }
+        });
+
+        return harvest;
     }
 
     private ConfigDocument loadConfigDocument(String name) {
@@ -643,7 +649,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     }
 
     private void loadHarvester(final InputSource in) {
-        this.harvester = harvest.getHarvester(in, new HarvestLoadCallback() {
+
+
+        this.harvester = createHarvest().getHarvester(in,
+                new HarvestLoadCallback() {
 
             @Override
             public void onSuccess(final List<IElementDef> elements) {
@@ -847,7 +856,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {
             boolean ok = refreshTree();
             if (ok) {
-                Settings settings = ide.getSettings();
+
 
                 final Harvester.ContextInitCallback callback =
                         new Harvester.ContextInitCallback() {
@@ -859,25 +868,8 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                     }
                 };
 
-                if (settings.isProxyEnabled()) {
-                    HttpClientManager httpClientManager = harvester.getScraper().getHttpClientManager();
 
-                    int proxyPort = settings.getProxyPort();
-                    String proxyServer = settings.getProxyServer();
-                    if (proxyPort > 0) {
-                        httpClientManager.setHttpProxy(proxyServer, proxyPort);
-                    } else {
-                        httpClientManager.setHttpProxy(proxyServer);
-                    }
 
-                    if (settings.isProxyAuthEnabled()) {
-                        String ntlmHost = settings.isNtlmAuthEnabled() ? settings.getNtlmHost() : null;
-                        String ntlmDomain = settings.isNtlmAuthEnabled() ? settings.getNtlmDomain() : null;
-                        httpClientManager.setHttpProxyCredentials(
-                                settings.getProxyUserename(), settings.getProxyPassword(), ntlmHost, ntlmDomain
-                        );
-                    }
-                }
 
                 this.harvester.setDebug(true);
                 this.logTextArea.setText(null);
@@ -888,6 +880,39 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                 new ScraperExecutionThread(this.harvester, callback, this.logTextArea).start();
             }
         }
+    }
+
+    private ProxySettings loadProxySettings() {
+        final Settings settings = ide.getSettings();
+
+        if (!settings.isProxyEnabled()) {
+            return ProxySettings.NO_PROXY_SET;
+        }
+
+        final String proxyServer = settings.getProxyServer();
+        int proxyPort = settings.getProxyPort();
+
+        final ProxySettings.Builder proxySettingsBuilder =
+            new ProxySettings.Builder(proxyServer);
+        if (proxyPort > 0) {
+            proxySettingsBuilder.setProxyPort(proxyPort);
+        }
+
+        if (settings.isProxyAuthEnabled()) {
+            final String ntlmHost = settings.isNtlmAuthEnabled()
+                ? settings.getNtlmHost() : null;
+            final String ntlmDomain = settings.isNtlmAuthEnabled()
+                ? settings.getNtlmDomain() : null;
+
+            proxySettingsBuilder.setProxyCredentialsUsername(
+                    settings.getProxyUserename());
+            proxySettingsBuilder.setProxyCredentialsPassword(
+                    settings.getProxyPassword());
+            proxySettingsBuilder.setProxyCredentialsNTHost(ntlmHost);
+            proxySettingsBuilder.setProxyCredentialsNTDomain(ntlmDomain);
+        }
+
+        return proxySettingsBuilder.build();
     }
 
     public WebScraper getScraper() {

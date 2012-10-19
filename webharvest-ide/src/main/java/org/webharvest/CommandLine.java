@@ -53,12 +53,15 @@ import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
+import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.DefaultDriverManager;
 import org.webharvest.runtime.database.DriverManager;
+import org.webharvest.runtime.web.HttpClientManager;
+import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Guice;
@@ -164,19 +167,19 @@ public class CommandLine {
             final String configLowercase = configFilePath.toLowerCase();
 
             final HarvestLoadCallback callback = new HarvestLoadCallback() {
-
                 @Override
                 public void onSuccess(final List<IElementDef> elements) {
                     // TODO Auto-generated method stub
 
                 }
-
             };
+
+            final ProxySettings proxySettings = parseProxySettings(params);
 
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
             final Harvest harvest = Guice.createInjector(
-                    new ScraperModule(workingDir)).
-                        getInstance(Harvest.class);
+                    new ScraperModule(workingDir), new HttpModule(proxySettings))
+                    .getInstance(Harvest.class);
 
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
             final Harvester harvester = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
@@ -186,25 +189,6 @@ public class CommandLine {
             String isDebug = params.get("debug");
             if (CommonUtil.isBooleanTrue(isDebug)) {
                 harvester.setDebug(true);
-            }
-
-            String proxyHost = params.get("proxyhost");
-            if (proxyHost != null && !"".equals(proxyHost)) {
-                String proxyPort = params.get("proxyport");
-                if (proxyPort != null && !"".equals(proxyPort)) {
-                    int port = Integer.parseInt(proxyPort);
-                    harvester.getScraper().getHttpClientManager().setHttpProxy(proxyHost, port);
-                } else {
-                    harvester.getScraper().getHttpClientManager().setHttpProxy(proxyHost);
-                }
-            }
-
-            String proxyUser = params.get("proxyuser");
-            if (proxyUser != null && !"".equals(proxyUser)) {
-                String proxyPassword = params.get("proxypassword");
-                String proxyNTHost = params.get("proxynthost");
-                String proxyNTDomain = params.get("proxyntdomain");
-                harvester.getScraper().getHttpClientManager().setHttpProxyCredentials(proxyUser, proxyPassword, proxyNTHost, proxyNTDomain);
             }
 
             harvester.execute(new Harvester.ContextInitCallback() {
@@ -228,6 +212,37 @@ public class CommandLine {
             });
 
         }
+    }
+
+    private static ProxySettings parseProxySettings(
+            final Map<String, String> params) {
+         final String proxyHost = params.get("proxyhost");
+         if (proxyHost == null || "".equals(proxyHost)) {
+             return ProxySettings.NO_PROXY_SET;
+         }
+
+         final ProxySettings.Builder proxySettingsBuilder =
+             new ProxySettings.Builder(proxyHost);
+
+         String proxyPort = params.get("proxyport");
+         if (proxyPort != null && !"".equals(proxyPort)) {
+             proxySettingsBuilder.setProxyPort(
+                     Integer.parseInt(proxyPort));
+         }
+
+         String proxyUser = params.get("proxyuser");
+         if (proxyUser != null && !"".equals(proxyUser)) {
+
+             proxySettingsBuilder.setProxyCredentialsUsername(proxyUser);
+             proxySettingsBuilder.setProxyCredentialsPassword(
+                     params.get("proxypassword"));
+             proxySettingsBuilder.setProxyCredentialsNTHost(
+                     params.get("proxynthost"));
+             proxySettingsBuilder.setProxyCredentialsNTDomain(
+                     params.get("proxyntdomain"));
+         }
+
+         return proxySettingsBuilder.build();
     }
 
     private static void parseDatabaseDrivers(final Map<String, String> params) {

@@ -37,7 +37,6 @@
 package org.webharvest.runtime;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -71,6 +70,7 @@ import org.webharvest.utils.SystemUtilities;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -100,7 +100,8 @@ public class Scraper implements WebScraper {
 
     private transient boolean isDebugMode = false;
 
-    private HttpClientManager httpClientManager;
+    @Inject
+    private Provider<HttpClientManager> httpClientManager;
 
     // stack of running processors
     private transient Stack<Processor> runningProcessors = new Stack<Processor>();
@@ -129,8 +130,6 @@ public class Scraper implements WebScraper {
         this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
 
-        this.httpClientManager = new HttpClientManager();
-
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
                 ? new ScraperContext10("sys", "http")
                 : new ScraperContext();
@@ -141,7 +140,7 @@ public class Scraper implements WebScraper {
         this.context.setLocalVar("sys", new ScriptingVariable(
                 new SystemUtilities(context)));
         this.context.setLocalVar("http", new ScriptingVariable(
-                httpClientManager.getHttpInfo()));
+                httpClientManager.get().getHttpInfo()));
     }
 
     // TODO rbala Make it private. Currently used only by IncludeProcessor
@@ -196,8 +195,9 @@ public class Scraper implements WebScraper {
         return this.workingDir;
     }
 
+    @Deprecated
     public HttpClientManager getHttpClientManager() {
-        return httpClientManager;
+        return httpClientManager.get();
     }
 
     public void addRunningFunction(CallProcessor callProcessor) {

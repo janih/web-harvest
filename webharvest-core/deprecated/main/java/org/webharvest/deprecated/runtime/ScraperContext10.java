@@ -158,7 +158,6 @@ public class ScraperContext10 implements DynamicScopeContext {
     private void rewriteSystemVariables(final Map<String, Variable> oldCRT,
             final Map<String, Variable> newCRT) {
         for (String sysVar : this.systemVariables) {
-            System.out.println("REWRITING: " + sysVar);
             newCRT.put(sysVar, oldCRT.get(sysVar));
         }
     }
