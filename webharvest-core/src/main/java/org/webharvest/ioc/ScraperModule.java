@@ -4,9 +4,11 @@ import java.io.File;
 
 import org.webharvest.Harvest;
 import org.webharvest.Harvester;
+import org.webharvest.events.DefaultHandlerHolder;
+import org.webharvest.events.HandlerHolder;
+import org.webharvest.runtime.DefaultHarvest;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScrapingHarvester;
-import org.webharvest.runtime.DefaultHarvest;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
@@ -70,6 +72,8 @@ public final class ScraperModule extends AbstractModule {
         bind(AttributeHolder.class).to(ScopeAttributeHolder.class);
 
         bind(Harvest.class).to(DefaultHarvest.class).in(Singleton.class);
+        bind(HandlerHolder.class).to(DefaultHandlerHolder.class).
+            in(Singleton.class);
 
         install(new FactoryModuleBuilder().
                 implement(WebScraper.class, Scraper.class).

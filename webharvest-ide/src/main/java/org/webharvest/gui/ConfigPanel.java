@@ -84,19 +84,27 @@ import org.webharvest.Harvester;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
+import org.webharvest.events.EventHandler;
+import org.webharvest.events.ProcessorStartEvent;
+import org.webharvest.events.ProcessorStopEvent;
+import org.webharvest.events.ScraperExecutionContinuedEvent;
+import org.webharvest.events.ScraperExecutionEndEvent;
+import org.webharvest.events.ScraperExecutionErrorEvent;
+import org.webharvest.events.ScraperExecutionPausedEvent;
+import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.ScraperRuntimeListener;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.xml.sax.InputSource;
 
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 
 /**
@@ -104,7 +112,7 @@ import com.google.inject.Guice;
  * It is part of multiple-document interface where several such instances may exist at
  * the same time.
  */
-public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeSelectionListener, CaretListener {
+public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretListener {
 
     private static final String VIEW_RESULT_AS_TEXT = "View result as text";
     private static final String VIEW_RESULT_AS_XML = "View result as XML";
@@ -229,6 +237,88 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         this.harvest = Guice.createInjector(
                 new ScraperModule(ide.getSettings().getWorkingPath())).
                     getInstance(Harvest.class);
+
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionStartEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionStartEvent event) {
+                ConfigPanel.this.onExecutionStart(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionPausedEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionPausedEvent event) {
+                ConfigPanel.this.onExecutionPaused(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionContinuedEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionContinuedEvent event) {
+                ConfigPanel.this.onExecutionContinued(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionEndEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionEndEvent event) {
+                ConfigPanel.this.onExecutionEnd(event.getScraper());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionErrorEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionErrorEvent event) {
+                ConfigPanel.this.onExecutionError(event.getScraper(),
+                        event.getException());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ProcessorStartEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ProcessorStartEvent event) {
+                ConfigPanel.this.onNewProcessorExecution(event.getScraper(),
+                        event.getProcessor());
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ProcessorStopEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ProcessorStopEvent event) {
+                ConfigPanel.this.onProcessorExecutionFinished(
+                        event.getScraper(), event.getProcessor(),
+                        event.getProperties());
+            }
+
+        });
 
         this.ide = ide;
 
@@ -584,11 +674,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onNewProcessorExecution(WebScraper scraper, Processor processor) {
+    private void onNewProcessorExecution(WebScraper scraper, Processor processor) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
@@ -609,7 +695,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onExecutionStart(WebScraper scraper) {
+    private void onExecutionStart(WebScraper scraper) {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
@@ -617,18 +703,18 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         this.ide.updateGUI();
     }
 
-    public void onExecutionContinued(WebScraper scraper) {
+    private void onExecutionContinued(WebScraper scraper) {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
         this.ide.updateGUI();
     }
 
-    public void onExecutionPaused(WebScraper scraper) {
+    private void onExecutionPaused(WebScraper scraper) {
         this.ide.updateGUI();
     }
 
-    public void onExecutionEnd(WebScraper scraper) {
+    private void onExecutionEnd(WebScraper scraper) {
         final Settings settings = ide.getSettings();
         if (settings.isDynamicConfigLocate()) {
             this.xmlPane.setEditable(true);
@@ -679,11 +765,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 //        releaseScraper();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onProcessorExecutionFinished(WebScraper scraper, Processor processor, Map properties) {
+    private void onProcessorExecutionFinished(WebScraper scraper, Processor processor, Map properties) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
@@ -706,7 +788,7 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
         }
     }
 
-    public void onExecutionError(WebScraper scraper, Exception e) {
+    private void onExecutionError(WebScraper scraper, Exception e) {
         final Settings settings = ide.getSettings();
         if (settings.isDynamicConfigLocate()) {
             this.xmlPane.setEditable(true);
@@ -799,7 +881,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
 
                 this.harvester.setDebug(true);
                 this.logTextArea.setText(null);
-                this.harvester.addRuntimeListener(this);
 
                 ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
 
@@ -950,7 +1031,6 @@ public class ConfigPanel extends JPanel implements ScraperRuntimeListener, TreeS
             this.configDocument.dispose();
         }
         if (this.harvester != null) {
-            this.harvester.removeRuntimeListener(this);
             this.harvester = null;
         }
 

@@ -3,23 +3,20 @@ package org.webharvest.runtime;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.events.HandlerHolder;
 import org.webharvest.ioc.ConfigDir;
 import org.webharvest.ioc.ConfigModule;
 import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.Scraping;
 import org.xml.sax.InputSource;
 
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -32,18 +29,11 @@ public class ScrapingHarvester implements Harvester {
     private final ScraperConfiguration config;
 
     @Inject
-    private RuntimeListenerAdapter listenerAdapter;
-
-    @Inject
-    private Provider<EventBus> eventBusProvider;
+    private HandlerHolder handlerHolder;
 
     // TODO rbala not needed when we finally get rid of getScraper() method
     @Deprecated
     private WebScraper scraper;
-
-    @Deprecated
-    private List<ScraperRuntimeListener> listeners =
-            new LinkedList<ScraperRuntimeListener>();
 
     @Deprecated
     boolean debug;
@@ -106,17 +96,13 @@ public class ScrapingHarvester implements Harvester {
     @Override
     @Scraping
     public DynamicScopeContext execute(final ContextInitCallback callback) {
-        final EventBus eventBus = eventBusProvider.get();
-        listenerAdapter.register(eventBus);
-        try {
-            this.scraper = scraperFactory.create(config);
-            callback.onSuccess(scraper.getContext());
-            scraper.execute();
+        handlerHolder.subscribe();
 
-            return scraper.getContext();
-        } finally {
-            listenerAdapter.unregister(eventBus);
-        }
+        this.scraper = scraperFactory.create(config);
+        callback.onSuccess(scraper.getContext());
+        scraper.execute();
+
+        return scraper.getContext();
     }
 
     /**
@@ -127,18 +113,6 @@ public class ScrapingHarvester implements Harvester {
     public WebScraper getScraper() {
         // Return reference to scraper from last call
         return scraper;
-    }
-
-    @Override
-    @Deprecated
-    public void addRuntimeListener(final ScraperRuntimeListener listener) {
-        listenerAdapter.add(listener);
-    }
-
-    @Override
-    @Deprecated
-    public void removeRuntimeListener(final ScraperRuntimeListener listener) {
-        listenerAdapter.remove(listener);
     }
 
     @Override

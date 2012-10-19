@@ -7,6 +7,8 @@ import java.net.URL;
 import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.events.EventHandler;
+import org.webharvest.events.HandlerHolder;
 import org.webharvest.ioc.HarvesterFactory;
 import org.xml.sax.InputSource;
 
@@ -18,11 +20,15 @@ public final class DefaultHarvest implements Harvest {
 
     private final HarvesterFactory harvestFactory;
 
+    private final HandlerHolder handlerHolder;
+
     // TODO Missing documentation
     // TODO Missing unit test
     @Inject
-    public DefaultHarvest(final HarvesterFactory harvestFactory) {
+    public DefaultHarvest(final HarvesterFactory harvestFactory,
+            final HandlerHolder handlerHolder) {
         this.harvestFactory = harvestFactory;
+        this.handlerHolder = handlerHolder;
     }
 
     /**
@@ -53,6 +59,14 @@ public final class DefaultHarvest implements Harvest {
     public Harvester getHarvester(final InputSource config,
             final HarvestLoadCallback callback) {
         return harvestFactory.create(config, callback);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addEventHandler(final EventHandler<?> handler) {
+        handlerHolder.register(handler);
     }
 
 }
