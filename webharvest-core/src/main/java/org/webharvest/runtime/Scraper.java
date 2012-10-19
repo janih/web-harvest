@@ -96,8 +96,6 @@ public class Scraper implements WebScraper {
     private String workingDir;
     private final DynamicScopeContext context;
 
-    private RuntimeConfig runtimeConfig;
-
     private transient boolean isDebugMode = false;
 
     @Inject
@@ -127,7 +125,6 @@ public class Scraper implements WebScraper {
     public Scraper(@Assisted final ScraperConfiguration configuration,
             @WorkingDir final String workingDir) {
         this.configuration = configuration;
-        this.runtimeConfig = new RuntimeConfig();
         this.workingDir = CommonUtil.adaptFilename(workingDir);
 
         this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
@@ -253,10 +250,6 @@ public class Scraper implements WebScraper {
             }
         }
         return null;
-    }
-
-    public RuntimeConfig getRuntimeConfig() {
-        return runtimeConfig;
     }
 
     public void setExecutingProcessor(Processor processor) {

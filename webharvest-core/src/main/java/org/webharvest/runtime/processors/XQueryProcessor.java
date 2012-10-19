@@ -69,6 +69,8 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.XmlUtil;
 
+import com.google.inject.Inject;
+
 /**
  * XQuery processor.
  */
@@ -104,6 +106,8 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
         ALLOWED_PARAM_TYPES.add("string*");
     }
 
+    @Inject
+    private RuntimeConfig runtimeConfig;
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         IElementDef xqueryElementDef = elementDef.getXqDef();
@@ -113,7 +117,6 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
         String xqExpression = xq.toString().trim();
         XQueryExternalParamDef[] externalParamDefs = elementDef.getExternalParamDefs();
 
-        RuntimeConfig runtimeConfig = scraper.getRuntimeConfig();
         final StaticQueryContext sqc = runtimeConfig.getStaticQueryContext();
         final Configuration config = sqc.getConfiguration();
 

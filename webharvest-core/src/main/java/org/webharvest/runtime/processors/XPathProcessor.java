@@ -58,6 +58,8 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.XmlUtil;
 
+import com.google.inject.Inject;
+
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -73,6 +75,9 @@ import java.util.Map;
 @Definition(value = "xpath", validAttributes = { "id", "expression", "v:*" },
         definitionClass = XPathDef.class )
 public class XPathProcessor extends AbstractProcessor<XPathDef> {
+
+    @Inject
+    private RuntimeConfig runtimeConfig;
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         Variable xml = getBodyTextContent(elementDef, scraper, context);
@@ -93,7 +98,6 @@ public class XPathProcessor extends AbstractProcessor<XPathDef> {
         String xpathExpression = null;
 
         try {
-            RuntimeConfig runtimeConfig = scraper.getRuntimeConfig();
             StaticQueryContext sqc = runtimeConfig.getStaticQueryContext();
             Configuration config = sqc.getConfiguration();
 

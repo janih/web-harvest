@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
@@ -62,6 +63,8 @@ public final class ConfigModule extends AbstractModule {
         requestStaticInjection(InjectorHelper.class);
 
         requestStaticInjection(BaseTemplater.class);
+
+        bind(RuntimeConfig.class).in(Singleton.class);
     }
 
     /**
