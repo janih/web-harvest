@@ -139,7 +139,7 @@ public class Scraper implements WebScraper {
     @PostConstruct
     public void initContext() {
         this.context.setLocalVar("sys", new ScriptingVariable(
-                new SystemUtilities(this)));
+                new SystemUtilities(context)));
         this.context.setLocalVar("http", new ScriptingVariable(
                 httpClientManager.getHttpInfo()));
     }

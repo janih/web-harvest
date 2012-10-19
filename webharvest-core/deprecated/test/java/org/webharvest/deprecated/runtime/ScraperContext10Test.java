@@ -63,7 +63,7 @@ public class ScraperContext10Test extends UnitilsTestNG {
         context = new ScraperContext10("sys", "http");
 
         context.setLocalVar("http", new HttpClientManager().getHttpInfo());
-        context.setLocalVar("sys", new SystemUtilities(scraperMock.getMock()));
+        context.setLocalVar("sys", new SystemUtilities(context));
     }
 
     @Test

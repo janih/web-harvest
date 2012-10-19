@@ -36,12 +36,9 @@
 */
 package org.webharvest.utils;
 
-import net.sf.saxon.trans.XPathException;
 import org.webharvest.exception.BaseException;
-import org.webharvest.exception.ScraperXPathException;
 import org.webharvest.exception.UserException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -63,10 +60,10 @@ public class SystemUtilities {
     public static final Variable apos = new NodeVariable("\'");
     public static final Variable backspace = new NodeVariable("\b");
 
-    private Scraper scraper;
+    private DynamicScopeContext context;
 
-    public SystemUtilities(Scraper scraper) {
-        this.scraper = scraper;
+    public SystemUtilities(DynamicScopeContext context) {
+        this.context = context;
     }
 
     /**
@@ -74,7 +71,7 @@ public class SystemUtilities {
      * @return True if scraper's context contain not-null variable with specified name.
      */
     public boolean isVariableDefined(String varName) {
-        return scraper.getContext().getVar(varName) != null;
+        return context.getVar(varName) != null;
     }
 
     /**
@@ -83,7 +80,7 @@ public class SystemUtilities {
      * @param varName Name of the variable
      */
     public Variable getVar(String varName) {
-        return scraper.getContext().getVar(varName);
+        return context.getVar(varName);
     }
 
     /**
@@ -95,7 +92,6 @@ public class SystemUtilities {
      * @param overwrite
      */
     public void defineVariable(String varName, Object varValue, boolean overwrite) {
-        final DynamicScopeContext context = scraper.getContext();
         if (overwrite || context.getVar(varName) == null) {
             context.setLocalVar(varName, CommonUtil.createVariable(varValue));
         }
@@ -165,38 +161,12 @@ public class SystemUtilities {
     }
 
     /**
-     * Evaluates XPath expression on specified XML
-     *
-     * @param expression
-     * @param xml
-     */
-    public Variable xpath(Object expression, Object xml) {
-        if (expression == null) {
-            throw new ScraperXPathException("XPath expression is null!");
-        }
-
-        if (xml == null) {
-            throw new ScraperXPathException("XML value is null!");
-        }
-
-        try {
-            return XmlUtil.evaluateXPath(expression.toString(), xml.toString(), scraper.getRuntimeConfig());
-        } catch (XPathException e) {
-            throw new ScraperXPathException("Error parsing XPath expression (XPath = [" + expression + "])!", e);
-        }
-    }
-
-    /**
      * @param path
      * @return Filename for the full path
      */
     public String getFilename(String path) {
         int index = Math.max(path.lastIndexOf("\\"), path.lastIndexOf("/"));
         return index >= 0 && index < path.length() - 1 ? path.substring(index + 1) : path;
-    }
-
-    public String getWorkingDir() {
-        return scraper.getWorkingDir();
     }
 
     public void error(String message) {
