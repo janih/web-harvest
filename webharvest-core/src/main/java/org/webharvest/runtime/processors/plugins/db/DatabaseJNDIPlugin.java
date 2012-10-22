@@ -42,6 +42,7 @@ import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Web Harvest plugin supporting database operations within JNDI - enabled
@@ -70,6 +71,7 @@ public final class DatabaseJNDIPlugin extends AbstractDatabasePlugin {
     public static final String JNDI_NAME_ATTRIBUTE = "name";
 
     @Inject
+    @Named("jndi")
     private ConnectionFactory connectionFactory;
 
     /**

@@ -14,6 +14,7 @@ import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Support for database operations.
@@ -25,6 +26,7 @@ import com.google.inject.Inject;
 public final class DatabasePlugin extends AbstractDatabasePlugin {
 
     @Inject
+    @Named("standalone")
     private ConnectionFactory connectionFactory;
 
     /**

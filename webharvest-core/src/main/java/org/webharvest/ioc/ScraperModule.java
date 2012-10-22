@@ -15,6 +15,7 @@ import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScrapingHarvester;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
+import org.webharvest.runtime.database.JNDIConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
 
 import com.google.common.eventbus.EventBus;
@@ -25,6 +26,8 @@ import com.google.inject.Scope;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 // TODO Add javadoc
 // TODO Add unit test
@@ -72,9 +75,6 @@ public final class ScraperModule extends AbstractModule {
 
         requestStaticInjection(InjectorHelper.class);
 
-        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class)
-            .in(ScrapingScope.class);
-
         bind(AttributeHolder.class).to(ScopeAttributeHolder.class);
 
         bind(Harvest.class).to(DefaultHarvest.class).in(Singleton.class);
@@ -92,6 +92,18 @@ public final class ScraperModule extends AbstractModule {
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Scraping.class),
                 new ScrapingInterceptor());
 
+        bindDBConnectionFactory();
+        bindScraperContext();
+    }
+
+    protected void bindDBConnectionFactory() {
+        bind(ConnectionFactory.class).annotatedWith(Names.named("standalone"))
+           .to(StandaloneConnectionPool.class).in(ScrapingScope.class);
+        bind(ConnectionFactory.class).annotatedWith(Names.named("jndi"))
+           .to(JNDIConnectionFactory.class).in(Singleton.class);
+    }
+
+    protected void bindScraperContext() {
         bind(ContextFactory.class).toInstance(new ContextFactory() {
 
             @Inject private Provider<ScraperContext> context;
@@ -104,5 +116,4 @@ public final class ScraperModule extends AbstractModule {
             }
         });
     }
-
 }
