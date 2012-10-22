@@ -36,7 +36,6 @@
 */
 package org.webharvest.runtime;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -45,10 +44,8 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ProcessorStopEvent;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
@@ -56,20 +53,17 @@ import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
+import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.Stack;
-import org.webharvest.utils.SystemUtilities;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -91,14 +85,14 @@ public class Scraper implements WebScraper {
     @Inject
     private EventBus eventBus;
 
+    @Inject
+    private ContextFactory contextFactory;
+
     private ScraperConfiguration configuration;
     private String workingDir;
-    private final DynamicScopeContext context;
+    private DynamicScopeContext context;
 
     private transient boolean isDebugMode = false;
-
-    @Inject
-    private Provider<HttpClientManager> httpClientManager;
 
     // stack of running processors
     private transient Stack<Processor> runningProcessors = new Stack<Processor>();
@@ -119,18 +113,17 @@ public class Scraper implements WebScraper {
             @WorkingDir final String workingDir) {
         this.configuration = configuration;
         this.workingDir = CommonUtil.adaptFilename(workingDir);
-
-        this.context = WHConstants.XMLNS_CORE_10.equals(configuration.getNamespaceURI())
-                ? new ScraperContext10("sys", "http")
-                : new ScraperContext();
     }
 
+    /**
+     * Initializes {@link DynamicScopeContext} - we need to do it after all are
+     * dependencies are injected. Also, we need to pass to the factory namespace
+     * URI of the configuration being executed (it is required in order to
+     * instantiate appropriate {@link DynamicScopeContext} implementation).
+     */
     @PostConstruct
     public void initContext() {
-        this.context.setLocalVar("sys", new ScriptingVariable(
-                new SystemUtilities(context)));
-        this.context.setLocalVar("http", new ScriptingVariable(
-                httpClientManager.get().getHttpInfo()));
+        this.context = contextFactory.create(configuration.getNamespaceURI());
     }
 
     // TODO rbala Make it private. Currently used only by IncludeProcessor

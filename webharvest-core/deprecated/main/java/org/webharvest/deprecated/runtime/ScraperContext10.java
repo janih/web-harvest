@@ -46,10 +46,15 @@ import org.slf4j.LoggerFactory;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
+import org.webharvest.utils.SystemUtilities;
+
+import com.google.inject.Inject;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -57,6 +62,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import javax.annotation.PostConstruct;
 
 import static java.text.MessageFormat.format;
 
@@ -67,13 +74,20 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     private static final String CALLER_PREFIX = "caller.";
 
-    private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
-    private String[] systemVariables = new String[0];
+    @Inject private HttpClientManager httpClientManager;
 
-    public ScraperContext10(final String... systemVariables) {
+    private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
+
+    public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
-        this.systemVariables = systemVariables;
         LOG.warn("You are using the DEPRECATED scraper configuration version. We urge you to migrate to a newer one! Please visit http://web-harvest.sourceforge.net/release.php for details.");
+    }
+
+    @PostConstruct
+    public void initContext() {
+        setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
+        setLocalVar("http", new ScriptingVariable(
+                httpClientManager.getHttpInfo()));
     }
 
     @Override
@@ -131,10 +145,8 @@ public class ScraperContext10 implements DynamicScopeContext {
     public <R> R executeFunctionCall(Callable<R> callable) throws InterruptedException {
         // Here the context shifts.
         try {
-            final Map<String, Variable> newCRT =
-                new HashMap<String, Variable>();
-            rewriteSystemVariables(stack.peek(), newCRT);
-            stack.push(newCRT);
+            stack.push(new HashMap<String, Variable>());
+            initContext();
 
             return callable.call();
 
@@ -147,18 +159,6 @@ public class ScraperContext10 implements DynamicScopeContext {
             throw new RuntimeException(e);
         } finally {
             stack.pop();
-        }
-    }
-
-    /**
-     * It's very ugly solution, however, the only one that allows to do not
-     * affect other components (such as the Scraper class) with bad design of
-     * old function call processor / scraper context.
-     */
-    private void rewriteSystemVariables(final Map<String, Variable> oldCRT,
-            final Map<String, Variable> newCRT) {
-        for (String sysVar : this.systemVariables) {
-            newCRT.put(sysVar, oldCRT.get(sysVar));
         }
     }
 

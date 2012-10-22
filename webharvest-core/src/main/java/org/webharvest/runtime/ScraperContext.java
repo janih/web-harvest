@@ -42,14 +42,21 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 import org.webharvest.utils.Stack;
+import org.webharvest.utils.SystemUtilities;
+
+import com.google.inject.Inject;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+
+import javax.annotation.PostConstruct;
 
 import static java.text.MessageFormat.format;
 
@@ -59,12 +66,21 @@ import static java.text.MessageFormat.format;
  */
 public class ScraperContext implements DynamicScopeContext {
 
+    @Inject private HttpClientManager httpClientManager;
+
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
 
     protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
 
     public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
+    }
+
+    @PostConstruct
+    public void initContext() {
+        setLocalVar("sys", new ScriptingVariable(new SystemUtilities(this)));
+        setLocalVar("http", new ScriptingVariable(
+                httpClientManager.getHttpInfo()));
     }
 
     public void setLocalVar(String name, Object value) {

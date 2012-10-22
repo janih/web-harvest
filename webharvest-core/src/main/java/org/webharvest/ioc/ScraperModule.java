@@ -4,10 +4,14 @@ import java.io.File;
 
 import org.webharvest.Harvest;
 import org.webharvest.Harvester;
+import org.webharvest.WHConstants;
+import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.DefaultHandlerHolder;
 import org.webharvest.events.HandlerHolder;
 import org.webharvest.runtime.DefaultHarvest;
+import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScrapingHarvester;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
@@ -15,6 +19,8 @@ import org.webharvest.runtime.database.StandaloneConnectionPool;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -85,6 +91,18 @@ public final class ScraperModule extends AbstractModule {
 
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Scraping.class),
                 new ScrapingInterceptor());
+
+        bind(ContextFactory.class).toInstance(new ContextFactory() {
+
+            @Inject private Provider<ScraperContext> context;
+            @Inject private Provider<ScraperContext10> context10;
+
+            @Override
+            public DynamicScopeContext create(final String namespace) {
+                return WHConstants.XMLNS_CORE_10.equals(namespace)
+                    ? context10.get() : context.get();
+            }
+        });
     }
 
 }

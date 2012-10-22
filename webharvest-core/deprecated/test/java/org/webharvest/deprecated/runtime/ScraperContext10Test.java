@@ -38,10 +38,14 @@
 
 package org.webharvest.deprecated.runtime;
 
+import static org.testng.AssertJUnit.assertNotNull;
+
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
+import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.mock.Mock;
 import org.webharvest.runtime.Scraper;
@@ -57,19 +61,40 @@ public class ScraperContext10Test extends UnitilsTestNG {
     @TestedObject
     private ScraperContext10 context;
 
-    private Mock<Scraper> scraperMock;
+    @InjectInto(property = "httpClientManager")
+    private HttpClientManager httpClientManager;
 
     @BeforeMethod
     public void before() {
-        context = new ScraperContext10("sys", "http");
+        this.context = new ScraperContext10();
+        this.httpClientManager = new HttpClientManager(
+                ProxySettings.NO_PROXY_SET);
+    }
 
-        context.setLocalVar("http", new HttpClientManager(
-                ProxySettings.NO_PROXY_SET).getHttpInfo());
-        context.setLocalVar("sys", new SystemUtilities(context));
+    @AfterMethod
+    public void after() {
+        this.context = null;
+        this.httpClientManager = null;
+    }
+
+    @Test
+    public void initializesHttpVar() {
+        context.initContext(); // @PostConstruct annotated
+        assertNotNull("Expected not null 'http' variable",
+                context.getVar("http"));
+    }
+
+    @Test
+    public void initializesSysVar() {
+        context.initContext(); // @PostConstruct annotated
+        assertNotNull("Expected not null 'sys' variable",
+                context.getVar("sys"));
     }
 
     @Test
     public void testGetVar() throws Exception {
+        this.context.initContext(); // @PostConstruct annotated
+
         // not existing var
         Assert.assertNull(context.getVar("x"));
 
