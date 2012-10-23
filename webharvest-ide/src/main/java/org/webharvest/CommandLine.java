@@ -37,13 +37,11 @@
 package org.webharvest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 
@@ -120,13 +118,7 @@ public class CommandLine {
                 workingDir = ".";
             }
 
-            final String logPropsFile = params.get("logpropsfile");
-            final String logLevel = params.get("loglevel");
-            if (logPropsFile != null && !"".equals(logPropsFile)) {
-                PropertyConfigurator.configure(logPropsFile);
-            } else if (logLevel != null && !"".equals(logLevel)) {
-                LogManager.getRootLogger().setLevel(Level.toLevel(logLevel));
-            }
+            parseLoggingSettings(params);
 
             // register plugins if specified
             String pluginsString = params.get("plugins");
@@ -191,6 +183,16 @@ public class CommandLine {
 
             });
 
+        }
+    }
+
+    private static void parseLoggingSettings(final Map<String, String> params) {
+        final String logPropsFile = params.get("logpropsfile");
+        final String logLevel = params.get("loglevel");
+        if (logPropsFile != null && !"".equals(logPropsFile)) {
+            PropertyConfigurator.configure(logPropsFile);
+        } else if (logLevel != null && !"".equals(logLevel)) {
+            LogManager.getRootLogger().setLevel(Level.toLevel(logLevel));
         }
     }
 
