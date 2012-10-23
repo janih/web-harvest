@@ -48,19 +48,18 @@ import java.util.Properties;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.ioc.HttpModule;
-import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.DefaultDriverManager;
 import org.webharvest.runtime.database.DriverManager;
-import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.webharvest.utils.CommonUtil;
 
@@ -121,32 +120,13 @@ public class CommandLine {
                 workingDir = ".";
             }
 
-            String logLevel = params.get("loglevel");
-            if (logLevel == null || "".equals(logLevel)) {
-                logLevel = "INFO";
-            }
-
-            Properties props = new Properties();
-
-            String logPropsFile = params.get("logpropsfile");
+            final String logPropsFile = params.get("logpropsfile");
+            final String logLevel = params.get("loglevel");
             if (logPropsFile != null && !"".equals(logPropsFile)) {
-                FileInputStream fis = new FileInputStream(new File(logPropsFile));
-                props.load(fis);
-                fis.close();
-            } else {
-                props.setProperty("log4j.rootLogger", logLevel.toUpperCase() + ", stdout");
-                props.setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-                props.setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-                props.setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p (%20F:%-3L) - %m\n");
-
-                props.setProperty("log4j.appender.file", "org.apache.log4j.DailyRollingFileAppender");
-                props.setProperty("log4j.appender.file.File", workingDir + "/out.log");
-                props.setProperty("log4j.appender.file.DatePattern", "yyyy-MM-dd");
-                props.setProperty("log4j.appender.file.layout", "org.apache.log4j.PatternLayout");
-                props.setProperty("log4j.appender.file.layout.ConversionPattern", "%-5p (%20F:%-3L) - %m\n");
+                PropertyConfigurator.configure(logPropsFile);
+            } else if (logLevel != null && !"".equals(logLevel)) {
+                LogManager.getRootLogger().setLevel(Level.toLevel(logLevel));
             }
-
-            PropertyConfigurator.configure(props);
 
             // register plugins if specified
             String pluginsString = params.get("plugins");
