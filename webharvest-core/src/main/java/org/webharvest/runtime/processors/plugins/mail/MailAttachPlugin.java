@@ -33,7 +33,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        Processor processor = scraper.getRunningProcessorOfType(MailPlugin.class);
+        Processor processor = getParentProcessor();
         if (processor != null) {
             MailPlugin mailPlugin = (MailPlugin) processor;
             Email email = mailPlugin.getEmail();

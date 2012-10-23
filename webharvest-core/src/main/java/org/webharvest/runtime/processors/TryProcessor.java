@@ -68,8 +68,8 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
     public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
         try {
             IElementDef tryBodyDef = elementDef.getTryBodyDef();
-            Variable result = new BodyProcessor.Builder(tryBodyDef).build().
-                run(scraper, context);
+            Variable result = new BodyProcessor.Builder(tryBodyDef).
+            	setParentProcessor(this).build().run(scraper, context);
             debug(tryBodyDef, scraper, result);
 
             return result;

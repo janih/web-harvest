@@ -139,7 +139,8 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
 
                 if (externalParamType.endsWith("*")) {
                     BodyProcessor bodyProcessor =
-                        new BodyProcessor.Builder(externalParamDef).build();
+                        new BodyProcessor.Builder(externalParamDef).
+                        	setParentProcessor(this).build();
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
                     Variable variable = bodyProcessor.run(scraper, context);

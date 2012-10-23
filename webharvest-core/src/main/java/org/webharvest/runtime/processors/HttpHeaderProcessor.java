@@ -67,7 +67,7 @@ public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
                 null, context);
 
         final HttpProcessor httpProcessor =
-            scraper.getRunningProcessorOfType(HttpProcessor.class);
+            (HttpProcessor) getParentProcessor();
         if (httpProcessor != null) {
             httpProcessor
                     .addHttpHeader(name,

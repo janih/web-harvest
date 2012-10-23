@@ -61,11 +61,11 @@ public class CallParamProcessor extends AbstractProcessor<CallParamDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
-        Variable variable = new BodyProcessor.Builder(elementDef).build().
+        Variable variable = new BodyProcessor.Builder(elementDef).setParentProcessor(this).build().
             execute(scraper, context);
 
-        final CallProcessor parentProcessor =
-            scraper.getRunningProcessorOfType(CallProcessor.class);
+        final CallProcessor parentProcessor = 
+        	(CallProcessor) getParentProcessor();
         parentProcessor.addFunctionParam(name, variable);
 
         this.setProperty("Name", name);

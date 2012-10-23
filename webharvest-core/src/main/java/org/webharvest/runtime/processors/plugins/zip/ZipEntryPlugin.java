@@ -1,5 +1,12 @@
 package org.webharvest.runtime.processors.plugins.zip;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -9,13 +16,6 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Inject;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Zip entry plugin - can be used only inside zip plugin.
@@ -30,7 +30,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        ZipPlugin zipPlugin = (ZipPlugin) scraper.getRunningProcessorOfType(ZipPlugin.class);
+        ZipPlugin zipPlugin = (ZipPlugin) getParentProcessor();
         if (zipPlugin != null) {
             String name = evaluateAttribute("name", context);
             if (CommonUtil.isEmptyString(name)) {

@@ -21,7 +21,7 @@ public class FtpGetPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
-        FtpPlugin ftpPlugin = (FtpPlugin) scraper.getRunningProcessorOfType(FtpPlugin.class);
+        FtpPlugin ftpPlugin = (FtpPlugin) getParentProcessor();
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();
 

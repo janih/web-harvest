@@ -66,7 +66,8 @@ public class EmptyProcessor extends AbstractProcessor<EmptyDef> {
     @Override
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
-        new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
+        new BodyProcessor.Builder(elementDef).
+        	setParentProcessor(this).build().execute(scraper, context);       
 
         return EmptyVariable.INSTANCE;
     }

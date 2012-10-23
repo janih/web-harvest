@@ -91,8 +91,8 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         // iterates while testing variable represents boolean true or loop limit is exceeded
         final double maxLoops = NumberUtils.toDouble(maxLoopsString, WHConstants.DEFAULT_MAX_LOOPS);
         while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
-            Variable loopResult = new BodyProcessor.Builder(elementDef).build().
-                execute(scraper, context);
+            Variable loopResult = new BodyProcessor.Builder(elementDef).
+            	setParentProcessor(this).build().execute(scraper, context);
             if (!isEmpty) {
                 resultList.addAll(loopResult.toList());
             }

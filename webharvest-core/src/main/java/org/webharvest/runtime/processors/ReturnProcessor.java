@@ -61,11 +61,11 @@ public class ReturnProcessor extends AbstractProcessor<ReturnDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         CallProcessor callProcessor =
-            scraper.getRunningProcessorOfType(CallProcessor.class);
+            (CallProcessor) getParentProcessor();
 
         if (callProcessor != null) {
             Variable returnValue = new BodyProcessor.Builder(elementDef).
-                build().execute(scraper, context);
+            	setParentProcessor(this).build().execute(scraper, context);
             callProcessor.setFunctionResult(returnValue);
         }
 

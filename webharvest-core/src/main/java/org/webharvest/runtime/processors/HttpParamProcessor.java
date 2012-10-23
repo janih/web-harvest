@@ -76,15 +76,16 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
                 elementDef.getContenttype(), null, context);
 
         final HttpProcessor httpProcessor =
-            scraper.getRunningProcessorOfType(HttpProcessor.class);
+            (HttpProcessor) getParentProcessor();
         if (httpProcessor != null) {
             httpProcessor.addHttpParam(
                     name,
                     isFile,
                     fileName,
                     contentType,
-                    new BodyProcessor.Builder(elementDef).build().execute(
-                            scraper, context));
+                    new BodyProcessor.Builder(elementDef).
+                    	setParentProcessor(this).build().
+                    		execute(scraper, context));
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);

@@ -195,8 +195,8 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
             byte[] data;
 
             if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
-                Variable bodyListVar = new BodyProcessor.Builder(elementDef)
-                        .build().execute(scraper, context);
+                Variable bodyListVar = new BodyProcessor.Builder(elementDef).
+                	setParentProcessor(this).build().execute(scraper, context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {

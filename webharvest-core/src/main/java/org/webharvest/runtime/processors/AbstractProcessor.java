@@ -68,7 +68,10 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     abstract protected Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
     protected TDef elementDef;
-    private Map properties = new LinkedHashMap();
+
+    private Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+    private Processor parentProcessor;
 
     protected AbstractProcessor() {
     }
@@ -107,15 +110,12 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         setProperty("ID", id);
 
-        // FIXME Should we do it since its slf4j implementation?
-        if (LOG.isInfoEnabled()) {
-            LOG.info("{}{} starts processing...{}", new Object[]{
-                    CommonUtil.indent(scraper.getRunningLevel()),
+        log("{}{} starts processing...{}", new Object[]{
+                    CommonUtil.indent(getRunningLevel()),
                     getClass().getSimpleName(),
                     id != null ? "[ID=" + id + "] " : ""});
-        }
 
-        scraper.setExecutingProcessor(this);
+        //TODO: fire event with information that processor has started execution
 
         final Variable result = execute(scraper, context);
         final long executionTime = System.currentTimeMillis() - startTime;
@@ -123,22 +123,18 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         setProperty(WHConstants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
         setProperty(WHConstants.VALUE_PROPERTY_NAME, result);
 
-        scraper.processorFinishedExecution(this, this.properties);
-        scraper.finishExecutingProcessor();
+        //TODO: fire event with information that processor has finished execution
 
         // if debug mode is true and processor ID is not null then write debugging file
         if (scraper.isDebugMode() && id != null) {
             writeDebugFile(result, id, scraper);
         }
 
-     // FIXME Should we do it since its slf4j implementation?
-        if (LOG.isInfoEnabled()) {
-            LOG.info("{}{} processor executed in {}ms. {}", new Object[]{
-                    CommonUtil.indent(scraper.getRunningLevel()),
+        log("{}{} processor executed in {}ms. {}", new Object[]{
+                    CommonUtil.indent(getRunningLevel()),
                     getClass().getSimpleName(),
                     executionTime,
                     id != null ? "[ID=" + id + "] " : ""});
-        }
 
         return result;
     }
@@ -147,7 +143,9 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
      * Defines processor runtime property with specified name and value.
      *
      * @param name
+     *            name of the property
      * @param value
+     *            value of the property
      */
     protected void setProperty(String name, Object value) {
         if (name != null && !"".equals(name) && value != null) {
@@ -168,8 +166,8 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef.hasOperations()) {
-            BodyProcessor bodyProcessor =
-                new BodyProcessor.Builder(elementDef).build();
+            BodyProcessor bodyProcessor = new BodyProcessor.Builder(elementDef).
+                setParentProcessor(this).build();
             if (properties != null) {
                 for (KeyValuePair property : properties) {
                     bodyProcessor.setProperty(property.getKey(), property.getValue());
@@ -223,6 +221,48 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         } catch (IOException e) {
             LOG.warn(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Helper method which logs information about processor's execution. It
+     * could be overridden in order to eliminate logging like in BodyProcessor -
+     * this is a temporary solution.
+     *
+     * @param format
+     *            the format of the message
+     * @param args
+     *            an array of arguments
+     */
+    protected void log(final String format, final Object[] args) {
+        // FIXME Should we do it since its slf4j implementation?
+        if (LOG.isInfoEnabled()) {
+            LOG.info(format, args);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setParentProcessor(final Processor parentProcessor) {
+        this.parentProcessor = parentProcessor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Processor getParentProcessor() {
+        return parentProcessor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRunningLevel() {
+        return parentProcessor == null ? 1 :
+            parentProcessor.getRunningLevel() + 1;
     }
 
 }

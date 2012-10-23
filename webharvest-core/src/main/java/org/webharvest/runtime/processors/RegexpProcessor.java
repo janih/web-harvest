@@ -81,8 +81,8 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
         debug(patternDef, scraper, patternVar);
 
         IElementDef sourceDef = elementDef.getRegexpSourceDef();
-        Variable source = new BodyProcessor.Builder(sourceDef).build().
-            run(scraper, context);
+        Variable source = new BodyProcessor.Builder(sourceDef).
+        	setParentProcessor(this).build().run(scraper, context);
         debug(sourceDef, scraper, source);
 
         String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, context);

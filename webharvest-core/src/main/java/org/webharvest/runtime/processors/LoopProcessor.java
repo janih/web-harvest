@@ -94,8 +94,8 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
         this.setProperty("Empty", String.valueOf(isEmpty));
 
         IElementDef loopValueDef = elementDef.getLoopValueDef();
-        Variable loopValue = new BodyProcessor.Builder(loopValueDef).build().
-            run(scraper, context);
+        Variable loopValue = new BodyProcessor.Builder(loopValueDef).
+        	setParentProcessor(this).build().run(scraper, context);
         debug(loopValueDef, scraper, loopValue);
 
 

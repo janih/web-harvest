@@ -23,8 +23,11 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
             return context.executeWithinNewContext(new Callable<Variable>() {
                 @Override
                 public Variable call() throws Exception {
-                    return CommonUtil.createVariable(ProcessorResolver
-                            .createProcessor(defs[0]).run(scraper, context));
+                    final Processor processor = ProcessorResolver
+                            .createProcessor(defs[0]);
+                    processor.setParentProcessor(getParentProcessor());
+                    return CommonUtil.createVariable(processor.run(scraper,
+                            context));
                 }
             });
         }
@@ -34,8 +37,10 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
             public Variable call() throws Exception {
                 final ListVariable result = new ListVariable();
                 for (IElementDef def : defs) {
-                    final Variable variable = ProcessorResolver
-                            .createProcessor(def).run(scraper, context);
+                    final Processor processor = ProcessorResolver
+                            .createProcessor(def);
+                    processor.setParentProcessor(getParentProcessor());
+                    final Variable variable = processor.run(scraper, context);
                     if (!variable.isEmpty()) {
                         result.addVariable(variable);
                     }
@@ -45,6 +50,14 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
                         .createVariable(result.get(0)) : result;
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void log(final String format, final Object[] args) {
+        // empty body - this processor should be transparent
     }
 
     /**
@@ -59,9 +72,11 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
 
         private final IElementDef elementDef;
 
+        private Processor parentProcessor;
+
         /**
-         * Default builder constructor which accepts {@link IElementDef}
-         * for {@link BodyProcessor}. Specified element definition should not be
+         * Default builder constructor which accepts {@link IElementDef} for
+         * {@link BodyProcessor}. Specified element definition should not be
          * null.
          *
          * @param elementDef
@@ -69,6 +84,18 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
          */
         public Builder(final IElementDef elementDef) {
             this.elementDef = elementDef;
+        }
+
+        /**
+         * Sets reference to the parent {@link Processor}.
+         *
+         * @param processor
+         *            reference to parent {@link Processor}
+         * @return an instance of this {@link Builder}
+         */
+        public Builder setParentProcessor(final Processor processor) {
+            this.parentProcessor = processor;
+            return this;
         }
 
         /**
@@ -80,6 +107,7 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
         public BodyProcessor build() {
             final BodyProcessor processor = new BodyProcessor();
             processor.setElementDef(elementDef);
+            processor.setParentProcessor(parentProcessor);
             return processor;
         }
 

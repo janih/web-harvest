@@ -24,4 +24,20 @@ public interface Processor<TDef extends IElementDef> {
     Variable run(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException;
 
+	/**
+	 * Returns reference to parent {@link Processor} of this processor.
+	 */
+	Processor getParentProcessor();
+
+	/**
+	 * Sets reference to parent {@link Processor}.
+	 */
+	void setParentProcessor(Processor parentProcessor);
+
+	/**
+	 * Returns information how deep in processors hierarchy is this
+	 * {@link Processor}. Value of the lowest level is {@code 1}.
+	 */
+	int getRunningLevel();
+
 }

@@ -29,7 +29,7 @@ public final class DbParamPlugin extends WebHarvestPlugin {
     }
 
     public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        Processor processor = scraper.getRunningProcessorOfType(AbstractDatabasePlugin.class);
+        Processor processor = getParentProcessor();
         if (processor != null) {
             AbstractDatabasePlugin databasePlugin = (AbstractDatabasePlugin) processor;
             String type = evaluateAttribute("type", context);

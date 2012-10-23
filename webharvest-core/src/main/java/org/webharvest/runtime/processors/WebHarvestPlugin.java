@@ -126,8 +126,8 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @return Instance of Variable
      */
     protected Variable executeBody(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        return new BodyProcessor.Builder(elementDef).build().
-            execute(scraper, context);
+        return new BodyProcessor.Builder(elementDef).setParentProcessor(this).
+        	build().execute(scraper, context);
     }
 
 }

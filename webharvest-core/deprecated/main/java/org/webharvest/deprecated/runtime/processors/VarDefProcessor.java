@@ -68,8 +68,8 @@ import org.webharvest.utils.CommonUtil;
 public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        final Variable var = new BodyProcessor.Builder(elementDef).build().
-            execute(scraper, context);
+        final Variable var = new BodyProcessor.Builder(elementDef).
+        	setParentProcessor(this).build().execute(scraper, context);
 
         final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, context);

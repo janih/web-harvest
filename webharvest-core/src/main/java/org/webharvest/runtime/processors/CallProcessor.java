@@ -90,7 +90,8 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         }
 
         // executes body of call processor
-        new BodyProcessor.Builder(elementDef).build().execute(scraper, context);
+        new BodyProcessor.Builder(elementDef).setParentProcessor(this).
+        	build().execute(scraper, context);
 
         doCall(context, new Callable<Object>() {
 
@@ -101,8 +102,9 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                 }
 
                 // executes body of function using new context
-                new BodyProcessor.Builder(functionDef).build().
-                    execute(scraper, context);
+                new BodyProcessor.Builder(functionDef).
+                	setParentProcessor(CallProcessor.this).build().
+                    	execute(scraper, context);
                 return null;
             }
         });

@@ -94,9 +94,6 @@ public class Scraper implements WebScraper {
 
     private transient boolean isDebugMode = false;
 
-    // stack of running processors
-    private transient Stack<Processor> runningProcessors = new Stack<Processor>();
-
     private volatile int status = STATUS_READY;
 
     private String message = null;
@@ -178,55 +175,12 @@ public class Scraper implements WebScraper {
         return this.workingDir;
     }
 
-    public int getRunningLevel() {
-        return runningProcessors.size() + 1;
-    }
-
     public boolean isDebugMode() {
         return isDebugMode;
     }
 
     public void setDebug(boolean debug) {
         this.isDebugMode = debug;
-    }
-
-    /**
-     * @param processorClazz
-     *            Class of enclosing running processor.
-     * @return Parent running processor in the tree of specified class, or null
-     *         if it doesn't exist.
-     */
-    public <T extends Processor< ? >> T getRunningProcessorOfType(
-            final Class<T> processorClazz) {
-        List<Processor> runningProcessorList = runningProcessors.getList();
-        ListIterator<Processor> listIterator = runningProcessorList.listIterator(runningProcessors.size());
-        while (listIterator.hasPrevious()) {
-            final Processor< ? > curr = listIterator.previous();
-            //Verifies that processor class which is looked for equals class or
-            //super class of running processor. It is a temporary solution which
-            //allows to find instance of processor when given class is for
-            //example an abstract.
-            //TODO: Refactor whole logic of this method, because now it looks a
-            //little bit ugly.
-            if (processorClazz.equals(curr.getClass())
-                    || processorClazz.equals(curr.getClass().getSuperclass())) {
-                return processorClazz.cast(curr);
-            }
-        }
-        return null;
-    }
-
-    public void setExecutingProcessor(Processor processor) {
-        runningProcessors.push(processor);
-        eventBus.post(new ProcessorStartEvent(this, processor));
-    }
-
-    public void finishExecutingProcessor() {
-        this.runningProcessors.pop();
-    }
-
-    public void processorFinishedExecution(final Processor processor, Map properties) {
-        eventBus.post(new ProcessorStopEvent(this, processor, properties));
     }
 
     public synchronized int getStatus() {

@@ -136,8 +136,8 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         final String encodedUrl = CommonUtil.encodeUrl(url, charset);
 
         // executes body of HTTP processor
-        final Variable bodyContent = new BodyProcessor.Builder(elementDef)
-                .build().execute(scraper, context);
+        final Variable bodyContent = new BodyProcessor.Builder(elementDef).
+        	setParentProcessor(this).build().execute(scraper, context);
 
         httpClientManager.setCookiePolicy(cookiePolicy);
 
