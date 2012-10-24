@@ -112,7 +112,7 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         IElementDef xqueryElementDef = elementDef.getXqDef();
         Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
-        debug(xqueryElementDef, scraper, xq);
+        debug(xqueryElementDef, context, xq);
 
         String xqExpression = xq.toString().trim();
         XQueryExternalParamDef[] externalParamDefs = elementDef.getExternalParamDefs();
@@ -140,11 +140,11 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
                 if (externalParamType.endsWith("*")) {
                     BodyProcessor bodyProcessor =
                         new BodyProcessor.Builder(externalParamDef).
-                        	setParentProcessor(this).build();
+                            setParentProcessor(this).build();
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
                     Variable variable = bodyProcessor.run(scraper, context);
-                    debug(externalParamDef, scraper, variable);
+                    debug(externalParamDef, context, variable);
 
                     List<Object> paramList = new ArrayList<Object>();
                     for (Object o : variable.toList()) {
@@ -157,7 +157,7 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
                     KeyValuePair props[] = {new KeyValuePair<String>("Name", externalParamName), new KeyValuePair<String>("Type", externalParamType)};
                     Variable var = getBodyTextContent(externalParamDef, scraper, context, true, props);
 
-                    debug(externalParamDef, scraper, var);
+                    debug(externalParamDef, context, var);
 
                     Object value = castSimpleValue(externalParamType, var, sqc);
                     dynamicContext.setParameter(externalParamName, value);

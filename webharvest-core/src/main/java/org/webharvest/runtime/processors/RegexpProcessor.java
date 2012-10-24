@@ -78,12 +78,12 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
         IElementDef patternDef = elementDef.getRegexpPatternDef();
         Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
-        debug(patternDef, scraper, patternVar);
+        debug(patternDef, context, patternVar);
 
         IElementDef sourceDef = elementDef.getRegexpSourceDef();
         Variable source = new BodyProcessor.Builder(sourceDef).
-        	setParentProcessor(this).build().run(scraper, context);
-        debug(sourceDef, scraper, source);
+            setParentProcessor(this).build().run(scraper, context);
+        debug(sourceDef, context, source);
 
         String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, context);
         final boolean isReplace = CommonUtil.isBooleanTrue(replace);
@@ -151,7 +151,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
                 IElementDef resultDef = elementDef.getRegexpResultDef();
                 Variable result = getBodyTextContent(resultDef, scraper, context, true);
-                debug(resultDef, scraper, result);
+                debug(resultDef, context, result);
 
                 String currResult = (result == null) ? matcher.group(0) : result.toString();
                 if (isReplace) {

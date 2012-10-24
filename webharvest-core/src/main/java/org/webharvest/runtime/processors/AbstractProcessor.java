@@ -127,10 +127,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         //TODO: fire event with information that processor has finished execution
 
-        // if debug mode is true and processor ID is not null then write debugging file
-        if (id != null) {
-            writeDebugFile(result, id, scraper);
-        }
+        writeDebugFile(id, result);
 
         log("{}{} processor executed in {}ms. {}", new Object[]{
                     CommonUtil.indent(getRunningLevel()),
@@ -152,16 +149,6 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     protected void setProperty(String name, Object value) {
         if (name != null && !"".equals(name) && value != null) {
             this.properties.put(name, value);
-        }
-    }
-
-    protected void debug(IElementDef elementDef, Scraper scraper, Variable variable) {
-        String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper.getContext()) : null;
-
-        if (id != null) {
-            if (variable != null) {
-                writeDebugFile(variable, id, scraper);
-            }
         }
     }
 
@@ -205,9 +192,19 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         return elementDef;
     }
 
-    //TODO: remove unused parameters
-    private void writeDebugFile(Variable var, String processorId, Scraper scraper) {
-        debugFileLogger.trace("[{}]\n{}\n\n", processorId, var.toString());
+    //TODO: can we remove elementDef parameter? (it is already accessible as a field)
+    protected void debug(final IElementDef elementDef,
+            final DynamicScopeContext context, final Variable variable) {
+        final String id = (elementDef != null) ? BaseTemplater.evaluateToString(
+                elementDef.getId(), null, context) : null;
+        writeDebugFile(id, variable);
+
+    }
+
+    private void writeDebugFile(final String processorId, final Variable var) {
+        if (processorId != null && var != null) {
+            debugFileLogger.trace("[{}]\n{}\n\n", processorId, var.toString());
+        }
     }
 
     /**

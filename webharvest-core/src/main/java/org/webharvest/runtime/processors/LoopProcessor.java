@@ -95,8 +95,8 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
         IElementDef loopValueDef = elementDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor.Builder(loopValueDef).
-        	setParentProcessor(this).build().run(scraper, context);
-        debug(loopValueDef, scraper, loopValue);
+            setParentProcessor(this).build().run(scraper, context);
+        debug(loopValueDef, context, loopValue);
 
 
         final Iterator iter = loopValue != null ? loopValue.toIterator() : null;
@@ -125,7 +125,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
                 // execute the loop body
                 IElementDef bodyDef = elementDef.getLoopBodyDef();
                 Variable loopResult = (bodyDef != null) ? new BodyProcessor.Builder(bodyDef).build().run(scraper, context) : EmptyVariable.INSTANCE;
-                debug(bodyDef, scraper, loopResult);
+                debug(bodyDef, context, loopResult);
                 if (!isEmpty) {
                     resultList.addAll(loopResult.toList());
                 }

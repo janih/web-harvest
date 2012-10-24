@@ -69,8 +69,8 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
         try {
             IElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor.Builder(tryBodyDef).
-            	setParentProcessor(this).build().run(scraper, context);
-            debug(tryBodyDef, scraper, result);
+                setParentProcessor(this).build().run(scraper, context);
+            debug(tryBodyDef, context, result);
 
             return result;
         } catch (final BaseException e) {
@@ -91,7 +91,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                     final Variable res =
                         new BodyProcessor.Builder(catchValueDef).build().
                             run(scraper, context);
-                    debug(catchValueDef, scraper, res);
+                    debug(catchValueDef, context, res);
                     return res;
                 }
             });

@@ -72,8 +72,8 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
                 String condition = BaseTemplater.evaluateToString(ifDef.getCondition(), null, context);
                 if (CommonUtil.isBooleanTrue(condition)) {
                     Variable ifResult = new BodyProcessor.Builder(ifDef).
-                    	setParentProcessor(this).build().run(scraper, context);
-                    debug(ifDef, scraper, ifResult);
+                        setParentProcessor(this).build().run(scraper, context);
+                    debug(ifDef, context, ifResult);
                     return ifResult;
                 }
             }
@@ -82,8 +82,8 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
         IElementDef elseDef = elementDef.getElseDef();
         if (elseDef != null) {
             Variable elseResult = new BodyProcessor.Builder(elseDef).
-            	setParentProcessor(this).build().run(scraper, context);
-            debug(elseDef, scraper, elseResult);
+                setParentProcessor(this).build().run(scraper, context);
+            debug(elseDef, context, elseResult);
             return elseResult;
         }
 

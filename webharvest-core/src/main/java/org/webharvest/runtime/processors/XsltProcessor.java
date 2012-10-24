@@ -77,11 +77,11 @@ public class XsltProcessor extends AbstractProcessor<XsltDef> {
     public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
         final IElementDef xsltElementDef = elementDef.getXmlDef();
         Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
-        debug(xsltElementDef, scraper, xmlStr);
+        debug(xsltElementDef, context, xmlStr);
 
         IElementDef stylesheetElementDef = elementDef.getStylesheetDef();
         Variable stylesheetStr = getBodyTextContent(stylesheetElementDef, scraper, context, true);
-        debug(stylesheetElementDef, scraper, stylesheetStr);
+        debug(stylesheetElementDef, context, stylesheetStr);
 
         try {
             TransformerFactory xformFactory = TransformerFactory.newInstance();
