@@ -192,13 +192,12 @@ public class CommandLine {
     private static void parseDebugModeSettings(final Map<String, String> params,
             final String workingDir) throws IOException {
         if (CommonUtil.isBooleanTrue(params.get("debug"))) {
-            final Logger l = LogManager.getLogger(DebugFileLogger.NAME);
-            l.setLevel(Level.TRACE);
-
-            // adding file appender
-            l.addAppender(new FileAppender(
+            final Logger logger = LogManager.getLogger(DebugFileLogger.NAME);
+            logger.setLevel(Level.TRACE);
+            logger.addAppender(new FileAppender(
                     new PatternLayout(DebugFileLogger.LAYOUT),
-                    new File(workingDir, "_DEBUG").getPath()));
+                    new File(workingDir, "_DEBUG").getPath(),
+                    false));
         }
     }
 
