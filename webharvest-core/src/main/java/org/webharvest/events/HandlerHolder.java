@@ -20,4 +20,6 @@ public interface HandlerHolder {
     // FIXME rbala Do we need a registration handler with unregister method?
     void register(EventHandler<?> handler);
 
+    void subscribe(); //TODO: added to fix failing tests
+
 }
