@@ -19,8 +19,4 @@ public interface Harvester {
         void onSuccess(DynamicScopeContext context);
 
     }
-
-    @Deprecated
-    void setDebug(boolean debug);
-
 }

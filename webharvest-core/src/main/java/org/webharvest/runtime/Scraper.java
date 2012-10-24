@@ -37,8 +37,6 @@
 package org.webharvest.runtime;
 
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -46,8 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.events.ProcessorStartEvent;
-import org.webharvest.events.ProcessorStopEvent;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
@@ -60,7 +56,6 @@ import org.webharvest.runtime.processors.ProcessorResolver;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-import org.webharvest.utils.Stack;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -91,8 +86,6 @@ public class Scraper implements WebScraper {
     private ScraperConfiguration configuration;
     private String workingDir;
     private DynamicScopeContext context;
-
-    private transient boolean isDebugMode = false;
 
     private volatile int status = STATUS_READY;
 
@@ -173,14 +166,6 @@ public class Scraper implements WebScraper {
 
     public String getWorkingDir() {
         return this.workingDir;
-    }
-
-    public boolean isDebugMode() {
-        return isDebugMode;
-    }
-
-    public void setDebug(boolean debug) {
-        this.isDebugMode = debug;
     }
 
     public synchronized int getStatus() {

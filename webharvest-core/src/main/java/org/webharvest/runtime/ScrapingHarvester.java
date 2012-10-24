@@ -114,14 +114,4 @@ public class ScrapingHarvester implements Harvester {
         // Return reference to scraper from last call
         return scraper;
     }
-
-    @Override
-    @Deprecated
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-        if (scraper != null) {
-            scraper.setDebug(debug);
-        }
-    }
-
 }

@@ -46,13 +46,17 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
+import org.webharvest.ioc.DebugFileLogger;
 import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -62,6 +66,7 @@ import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * Startup class  for Web-Harvest.
@@ -120,6 +125,14 @@ public class CommandLine {
 
             parseLoggingSettings(params);
 
+            final ProxySettings proxySettings = parseProxySettings(params);
+
+            final Injector injector = Guice.createInjector(
+                    new ScraperModule(workingDir),
+                    new HttpModule(proxySettings));
+
+            parseDebugModeSettings(params, workingDir);
+
             // register plugins if specified
             String pluginsString = params.get("plugins");
             if (!CommonUtil.isEmpty(pluginsString)) {
@@ -146,25 +159,15 @@ public class CommandLine {
                 }
             };
 
-            final ProxySettings proxySettings = parseProxySettings(params);
-
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            final Harvest harvest = Guice.createInjector(
-                    new ScraperModule(workingDir), new HttpModule(proxySettings))
-                    .getInstance(Harvest.class);
+            final Harvest harvest = injector .getInstance(Harvest.class);
 
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
             final Harvester harvester = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
                     ? harvest.getHarvester(new URL(configFilePath), callback)
                     : harvest.getHarvester(configFilePath, callback);
 
-            String isDebug = params.get("debug");
-            if (CommonUtil.isBooleanTrue(isDebug)) {
-                harvester.setDebug(true);
-            }
-
             harvester.execute(new Harvester.ContextInitCallback() {
-
                 @Override
                 public void onSuccess(DynamicScopeContext context) {
                     // adds initial variables to the scraper's content, if any
@@ -183,6 +186,19 @@ public class CommandLine {
 
             });
 
+        }
+    }
+
+    private static void parseDebugModeSettings(final Map<String, String> params,
+            final String workingDir) throws IOException {
+        if (CommonUtil.isBooleanTrue(params.get("debug"))) {
+            final Logger l = LogManager.getLogger(DebugFileLogger.NAME);
+            l.setLevel(Level.TRACE);
+
+            // adding file appender
+            l.addAppender(new FileAppender(
+                    new PatternLayout(DebugFileLogger.LAYOUT),
+                    new File(workingDir, "_DEBUG").getPath()));
         }
     }
 

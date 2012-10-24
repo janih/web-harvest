@@ -36,18 +36,16 @@
 */
 package org.webharvest.runtime.processors;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
+import org.webharvest.ioc.DebugFileLogger;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -55,6 +53,8 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
+
+import com.google.inject.Inject;
 
 /**
  * Base processor that contains common processor logic.
@@ -64,6 +64,8 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
     // TODO Consider making it a static logger
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractProcessor.class);
+
+    @DebugFileLogger @Inject private Logger debugFileLogger;
 
     abstract protected Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
 
@@ -126,7 +128,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         //TODO: fire event with information that processor has finished execution
 
         // if debug mode is true and processor ID is not null then write debugging file
-        if (scraper.isDebugMode() && id != null) {
+        if (id != null) {
             writeDebugFile(result, id, scraper);
         }
 
@@ -156,7 +158,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     protected void debug(IElementDef elementDef, Scraper scraper, Variable variable) {
         String id = (elementDef != null) ? BaseTemplater.evaluateToString(elementDef.getId(), null, scraper.getContext()) : null;
 
-        if (scraper.isDebugMode() && id != null) {
+        if (id != null) {
             if (variable != null) {
                 writeDebugFile(variable, id, scraper);
             }
@@ -203,24 +205,9 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         return elementDef;
     }
 
+    //TODO: remove unused parameters
     private void writeDebugFile(Variable var, String processorId, Scraper scraper) {
-        byte[] data = var == null ? new byte[]{} : var.toString().getBytes();
-
-        String workingDir = scraper.getWorkingDir();
-        String dir = CommonUtil.getAbsoluteFilename(workingDir, "_debug");
-
-        int index = 1;
-        File debugFile = new File(dir, processorId + "_" + index + ".debug");
-        while (debugFile.exists()) {
-            index++;
-            debugFile = new File(dir, processorId + "_" + index + ".debug");
-        }
-
-        try {
-            FileUtils.writeByteArrayToFile(debugFile, data);
-        } catch (IOException e) {
-            LOG.warn(e.getMessage(), e);
-        }
+        debugFileLogger.trace("[{}]\n{}\n\n", processorId, var.toString());
     }
 
     /**

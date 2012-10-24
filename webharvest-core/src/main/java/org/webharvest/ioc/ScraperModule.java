@@ -2,6 +2,8 @@ package org.webharvest.ioc;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webharvest.Harvest;
 import org.webharvest.Harvester;
 import org.webharvest.WHConstants;
@@ -26,7 +28,6 @@ import com.google.inject.Scope;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
 // TODO Add javadoc
@@ -94,6 +95,7 @@ public final class ScraperModule extends AbstractModule {
 
         bindDBConnectionFactory();
         bindScraperContext();
+        bindDebugFileLogger();
     }
 
     protected void bindDBConnectionFactory() {
@@ -115,5 +117,10 @@ public final class ScraperModule extends AbstractModule {
                     ? context10.get() : context.get();
             }
         });
+    }
+
+    protected void bindDebugFileLogger() {
+        bind(Logger.class).annotatedWith(DebugFileLogger.class).toInstance(
+                LoggerFactory.getLogger(DebugFileLogger.NAME));
     }
 }

@@ -14,9 +14,6 @@ public interface WebScraper {
     void execute();
 
     @Deprecated
-    void setDebug(boolean debug);
-
-    @Deprecated
     void informListenersAboutError(Exception e);
 
     @Deprecated

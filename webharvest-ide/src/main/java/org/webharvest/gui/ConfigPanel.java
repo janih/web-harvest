@@ -868,10 +868,6 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                     }
                 };
 
-
-
-
-                this.harvester.setDebug(true);
                 this.logTextArea.setText(null);
 
                 ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
