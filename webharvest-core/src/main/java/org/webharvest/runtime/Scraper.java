@@ -164,10 +164,6 @@ public class Scraper implements WebScraper {
         return context;
     }
 
-    public String getWorkingDir() {
-        return this.workingDir;
-    }
-
     public synchronized int getStatus() {
         return status;
     }

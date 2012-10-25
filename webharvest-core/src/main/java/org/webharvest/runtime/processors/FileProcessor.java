@@ -45,6 +45,7 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.FileDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
+import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -81,12 +82,14 @@ import java.util.regex.PatternSyntaxException;
 public class FileProcessor extends AbstractProcessor<FileDef> {
 
     @Inject
+    @WorkingDir
+    private String workingDir;
+
+    @Inject
     private ScraperConfiguration configuration;
 
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
-        String workingDir = scraper.getWorkingDir();
-
         String action = BaseTemplater.evaluateToString(elementDef.getAction(),
                 null, context);
         String filePath = BaseTemplater.evaluateToString(elementDef.getPath(),
@@ -196,7 +199,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
             if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
                 Variable bodyListVar = new BodyProcessor.Builder(elementDef).
-                	setParentProcessor(this).build().execute(scraper, context);
+                    setParentProcessor(this).build().execute(scraper, context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {
