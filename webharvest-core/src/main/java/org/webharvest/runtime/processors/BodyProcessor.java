@@ -53,14 +53,6 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void log(final String format, final Object[] args) {
-        // empty body - this processor should be transparent
-    }
-
-    /**
      * A builder responsible for creating instance of {@link BodyProcessor} and
      * completing it with appropriate {@link IElementDef}.
      *

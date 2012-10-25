@@ -112,10 +112,12 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         setProperty("ID", id);
 
-        log("{}{} starts processing...{}", new Object[]{
+        if (LOG.isInfoEnabled()) {
+            LOG.info("{}{} starts processing...{}", new Object[]{
                     CommonUtil.indent(getRunningLevel()),
                     getClass().getSimpleName(),
                     id != null ? "[ID=" + id + "] " : ""});
+        }
 
         //TODO: fire event with information that processor has started execution
 
@@ -129,11 +131,13 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         writeDebugFile(id, result);
 
-        log("{}{} processor executed in {}ms. {}", new Object[]{
+        if (LOG.isInfoEnabled()) {
+            LOG.info("{}{} processor executed in {}ms. {}", new Object[]{
                     CommonUtil.indent(getRunningLevel()),
                     getClass().getSimpleName(),
                     executionTime,
                     id != null ? "[ID=" + id + "] " : ""});
+        }
 
         return result;
     }
@@ -204,23 +208,6 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     private void writeDebugFile(final String processorId, final Variable var) {
         if (processorId != null && var != null) {
             debugFileLogger.trace("[{}]\n{}\n\n", processorId, var.toString());
-        }
-    }
-
-    /**
-     * Helper method which logs information about processor's execution. It
-     * could be overridden in order to eliminate logging like in BodyProcessor -
-     * this is a temporary solution.
-     *
-     * @param format
-     *            the format of the message
-     * @param args
-     *            an array of arguments
-     */
-    protected void log(final String format, final Object[] args) {
-        // FIXME Should we do it since its slf4j implementation?
-        if (LOG.isInfoEnabled()) {
-            LOG.info(format, args);
         }
     }
 
