@@ -42,14 +42,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.webharvest.ioc.ConfigSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.xml.sax.InputSource;
@@ -60,22 +57,17 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * Basic configuration.
  */
-public class ScraperConfiguration {
-
-    public static final String DEFAULT_CHARSET = "UTF-8";
-    private static final ScriptingLanguage DEFAULT_SCRIPTING_LANGUAGE = ScriptingLanguage.BEANSHELL;
+public class ScraperConfiguration implements RestorableConfiguration {
 
     // map of function definitions
     private Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
-    // sequence of operationDefs
-    private List<IElementDef> operations = new ArrayList<IElementDef>();
+    private ElementDefProxy rootElementDef;
 
     private String charset;
     private ScriptingLanguage scriptingLanguage;
     private File sourceFile;
     private String url;
-    private String namespaceURI;
 
     /**
      * Creates configuration instance loaded from the specified input stream.
@@ -128,31 +120,55 @@ public class ScraperConfiguration {
 
     private void createFromInputStream(InputSource in) {
         // loads configuration from input stream to the internal structure
-        final ElementDefProxy def = XmlParser.parse(in);
-        final XmlNode node = def.getNode();
-
-
-        this.namespaceURI = node.getUri();
-        this.charset = StringUtils.defaultIfEmpty(node.getAttribute("charset"), DEFAULT_CHARSET);
-
-        this.scriptingLanguage = (ScriptingLanguage) ObjectUtils.defaultIfNull(
-                ScriptingLanguage.recognize(node.getAttribute("scriptlang")),
-                DEFAULT_SCRIPTING_LANGUAGE);
-
-        operations.addAll(Arrays.asList(def.getOperationDefs()));
+        this.rootElementDef = XmlParser.parse(in);
     }
 
     public List<IElementDef> getOperations() {
-        return operations;
+        return Arrays.asList(rootElementDef.getOperationDefs());
     }
 
+    public IElementDef getRootElementDef() {
+        return rootElementDef;
+    }
+
+    /**
+     * Returns default configuration's charset.
+     *
+     * @return default configuration's charset.
+     */
     public String getCharset() {
         return charset;
     }
 
+    /**
+     * Sets default configuration's charset.
+     *
+     * @param charset
+     *            new default configuration's charset
+     */
+    public void setCharset(final String charset) {
+        this.charset = charset;
+    }
+
+    /**
+     * Returns default configuration's {@link ScriptingLanguage}.
+     *
+     * @return default configuration's {@link ScriptingLanguage}.
+     */
     public ScriptingLanguage getScriptingLanguage() {
         return scriptingLanguage;
     }
+
+    /**
+     * Sets default configuration's {@link ScriptingLanguage}.
+     *
+     * @param language
+     *            new default configuration's {@link ScriptingLanguage}
+     */
+    public void setScriptingLanguage(final ScriptingLanguage language) {
+        this.scriptingLanguage = language;
+    }
+
 
     public FunctionDef getFunctionDef(String name) {
         return functionDefs.get(name);
@@ -179,6 +195,27 @@ public class ScraperConfiguration {
     }
 
     public String getNamespaceURI() {
-        return namespaceURI;
+        return rootElementDef.getNode().getUri();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void restoreState(final ConfigurationSnapshot state) {
+        if (state == null) {
+            throw new IllegalArgumentException(
+                    "Snapshot of configuration must not be null.");
+        }
+        this.charset = state.getCharset();
+        this.scriptingLanguage = state.getScriptingLanguage();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConfigurationSnapshot captureState() {
+        return new ConfigurationSnapshot(this.charset, this.scriptingLanguage);
     }
 }

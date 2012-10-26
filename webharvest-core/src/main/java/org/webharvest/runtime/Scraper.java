@@ -116,38 +116,30 @@ public class Scraper implements WebScraper {
         this.context = contextFactory.create(configuration.getNamespaceURI());
     }
 
-    // TODO rbala Make it private. Currently used only by IncludeProcessor
-    public Variable execute(List<IElementDef> ops) {
+    public void execute() {
+        long startTime = System.currentTimeMillis();
+
         this.setStatus(STATUS_RUNNING);
 
-        // inform al listeners that execution is just about to start
+        // inform all listeners that execution is just about to start
         eventBus.post(new ScraperExecutionStartEvent(this));
 
         try {
-            for (IElementDef elementDef : ops) {
-                Processor processor = ProcessorResolver.createProcessor(elementDef);
-                if (processor != null) {
-                    processor.run(this, context);
-                }
+            final Processor processor = ProcessorResolver.createProcessor(
+                    configuration.getRootElementDef());
+            if (processor != null) {
+                processor.run(this, context);
             }
         } catch (InterruptedException e) {
             setStatus(STATUS_STOPPED);
             Thread.currentThread().interrupt();
         }
 
-        return EmptyVariable.INSTANCE;
-    }
-
-    public void execute() {
-        long startTime = System.currentTimeMillis();
-
-        execute(configuration.getOperations());
-
         if (this.status == STATUS_RUNNING) {
             this.setStatus(STATUS_FINISHED);
         }
 
-        // inform al listeners that execution is finished
+        // inform all listeners that execution is finished
         eventBus.post(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {

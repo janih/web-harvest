@@ -101,7 +101,10 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
         ScraperConfiguration includedConfig;
         try {
             includedConfig = isUrl ? new ScraperConfiguration(new URL(fullPath)) : new ScraperConfiguration(fullPath);
-            scraper.execute(includedConfig.getOperations());
+
+            ProcessorResolver.createProcessor(
+                    includedConfig.getRootElementDef()).run(scraper, context);
+
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
