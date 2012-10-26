@@ -4,12 +4,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
+import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.ElementDefProxy;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.processors.BodyProcessor.Builder;
 
-public class BodyProcessorBuilderTest extends UnitilsTestNG {
+public class BodyProcessorBuilderTest extends UnitilsTestNGExtension {
 
         private Mock<Processor> parentProcessor;
 

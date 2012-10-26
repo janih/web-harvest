@@ -1,6 +1,7 @@
 package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.IElementDef;
+import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -100,6 +101,12 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
             final BodyProcessor processor = new BodyProcessor();
             processor.setElementDef(elementDef);
             processor.setParentProcessor(parentProcessor);
+
+            //FIXME: Because BodyProcessor is not instantiated from definition,
+            //its (or AbstractProcessor) dependencies must be injected right
+            //here. It is not perfect solution, but temporarily it works.
+            InjectorHelper.getInjector().injectMembers(processor);
+
             return processor;
         }
 

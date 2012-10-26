@@ -45,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.IElementDef;
+import org.webharvest.events.ProcessorStartEvent;
+import org.webharvest.events.ProcessorStopEvent;
 import org.webharvest.ioc.DebugFileLogger;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -54,6 +56,7 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
 /**
@@ -74,6 +77,9 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
     private Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
     private Processor parentProcessor;
+
+    @Inject
+    private EventBus eventBus;
 
     protected AbstractProcessor() {
     }
@@ -119,7 +125,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
                     id != null ? "[ID=" + id + "] " : ""});
         }
 
-        //TODO: fire event with information that processor has started execution
+        eventBus.post(new ProcessorStartEvent(scraper, this));
 
         final Variable result = execute(scraper, context);
         final long executionTime = System.currentTimeMillis() - startTime;
@@ -127,7 +133,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         setProperty(WHConstants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
         setProperty(WHConstants.VALUE_PROPERTY_NAME, result);
 
-        //TODO: fire event with information that processor has finished execution
+        eventBus.post(new ProcessorStopEvent(scraper, this, properties));
 
         writeDebugFile(id, result);
 
