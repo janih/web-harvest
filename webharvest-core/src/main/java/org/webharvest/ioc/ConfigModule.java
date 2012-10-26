@@ -9,14 +9,11 @@ import java.net.URL;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
-import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.xml.sax.InputSource;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 // TODO Add javadoc
@@ -65,21 +62,6 @@ public final class ConfigModule extends AbstractModule {
         requestStaticInjection(BaseTemplater.class);
 
         bind(RuntimeConfig.class).in(Singleton.class);
-    }
-
-    /**
-     * Provides {@link ScriptingLanguage} obtained from current
-     * {@link ScraperConfiguration}.
-     *
-     * @param configuration
-     *            current {@link ScraperConfiguration}
-     * @return {@link ScriptingLanguage} obtained from given configuration
-     */
-    @Provides
-    @Inject
-    public ScriptingLanguage getScriptingLanguage(
-            final ScraperConfiguration configuration) {
-        return configuration.getScriptingLanguage();
     }
 
 }
