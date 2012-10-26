@@ -1,18 +1,21 @@
 package org.webharvest;
 
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertSame;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 
-public class LockedRegistryTest  extends UnitilsTestNG  {
-
-    private static final String KEY = "key";
+public class LockedRegistryTest extends UnitilsTestNG  {
 
     private static final String VALUE = "value";
 
@@ -20,16 +23,20 @@ public class LockedRegistryTest  extends UnitilsTestNG  {
 
     private LockedRegistry<String, String> decorator;
 
+    private AtomicInteger atomicCounter;
+
     @BeforeClass
     public void setUp() {
         delegate = new RegistryMock();
         decorator = new LockedRegistry<String, String>(delegate);
+        atomicCounter = new AtomicInteger();
     }
 
     @AfterClass
     public void tearDown() {
         decorator = null;
         delegate = null;
+        atomicCounter = null;
     }
 
     @Test(expectedExceptions=IllegalArgumentException.class)
@@ -39,14 +46,15 @@ public class LockedRegistryTest  extends UnitilsTestNG  {
 
     @Test(threadPoolSize = 100, invocationCount = 100)
     public void test() throws Exception {
-        decorator.bind(KEY, VALUE);
-        final String value = decorator.lookup(KEY);
+        final String key = Integer.toString(atomicCounter.incrementAndGet());
+        decorator.bind(key, VALUE);
+        final String value = decorator.lookup(key);
         assertNotNull("Null value", value);
         assertSame("Unexpected value", VALUE, value);
-        decorator.unbind(KEY);
+        decorator.unbind(key);
         final Set<String> entries = decorator.listBound();
-        assertNotNull("Null entries", entries);
-        assertTrue("Found entries", entries.isEmpty());
+        assertNotNull("Null bound", entries);
+        assertFalse("Found previously unbound value", entries.contains(key));
     }
 
     private final class RegistryMock implements Registry<String, String> {
@@ -72,7 +80,7 @@ public class LockedRegistryTest  extends UnitilsTestNG  {
 
         @Override
         public Set<String> listBound() {
-            return new HashSet<String>(storage.values());
+            return new HashSet<String>(storage.keySet());
         }
 
     }
