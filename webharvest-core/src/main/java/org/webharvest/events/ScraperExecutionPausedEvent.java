@@ -1,17 +1,23 @@
 package org.webharvest.events;
 
+import org.webharvest.Harvester;
 import org.webharvest.runtime.WebScraper;
 
-public final class ScraperExecutionPausedEvent {
+public final class ScraperExecutionPausedEvent implements HarvesterEvent{
 
-    private final WebScraper scraper;
+    private final Harvester harvester;
 
-    public ScraperExecutionPausedEvent(final WebScraper scraper) {
-        this.scraper = scraper;
+    public ScraperExecutionPausedEvent(final Harvester harvester) {
+        this.harvester = harvester;
     }
 
     public WebScraper getScraper() {
-        return scraper;
+        return harvester.getScraper();
+    }
+
+    @Override
+    public Harvester getHarvester() {
+        return harvester;
     }
 
 }

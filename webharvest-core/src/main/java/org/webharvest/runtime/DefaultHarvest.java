@@ -8,7 +8,9 @@ import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.events.EventHandler;
+import org.webharvest.events.EventSink;
 import org.webharvest.events.HandlerHolder;
+import org.webharvest.events.HarvesterEvent;
 import org.webharvest.ioc.HarvesterFactory;
 import org.xml.sax.InputSource;
 
@@ -21,6 +23,9 @@ public final class DefaultHarvest implements Harvest {
     private final HarvesterFactory harvestFactory;
 
     private final HandlerHolder handlerHolder;
+
+    @Inject
+    private EventSink eventSink;
 
     // TODO Missing documentation
     // TODO Missing unit test
@@ -65,8 +70,18 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
+    // TODO Missing unit test
     public void addEventHandler(final EventHandler<?> handler) {
         handlerHolder.register(handler);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    // TODO Missing unit test
+    public <E extends HarvesterEvent>  void postEvent(final E event) {
+        eventSink.publish(event);
     }
 
 }

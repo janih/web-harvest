@@ -102,7 +102,6 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
-import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 import org.xml.sax.InputSource;
 
@@ -222,6 +221,8 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     private JMenuItem logSelectAllMenuItem;
     private JMenuItem logClearAllMenuItem;
 
+    private Harvest harvest;
+
     private Harvester harvester;
 
     /**
@@ -232,8 +233,6 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
      */
     public ConfigPanel(final Ide ide, String name) {
         super(new BorderLayout());
-
-
 
         this.ide = ide;
 
@@ -393,11 +392,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
     private Harvest createHarvest() {
         // FIXME rbala although temporary solution it is duplicated (CommandLine)
-        final Harvest harvest = Guice.createInjector(
+        this.harvest = Guice.createInjector(
                     new ScraperModule(ide.getSettings().getWorkingPath()),
                     new HttpModule(loadProxySettings()))
                 .getInstance(Harvest.class);
-
         // TODO rbala Possibly bind with Guice when finally created Swing module
         harvest.addEventHandler(new EventHandler<ScraperExecutionStartEvent>() {
 
@@ -692,7 +690,9 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                 setExecutingNode(nodeInfo);
                 int lineNumber = locateInSource(nodeInfo.getNode(), true) - 1;
                 if (xmlPane.getBreakpoints().isThereBreakpoint(lineNumber)) {
-                    scraper.pauseExecution();
+
+                    harvest.postEvent(new ScraperExecutionPausedEvent(harvester));
+
                     xmlPane.clearMarkerLine();
                     xmlPane.setStopDebugLine(lineNumber);
                     ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_BREAKPOINT_ICON);
@@ -935,7 +935,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
     public synchronized void pauseScraperExecution() {
         if (this.harvester != null) {
-            this.harvester.getScraper().pauseExecution();
+            harvest.postEvent(new ScraperExecutionPausedEvent(harvester));
             ide.setTabIcon(this, ResourceManager.SMALL_PAUSED_ICON);
         }
     }

@@ -1,15 +1,20 @@
 package org.webharvest.ioc;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.AbstractRegistry;
 import org.webharvest.Harvest;
 import org.webharvest.Harvester;
+import org.webharvest.LockedRegistry;
+import org.webharvest.Registry;
+import org.webharvest.ScrapingAware;
 import org.webharvest.WHConstants;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.DefaultHandlerHolder;
+import org.webharvest.events.EventSink;
 import org.webharvest.events.HandlerHolder;
+import org.webharvest.events.HarvesterEventSink;
+import org.webharvest.ioc.ScrapingInterceptor.ScrapingAwareHelper;
 import org.webharvest.runtime.DefaultHarvest;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -26,6 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
@@ -38,23 +44,11 @@ public final class ScraperModule extends AbstractModule {
 
     private final String workingDir;
 
-    private final String configDir;
-
     // TODO Add documentation
     // TODO Add unit test
     // FIXME rbala I'm not convinced this is good idea
     public ScraperModule(final String workingDir) {
         this.workingDir = workingDir;
-        // Set the current directory
-        this.configDir = new File("").getAbsolutePath();
-    }
-
-    // TODO Add documentation
-    // TODO Add unit test
-    // FIXME rbala I'm not convinced this is good idea
-    public ScraperModule(final String workingDir, final String configDir) {
-        this.workingDir = workingDir;
-        this.configDir = configDir;
     }
 
     /**
@@ -62,33 +56,44 @@ public final class ScraperModule extends AbstractModule {
      */
     @Override
     protected void configure() {
+        bind(ScrapingAwareHelper.class).toInstance(new ScrapingAwareHelper());
         bindListener(Matchers.any(), new PostConstructListener());
 
+        // FIXME rbala AbstractRegistry is actually not an abstract (no abstract methods)
+        bind(new TypeLiteral<Registry<Harvester, EventBus>>() {}).
+                toInstance(new LockedRegistry<Harvester, EventBus>(
+                        new AbstractRegistry<Harvester, EventBus>() { }));
+
         bindConstant().annotatedWith(WorkingDir.class).to(workingDir);
-        bindConstant().annotatedWith(ConfigDir.class).to(configDir);
 
         bindScope(ScrapingScope.class, SCRAPER_SCOPE);
         // Make our scope instance injectable
         bind(ScraperScope.class).toInstance((ScraperScope) SCRAPER_SCOPE);
 
+        bindListener(TypeMatchers.subclassesOf(ScrapingAware.class),
+                new ScrapingAwareTypeListener());
+
         bind(EventBus.class).in(ScrapingScope.class);
         bindListener(Matchers.any(), new EventBusTypeListener());
+        bind(EventSink.class).to(HarvesterEventSink.class).in(Singleton.class);
 
         requestStaticInjection(InjectorHelper.class);
+
+        bind(ConnectionFactory.class).to(StandaloneConnectionPool.class).in(
+                ScrapingScope.class);
+
 
         bind(AttributeHolder.class).to(ScopeAttributeHolder.class);
 
         bind(Harvest.class).to(DefaultHarvest.class).in(Singleton.class);
-        bind(HandlerHolder.class).to(DefaultHandlerHolder.class).
-            in(Singleton.class);
+        bind(HandlerHolder.class).to(DefaultHandlerHolder.class).in(
+                Singleton.class);
 
-        install(new FactoryModuleBuilder().
-                implement(WebScraper.class, Scraper.class).
-                build(ScraperFactory.class));
+        install(new FactoryModuleBuilder().implement(WebScraper.class,
+                Scraper.class).build(ScraperFactory.class));
 
-        install(new FactoryModuleBuilder().
-                implement(Harvester.class, ScrapingHarvester.class).
-                build(HarvesterFactory.class));
+        install(new FactoryModuleBuilder().implement(Harvester.class,
+                ScrapingHarvester.class).build(HarvesterFactory.class));
 
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Scraping.class),
                 new ScrapingInterceptor());

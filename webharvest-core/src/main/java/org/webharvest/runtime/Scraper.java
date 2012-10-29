@@ -51,6 +51,7 @@ import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -165,12 +166,13 @@ public class Scraper implements WebScraper {
         return message;
     }
 
-    public void pauseExecution() {
+    @Subscribe
+    public void pauseExecution(final ScraperExecutionPausedEvent event) {
         if (this.status == STATUS_RUNNING) {
             setStatus(STATUS_PAUSED);
 
             // inform al listeners that execution is paused
-            eventBus.post(new ScraperExecutionPausedEvent(this));
+           // eventBus.post(new ScraperExecutionPausedEvent(this));
         }
     }
 
