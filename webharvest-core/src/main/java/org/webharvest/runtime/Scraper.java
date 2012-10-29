@@ -36,13 +36,10 @@
 */
 package org.webharvest.runtime;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
@@ -50,12 +47,8 @@ import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.ioc.ContextFactory;
-import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
-import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.CommonUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -84,25 +77,20 @@ public class Scraper implements WebScraper {
     private ContextFactory contextFactory;
 
     private ScraperConfiguration configuration;
-    private String workingDir;
     private DynamicScopeContext context;
 
     private volatile int status = STATUS_READY;
-
     private String message = null;
 
     /**
      * Constructor.
      *
      * @param configuration
-     * @param workingDir
      * @deprecated as public constructor make it private.
      */
     @AssistedInject
-    public Scraper(@Assisted final ScraperConfiguration configuration,
-            @WorkingDir final String workingDir) {
+    public Scraper(@Assisted final ScraperConfiguration configuration) {
         this.configuration = configuration;
-        this.workingDir = CommonUtil.adaptFilename(workingDir);
     }
 
     /**
