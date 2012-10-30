@@ -118,6 +118,9 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         setProperty("ID", id);
 
+        //TODO: mczapiewski Information about beginning and finishing of
+        //processing should not be logged for BodyProcessor, because it only
+        //delegates processing to other processors.
         if (LOG.isInfoEnabled()) {
             LOG.info("{}{} starts processing...{}", new Object[]{
                     CommonUtil.indent(getRunningLevel()),
@@ -137,6 +140,9 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         writeDebugFile(id, result);
 
+        //TODO: mczapiewski Information about beginning and finishing of
+        //processing should not be logged for BodyProcessor, because it only
+        //delegates processing to other processors.
         if (LOG.isInfoEnabled()) {
             LOG.info("{}{} processor executed in {}ms. {}", new Object[]{
                     CommonUtil.indent(getRunningLevel()),
