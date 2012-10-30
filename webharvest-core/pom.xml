@@ -53,6 +53,15 @@
     </build>
 
     <dependencies>
+        <!--
+            Required for class based mock objects (easymock with conjuction with
+            unitils)
+        -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

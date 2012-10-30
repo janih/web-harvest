@@ -410,6 +410,16 @@
                 <version>${unitils.version}</version>
                 <scope>test</scope>
             </dependency>
+            <!--
+              Required for class based mock objects (easymock with conjuction
+              with nitils)
+            -->
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib-nodep</artifactId>
+                <version>2.2</version>
+                <scope>test</scope>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
