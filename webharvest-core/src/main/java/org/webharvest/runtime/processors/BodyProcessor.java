@@ -18,26 +18,11 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
 
     public Variable execute(final Scraper scraper,
             final DynamicScopeContext context) throws InterruptedException {
-        final IElementDef[] defs = elementDef.getOperationDefs();
-
-        if (defs.length == 1) {
-            return context.executeWithinNewContext(new Callable<Variable>() {
-                @Override
-                public Variable call() throws Exception {
-                    final Processor processor = ProcessorResolver
-                            .createProcessor(defs[0]);
-                    processor.setParentProcessor(getParentProcessor());
-                    return CommonUtil.createVariable(processor.run(scraper,
-                            context));
-                }
-            });
-        }
-
         return context.executeWithinNewContext(new Callable<Variable>() {
             @Override
             public Variable call() throws Exception {
                 final ListVariable result = new ListVariable();
-                for (IElementDef def : defs) {
+                for (IElementDef def : elementDef.getOperationDefs()) {
                     final Processor processor = ProcessorResolver
                             .createProcessor(def);
                     processor.setParentProcessor(getParentProcessor());
