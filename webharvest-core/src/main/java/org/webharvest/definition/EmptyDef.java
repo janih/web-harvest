@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of empty element. Empty element just executes body and
@@ -44,7 +44,7 @@ import org.webharvest.runtime.processors.AbstractProcessor;
  */
 public class EmptyDef extends WebHarvestPluginDef {
 
-    public EmptyDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public EmptyDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
     }
 

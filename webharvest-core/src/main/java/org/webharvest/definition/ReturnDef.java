@@ -36,14 +36,14 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of function's return statement.
  */
 public class ReturnDef extends WebHarvestPluginDef {
 
-    public ReturnDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public ReturnDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
     }
 

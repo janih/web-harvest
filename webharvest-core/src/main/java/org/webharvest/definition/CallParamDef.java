@@ -1,6 +1,6 @@
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of function call parameter.
@@ -9,13 +9,13 @@ public class CallParamDef extends WebHarvestPluginDef {
 
     private String name;
 
-    public CallParamDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
-    	super(xmlNode, processorClass);
+    public CallParamDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
+        super(xmlNode, processorClass);
         this.name = xmlNode.getAttribute("name");
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public String getShortElementName() {

@@ -36,27 +36,27 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of conditional processor.
  */
 public class IfDef extends WebHarvestPluginDef {
 
-	private String condition;
+    private String condition;
 
-    public IfDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public IfDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
-        
+
         this.condition = xmlNode.getAttribute("condition");
     }
 
     public String getCondition() {
-		return condition;
-	}
+        return condition;
+    }
 
     public String getShortElementName() {
         return "if";
     }
-    
+
 }

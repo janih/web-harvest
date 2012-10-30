@@ -1,6 +1,6 @@
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of exit processor.
@@ -10,7 +10,7 @@ public class ExitDef extends WebHarvestPluginDef {
     private String condition;
     private String message;
 
-    public ExitDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public ExitDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.condition = xmlNode.getAttribute("condition");

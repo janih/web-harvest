@@ -41,7 +41,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.webharvest.WHConstants;
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * @author Vladimir Nikic
@@ -53,7 +53,7 @@ public class ElementInfo {
 
     private String name;
     private Class<? extends IElementDef> definitionClass;
-    private Class<? extends AbstractProcessor> processorClass;
+    private Class<? extends Processor> processorClass;
     private String validTags;
 
     private Set<String> tagsSet = new TreeSet<String>();
@@ -72,7 +72,7 @@ public class ElementInfo {
 
     public ElementInfo(String name,
                        Class<? extends IElementDef> definitionClass,
-                       Class<? extends AbstractProcessor> processorClass,
+                       Class<? extends Processor> processorClass,
                        String validTags, String validAtts,
                        final boolean isInternal,
                        final Class[] dependantProcessors) {
@@ -140,7 +140,7 @@ public class ElementInfo {
         return definitionClass;
     }
 
-    public Class<? extends AbstractProcessor> getProcessorClass() {
+    public Class<? extends Processor> getProcessorClass() {
         return processorClass;
     }
 

@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of regular expression processor.
@@ -57,7 +57,7 @@ public class RegexpDef extends WebHarvestPluginDef {
     private String flagUnicodecase;
     private String flagCanoneq;
 
-    public RegexpDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public RegexpDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.max = xmlNode.getAttribute("max");

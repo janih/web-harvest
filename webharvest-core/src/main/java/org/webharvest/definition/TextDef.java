@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of text processor.
@@ -46,7 +46,7 @@ public class TextDef extends WebHarvestPluginDef {
     private String charset;
     private String delimiter;
 
-    public TextDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public TextDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
         this.charset = xmlNode.getAttribute("charset");
         this.delimiter = xmlNode.getAttribute("delimiter");

@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of HTML to XML rensformation task.
@@ -64,7 +64,7 @@ public class HtmlToXmlDef extends WebHarvestPluginDef {
     private String hyphenReplacement;
     private String booleanAtts;
 
-    public HtmlToXmlDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public HtmlToXmlDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.outputType = xmlNode.getAttribute("outputtype");

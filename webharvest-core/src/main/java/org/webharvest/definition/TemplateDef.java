@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of template task.
@@ -45,7 +45,7 @@ public class TemplateDef extends WebHarvestPluginDef {
 
     private String language;
 
-    public TemplateDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public TemplateDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
         this.language = xmlNode.getAttribute("language");
     }

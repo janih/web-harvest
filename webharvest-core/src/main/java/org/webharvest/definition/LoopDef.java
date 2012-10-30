@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of loop processor.
@@ -53,7 +53,7 @@ public class LoopDef extends WebHarvestPluginDef {
     private IElementDef loopValueDef;
     private IElementDef loopBodyDef;
 
-    public LoopDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public LoopDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         XmlNode loopValueDefNode = xmlNode.getFirstSubnode(new ElementName("list", xmlNode.getUri()));

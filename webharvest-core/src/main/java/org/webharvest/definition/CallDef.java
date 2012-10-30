@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of function call.
@@ -45,7 +45,7 @@ public class CallDef extends WebHarvestPluginDef {
 
     private String name;
 
-    public CallDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public CallDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.name = xmlNode.getAttribute("name");

@@ -39,7 +39,7 @@ package org.webharvest.definition;
 import java.util.Iterator;
 import java.util.List;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of XQuery processor.
@@ -52,7 +52,7 @@ public class XQueryDef extends WebHarvestPluginDef {
 
     private XQueryExternalParamDef[] externalParamDefs;
 
-    public XQueryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public XQueryDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         XmlNode xqDefNode = xmlNode.getFirstSubnode(new ElementName("xq-expression", xmlNode.getUri()));

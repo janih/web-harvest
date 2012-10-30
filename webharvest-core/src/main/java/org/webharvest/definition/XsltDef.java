@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of user-defined function.
@@ -47,7 +47,7 @@ public class XsltDef extends WebHarvestPluginDef {
 
     private IElementDef stylesheetDef;
 
-    public XsltDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public XsltDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         XmlNode xmlDefNode = xmlNode.getFirstSubnode(new ElementName("xml", xmlNode.getUri()));

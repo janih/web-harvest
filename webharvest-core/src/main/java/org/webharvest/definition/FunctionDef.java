@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of user-defined function.
@@ -45,9 +45,9 @@ public class FunctionDef extends WebHarvestPluginDef {
 
     private String name;
 
-    public FunctionDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public FunctionDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
-        
+
         this.name = xmlNode.getAttribute("name");
     }
 

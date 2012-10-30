@@ -2,7 +2,7 @@ package org.webharvest.definition;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 
 /**
@@ -32,7 +32,7 @@ public final class ConfigDef extends WebHarvestPluginDef {
      *            class of the processor/plugin
      */
     public ConfigDef(final XmlNode xmlNode,
-            final Class<? extends AbstractProcessor> pluginClass) {
+            final Class<? extends Processor> pluginClass) {
         super(xmlNode, pluginClass);
 
         this.charset = StringUtils.defaultIfEmpty(

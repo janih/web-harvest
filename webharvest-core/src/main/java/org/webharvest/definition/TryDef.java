@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of try-catche element.
@@ -46,7 +46,7 @@ public class TryDef extends WebHarvestPluginDef {
     private IElementDef tryBodyDef;
     private IElementDef catchValueDef;
 
-    public TryDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public TryDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         XmlNode tryBodyDefNode = xmlNode.getFirstSubnode(new ElementName("body", xmlNode.getUri()));

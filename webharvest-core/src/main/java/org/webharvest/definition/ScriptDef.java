@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of script processor.
@@ -48,7 +48,7 @@ public class ScriptDef extends WebHarvestPluginDef {
     // For backward compatibility with ver.2b1 only!
     private String returnExpression;
 
-    public ScriptDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public ScriptDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
         this.language = xmlNode.getAttribute("language");
         this.returnExpression = xmlNode.getAttribute("return");

@@ -37,7 +37,7 @@
 package org.webharvest.definition;
 
 import org.apache.commons.lang.StringUtils;
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of variable.
@@ -47,7 +47,7 @@ public class VarDefDef extends WebHarvestPluginDef {
     private String name;
     private String overwrite;
 
-    public VarDefDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public VarDefDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.name = StringUtils.trim(xmlNode.getAttribute("name"));

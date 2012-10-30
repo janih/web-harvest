@@ -36,12 +36,12 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.WHConstants;
-import org.webharvest.exception.ConfigurationException;
-import org.webharvest.runtime.processors.AbstractProcessor;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.webharvest.WHConstants;
+import org.webharvest.exception.ConfigurationException;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of XPath processor.
@@ -51,7 +51,7 @@ public class XPathDef extends WebHarvestPluginDef {
     private String expression;
     private Map<String, String> variableMap = new HashMap<String, String>();
 
-    public XPathDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public XPathDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.expression = xmlNode.getAttribute("expression");

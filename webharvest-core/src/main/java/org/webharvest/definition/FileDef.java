@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 import org.webharvest.utils.CommonUtil;
 
 /**
@@ -53,7 +53,7 @@ public class FileDef extends WebHarvestPluginDef {
     private String listDirs;
     private String listRecursive;
 
-    public FileDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public FileDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.action = xmlNode.getAttribute("action");
@@ -101,5 +101,5 @@ public class FileDef extends WebHarvestPluginDef {
     public String getListRecursive() {
         return listRecursive;
     }
-    
+
 }

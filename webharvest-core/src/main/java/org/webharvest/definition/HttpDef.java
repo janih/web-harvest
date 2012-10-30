@@ -36,10 +36,10 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
-import org.webharvest.utils.CommonUtil;
-
 import java.util.concurrent.TimeUnit;
+
+import org.webharvest.runtime.processors.Processor;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Definition of HTTP processor.
@@ -67,7 +67,7 @@ public class HttpDef extends WebHarvestPluginDef {
     private String retryDelay;
     private String retryDelayFactor;
 
-    public HttpDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public HttpDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.method = CommonUtil.nvl(xmlNode.getAttribute("method"), DEFAULT_METHOD);

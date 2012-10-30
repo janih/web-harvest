@@ -36,7 +36,7 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of include element.
@@ -45,7 +45,7 @@ public class IncludeDef extends WebHarvestPluginDef {
 
     private String path;
 
-    public IncludeDef(XmlNode xmlNode, Class<? extends AbstractProcessor> processorClass) {
+    public IncludeDef(XmlNode xmlNode, Class<? extends Processor> processorClass) {
         super(xmlNode, processorClass);
 
         this.path = xmlNode.getAttribute("path");

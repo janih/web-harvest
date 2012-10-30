@@ -36,18 +36,18 @@
 */
 package org.webharvest.definition;
 
-import org.webharvest.runtime.processors.AbstractProcessor;
+import org.webharvest.runtime.processors.Processor;
 
 /**
  * Definition of constant processor. It is not explicitly used
  * in configuaration xml, but is used internally to define static
- * (text) content. 
+ * (text) content.
  */
 public class ConstantDef extends WebHarvestPluginDef {
 
     private String text;
 
-    public ConstantDef(String text, Class<? extends AbstractProcessor> processorClass) {
+    public ConstantDef(String text, Class<? extends Processor> processorClass) {
         super(XmlNode.NULL, processorClass);
         this.text = text;
     }

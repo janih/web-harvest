@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.webharvest.exception.PluginException;
 import org.webharvest.ioc.InjectorHelper;
-import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 
 /**
@@ -13,10 +12,10 @@ import org.webharvest.runtime.processors.Processor;
 public class WebHarvestPluginDef extends AbstractElementDef {
 
 
-    private Class<? extends AbstractProcessor> pluginClass;
+    private Class<? extends Processor> pluginClass;
 
     public WebHarvestPluginDef(final XmlNode xmlNode,
-            Class<? extends AbstractProcessor> pluginClass) {
+            Class<? extends Processor> pluginClass) {
         super(xmlNode);
         this.pluginClass = pluginClass;
     }
@@ -40,7 +39,7 @@ public class WebHarvestPluginDef extends AbstractElementDef {
     public Processor createPlugin() {
         if (pluginClass != null) {
             try {
-                AbstractProcessor plugin = pluginClass.newInstance();
+                Processor plugin = pluginClass.newInstance();
                 plugin.setElementDef(this);
 
                 //FIXME: This a temporary solution which is not neat, but
