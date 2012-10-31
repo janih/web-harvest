@@ -69,10 +69,10 @@ public class VarDefProcessorTest extends UnitilsTestNGExtension {
     }
 
     private Variable invoke(String varDefXml) throws InterruptedException {
-        return ProcessorTestUtils.<VarDefProcessor>processor(
+        return ProcessorTestUtils.processor(
                     XmlNodeTestUtils.createXmlNode(varDefXml,
                         XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context);
+                run(scraperMock.getMock(), context);
     }
 
     @Test

@@ -17,15 +17,19 @@ import org.webharvest.events.HarvesterEventSink;
 import org.webharvest.ioc.ScrapingInterceptor.ScrapingAwareHelper;
 import org.webharvest.runtime.DefaultHarvest;
 import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.RunningStatusGuard;
+import org.webharvest.runtime.EventBasedStatusHolder;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScrapingHarvester;
+import org.webharvest.runtime.StatusHolder;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.JNDIConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.Monitor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -101,6 +105,7 @@ public final class ScraperModule extends AbstractModule {
         bindDBConnectionFactory();
         bindScraperContext();
         bindDebugFileLogger();
+        bindStatusHolder();
     }
 
     protected void bindDBConnectionFactory() {
@@ -127,5 +132,13 @@ public final class ScraperModule extends AbstractModule {
     protected void bindDebugFileLogger() {
         bind(Logger.class).annotatedWith(DebugFileLogger.class).toInstance(
                 LoggerFactory.getLogger(DebugFileLogger.NAME));
+    }
+
+    protected void bindStatusHolder() {
+        bind(Monitor.class).in(ScrapingScope.class);
+        bind(StatusHolder.class).to(EventBasedStatusHolder.class)
+            .in(ScrapingScope.class);
+        bind(Monitor.Guard.class).to(RunningStatusGuard.class)
+            .in(ScrapingScope.class);
     }
 }

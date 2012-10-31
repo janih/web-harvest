@@ -66,7 +66,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
 
     @Test
     public void testExecute_fullMatch() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertEquals((Object) ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
@@ -78,12 +78,12 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222c333][111][222][333]");
+                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222c333][111][222][333]");
     }
 
     @Test
     public void testExecute_notMatch() throws Exception {
-        Assert.assertTrue(ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertTrue(ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(\\d+)$</regexp-pattern>" +
@@ -93,12 +93,12 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_1'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).isEmpty());
+                run(scraperMock.getMock(), context).isEmpty());
     }
 
     @Test
     public void testExecute_emptySource() throws Exception {
-        Assert.assertTrue(ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertTrue(ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
@@ -110,12 +110,12 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).isEmpty());
+                run(scraperMock.getMock(), context).isEmpty());
     }
 
     @Test
     public void testExecute_1st_group_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertEquals((Object) ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
@@ -127,12 +127,12 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[b222c333][][222][333]");
+                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[b222c333][][222][333]");
     }
 
     @Test
     public void testExecute_2nd_group_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertEquals((Object) ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
@@ -144,12 +144,12 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111c333][111][][333]");
+                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111c333][111][][333]");
     }
 
     @Test
     public void testExecute_3rd_group_absent() throws Exception {
-        Assert.assertEquals((Object) ProcessorTestUtils.<RegexpProcessor>processor(
+        Assert.assertEquals((Object) ProcessorTestUtils.processor(
                 XmlNodeTestUtils.createXmlNode("" +
                 "<regexp>" +
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
@@ -161,6 +161,6 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                execute(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222][111][222][]");
+                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222][111][222][]");
     }
 }

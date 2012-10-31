@@ -12,9 +12,12 @@ import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.templaters.BaseTemplater;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.Monitor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 /**
@@ -97,7 +100,22 @@ public abstract class UnitilsTestNGExtension extends UnitilsTestNG {
             // ScriptProcessor dependecies
             bind(ScriptEngineFactory.class)
                     .toInstance(getScriptEngineFactory());
+
+            // Processor's decorators dependencies
+            bind(Monitor.class).in(Singleton.class);
+        }
+
+        @Inject
+        @Provides
+        public Monitor.Guard getMonitorGuard(final Monitor monitor) {
+            return new Monitor.Guard(monitor) {
+                @Override
+                public boolean isSatisfied() {
+                    return true;
+                }
+            };
         }
 
     }
+
 }

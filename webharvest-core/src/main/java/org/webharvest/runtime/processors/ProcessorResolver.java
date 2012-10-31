@@ -41,10 +41,9 @@ import org.webharvest.definition.PluginDef;
 
 public class ProcessorResolver {
 
-    public static Processor createProcessor(IElementDef elementDef) {
+    public static <TDef extends IElementDef> Processor<TDef> createProcessor(TDef elementDef) {
         if (elementDef instanceof PluginDef) {
-            return ((PluginDef) elementDef).createPlugin();
-
+            return new RunningStatusController<TDef>(elementDef.createPlugin());
         } else {
             throw new IllegalArgumentException("Unexpected element definition class: " + elementDef.getClass());
         }

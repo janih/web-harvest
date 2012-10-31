@@ -176,12 +176,13 @@ public class Scraper implements WebScraper {
         }
     }
 
-    public void continueExecution() {
+    @Subscribe
+    public void continueExecution(final ScraperExecutionContinuedEvent event) {
         if (this.status == STATUS_PAUSED) {
             setStatus(STATUS_RUNNING);
 
             // inform al listeners that execution is continued
-            eventBus.post(new ScraperExecutionContinuedEvent(this));
+            // eventBus.post(new ScraperExecutionContinuedEvent(this));
         }
     }
 

@@ -45,7 +45,6 @@ import org.testng.annotations.Test;
 import org.unitils.mock.Mock;
 import org.unitils.mock.core.MockObject;
 import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.util.ReflectionUtils;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.runtime.Scraper;
@@ -77,19 +76,15 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
     public void testExecute_defaultLang() throws Exception {
         engineMock.returns("my val").evaluate(context, null);
 
-        final ScriptProcessor processor =
-            ProcessorTestUtils.<ScriptProcessor>processor(
+        final Processor processor =
+            ProcessorTestUtils.processor(
                     XmlNodeTestUtils.createXmlNode("" +
                     "<script><![CDATA[ some script here ]]></script>",
                     XmlNodeTestUtils.NAMESPACE_10));
 
-        ReflectionUtils.setFieldValue(processor,
-                ScriptProcessor.class.getDeclaredField("scriptEngineFactory"),
-                scriptEngineFactoryMock.getMock());
-
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.execute(scraperMock.getMock(), context));
+                processor.run(scraperMock.getMock(), context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", null));
@@ -99,19 +94,15 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
     public void testExecute_specifiedLang() throws Exception {
         engineMock.returns("my val").evaluate(context, null);
 
-        final ScriptProcessor processor =
-            ProcessorTestUtils.<ScriptProcessor>processor(
+        final Processor processor =
+            ProcessorTestUtils.processor(
                     XmlNodeTestUtils.createXmlNode("" +
                     "<script language='groovy'><![CDATA[ some script here ]]></script>",
                     XmlNodeTestUtils.NAMESPACE_10));
 
-        ReflectionUtils.setFieldValue(processor,
-                ScriptProcessor.class.getDeclaredField("scriptEngineFactory"),
-                scriptEngineFactoryMock.getMock());
-
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.execute(scraperMock.getMock(), context));
+                processor.run(scraperMock.getMock(), context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", GROOVY));
@@ -122,19 +113,15 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
         engineMock.returns("my val").evaluate(context, null);
 
 
-        final ScriptProcessor processor =
-            ProcessorTestUtils.<ScriptProcessor>processor(
+        final Processor processor =
+            ProcessorTestUtils.processor(
                     XmlNodeTestUtils.createXmlNode("" +
                     "<script language='groovy'><![CDATA[ some script here ]]></script>",
                     XmlNodeTestUtils.NAMESPACE_10));
 
-        ReflectionUtils.setFieldValue(processor,
-                ScriptProcessor.class.getDeclaredField("scriptEngineFactory"),
-                scriptEngineFactoryMock.getMock());
-
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.execute(scraperMock.getMock(), context));
+                processor.run(scraperMock.getMock(), context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", GROOVY));
@@ -151,17 +138,9 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         templaterMock.returns("my return code").evaluate(context, null);
 
-        final ScriptProcessor processor =
-            ProcessorTestUtils.<ScriptProcessor>processor(
-                    XmlNodeTestUtils.createXmlNode("" +
-                    "<script return='${myReturnExpr}'><![CDATA[ some script here ]]></script>",
-                    XmlNodeTestUtils.NAMESPACE_10));
-
-        ReflectionUtils.setFieldValue(processor,
-                ScriptProcessor.class.getDeclaredField("scriptEngineFactory"),
-                scriptEngineFactoryMock.getMock());
-
-       processor.execute(scraperMock.getMock(), context);
+        ProcessorTestUtils.processor(XmlNodeTestUtils.createXmlNode("" +
+                "<script return='${myReturnExpr}'><![CDATA[ some script here ]]></script>",
+                XmlNodeTestUtils.NAMESPACE_10)).run(scraperMock.getMock(), context);
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here; my return code", null));

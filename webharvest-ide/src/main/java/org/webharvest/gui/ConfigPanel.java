@@ -848,9 +848,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
     public void runConfiguration() {
         if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
-            synchronized (this.harvester.getScraper()) {
-                this.harvester.getScraper().notifyAll();
-            }
+            harvest.postEvent(new ScraperExecutionContinuedEvent(this.harvester));
 
             ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
         } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {

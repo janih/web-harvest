@@ -99,19 +99,6 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
             throw new InterruptedException();
         }
 
-        if (scraperStatus == Scraper.STATUS_PAUSED) {
-            final SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
-            synchronized (scraper) {
-                LOG.info("Execution paused [{}].",
-                        dateFormatter.format(new Date()));
-                scraper.wait();
-            }
-
-
-            scraper.continueExecution();
-            LOG.info("Execution continued [{}].", dateFormatter.format(new Date()));
-        }
-
         final long startTime = System.currentTimeMillis();
 
         final String id = (this.elementDef != null) ? BaseTemplater.evaluateToString(this.elementDef.getId(), null, context) : null;
