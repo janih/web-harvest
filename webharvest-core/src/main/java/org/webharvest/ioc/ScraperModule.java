@@ -33,7 +33,6 @@ import com.google.common.util.concurrent.Monitor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Scope;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -44,7 +43,7 @@ import com.google.inject.name.Names;
 // TODO Add unit test
 public final class ScraperModule extends AbstractModule {
 
-    private static final Scope SCRAPER_SCOPE = new ScraperScope();
+    private static final ScraperScope SCRAPER_SCOPE = new ScraperScope();
 
     private final String workingDir;
 
@@ -72,7 +71,7 @@ public final class ScraperModule extends AbstractModule {
 
         bindScope(ScrapingScope.class, SCRAPER_SCOPE);
         // Make our scope instance injectable
-        bind(ScraperScope.class).toInstance((ScraperScope) SCRAPER_SCOPE);
+        bind(ScraperScope.class).toInstance(SCRAPER_SCOPE);
 
         bindListener(TypeMatchers.subclassesOf(ScrapingAware.class),
                 new ScrapingAwareTypeListener());

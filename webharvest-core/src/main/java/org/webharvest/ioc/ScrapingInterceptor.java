@@ -153,7 +153,7 @@ public final class ScrapingInterceptor implements MethodInterceptor {
     // TODO It is easy to register listener but how about unregistering it?
     // TODO Resolve duplication of methods with ScrapingAware
     @Singleton
-    public static final class ScrapingAwareHelper {
+    public static class ScrapingAwareHelper {
 
         /**
          * Collection of {@link ScrapingAware} listeners.

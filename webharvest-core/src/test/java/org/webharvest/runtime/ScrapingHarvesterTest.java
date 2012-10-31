@@ -64,9 +64,9 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         expect(mockConfiguration.getOperations()).andReturn(mockElementDef);
         mockLoadCallback.onSuccess(mockElementDef);
         expectLastCall();
+        EasyMockUnitils.replay();
         final File tmp = File.createTempFile("foo", "tmp");
         try {
-            EasyMockUnitils.replay();
             new ScrapingHarvester(mockInjector, mockFactory,
                     tmp.getAbsolutePath(), mockLoadCallback);
         } finally {
