@@ -16,31 +16,47 @@ import org.xml.sax.InputSource;
 
 import com.google.inject.Inject;
 
-// TODO Missing documentation
-// TODO Missing unit test
+/**
+ * Default implementation of {@link Harvest} interface.
+ *
+ * @author Robert Bala
+ * @since 2.1.0-SNAPSHOT
+ * @version %I%, %G%
+ * @see Harvest
+ */
 public final class DefaultHarvest implements Harvest {
 
     private final HarvesterFactory harvestFactory;
 
     private final HandlerHolder handlerHolder;
 
-    @Inject
     private EventSink eventSink;
 
-    // TODO Missing documentation
-    // TODO Missing unit test
+    /**
+     * Default class constructor specifying {@link HarvesterFactory},
+     * {@link HandlerHolder} and {@link EventSink} that are expected to be Guice
+     * injected.
+     *
+     * @param harvestFactory
+     *            reference to factory capable to produce {@link Harvester}
+     *            objects.
+     * @param handlerHolder
+     *            reference to object storing all registered event handlers.
+     * @param eventSink
+     *            reference to event bus facade.
+     */
     @Inject
     public DefaultHarvest(final HarvesterFactory harvestFactory,
-            final HandlerHolder handlerHolder) {
+            final HandlerHolder handlerHolder, final EventSink eventSink) {
         this.harvestFactory = harvestFactory;
         this.handlerHolder = handlerHolder;
+        this.eventSink = eventSink;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    // TODO Missing unit test
     public Harvester getHarvester(final URL config,
             final HarvestLoadCallback callback) throws IOException {
         return harvestFactory.create(config, callback);
@@ -50,7 +66,6 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
-    // TODO Missing unit test
     public Harvester getHarvester(final String config,
             final HarvestLoadCallback callback) throws FileNotFoundException {
         return harvestFactory.create(config, callback);
@@ -60,7 +75,6 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
-    // TODO Missing unit test
     public Harvester getHarvester(final InputSource config,
             final HarvestLoadCallback callback) {
         return harvestFactory.create(config, callback);
@@ -70,7 +84,6 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
-    // TODO Missing unit test
     public void addEventHandler(final EventHandler<?> handler) {
         handlerHolder.register(handler);
     }
@@ -79,8 +92,7 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
-    // TODO Missing unit test
-    public <E extends HarvesterEvent>  void postEvent(final E event) {
+    public <E extends HarvesterEvent> void postEvent(final E event) {
         eventSink.publish(event);
     }
 
