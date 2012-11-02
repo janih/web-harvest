@@ -74,10 +74,8 @@ public class Scraper implements WebScraper {
     @Inject
     private EventBus eventBus;
 
-    @Inject
-    private ContextFactory contextFactory;
-
     private ScraperConfiguration configuration;
+
     private DynamicScopeContext context;
 
     private volatile int status = STATUS_READY;
@@ -94,18 +92,7 @@ public class Scraper implements WebScraper {
         this.configuration = configuration;
     }
 
-    /**
-     * Initializes {@link DynamicScopeContext} - we need to do it after all are
-     * dependencies are injected. Also, we need to pass to the factory namespace
-     * URI of the configuration being executed (it is required in order to
-     * instantiate appropriate {@link DynamicScopeContext} implementation).
-     */
-    @PostConstruct
-    public void initContext() {
-        this.context = contextFactory.create(configuration.getNamespaceURI());
-    }
-
-    public void execute() {
+    public void execute(final DynamicScopeContext context) {
         long startTime = System.currentTimeMillis();
 
         this.setStatus(STATUS_RUNNING);
@@ -127,6 +114,9 @@ public class Scraper implements WebScraper {
         if (this.status == STATUS_RUNNING) {
             this.setStatus(STATUS_FINISHED);
         }
+
+        // TODO rbala Remove along with deprecated method getContext()
+        this.context = context;
 
         // inform all listeners that execution is finished
         eventBus.post(new ScraperExecutionEndEvent(this));

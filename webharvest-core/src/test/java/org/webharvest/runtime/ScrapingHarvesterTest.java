@@ -16,6 +16,7 @@ import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.ScraperFactory;
 import org.xml.sax.InputSource;
 
@@ -23,6 +24,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 
 public class ScrapingHarvesterTest extends UnitilsTestNG {
+
+    private static final String NAMESPACE = "http://foo.com";
 
     @RegularMock
     private Injector mockInjector;
@@ -54,6 +57,9 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
     @RegularMock
     private DynamicScopeContext mockContext;
 
+    @RegularMock
+    private ContextFactory mockContextFactory;
+
     @Test
     public void testConstructorWithFilePathConfiguration()
             throws IOException {
@@ -67,7 +73,7 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         EasyMockUnitils.replay();
         final File tmp = File.createTempFile("foo", "tmp");
         try {
-            new ScrapingHarvester(mockInjector, mockFactory,
+            new ScrapingHarvester(mockInjector, mockFactory, mockContextFactory,
                     tmp.getAbsolutePath(), mockLoadCallback);
         } finally {
             tmp.delete();
@@ -85,7 +91,7 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         mockLoadCallback.onSuccess(mockElementDef);
         expectLastCall();
         EasyMockUnitils.replay();
-        new ScrapingHarvester(mockInjector, mockFactory,
+        new ScrapingHarvester(mockInjector, mockFactory, mockContextFactory,
                 new URL("http://www.hurra.com"), mockLoadCallback);
     }
 
@@ -100,7 +106,7 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         mockLoadCallback.onSuccess(mockElementDef);
         expectLastCall();
         EasyMockUnitils.replay();
-        new ScrapingHarvester(mockInjector, mockFactory,
+        new ScrapingHarvester(mockInjector, mockFactory, mockContextFactory,
                 mockInputSource, mockLoadCallback);
     }
 
@@ -114,15 +120,16 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         mockLoadCallback.onSuccess(mockElementDef);
         expectLastCall();
         expect(mockFactory.create(mockConfiguration)).andReturn(mockScraper);
-        expect(mockScraper.getContext()).andReturn(mockContext);
+        expect(mockConfiguration.getNamespaceURI()).andReturn(NAMESPACE);
+        expect(mockContextFactory.create(NAMESPACE)).andReturn(mockContext);
         mockInitCallback.onSuccess(mockContext);
         expectLastCall();
-        mockScraper.execute();
+        mockScraper.execute(mockContext);
         expectLastCall();
-        expect(mockScraper.getContext()).andReturn(mockContext);
         EasyMockUnitils.replay();
         final Harvester harvester = new ScrapingHarvester(mockInjector,
-                mockFactory, mockInputSource, mockLoadCallback);
+                mockFactory, mockContextFactory, mockInputSource,
+                mockLoadCallback);
         final DynamicScopeContext context = harvester.execute(mockInitCallback);
         assertNotNull(context);
         assertSame(mockContext, context);

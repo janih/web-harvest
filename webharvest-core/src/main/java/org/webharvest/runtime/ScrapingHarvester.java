@@ -41,10 +41,12 @@ import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.ioc.ConfigModule;
+import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.ScraperFactory;
 import org.webharvest.ioc.Scraping;
 import org.xml.sax.InputSource;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.assistedinject.Assisted;
@@ -88,6 +90,8 @@ public class ScrapingHarvester implements Harvester {
     @Deprecated
     private WebScraper scraper;
 
+    private ContextFactory contextFactory;
+
     /**
      * Class constructor expecting Guice {@link Injector},
      * {@link ScraperFactory}, {@link URL} and {@link HarvestLoadCallback} to be
@@ -105,11 +109,14 @@ public class ScrapingHarvester implements Harvester {
      * @throws IOException
      */
     // FIXME rbala more then 4 parameters
+    // TODO contextFactory not in documentation
     @AssistedInject
     public ScrapingHarvester(final Injector injector,
-            final ScraperFactory scraperFactory, @Assisted final URL config,
+            final ScraperFactory scraperFactory,
+            final ContextFactory contextFactory, @Assisted final URL config,
             @Assisted final HarvestLoadCallback callback) throws IOException {
-        this(injector, scraperFactory, new ConfigModule(config), callback);
+        this(injector, scraperFactory, contextFactory, new ConfigModule(config),
+                callback);
     }
 
     /**
@@ -130,11 +137,14 @@ public class ScrapingHarvester implements Harvester {
      */
     // FIXME rbala more then 4 parameters
     @AssistedInject
+    // TODO contextFactory not in documentation
     public ScrapingHarvester(final Injector injector,
-            final ScraperFactory scraperFactory, @Assisted final String config,
+            final ScraperFactory scraperFactory,
+            final ContextFactory contextFactory, @Assisted final String config,
             @Assisted final HarvestLoadCallback callback)
             throws FileNotFoundException {
-        this(injector, scraperFactory, new ConfigModule(config), callback);
+        this(injector, scraperFactory, contextFactory, new ConfigModule(config),
+                callback);
     }
 
     /**
@@ -154,17 +164,22 @@ public class ScrapingHarvester implements Harvester {
      * @throws IOException
      */
     @AssistedInject
+    // TODO contextFactory not in documentation
     public ScrapingHarvester(final Injector injector,
             final ScraperFactory scraperFactory,
+            final ContextFactory contextFactory,
             @Assisted final InputSource config,
             @Assisted final HarvestLoadCallback callback) {
-        this(injector, scraperFactory, new ConfigModule(config), callback);
+        this(injector, scraperFactory, contextFactory, new ConfigModule(config),
+                callback);
     }
 
     private ScrapingHarvester(final Injector injector,
-            final ScraperFactory scraperFactory, final Module module,
+            final ScraperFactory scraperFactory,
+            final ContextFactory contextFactory, final Module module,
             final HarvestLoadCallback loadCallback) {
         this.scraperFactory = scraperFactory;
+        this.contextFactory = contextFactory;
         this.config = injector.createChildInjector(module).getInstance(
                 ScraperConfiguration.class);
         loadCallback.onSuccess(config.getOperations());
@@ -177,16 +192,20 @@ public class ScrapingHarvester implements Harvester {
     @Scraping
     public DynamicScopeContext execute(final ContextInitCallback callback) {
         this.scraper = scraperFactory.create(config);
-        callback.onSuccess(scraper.getContext());
+
+        final DynamicScopeContext context =
+                contextFactory.create(config.getNamespaceURI());
+
+        callback.onSuccess(context);
 
         // FIXME rbala Moved directly from ScraperExecutionThread. Not covered by any test!
         try {
-            scraper.execute();
+            scraper.execute(context);
         } catch (RuntimeException e) {
             scraper.informListenersAboutError(e);
         }
 
-        return scraper.getContext();
+        return context;
     }
 
     /**
