@@ -55,11 +55,10 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * Basic configuration.
  */
-public class ScraperConfiguration implements RestorableConfiguration {
+public class ScraperConfiguration {
 
     private ElementDefProxy rootElementDef;
 
-    private ScriptingLanguage scriptingLanguage;
     private File sourceFile;
     private String url;
 
@@ -125,25 +124,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
         return rootElementDef;
     }
 
-    /**
-     * Returns default configuration's {@link ScriptingLanguage}.
-     *
-     * @return default configuration's {@link ScriptingLanguage}.
-     */
-    public ScriptingLanguage getScriptingLanguage() {
-        return scriptingLanguage;
-    }
-
-    /**
-     * Sets default configuration's {@link ScriptingLanguage}.
-     *
-     * @param language
-     *            new default configuration's {@link ScriptingLanguage}
-     */
-    public void setScriptingLanguage(final ScriptingLanguage language) {
-        this.scriptingLanguage = language;
-    }
-
     public File getSourceFile() {
         return this.sourceFile;
     }
@@ -162,25 +142,5 @@ public class ScraperConfiguration implements RestorableConfiguration {
 
     public String getNamespaceURI() {
         return rootElementDef.getNode().getUri();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void restoreState(final ConfigurationSnapshot state) {
-        if (state == null) {
-            throw new IllegalArgumentException(
-                    "Snapshot of configuration must not be null.");
-        }
-        this.scriptingLanguage = state.getScriptingLanguage();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConfigurationSnapshot captureState() {
-        return new ConfigurationSnapshot(this.scriptingLanguage);
     }
 }

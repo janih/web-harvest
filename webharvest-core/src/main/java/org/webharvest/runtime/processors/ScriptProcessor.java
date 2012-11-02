@@ -78,11 +78,16 @@ public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
         }
 
         final ScriptSource scriptSource = new ScriptSource(sourceCode,
-                ScriptingLanguage.recognize(BaseTemplater.evaluateToString(
-                        elementDef.getLanguage(), null, context)));
-
+                evaluateScriptingLanguage(context));
         return CommonUtil.createVariable(scriptEngineFactory
                 .getEngine(scriptSource).evaluate(context, scriptSource));
     }
 
+    private ScriptingLanguage evaluateScriptingLanguage(
+            final DynamicScopeContext context) {
+        ScriptingLanguage language = ScriptingLanguage.recognize(
+                BaseTemplater.evaluateToString(elementDef.getLanguage(),
+                        null, context));
+        return language != null ? language : context.getScriptingLanguage();
+    }
 }

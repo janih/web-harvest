@@ -68,48 +68,56 @@ public class BaseTemplater {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public static Variable evaluateToVariable(String source, ScriptingLanguage language, DynamicScopeContext context) {
+    public static Variable evaluateToVariable(final String source,
+            final ScriptingLanguage language,
+            final DynamicScopeContext context) {
         if (source == null) {
             return EmptyVariable.INSTANCE;
         }
+        final ScriptingLanguage scriptingLanguage =
+            language != null ? language : context.getScriptingLanguage();
 
-        int startIndex = source.indexOf(VAR_START);
-
-        if (startIndex < 0) {
-            return new NodeVariable(source);
-        }
-
-        final List<Object> result = new ArrayList<Object>();
-        int endIndex = -1;
-
-        while (0 <= startIndex && startIndex < source.length()) {
-            if (endIndex + 1 < startIndex) {
-                result.add(source.substring(endIndex + 1, startIndex));
-            }
-            endIndex = source.indexOf(VAR_END, startIndex);
-
-            if (endIndex > startIndex) {
-                final ScriptSource scriptSource = new ScriptSource(
-                        source.substring(startIndex + VAR_START.length(),
-                                endIndex), language);
-                final Object resultObj = scriptEngineFactory.
-                        getEngine(scriptSource).
-                        evaluate(context, scriptSource);
-
-                if (resultObj != null) {
-                    result.add(resultObj);
-                }
-            }
-
-            startIndex = source.indexOf(VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1));
-        }
-
-        if (endIndex + 1 < source.length()) {
-            result.add(source.substring(endIndex + 1));
-        }
-
-        return CommonUtil.createVariable(result.size() == 1 ? result.get(0) : StringUtils.join(result, null));
-
+        return evaluateToVariableInternal(source, scriptingLanguage, context);
     }
 
+    private static Variable evaluateToVariableInternal(final String source,
+            final ScriptingLanguage language,
+            final DynamicScopeContext context) {
+          int startIndex = source.indexOf(VAR_START);
+
+          if (startIndex < 0) {
+              return new NodeVariable(source);
+          }
+
+          final List<Object> result = new ArrayList<Object>();
+          int endIndex = -1;
+
+          while (0 <= startIndex && startIndex < source.length()) {
+              if (endIndex + 1 < startIndex) {
+                  result.add(source.substring(endIndex + 1, startIndex));
+              }
+              endIndex = source.indexOf(VAR_END, startIndex);
+
+              if (endIndex > startIndex) {
+                  final ScriptSource scriptSource = new ScriptSource(
+                          source.substring(startIndex + VAR_START.length(),
+                                  endIndex), language);
+                  final Object resultObj = scriptEngineFactory.
+                          getEngine(scriptSource).
+                          evaluate(context, scriptSource);
+
+                  if (resultObj != null) {
+                      result.add(resultObj);
+                  }
+              }
+
+              startIndex = source.indexOf(VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1));
+          }
+
+          if (endIndex + 1 < source.length()) {
+              result.add(source.substring(endIndex + 1));
+          }
+
+          return CommonUtil.createVariable(result.size() == 1 ? result.get(0) : StringUtils.join(result, null));
+    }
 }

@@ -42,6 +42,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.VariableException;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -77,6 +78,10 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
+    @Deprecated
+    private ScriptingLanguage scriptingLanguage;
+
+    @Deprecated
     private String charset;
 
     public ScraperContext() {
@@ -216,6 +221,24 @@ public class ScraperContext implements DynamicScopeContext {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
+    public ScriptingLanguage getScriptingLanguage() {
+        return scriptingLanguage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void setScriptingLanguage(final ScriptingLanguage language) {
+        this.scriptingLanguage = language;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getCharset() {
         return charset;
     }
@@ -227,5 +250,4 @@ public class ScraperContext implements DynamicScopeContext {
     public void setCharset(final String charset) {
         this.charset = charset;
     }
-
 }

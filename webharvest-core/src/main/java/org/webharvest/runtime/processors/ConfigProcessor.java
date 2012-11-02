@@ -5,7 +5,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ConfigDef;
-import org.webharvest.definition.ConfigurationSnapshot;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -29,7 +28,6 @@ import com.google.inject.Inject;
         definitionClass = ConfigDef.class)
 public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
 
-
     @Inject
     private ScraperConfiguration configuration;
 
@@ -40,18 +38,11 @@ public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
     protected Variable execute(final Scraper scraper,
             final DynamicScopeContext context) throws InterruptedException {
 
-        //save configuration's state
-        final ConfigurationSnapshot snapshot = configuration.captureState();
-
         context.setCharset(getElementDef().getCharset());
-        configuration.setScriptingLanguage(
-                getElementDef().getScriptingLanguage());
+        context.setScriptingLanguage(getElementDef().getScriptingLanguage());
 
         //evaluate body of config element
         getBodyTextContent(getElementDef(), scraper, context);
-
-        //restore previously saved state of the configuration
-        configuration.restoreState(snapshot);
 
         return EmptyVariable.INSTANCE;
     }

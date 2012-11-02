@@ -38,7 +38,7 @@
 
 package org.webharvest.runtime.processors;
 
-import static org.webharvest.runtime.scripting.ScriptingLanguage.GROOVY;
+import static org.webharvest.runtime.scripting.ScriptingLanguage.*;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -51,6 +51,7 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptSource;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.NodeVariable;
 
 /**
@@ -68,6 +69,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
     @BeforeMethod
     public void before() {
         context = new ScraperContext();
+        context.setScriptingLanguage(JAVASCRIPT); // default scripting language
         scraperMock.returns(context).getContext();
         scriptEngineFactoryMock.returns(engineMock.getMock()).getEngine(null);
     }
@@ -87,7 +89,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
                 processor.run(scraperMock.getMock(), context));
 
         scriptEngineFactoryMock.assertInvoked().
-                getEngine(new ScriptSource("some script here", null));
+                getEngine(new ScriptSource("some script here", JAVASCRIPT));
     }
 
     @Test
@@ -134,7 +136,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         scriptEngineFactoryMock.
                 returns(templaterMock.getMock()).
-                getEngine(new ScriptSource("myReturnExpr", null));
+                getEngine(new ScriptSource("myReturnExpr", JAVASCRIPT));
 
         templaterMock.returns("my return code").evaluate(context, null);
 
@@ -143,7 +145,8 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
                 XmlNodeTestUtils.NAMESPACE_10)).run(scraperMock.getMock(), context);
 
         scriptEngineFactoryMock.assertInvoked().
-                getEngine(new ScriptSource("some script here; my return code", null));
+                getEngine(new ScriptSource("some script here; my return code",
+                        JAVASCRIPT));
     }
 
 }

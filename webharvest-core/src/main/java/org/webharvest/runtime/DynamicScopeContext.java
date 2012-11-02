@@ -39,6 +39,7 @@
 package org.webharvest.runtime;
 
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
@@ -72,6 +73,12 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     @Deprecated
     void addFunctionDef(FunctionDef funcDef);
+
+    @Deprecated
+    ScriptingLanguage getScriptingLanguage();
+
+    @Deprecated
+    void setScriptingLanguage(final ScriptingLanguage language);
 
     /**
      * Returns default configuration's charset.

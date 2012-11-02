@@ -45,7 +45,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.mock.Mock;
 import org.webharvest.UnitilsTestNGExtension;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.definition.XmlNodeTestUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.Scraper;
@@ -60,14 +59,13 @@ public class DefVarPluginTest extends UnitilsTestNGExtension {
 
     ScraperContext context;
     Mock<Scraper> scraperMock;
-    Mock<ScraperConfiguration> configurationMock;
 
     @BeforeMethod
     public void before() {
         context = new ScraperContext();
 
         scraperMock.returns(context).getContext();
-        configurationMock.returns(ScriptingLanguage.GROOVY).getScriptingLanguage();
+        context.setScriptingLanguage(ScriptingLanguage.BEANSHELL);
     }
 
     @Test
@@ -117,6 +115,6 @@ public class DefVarPluginTest extends UnitilsTestNGExtension {
      */
     @Override
     protected ScriptEngineFactory getScriptEngineFactory() {
-        return new JSRScriptEngineFactory(configurationMock.getMock());
+        return new JSRScriptEngineFactory();
     }
 }

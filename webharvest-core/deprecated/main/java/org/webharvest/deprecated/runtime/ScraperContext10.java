@@ -47,6 +47,7 @@ import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.web.HttpClientManager;
@@ -83,6 +84,10 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Deprecated
     private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
+    @Deprecated
+    private ScriptingLanguage scriptingLanguage;
+
+    @Deprecated
     private String charset;
 
     public ScraperContext10() {
@@ -228,6 +233,24 @@ public class ScraperContext10 implements DynamicScopeContext {
         functionDefs.put(funcDef.getName(), funcDef);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public ScriptingLanguage getScriptingLanguage() {
+        return scriptingLanguage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void setScriptingLanguage(final ScriptingLanguage language) {
+        this.scriptingLanguage = language;
+    }
+    
     /**
      * {@inheritDoc}
      */

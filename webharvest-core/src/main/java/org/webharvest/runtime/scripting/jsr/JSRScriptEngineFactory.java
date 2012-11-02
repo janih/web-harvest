@@ -38,14 +38,11 @@ import java.util.Map;
 
 import javax.script.ScriptEngineManager;
 
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
-
-import com.google.inject.Inject;
 
 /**
  * {@link ScriptEngineFactory} implementation that creates script engines based
@@ -68,29 +65,6 @@ public final class JSRScriptEngineFactory implements ScriptEngineFactory {
 
     private final ScriptEngineManager manager = new ScriptEngineManager();
 
-    private final ScraperConfiguration configuration;
-
-
-    /**
-     * {@link JSRScriptEngineFactory} constructor accepting
-     * {@link ScraperConfiguration} used to obtain default
-     * {@link ScriptingLanguage}, when the language of script in
-     * {@link #getEngine(ScriptSource)} method cannot be evaluated.
-     *
-     * @param configuration
-     *            the {@link ScraperConfiguration} containing information about
-     *            default {@link ScriptingLanguage}; must not be {@code null}
-     *
-     */
-    @Inject
-    public JSRScriptEngineFactory(final ScraperConfiguration configuration) {
-        if (configuration == null) {
-            throw new IllegalArgumentException(
-                    "Scraper configuration must not be null");
-        }
-        this.configuration = configuration;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -101,13 +75,7 @@ public final class JSRScriptEngineFactory implements ScriptEngineFactory {
 
     private javax.script.ScriptEngine getJSRScriptEngine(
             final ScriptSource scriptSource) {
-        ScriptingLanguage scriptingLanguage = scriptSource.getLanguage();
-        //If language for script source is null, then default scripting language
-        //should be used.
-        //FIXME: ScriptSource should never return null as ScriptingLanguage.
-        if (scriptingLanguage == null) {
-            scriptingLanguage = configuration.getScriptingLanguage();
-        }
+        final ScriptingLanguage scriptingLanguage = scriptSource.getLanguage();
 
         javax.script.ScriptEngine scriptEngine = cache.get(scriptingLanguage);
         if (scriptEngine != null) {
@@ -129,12 +97,7 @@ public final class JSRScriptEngineFactory implements ScriptEngineFactory {
      */
     private javax.script.ScriptEngine createJSRScriptEngine(
             final ScriptingLanguage scriptingLanguage) {
-        String engineType =
-            configuration.getScriptingLanguage().name().toLowerCase();
-        if (scriptingLanguage != null) {
-            engineType = scriptingLanguage.name().toLowerCase();
-        }
-
+        final String engineType = scriptingLanguage.name().toLowerCase();
         final javax.script.ScriptEngine engine = manager.getEngineByName(
                 engineType);
 

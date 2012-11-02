@@ -49,7 +49,16 @@ public final class ScriptSource {
     private String sourceCode;
     private ScriptingLanguage language;
 
-    public ScriptSource(String sourceCode, ScriptingLanguage language) {
+    public ScriptSource(final String sourceCode,
+            final ScriptingLanguage language) {
+        if (sourceCode == null) {
+            throw new IllegalArgumentException(
+                    "Script source must not be null");
+        }
+        if (language == null) {
+            throw new IllegalArgumentException(
+                    "Script language must not be null");
+        }
         this.sourceCode = sourceCode;
         this.language = language;
     }
