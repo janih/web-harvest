@@ -4,7 +4,7 @@ import org.webharvest.runtime.scripting.ScriptingLanguage;
 
 /**
  * Snapshot of {@link ScraperConfiguration} which contains information such as
- * configuration's charset and its default {@link ScriptingLanguage}.
+ * default {@link ScriptingLanguage}.
  *
  * @see RestorableConfiguration
  *
@@ -14,31 +14,17 @@ import org.webharvest.runtime.scripting.ScriptingLanguage;
  */
 public final class ConfigurationSnapshot {
 
-    private String charset;
     private ScriptingLanguage scriptingLanguage;
 
     /**
-     * Default class constructor which accepts configuration's charset and
+     * Default class constructor which accepts configuration's
      * default {@link ScriptingLanguage}.
      *
-     * @param charset
-     *            configuration's charset
      * @param scriptingLanguage
      *            default {@link ScriptingLanguage} of the configuration
      */
-    public ConfigurationSnapshot(final String charset,
-            final ScriptingLanguage scriptingLanguage) {
-        this.charset = charset;
+    public ConfigurationSnapshot(final ScriptingLanguage scriptingLanguage) {
         this.scriptingLanguage = scriptingLanguage;
-    }
-
-    /**
-     * Returns configuration's charset.
-     *
-     * @return configuration's charset
-     */
-    public String getCharset() {
-        return charset;
     }
 
     /**

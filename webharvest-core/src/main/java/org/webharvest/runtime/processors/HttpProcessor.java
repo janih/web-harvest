@@ -36,10 +36,22 @@
  */
 package org.webharvest.runtime.processors;
 
+import static org.webharvest.WHConstants.XMLNS_CORE;
+import static org.webharvest.WHConstants.XMLNS_CORE_10;
+import static org.webharvest.utils.CommonUtil.getBooleanValue;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -57,19 +69,6 @@ import org.webharvest.utils.KeyValuePair;
 
 import com.google.inject.Inject;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.webharvest.WHConstants.XMLNS_CORE;
-import static org.webharvest.WHConstants.XMLNS_CORE_10;
-import static org.webharvest.utils.CommonUtil.getBooleanValue;
-
 /**
  * Http processor.
  */
@@ -85,9 +84,6 @@ import static org.webharvest.utils.CommonUtil.getBooleanValue;
 public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
     private static final String HTML_META_CHARSET_REGEX = "(<meta\\s*http-equiv\\s*=\\s*(\"|')content-type(\"|')\\s*content\\s*=\\s*(\"|')text/html;\\s*charset\\s*=\\s*(.*?)(\"|')\\s*/?>)";
-
-    @Inject
-    private ScraperConfiguration configuration;
 
     @Inject
     private HttpClientManager httpClientManager;
@@ -130,14 +126,14 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
         String charset = specifiedCharset;
 
         if (charset == null) {
-            charset = configuration.getCharset();
+            charset = context.getCharset();
         }
 
         final String encodedUrl = CommonUtil.encodeUrl(url, charset);
 
         // executes body of HTTP processor
         final Variable bodyContent = new BodyProcessor.Builder(elementDef).
-        	setParentProcessor(this).build().execute(scraper, context);
+            setParentProcessor(this).build().execute(scraper, context);
 
         httpClientManager.setCookiePolicy(cookiePolicy);
 

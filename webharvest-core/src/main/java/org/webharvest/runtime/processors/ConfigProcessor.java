@@ -43,7 +43,7 @@ public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
         //save configuration's state
         final ConfigurationSnapshot snapshot = configuration.captureState();
 
-        configuration.setCharset(getElementDef().getCharset());
+        context.setCharset(getElementDef().getCharset());
         configuration.setScriptingLanguage(
                 getElementDef().getScriptingLanguage());
 

@@ -83,6 +83,8 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Deprecated
     private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
+    private String charset;
+
     public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
         LOG.warn("You are using the DEPRECATED scraper configuration version. We urge you to migrate to a newer one! Please visit http://web-harvest.sourceforge.net/release.php for details.");
@@ -224,6 +226,22 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Deprecated
     public void addFunctionDef(final FunctionDef funcDef) {
         functionDefs.put(funcDef.getName(), funcDef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCharset() {
+        return charset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCharset(final String charset) {
+        this.charset = charset;
     }
 
 }

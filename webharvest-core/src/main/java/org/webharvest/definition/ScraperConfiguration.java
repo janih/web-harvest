@@ -59,7 +59,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
 
     private ElementDefProxy rootElementDef;
 
-    private String charset;
     private ScriptingLanguage scriptingLanguage;
     private File sourceFile;
     private String url;
@@ -127,25 +126,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
     }
 
     /**
-     * Returns default configuration's charset.
-     *
-     * @return default configuration's charset.
-     */
-    public String getCharset() {
-        return charset;
-    }
-
-    /**
-     * Sets default configuration's charset.
-     *
-     * @param charset
-     *            new default configuration's charset
-     */
-    public void setCharset(final String charset) {
-        this.charset = charset;
-    }
-
-    /**
      * Returns default configuration's {@link ScriptingLanguage}.
      *
      * @return default configuration's {@link ScriptingLanguage}.
@@ -193,7 +173,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
             throw new IllegalArgumentException(
                     "Snapshot of configuration must not be null.");
         }
-        this.charset = state.getCharset();
         this.scriptingLanguage = state.getScriptingLanguage();
     }
 
@@ -202,6 +181,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
      */
     @Override
     public ConfigurationSnapshot captureState() {
-        return new ConfigurationSnapshot(this.charset, this.scriptingLanguage);
+        return new ConfigurationSnapshot(this.scriptingLanguage);
     }
 }

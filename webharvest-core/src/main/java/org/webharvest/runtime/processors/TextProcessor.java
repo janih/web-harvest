@@ -40,7 +40,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.definition.TextDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -51,8 +50,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import com.google.inject.Inject;
 
 /**
  * Text processor.
@@ -65,9 +62,6 @@ import com.google.inject.Inject;
         definitionClass = TextDef.class)
 public class TextProcessor extends AbstractProcessor<TextDef> {
 
-    @Inject
-    private ScraperConfiguration configuration;
-
     /**
      * {@inheritDoc}
      */
@@ -77,7 +71,7 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
         String charset = BaseTemplater.evaluateToString(
                 elementDef.getCharset(), null, context);
         if (CommonUtil.isEmptyString(charset)) {
-            charset = configuration.getCharset();
+            charset = context.getCharset();
         }
         String delimiter = BaseTemplater.evaluateToString(
                 elementDef.getDelimiter(), null, context);
@@ -86,7 +80,7 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
         }
 
         Variable body = new BodyProcessor.Builder(elementDef).
-        	setParentProcessor(this).build().execute(scraper, context);
+            setParentProcessor(this).build().execute(scraper, context);
         return new NodeVariable(
                 body instanceof ListVariable ? ((ListVariable) body).toString(
                         charset, delimiter) : body.toString(charset));

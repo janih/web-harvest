@@ -39,11 +39,20 @@ package org.webharvest.runtime.processors;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.FileDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.DynamicScopeContext;
@@ -58,16 +67,6 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.FileListIterator;
 
 import com.google.inject.Inject;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * File processor.
@@ -85,9 +84,6 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
     @WorkingDir
     private String workingDir;
 
-    @Inject
-    private ScraperConfiguration configuration;
-
     public Variable execute(Scraper scraper, DynamicScopeContext context)
             throws InterruptedException {
         String action = BaseTemplater.evaluateToString(elementDef.getAction(),
@@ -99,7 +95,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
         String charset = BaseTemplater.evaluateToString(
                 elementDef.getCharset(), null, context);
         if (charset == null) {
-            charset = configuration.getCharset();
+            charset = context.getCharset();
         }
         String listFilter = BaseTemplater.evaluateToString(
                 elementDef.getListFilter(), null, context);

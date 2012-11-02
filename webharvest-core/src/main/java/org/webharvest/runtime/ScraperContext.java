@@ -77,6 +77,8 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
+    private String charset;
+
     public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
     }
@@ -208,6 +210,22 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     public void addFunctionDef(final FunctionDef funcDef) {
         functionDefs.put(funcDef.getName(), funcDef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCharset() {
+        return charset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCharset(final String charset) {
+        this.charset = charset;
     }
 
 }

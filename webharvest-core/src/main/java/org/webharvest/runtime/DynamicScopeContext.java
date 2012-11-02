@@ -73,4 +73,19 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
     @Deprecated
     void addFunctionDef(FunctionDef funcDef);
 
+    /**
+     * Returns default configuration's charset.
+     *
+     * @return default configuration's charset.
+     */
+    String getCharset();
+
+    /**
+     * Sets default configuration's charset.
+     *
+     * @param charset
+     *            new default configuration's charset
+     */
+    void setCharset(String charset);
+
 }

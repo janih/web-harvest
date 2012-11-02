@@ -8,7 +8,6 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.Processor;
@@ -18,15 +17,10 @@ import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import com.google.inject.Inject;
-
 /**
  * Mail attachment plugin - can be used only inside mail plugin.
  */
 public class MailAttachPlugin extends WebHarvestPlugin {
-
-    @Inject
-    private ScraperConfiguration configuration;
 
     public String getName() {
         return "mail-attach";
@@ -50,7 +44,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
                     if (CommonUtil.isEmptyString(mimeType)) {
                         mimeType = isInline ? "image/jpeg" : "application/octet-stream";
                     }
-                    DataSource dataSource = MailPlugin.createDataSourceOfVariable(bodyVar, configuration.getCharset(), mimeType);
+                    DataSource dataSource = MailPlugin.createDataSourceOfVariable(bodyVar, context.getCharset(), mimeType);
                     String cid = htmlEmail.embed(dataSource, attachmentName);
                     return isInline ? new NodeVariable("cid:" + cid) : EmptyVariable.INSTANCE;
                 } catch (IOException e) {

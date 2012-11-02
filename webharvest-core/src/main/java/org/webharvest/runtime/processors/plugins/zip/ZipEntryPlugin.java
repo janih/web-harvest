@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
@@ -15,15 +14,10 @@ import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
-import com.google.inject.Inject;
-
 /**
  * Zip entry plugin - can be used only inside zip plugin.
  */
 public class ZipEntryPlugin extends WebHarvestPlugin {
-
-    @Inject
-    private ScraperConfiguration configuration;
 
     public String getName() {
         return "zip-entry";
@@ -38,7 +32,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
             }
             String charset = evaluateAttribute("charset", context);
             if (CommonUtil.isEmptyString(charset)) {
-                charset = configuration.getCharset();
+                charset = context.getCharset();
             }
 
             ZipOutputStream zipOutStream = zipPlugin.getZipOutStream();
