@@ -38,6 +38,7 @@
 
 package org.webharvest.runtime;
 
+import org.webharvest.definition.FunctionDef;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
 
@@ -65,4 +66,11 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
     Variable replaceExistingVar(String name, Variable variable);
 
     boolean containsVar(String name);
+
+    @Deprecated
+    FunctionDef getFunctionDef(String name);
+
+    @Deprecated
+    void addFunctionDef(FunctionDef funcDef);
+
 }

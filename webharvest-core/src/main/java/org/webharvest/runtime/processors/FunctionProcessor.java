@@ -41,15 +41,12 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.FunctionDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
-
-import com.google.inject.Inject;
 
 /**
  * Function definition processor.
@@ -62,11 +59,8 @@ import com.google.inject.Inject;
         requiredAttributes = "name", definitionClass = FunctionDef.class)
 public class FunctionProcessor extends AbstractProcessor<FunctionDef> {
 
-    @Inject
-    private ScraperConfiguration configuration;
-
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
-        configuration.addFunctionDef(elementDef);
+        context.addFunctionDef(elementDef);
 
         this.setProperty("Name", elementDef.getName());
 

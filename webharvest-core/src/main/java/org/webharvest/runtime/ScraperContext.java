@@ -40,6 +40,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
@@ -71,6 +72,10 @@ public class ScraperContext implements DynamicScopeContext {
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
 
     protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
+
+    // map of function definitions
+    @Deprecated
+    private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
     public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
@@ -186,4 +191,23 @@ public class ScraperContext implements DynamicScopeContext {
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public FunctionDef getFunctionDef(final String name) {
+        return functionDefs.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void addFunctionDef(final FunctionDef funcDef) {
+        functionDefs.put(funcDef.getName(), funcDef);
+    }
+
 }

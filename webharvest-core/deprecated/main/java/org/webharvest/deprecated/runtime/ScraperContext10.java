@@ -43,6 +43,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -77,6 +78,10 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Inject private HttpClientManager httpClientManager;
 
     private Stack<Map<String, Variable>> stack = new Stack<Map<String, Variable>>();
+
+    // map of function definitions
+    @Deprecated
+    private final Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
     public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
@@ -202,4 +207,23 @@ public class ScraperContext10 implements DynamicScopeContext {
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public FunctionDef getFunctionDef(final String name) {
+        return functionDefs.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void addFunctionDef(final FunctionDef funcDef) {
+        functionDefs.put(funcDef.getName(), funcDef);
+    }
+
 }

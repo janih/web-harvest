@@ -43,9 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.webharvest.ioc.ConfigSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -58,9 +56,6 @@ import com.google.inject.assistedinject.Assisted;
  * Basic configuration.
  */
 public class ScraperConfiguration implements RestorableConfiguration {
-
-    // map of function definitions
-    private Map<String, FunctionDef> functionDefs = new HashMap<String, FunctionDef>();
 
     private ElementDefProxy rootElementDef;
 
@@ -167,15 +162,6 @@ public class ScraperConfiguration implements RestorableConfiguration {
      */
     public void setScriptingLanguage(final ScriptingLanguage language) {
         this.scriptingLanguage = language;
-    }
-
-
-    public FunctionDef getFunctionDef(String name) {
-        return functionDefs.get(name);
-    }
-
-    public void addFunctionDef(FunctionDef funcDef) {
-        functionDefs.put(funcDef.getName(), funcDef);
     }
 
     public File getSourceFile() {
