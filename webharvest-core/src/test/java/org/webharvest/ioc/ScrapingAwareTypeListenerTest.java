@@ -1,4 +1,4 @@
-package org.webharvest.events;
+package org.webharvest.ioc;
 
 import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
@@ -10,6 +10,7 @@ import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.ScrapingAware;
 import org.webharvest.ioc.ScrapingAwareTypeListener;
+import org.webharvest.ioc.EventBusTypeListenerTest.ApplicableSubscriber;
 import org.webharvest.ioc.ScrapingInterceptor.ScrapingAwareHelper;
 
 import com.google.inject.Provider;
@@ -19,8 +20,7 @@ import com.google.inject.spi.TypeEncounter;
 
 public class ScrapingAwareTypeListenerTest extends UnitilsTestNG {
 
-    @RegularMock
-    private TypeLiteral<Object> mockType;
+    private MockTypeLiteral mockTypeLiteral;
 
     @RegularMock
     private TypeEncounter<Object> mockEncounter;
@@ -39,12 +39,14 @@ public class ScrapingAwareTypeListenerTest extends UnitilsTestNG {
 
     @BeforeMethod
     public void setUp() {
+        mockTypeLiteral = new MockTypeLiteral();
         listener = new ScrapingAwareTypeListener();
     }
 
     @AfterMethod
     public void tearDown() {
         listener = null;
+        mockTypeLiteral = null;
     }
 
     @Test
@@ -63,11 +65,12 @@ public class ScrapingAwareTypeListenerTest extends UnitilsTestNG {
         mockAwareHelper.addListener(mockAwareObject);
         expectLastCall();
         EasyMockUnitils.replay();
-        listener.hear(mockType, mockEncounter);
-        final InjectionListener<Object> listener = capture.getCaptured();
+        listener.hear(mockTypeLiteral, mockEncounter);
+        final InjectionListener<Object> injectionListener =
+                capture.getCaptured();
         assertNotNull(listener);
-        listener.afterInjection(mockAwareObject);
-        listener.afterInjection(this);
+        injectionListener.afterInjection(mockAwareObject);
+        injectionListener.afterInjection(this);
     }
 
     @Test
@@ -75,6 +78,7 @@ public class ScrapingAwareTypeListenerTest extends UnitilsTestNG {
         EasyMockUnitils.replay();
     }
 
+    // TODO rbala Duplicate code with EventBusTypeListenerTest
     private final class Capture {
 
         private Object captured;
@@ -87,6 +91,17 @@ public class ScrapingAwareTypeListenerTest extends UnitilsTestNG {
         private void setCaptured(final Object captured) {
             this.captured = captured;
         }
+
+    }
+
+    /**
+     * Handy trick. Since we can not mock the TypeLiteral with EasyMock (even
+     * with help of cglib - missing public constructor). We just simply
+     * create subclass
+     */
+    // TODO rbala Duplicate code with EventBusTypeListenerTest
+    static final class MockTypeLiteral extends
+            TypeLiteral<Object> {
 
     }
 

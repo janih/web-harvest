@@ -33,7 +33,7 @@ public final class EventBusTypeListener implements TypeListener {
      * {@inheritDoc}
      */
     @Override
-     public <I> void hear(final TypeLiteral<I> typeLiteral,
+    public <I> void hear(final TypeLiteral<I> typeLiteral,
              final TypeEncounter<I> typeEncounter) {
         // TODO rbala Refactor as soon as possible. Ugly code (the whole method)
         boolean qualifies = false;
