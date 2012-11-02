@@ -41,6 +41,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -72,7 +73,9 @@ public class ScraperContext implements DynamicScopeContext {
 
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
 
-    protected Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
+    private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
+
+    private IElementDef definition;
 
     // map of function definitions
     @Deprecated
@@ -250,4 +253,20 @@ public class ScraperContext implements DynamicScopeContext {
     public void setCharset(final String charset) {
         this.charset = charset;
     }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRootDef(final IElementDef definition) {
+        this.definition = definition;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IElementDef getRootDef() {
+        return definition;
+    }
+
 }

@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -89,6 +90,8 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     @Deprecated
     private String charset;
+
+    private IElementDef definition;
 
     public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
@@ -265,6 +268,22 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Override
     public void setCharset(final String charset) {
         this.charset = charset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRootDef(final IElementDef definition) {
+        this.definition = definition;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IElementDef getRootDef() {
+        return definition;
     }
 
 }

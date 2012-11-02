@@ -38,13 +38,14 @@
 
 package org.webharvest.runtime;
 
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.webharvest.definition.FunctionDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.KeyValuePair;
-
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,5 +95,13 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
      *            new default configuration's charset
      */
     void setCharset(String charset);
+
+    // TODO rbala Temporary method! Root element def should be set upon context initialization!
+    @Deprecated
+    void setRootDef(IElementDef definition);
+
+    // FIXME rbala Unsure if it is the right place!
+    @Deprecated
+    IElementDef getRootDef();
 
 }

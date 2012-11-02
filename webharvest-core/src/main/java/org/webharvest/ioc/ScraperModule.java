@@ -84,16 +84,13 @@ public final class ScraperModule extends AbstractModule {
 
         bind(ConnectionFactory.class).to(StandaloneConnectionPool.class).in(
                 ScrapingScope.class);
-
+        bind(WebScraper.class).to(Scraper.class).in(ScrapingScope.class);
 
         bind(AttributeHolder.class).to(ScopeAttributeHolder.class);
 
         bind(Harvest.class).to(DefaultHarvest.class).in(Singleton.class);
         bind(HandlerHolder.class).to(DefaultHandlerHolder.class).in(
                 Singleton.class);
-
-        install(new FactoryModuleBuilder().implement(WebScraper.class,
-                Scraper.class).build(ScraperFactory.class));
 
         install(new FactoryModuleBuilder().implement(Harvester.class,
                 ScrapingHarvester.class).build(HarvesterFactory.class));

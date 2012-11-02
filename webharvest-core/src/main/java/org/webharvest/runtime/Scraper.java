@@ -36,25 +36,19 @@
 */
 package org.webharvest.runtime;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
-import org.webharvest.ioc.ContextFactory;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 /**
  * Basic runtime class.
@@ -74,23 +68,10 @@ public class Scraper implements WebScraper {
     @Inject
     private EventBus eventBus;
 
-    private ScraperConfiguration configuration;
-
     private DynamicScopeContext context;
 
     private volatile int status = STATUS_READY;
     private String message = null;
-
-    /**
-     * Constructor.
-     *
-     * @param configuration
-     * @deprecated as public constructor make it private.
-     */
-    @AssistedInject
-    public Scraper(@Assisted final ScraperConfiguration configuration) {
-        this.configuration = configuration;
-    }
 
     public void execute(final DynamicScopeContext context) {
         long startTime = System.currentTimeMillis();
@@ -102,7 +83,7 @@ public class Scraper implements WebScraper {
 
         try {
             final Processor processor = ProcessorResolver.createProcessor(
-                    configuration.getRootElementDef());
+                    context.getRootDef());
             if (processor != null) {
                 processor.run(this, context);
             }
