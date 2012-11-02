@@ -23,7 +23,6 @@ import com.google.inject.spi.TypeListener;
  * @see TypeListener
  * @see EventBus
  */
-// FIXME rbala Is it necessary to create unit test?
 public final class EventBusTypeListener implements TypeListener {
 
     private static final Logger LOG = LoggerFactory.
