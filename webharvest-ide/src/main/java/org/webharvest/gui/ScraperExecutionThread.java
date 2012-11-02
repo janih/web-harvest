@@ -5,16 +5,16 @@
     with or without modification, are permitted provided that the following
     conditions are met:
 
-    * Redistributions of source code must retain the above
+ * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
+ * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
 
-    * The name of Web-Harvest may not be used to endorse or promote
+ * The name of Web-Harvest may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
@@ -33,7 +33,7 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "Web-Harvest" in the
     subject line.
-*/
+ */
 package org.webharvest.gui;
 
 import javax.swing.JTextArea;
@@ -57,12 +57,8 @@ public class ScraperExecutionThread extends Thread {
     }
 
     public void run() {
-        try {
-            TextAreaAppender.setCurrentLogArea(logTextArea);
-            harvester.execute(callback);
-        } catch (RuntimeException e) {
-            harvester.getScraper().informListenersAboutError(e);
-        }
+        TextAreaAppender.setCurrentLogArea(logTextArea);
+        harvester.execute(callback);
     }
 
 }

@@ -178,7 +178,13 @@ public class ScrapingHarvester implements Harvester {
     public DynamicScopeContext execute(final ContextInitCallback callback) {
         this.scraper = scraperFactory.create(config);
         callback.onSuccess(scraper.getContext());
-        scraper.execute();
+
+        // FIXME rbala Moved directly from ScraperExecutionThread. Not covered by any test!
+        try {
+            scraper.execute();
+        } catch (RuntimeException e) {
+            scraper.informListenersAboutError(e);
+        }
 
         return scraper.getContext();
     }
