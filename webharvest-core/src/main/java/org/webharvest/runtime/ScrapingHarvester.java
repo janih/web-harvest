@@ -40,14 +40,11 @@ import java.net.URL;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.ioc.ConfigModule;
+import org.webharvest.ioc.ConfigFactory;
 import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.Scraping;
 import org.xml.sax.InputSource;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -74,7 +71,6 @@ import com.google.inject.assistedinject.AssistedInject;
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
  * @see Harvester
- * @see Injector
  * @see WebScraper
  * @see HarvestLoadCallback
  */
@@ -93,12 +89,10 @@ public class ScrapingHarvester implements Harvester {
     private ContextFactory contextFactory;
 
     /**
-     * Class constructor expecting Guice {@link Injector},
+     * Class constructor expecting Guice
      * {@link WebScraper} provider, {@link URL} and {@link HarvestLoadCallback}
      * to be specified.
      *
-     * @param injector
-     *            Guice {@link Injector}.
      * @param scraperProvider
      *            the {@link WebScraper} provider.
      * @param config
@@ -111,21 +105,18 @@ public class ScrapingHarvester implements Harvester {
     // FIXME rbala more then 4 parameters
     // TODO contextFactory not in documentation
     @AssistedInject
-    public ScrapingHarvester(final Injector injector,
+    public ScrapingHarvester(final ConfigFactory configFactory,
             final Provider<WebScraper> scraperProvider,
             final ContextFactory contextFactory, @Assisted final URL config,
             @Assisted final HarvestLoadCallback callback) throws IOException {
-        this(injector, scraperProvider, contextFactory, new ConfigModule(config),
-                callback);
+        this(scraperProvider, contextFactory,
+                configFactory.create(config), callback);
     }
 
     /**
-     * Class constructor expecting Guice {@link Injector},
-     * {@link WebScraper} provider, configuration file path and
-     * {@link HarvestLoadCallback} to be specified.
+     * Class constructor expecting Guice {@link WebScraper} provider,
+     * configuration file path and {@link HarvestLoadCallback} to be specified.
      *
-     * @param injector
-     *            Guice {@link Injector}.
      * @param scraperProvider
      *            the {@link WebScraper} provider.
      * @param config
@@ -138,22 +129,20 @@ public class ScrapingHarvester implements Harvester {
     // FIXME rbala more then 4 parameters
     @AssistedInject
     // TODO contextFactory not in documentation
-    public ScrapingHarvester(final Injector injector,
+    public ScrapingHarvester(final ConfigFactory configFactory,
             final Provider<WebScraper> scraperProvider,
             final ContextFactory contextFactory, @Assisted final String config,
             @Assisted final HarvestLoadCallback callback)
             throws FileNotFoundException {
-        this(injector, scraperProvider, contextFactory,
-                new ConfigModule(config), callback);
+        this(scraperProvider, contextFactory,
+                configFactory.create(config), callback);
     }
 
     /**
-     * Class constructor expecting Guice {@link Injector},
-     * {@link WebScraper} provider, {@link URL} and {@link HarvestLoadCallback}
+     * Class constructor expecting Guice {@link WebScraper} provider,
+     * {@link URL} and {@link HarvestLoadCallback}
      * to be specified.
      *
-     * @param injector
-     *            Guice {@link Injector}.
      * @param scraperProvider
      *            the {@link WebScraper} provider.
      * @param config
@@ -165,23 +154,22 @@ public class ScrapingHarvester implements Harvester {
      */
     @AssistedInject
     // TODO contextFactory not in documentation
-    public ScrapingHarvester(final Injector injector,
+    public ScrapingHarvester(final ConfigFactory configFactory,
             final Provider<WebScraper> scraperProvider,
             final ContextFactory contextFactory,
             @Assisted final InputSource config,
             @Assisted final HarvestLoadCallback callback) {
-        this(injector, scraperProvider, contextFactory, new ConfigModule(config),
-                callback);
+        this(scraperProvider, contextFactory,
+                configFactory.create(config), callback);
     }
 
-    private ScrapingHarvester(final Injector injector,
-            final Provider<WebScraper> scraperProvider,
-            final ContextFactory contextFactory, final Module module,
+    private ScrapingHarvester(final Provider<WebScraper> scraperProvider,
+            final ContextFactory contextFactory,
+            final ScraperConfiguration config,
             final HarvestLoadCallback loadCallback) {
         this.scraperProvider = scraperProvider;
         this.contextFactory = contextFactory;
-        this.config = injector.createChildInjector(module).getInstance(
-                ScraperConfiguration.class);
+        this.config = config;
         loadCallback.onSuccess(config.getOperations());
     }
 

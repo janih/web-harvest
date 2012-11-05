@@ -59,6 +59,7 @@ import org.webharvest.utils.SystemUtilities;
 
 import com.google.inject.Inject;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,6 +93,12 @@ public class ScraperContext10 implements DynamicScopeContext {
     private String charset;
 
     private IElementDef definition;
+
+    @Deprecated
+    private File sourceFile;
+
+    @Deprecated
+    private String url;
 
     public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
@@ -253,7 +260,7 @@ public class ScraperContext10 implements DynamicScopeContext {
     public void setScriptingLanguage(final ScriptingLanguage language) {
         this.scriptingLanguage = language;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -284,6 +291,30 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Override
     public IElementDef getRootDef() {
         return definition;
+    }
+
+    @Override
+    @Deprecated
+    public File getSourceFile() {
+        return this.sourceFile;
+    }
+
+    @Override
+    @Deprecated
+    public void setSourceFile(File sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    @Override
+    @Deprecated
+    public String getUrl() {
+        return this.url;
+    }
+
+    @Override
+    @Deprecated
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

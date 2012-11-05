@@ -7,10 +7,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.runtime.RuntimeConfig;
-import org.webharvest.runtime.scripting.ScriptEngineFactory;
-import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
-import org.webharvest.runtime.templaters.BaseTemplater;
 import org.xml.sax.InputSource;
 
 import com.google.inject.AbstractModule;
@@ -51,17 +47,6 @@ public final class ConfigModule extends AbstractModule {
         bind(InputSource.class).annotatedWith(ConfigSource.class).toInstance(
                 config);
         bind(ScraperConfiguration.class).in(Singleton.class);
-        bind(ScriptEngineFactory.class).to(JSRScriptEngineFactory.class).in(
-                Singleton.class);
-
-        // FIXME: This is a dirty trick replacing in InjectorHelper
-        // ScraperModule's injector by injector for ConfigModule which is a
-        // child module.
-        requestStaticInjection(InjectorHelper.class);
-
-        requestStaticInjection(BaseTemplater.class);
-
-        bind(RuntimeConfig.class).in(Singleton.class);
     }
 
 }

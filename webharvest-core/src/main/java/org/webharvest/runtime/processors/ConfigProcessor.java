@@ -5,15 +5,12 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ConfigDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
-
-import com.google.inject.Inject;
 
 /**
  * @author Robert Bala
@@ -27,9 +24,6 @@ import com.google.inject.Inject;
 @Definition(value = "config", validAttributes = { "charset", "scriptlang" },
         definitionClass = ConfigDef.class)
 public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
-
-    @Inject
-    private ScraperConfiguration configuration;
 
     /**
      * {@inheritDoc}

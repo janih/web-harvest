@@ -38,6 +38,7 @@
 
 package org.webharvest.runtime;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -103,5 +104,17 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
     // FIXME rbala Unsure if it is the right place!
     @Deprecated
     IElementDef getRootDef();
+
+    @Deprecated
+    File getSourceFile();
+
+    @Deprecated
+    void setSourceFile(File sourceFile);
+
+    @Deprecated
+    String getUrl();
+
+    @Deprecated
+    void setUrl(String url);
 
 }

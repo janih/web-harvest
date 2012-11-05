@@ -19,6 +19,7 @@ import org.webharvest.runtime.DefaultHarvest;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RunningStatusGuard;
 import org.webharvest.runtime.EventBasedStatusHolder;
+import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.ScrapingHarvester;
@@ -27,6 +28,9 @@ import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.database.ConnectionFactory;
 import org.webharvest.runtime.database.JNDIConnectionFactory;
 import org.webharvest.runtime.database.StandaloneConnectionPool;
+import org.webharvest.runtime.scripting.ScriptEngineFactory;
+import org.webharvest.runtime.scripting.jsr.JSRScriptEngineFactory;
+import org.webharvest.runtime.templaters.BaseTemplater;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Monitor;
@@ -92,6 +96,8 @@ public final class ScraperModule extends AbstractModule {
         bind(HandlerHolder.class).to(DefaultHandlerHolder.class).in(
                 Singleton.class);
 
+        install(new FactoryModuleBuilder().build(ConfigFactory.class));
+
         install(new FactoryModuleBuilder().implement(Harvester.class,
                 ScrapingHarvester.class).build(HarvesterFactory.class));
 
@@ -102,6 +108,12 @@ public final class ScraperModule extends AbstractModule {
         bindScraperContext();
         bindDebugFileLogger();
         bindStatusHolder();
+
+        // FIXME rbala Moved from ConfigModule
+        bind(ScriptEngineFactory.class).to(JSRScriptEngineFactory.class).in(
+                Singleton.class);
+        requestStaticInjection(BaseTemplater.class);
+        bind(RuntimeConfig.class).in(Singleton.class);
     }
 
     protected void bindDBConnectionFactory() {
