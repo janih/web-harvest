@@ -1301,7 +1301,6 @@
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="language" use="optional"
-          default="beanshell"
           type="xs:string">
           <xs:annotation>
             <xs:documentation>

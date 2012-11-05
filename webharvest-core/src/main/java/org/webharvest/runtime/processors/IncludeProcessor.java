@@ -44,6 +44,7 @@ import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.NestedContextFactory;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -103,7 +104,8 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
             includedConfig = isUrl ? new ScraperConfiguration(new URL(fullPath)) : new ScraperConfiguration(fullPath);
 
             ProcessorResolver.createProcessor(
-                    includedConfig.getRootElementDef()).run(scraper, context);
+                    includedConfig.getRootElementDef()).run(scraper,
+                            NestedContextFactory.create(context));
 
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
