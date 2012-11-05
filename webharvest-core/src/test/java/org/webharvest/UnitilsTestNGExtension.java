@@ -8,6 +8,7 @@ import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
 import org.webharvest.ioc.DebugFileLogger;
 import org.webharvest.ioc.InjectorHelper;
+import org.webharvest.runtime.StatusHolder;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.templaters.BaseTemplater;
 
@@ -37,6 +38,7 @@ public abstract class UnitilsTestNGExtension extends UnitilsTestNG {
 
     protected Mock<ScriptEngineFactory> scriptEngineFactoryMock;
     protected Mock<Logger> loggerMock;
+    protected Mock<StatusHolder> holderMock;
 
     /**
      * Put mocks into static fields of InjectorHelper and BaseTemplater classes.
@@ -103,6 +105,7 @@ public abstract class UnitilsTestNGExtension extends UnitilsTestNG {
 
             // Processor's decorators dependencies
             bind(Monitor.class).in(Singleton.class);
+            bind(StatusHolder.class).toInstance(holderMock.getMock());
         }
 
         @Inject

@@ -92,6 +92,7 @@ import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
+import org.webharvest.events.ScraperExecutionStoppedEvent;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
@@ -927,7 +928,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
     public synchronized void stopScraperExecution() {
         if (this.harvester != null) {
-            this.harvester.getScraper().stopExecution();
+            this.harvest.postEvent(new ScraperExecutionStoppedEvent(harvester));
         }
     }
 

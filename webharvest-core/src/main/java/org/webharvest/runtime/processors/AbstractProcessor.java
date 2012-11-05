@@ -36,8 +36,6 @@
 */
 package org.webharvest.runtime.processors;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -89,11 +87,6 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
      */
     @Override
     public Variable run(final Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        final int scraperStatus = scraper.getStatus();
-
-        if (scraperStatus == Scraper.STATUS_STOPPED || scraperStatus == Scraper.STATUS_EXIT) {
-            return EmptyVariable.INSTANCE;
-        }
 
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();

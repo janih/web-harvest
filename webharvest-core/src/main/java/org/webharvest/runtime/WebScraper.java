@@ -51,8 +51,5 @@ public interface WebScraper {
     void informListenersAboutError(Exception e);
 
     @Deprecated
-    void stopExecution();
-
-    @Deprecated
     String getMessage();
 }

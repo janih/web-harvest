@@ -5,6 +5,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ExitDef;
+import org.webharvest.events.ScraperExecutionExitEvent;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -13,6 +14,9 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+
+import com.google.common.eventbus.EventBus;
+import com.google.inject.Inject;
 
 /**
  * Exit processor.
@@ -25,6 +29,9 @@ import org.webharvest.utils.CommonUtil;
         definitionClass = ExitDef.class)
 public class ExitProcessor extends AbstractProcessor<ExitDef> {
 
+    @Inject
+    private EventBus eventBus;
+
     public Variable execute(Scraper scraper, DynamicScopeContext context) {
         String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, context);
         if (condition == null || "".equals(condition)) {
@@ -36,7 +43,7 @@ public class ExitProcessor extends AbstractProcessor<ExitDef> {
             if (message == null) {
                 message = "";
             }
-            scraper.exitExecution(message);
+            eventBus.post(new ScraperExecutionExitEvent(message));
             LOG.info("Configuration exited: {}", message);
         }
 

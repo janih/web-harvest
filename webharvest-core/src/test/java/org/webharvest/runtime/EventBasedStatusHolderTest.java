@@ -55,5 +55,29 @@ public class EventBasedStatusHolderTest {
                 Scraper.STATUS_RUNNING);
     }
 
+    @Test
+    public void stop() throws Exception {
+        assertEquals("Unexpected status.", holder.getStatus(),
+                Scraper.STATUS_RUNNING);
+
+        //event is unneeded in unit test
+        holder.stop(null);
+
+        assertEquals("Unexpected status.", holder.getStatus(),
+                Scraper.STATUS_STOPPED);
+    }
+
+    @Test
+    public void exit() throws Exception {
+        assertEquals("Unexpected status.", holder.getStatus(),
+                Scraper.STATUS_RUNNING);
+
+        //event is unneeded in unit test
+        holder.exit(null);
+
+        assertEquals("Unexpected status.", holder.getStatus(),
+                Scraper.STATUS_EXIT);
+    }
+
 
 }

@@ -41,8 +41,10 @@ import org.slf4j.LoggerFactory;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
+import org.webharvest.events.ScraperExecutionExitEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
+import org.webharvest.events.ScraperExecutionStoppedEvent;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.ProcessorResolver;
 
@@ -124,13 +126,15 @@ public class Scraper implements WebScraper {
         this.status = status;
     }
 
-    public void stopExecution() {
+    @Subscribe
+    public void stopExecution(final ScraperExecutionStoppedEvent event) {
         setStatus(STATUS_STOPPED);
     }
 
-    public void exitExecution(String message) {
+    @Subscribe
+    public void exitExecution(final ScraperExecutionExitEvent event) {
         setStatus(STATUS_EXIT);
-        this.message = message;
+        this.message = event.getMessage();
     }
 
     public String getMessage() {

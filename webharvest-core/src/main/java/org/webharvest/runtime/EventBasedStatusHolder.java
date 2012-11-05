@@ -1,7 +1,9 @@
 package org.webharvest.runtime;
 
 import org.webharvest.events.ScraperExecutionContinuedEvent;
+import org.webharvest.events.ScraperExecutionExitEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
+import org.webharvest.events.ScraperExecutionStoppedEvent;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Monitor;
@@ -100,6 +102,30 @@ public class EventBasedStatusHolder implements StatusHolder {
         } finally {
             monitor.leave();
         }
+    }
+
+    /**
+     * Changes status to {@link Scraper#STATUS_STOPPED}. This method is called
+     * when {@link ScraperExecutionStoppedEvent} has been fired.
+     *
+     * @param event
+     *            an instance of {@link ScraperExecutionStoppedEvent}
+     */
+    @Subscribe
+    public void stop(final ScraperExecutionStoppedEvent event) {
+        status = Scraper.STATUS_STOPPED;
+    }
+
+    /**
+     * Changes status to {@link Scraper#STATUS_EXIT}. This method is called when
+     * {@link ScraperExecutionExitEvent} has been fired.
+     *
+     * @param event
+     *            an instance of {@link ScraperExecutionExitEvent}
+     */
+    @Subscribe
+    public void exit(final ScraperExecutionExitEvent event) {
+        status = Scraper.STATUS_EXIT;
     }
 
     /**
