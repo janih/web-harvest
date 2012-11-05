@@ -5,6 +5,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ConfigDef;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -35,8 +36,15 @@ public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
         context.setCharset(getElementDef().getCharset());
         context.setScriptingLanguage(getElementDef().getScriptingLanguage());
 
-        //evaluate body of config element
-        getBodyTextContent(getElementDef(), scraper, context);
+        // FIXME: It should be done by BodyProcessor (or some other component
+        // while we'll annihilate BodyProcessor). However, due to current
+        // BodyProcessor implementation, every processor is executed within new
+        // context. If we had new context at this level, variables defined
+        // within 'config' element body would not be available in the scraper
+        // context at the end of its execution.
+        for (IElementDef elementDef : getElementDef().getOperationDefs()) {
+            ProcessorResolver.createProcessor(elementDef).run(scraper, context);
+        }
 
         return EmptyVariable.INSTANCE;
     }
