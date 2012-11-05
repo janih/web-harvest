@@ -16,14 +16,13 @@ import com.google.inject.Inject;
  * It means that processing status is changed on:
  * <ul>
  * <li>paused - if configuration's processing is in execution state</li>
- * <li>paused - if configuration's processing is in paused state</li>
+ * <li>running - if configuration's processing is in paused state</li>
  * </ul>
  *
  * @author mczapiewski
  * @since 2.1-SNAPSHOT
  * @version %I%, %G%
  */
-//TODO missing unit test
 public class EventBasedStatusHolder implements StatusHolder {
 
     private final Monitor monitor;

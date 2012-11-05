@@ -14,7 +14,6 @@ import com.google.inject.Inject;
  * @since 2.1-SNAPSHOT
  * @version %I%, %G%
  */
-//TODO missing unit test
 public final class RunningStatusGuard extends Guard {
 
     @Inject
