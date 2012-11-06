@@ -13,6 +13,8 @@ public class BufferConfigSourceTest extends UnitilsTestNG {
 
     private static final String CONTENT = "blah, blah";
 
+    private static final String LOCATION = "/fs/sd/asd";
+
     private BufferConfigSource source;
 
     @BeforeMethod
@@ -26,13 +28,24 @@ public class BufferConfigSourceTest extends UnitilsTestNG {
     }
 
     @Test(expectedExceptions=IllegalArgumentException.class)
-    public void testCreateWithoutFile() {
+    public void testCreateWithoutContent() {
         new BufferConfigSource(null);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void testCreateWithoutContentButWithLocation() {
+        new BufferConfigSource(null, LOCATION);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void testCreateWithContentButWithoutLocation() {
+        new BufferConfigSource(CONTENT, null);
     }
 
     @Test
     public void testGetLocation() {
-        assertNull(source.getLocation());
+        assertNotNull(source.getLocation());
+        assertEquals(source.getLocation(), "");
     }
 
     @Test
