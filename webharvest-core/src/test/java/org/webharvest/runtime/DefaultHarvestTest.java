@@ -4,6 +4,8 @@ import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
@@ -11,7 +13,10 @@ import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.definition.Config;
+import org.webharvest.definition.ConfigFactory;
 import org.webharvest.definition.ConfigSource;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.events.EventHandler;
 import org.webharvest.events.EventSink;
 import org.webharvest.events.HandlerHolder;
@@ -41,12 +46,21 @@ public class DefaultHarvestTest extends UnitilsTestNG {
     @RegularMock
     private ConfigSource mockConfigSource;
 
+    @RegularMock
+    private ConfigFactory mockConfigFactory;
+
+    @RegularMock
+    private Config mockConfig;
+
+    @RegularMock
+    private IElementDef mockElementDef;
+
     private DefaultHarvest harvest;
 
     @BeforeMethod
     public void setUp() {
-        harvest = new DefaultHarvest(mockFactory, mockHandlerHolder,
-                mockEventSink);
+        harvest = new DefaultHarvest(mockConfigFactory, mockFactory,
+                mockHandlerHolder, mockEventSink);
     }
 
     @AfterMethod
@@ -56,8 +70,16 @@ public class DefaultHarvestTest extends UnitilsTestNG {
 
     @Test
     public void testGetHarvester() throws IOException {
-        expect(mockFactory.create(mockConfigSource, mockLoadCallback)).
+        final List<IElementDef> emptyList = Collections.emptyList();
+        expect(mockConfigFactory.create(mockConfigSource)).andReturn(mockConfig);
+        expect(mockFactory.create(mockConfig)).
             andReturn(mockHarvester);
+        mockConfig.reload();
+        expectLastCall();
+        expect(mockConfig.getElementDef()).andReturn(mockElementDef);
+        expect(mockElementDef.getElementDefs()).andReturn(emptyList);
+        mockLoadCallback.onSuccess(emptyList);
+        expectLastCall();
         EasyMockUnitils.replay();
         final Harvester harvester = harvest.getHarvester(mockConfigSource,
                 mockLoadCallback);

@@ -38,13 +38,25 @@
 
 package org.webharvest.deprecated.runtime;
 
+import static java.text.MessageFormat.format;
+
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webharvest.definition.Config;
 import org.webharvest.definition.FunctionDef;
-import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -58,18 +70,6 @@ import org.webharvest.utils.Stack;
 import org.webharvest.utils.SystemUtilities;
 
 import com.google.inject.Inject;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import javax.annotation.PostConstruct;
-
-import static java.text.MessageFormat.format;
 
 @Deprecated
 public class ScraperContext10 implements DynamicScopeContext {
@@ -92,13 +92,13 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Deprecated
     private String charset;
 
-    private IElementDef definition;
-
     @Deprecated
     private File sourceFile;
 
     @Deprecated
     private String url;
+
+    private Config config;
 
     public ScraperContext10() {
         this.stack.push(new HashMap<String, Variable>());
@@ -277,22 +277,6 @@ public class ScraperContext10 implements DynamicScopeContext {
         this.charset = charset;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setRootDef(final IElementDef definition) {
-        this.definition = definition;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IElementDef getRootDef() {
-        return definition;
-    }
-
     @Override
     @Deprecated
     public File getSourceFile() {
@@ -315,6 +299,20 @@ public class ScraperContext10 implements DynamicScopeContext {
     @Deprecated
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Config getConfig() {
+        return config;
+    }
+
+    @Override
+    @Deprecated
+    public void setConfig(final Config config) {
+        this.config = config;
     }
 
 }

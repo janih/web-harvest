@@ -48,9 +48,10 @@ import java.net.URL;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.FileConfigSource;
+import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.IncludeDef;
-import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.definition.URLConfigSource;
+import org.webharvest.definition.XmlParser;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
@@ -96,25 +97,18 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
             isUrl = true;
         }
 
-        ScraperConfiguration includedConfig;
         try {
+            // TODO rbala Use factory with polymorfic methods!
             final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
 
-            includedConfig = new ScraperConfiguration(source);
-
             ProcessorResolver.createProcessor(
-                    includedConfig.getRootElementDef()).run(
+                    XmlParser.parse(source)).run(
                             NestedContextFactory.create(context));
 
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
             return EmptyVariable.INSTANCE;
-
-        } catch (FileNotFoundException e) {
-            throw new FileException("Cannot include configuration file " + fullPath, e);
-        } catch (MalformedURLException e) {
-            throw new FileException("Cannot include configuration file " + fullPath, e);
         } catch (IOException e) {
             throw new FileException("Cannot include configuration file " + fullPath, e);
         }

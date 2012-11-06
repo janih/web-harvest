@@ -1,6 +1,7 @@
 package org.webharvest.definition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +28,11 @@ public abstract class AbstractElementDef implements IElementDef {
         return operationDefs != null && operationDefs.size() > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
     public IElementDef[] getOperationDefs() {
         IElementDef[] defs = new IElementDef[operationDefs.size()];
         Iterator<IElementDef> it = operationDefs.iterator();
@@ -69,6 +75,14 @@ public abstract class AbstractElementDef implements IElementDef {
 
     public void add(IElementDef element) {
         operationDefs.add(element);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IElementDef> getElementDefs() {
+        return Arrays.asList(getOperationDefs());
     }
 
 }

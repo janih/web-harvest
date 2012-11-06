@@ -42,6 +42,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.webharvest.definition.Config;
 import org.webharvest.definition.FunctionDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -97,14 +98,6 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
      */
     void setCharset(String charset);
 
-    // TODO rbala Temporary method! Root element def should be set upon context initialization!
-    @Deprecated
-    void setRootDef(IElementDef definition);
-
-    // FIXME rbala Unsure if it is the right place!
-    @Deprecated
-    IElementDef getRootDef();
-
     @Deprecated
     File getSourceFile();
 
@@ -116,5 +109,10 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
 
     @Deprecated
     void setUrl(String url);
+
+    Config getConfig();
+
+    @Deprecated
+    void setConfig(Config config);
 
 }

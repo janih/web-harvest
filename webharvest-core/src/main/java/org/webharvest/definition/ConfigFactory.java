@@ -29,35 +29,28 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-*/
-
-package org.webharvest.ioc;
-
-import org.webharvest.definition.Config;
-import org.webharvest.runtime.DynamicScopeContext;
+ */
+package org.webharvest.definition;
 
 /**
- * Factory creating brand new instances of {@link DynamicScopeContext}. In order
- * to instantiate appropriate {@link DynamicScopeContext} implementation factory
- * accepts namespace URI of the configuration being executed.
+ * Represents simple {@link Config} factory.
  *
- * @see DynamicScopeContext
- *
- * @author Piotr Dyraga
+ * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
+ * @see ConfigSource
+ * @see Config
  */
-public interface ContextFactory {
+public interface ConfigFactory {
 
     /**
-     * Returns brand new instance of {@link DynamicScopeContext}. Factory
-     * instantiates particular implementation of {@link DynamicScopeContext}
-     * basis on provided configuration namespace URI.
+     * Produces new instance of {@link Config} for specified
+     * {@link ConfigSource} resource.
      *
-     * @param namespaceUri
-     *            namespace URI of configuration being executed
-     * @return brand new instance of {@link DynamicScopeContext}
+     * @param source
+     *            reference to configuration resource.
+     * @return new instance of {@link Config} object.
      */
-    DynamicScopeContext create(Config config);
+    Config create(ConfigSource source);
 
 }

@@ -1,8 +1,5 @@
 package org.webharvest.definition;
 
-import java.io.StringReader;
-
-import org.xml.sax.InputSource;
 
 public class XmlNodeTestUtils {
 
@@ -24,8 +21,8 @@ public class XmlNodeTestUtils {
     public static XmlNode createXmlNode(final String xmlPart, final String namespace) {
         final StringBuilder builder = new StringBuilder().append("<config ").
             append(namespace).append(">").append(xmlPart).append("</config>");
-        final XmlNode configNode = XmlParser.parse(new InputSource(
-                new StringReader(builder.toString()))).getNode();
+        final XmlNode configNode = XmlParser.parse(
+                new BufferConfigSource(builder.toString())).getNode();
 
         return (XmlNode) configNode.getElementList().get(0);
     }

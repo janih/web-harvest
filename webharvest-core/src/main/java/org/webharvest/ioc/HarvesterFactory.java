@@ -33,11 +33,9 @@
 
 package org.webharvest.ioc;
 
-import java.io.IOException;
-
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
-import org.webharvest.definition.ConfigSource;
+import org.webharvest.definition.Config;
 
 /**
  * Guice dynamic factory helper interface that help to instantiate
@@ -50,26 +48,17 @@ import org.webharvest.definition.ConfigSource;
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
  * @see Harvester
- * @see HarvestLoadCallback
+ * @see Config
  */
 public interface HarvesterFactory {
 
     /**
-     * Creates new instance of {@link Harvester} according to policy defined in
-     * Guice module bindings with {@link ConfigSource} to configuration resource
-     * and {@link HarvestLoadCallback} callback executed upon successful load of
-     * configuration.
+     * Produces new instance of {@link Harvester} for specified {@link Config}.
      *
      * @param config
-     *            reference to {@link ConfigSource}.
-     * @param callback
-     *            loaded configuration callback.
-     * @return new instance of {@link Harvester} with already loaded
-     *         configuration.
-     * @throws IOException
-     *             in case of configuration load problems.
+     *            reference to {@link Config}.
+     * @return new instance of {@link Harvester}.
      */
-    Harvester create(ConfigSource config, HarvestLoadCallback callback)
-            throws IOException;
+    Harvester create(Config config);
 
 }

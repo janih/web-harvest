@@ -13,10 +13,13 @@ import org.webharvest.Registry;
 import org.webharvest.ScrapingAware;
 import org.webharvest.WHConstants;
 import org.webharvest.definition.BufferConfigSource;
+import org.webharvest.definition.Config;
+import org.webharvest.definition.ConfigFactory;
 import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.ConfigSourceFactory;
 import org.webharvest.definition.FileConfigSource;
 import org.webharvest.definition.URLConfigSource;
+import org.webharvest.definition.XMLConfig;
 import org.webharvest.deprecated.runtime.ScraperContext10;
 import org.webharvest.events.DefaultHandlerHolder;
 import org.webharvest.events.EventSink;
@@ -105,7 +108,8 @@ public final class ScraperModule extends AbstractModule {
         bind(HandlerHolder.class).to(DefaultHandlerHolder.class).in(
                 Singleton.class);
 
-        install(new FactoryModuleBuilder().build(ConfigFactory.class));
+        install(new FactoryModuleBuilder().implement(Config.class,
+                XMLConfig.class).build(ConfigFactory.class));
 
         install(new FactoryModuleBuilder().implement(Harvester.class,
                 ScrapingHarvester.class).build(HarvesterFactory.class));
@@ -135,13 +139,17 @@ public final class ScraperModule extends AbstractModule {
     protected void bindScraperContext() {
         bind(ContextFactory.class).toInstance(new ContextFactory() {
 
-            @Inject private Provider<ScraperContext> context;
-            @Inject private Provider<ScraperContext10> context10;
+            @Inject private Provider<ScraperContext> newProvider;
+            @Inject private Provider<ScraperContext10> oldProvider;
 
             @Override
-            public DynamicScopeContext create(final String namespace) {
-                return WHConstants.XMLNS_CORE_10.equals(namespace)
-                    ? context10.get() : context.get();
+            public DynamicScopeContext create(final Config config) {
+                final DynamicScopeContext context = WHConstants.XMLNS_CORE_10.equals(null)
+                    ? oldProvider.get() : newProvider.get();
+                // TODO rbala So far this should be enough. Find better option to pass configuration when instantiating context
+                context.setConfig(config);
+
+                return context;
             }
         });
     }

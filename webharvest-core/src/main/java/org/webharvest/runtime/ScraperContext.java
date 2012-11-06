@@ -36,12 +36,24 @@
 */
 package org.webharvest.runtime;
 
+import static java.text.MessageFormat.format;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.webharvest.definition.Config;
 import org.webharvest.definition.FunctionDef;
-import org.webharvest.definition.IElementDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -56,14 +68,6 @@ import org.webharvest.utils.SystemUtilities;
 
 import com.google.inject.Inject;
 
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.Callable;
-
-import javax.annotation.PostConstruct;
-
-import static java.text.MessageFormat.format;
-
 /**
  * Context of scraper execution. All the variables created during
  * scraper execution are stored in this context.
@@ -75,8 +79,6 @@ public class ScraperContext implements DynamicScopeContext {
     private Stack<Set<String>> variablesNamesStack = new Stack<Set<String>>();
 
     private Map<String, Stack<Variable>> centralReferenceTable = new HashMap<String, Stack<Variable>>();
-
-    private IElementDef definition;
 
     // map of function definitions
     @Deprecated
@@ -93,6 +95,8 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Deprecated
     private String url;
+
+    private Config config;
 
     public ScraperContext() {
         variablesNamesStack.push(new HashSet<String>());
@@ -260,21 +264,6 @@ public class ScraperContext implements DynamicScopeContext {
     public void setCharset(final String charset) {
         this.charset = charset;
     }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setRootDef(final IElementDef definition) {
-        this.definition = definition;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IElementDef getRootDef() {
-        return definition;
-    }
 
     @Override
     @Deprecated
@@ -298,6 +287,20 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Config getConfig() {
+        return config;
+    }
+
+    @Override
+    @Deprecated
+    public void setConfig(final Config config) {
+        this.config = config;
     }
 
 }

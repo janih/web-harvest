@@ -35,17 +35,14 @@ package org.webharvest.runtime;
 
 import java.io.IOException;
 
-import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
-import org.webharvest.definition.ConfigSource;
-import org.webharvest.definition.ScraperConfiguration;
-import org.webharvest.ioc.ConfigFactory;
+import org.webharvest.definition.Config;
 import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.Scraping;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 /**
  * Default implementation of {@link Harvester} interface aimed to perform data
@@ -70,55 +67,43 @@ import com.google.inject.assistedinject.AssistedInject;
  * @version %I%, %G%
  * @see Harvester
  * @see WebScraper
- * @see HarvestLoadCallback
+ * @see Config
  */
 // FIXME rbala Can not be final as we put an @Scraping annotation on this
 public class ScrapingHarvester implements Harvester {
 
     private final Provider<WebScraper> scraperProvider;
 
-    private final ScraperConfiguration config;
+    private final Config config;
 
     // TODO rbala not needed when we finally get rid of getScraper() method
     // FIXME rbala Not thread safe (no synchronization)
     @Deprecated
     private WebScraper scraper;
 
-    private ContextFactory contextFactory;
+    private final ContextFactory contextFactory;
 
     /**
      * Class constructor expecting Guice
-     * {@link WebScraper} provider, {@link ConfigSource} and
-     * {@link HarvestLoadCallback} to be specified.
+     * {@link WebScraper} provider, {@link DynamicScopeContext} factory and
+     * {@link Config} as already loaded configuration.
      *
      * @param scraperProvider
      *            the {@link WebScraper} provider.
+
+     * @param contextFactory
+     *            reference to a {@link DynamicScopeContext} factory.
      * @param config
-     *            reference to configuration source as {@link ConfigSource}.
-     * @param callback
-     *            reference to a callback that is automatically invoked on
-     *            successful load of configuration.
+     *            reference to the configuration {@link Config}.
      * @throws IOException
      */
-    // TODO contextFactory not in documentation
-    @AssistedInject
-    public ScrapingHarvester(final ConfigFactory configFactory,
-            final Provider<WebScraper> scraperProvider,
+    @Inject
+    public ScrapingHarvester(final Provider<WebScraper> scraperProvider,
             final ContextFactory contextFactory,
-            @Assisted final ConfigSource config,
-            @Assisted final HarvestLoadCallback callback) throws IOException {
-        this(scraperProvider, contextFactory,
-                configFactory.create(config), callback);
-    }
-
-    private ScrapingHarvester(final Provider<WebScraper> scraperProvider,
-            final ContextFactory contextFactory,
-            final ScraperConfiguration config,
-            final HarvestLoadCallback loadCallback) {
+            @Assisted final Config config) {
         this.scraperProvider = scraperProvider;
         this.contextFactory = contextFactory;
         this.config = config;
-        loadCallback.onSuccess(config.getOperations());
     }
 
     /**
@@ -130,13 +115,7 @@ public class ScrapingHarvester implements Harvester {
         this.scraper = scraperProvider.get();
 
         final DynamicScopeContext context =
-                contextFactory.create(config.getNamespaceURI());
-        context.setRootDef(config.getRootElementDef());
-
-        // TODO rbala Added in order to fix problem with IncludeProcessor. However currently it may work with only one level of nested configurations.
-       // context.setSourceFile(config.getSourceFile());
-        //context.setUrl(config.getUrl());
-
+                contextFactory.create(config);
         callback.onSuccess(context);
 
         // FIXME rbala Moved directly from ScraperExecutionThread. Not covered by any test!
@@ -158,4 +137,5 @@ public class ScrapingHarvester implements Harvester {
         // Return reference to scraper from last call
         return scraper;
     }
+
 }

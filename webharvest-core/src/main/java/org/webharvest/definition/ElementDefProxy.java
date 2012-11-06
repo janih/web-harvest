@@ -1,5 +1,7 @@
 package org.webharvest.definition;
 
+import java.util.List;
+
 import org.webharvest.runtime.processors.Processor;
 
 public class ElementDefProxy implements IElementDef {
@@ -17,6 +19,7 @@ public class ElementDefProxy implements IElementDef {
     }
 
     @Override
+    @Deprecated
     public IElementDef[] getOperationDefs() {
          return getDelegate().getOperationDefs();
     }
@@ -58,6 +61,11 @@ public class ElementDefProxy implements IElementDef {
     @Override
     public int getColumnNumber() {
         return node.getColumnNumber();
+    }
+
+    @Override
+    public List<IElementDef> getElementDefs() {
+        return getDelegate().getElementDefs();
     }
 
 }

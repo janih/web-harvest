@@ -29,35 +29,69 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
+package org.webharvest.definition;
 
-package org.webharvest.ioc;
-
-import org.webharvest.definition.Config;
-import org.webharvest.runtime.DynamicScopeContext;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 /**
- * Factory creating brand new instances of {@link DynamicScopeContext}. In order
- * to instantiate appropriate {@link DynamicScopeContext} implementation factory
- * accepts namespace URI of the configuration being executed.
+ * Implementation of {@link ConfigSource} capable to work with XML
+ * based configurations.
  *
- * @see DynamicScopeContext
- *
- * @author Piotr Dyraga
+ * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
+ * @see Config
+ * @see ConfigSource
+ * @see IElementDef
  */
-public interface ContextFactory {
+public final class XMLConfig implements Config {
+
+    private final ConfigSource configSource;
+
+    private IElementDef elementDef;
 
     /**
-     * Returns brand new instance of {@link DynamicScopeContext}. Factory
-     * instantiates particular implementation of {@link DynamicScopeContext}
-     * basis on provided configuration namespace URI.
+     * Default class constructor specifying {@link ConfigSource} object
+     * as configuration resource (from which it will be obtained).
      *
-     * @param namespaceUri
-     *            namespace URI of configuration being executed
-     * @return brand new instance of {@link DynamicScopeContext}
+     * @param configSource reference to configuration resource.
      */
-    DynamicScopeContext create(Config config);
+    @Inject
+    public XMLConfig(@Assisted final ConfigSource configSource) {
+        if (configSource == null) {
+            throw new IllegalArgumentException("ConfigSource is required");
+        }
+        this.configSource = configSource;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConfigSource getConfigSource() {
+        return configSource;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IElementDef getElementDef() {
+        if (elementDef == null) {
+            throw new IllegalStateException("No configuration source provided");
+        }
+
+        return elementDef;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reload() {
+        this.elementDef = XmlParser.parse(configSource);
+    }
 
 }

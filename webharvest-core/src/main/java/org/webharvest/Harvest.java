@@ -61,7 +61,7 @@ public interface Harvest {
      * Throws {@link IOException} in case of any problems with reading
      * configuration from remote location.
      *
-     * @param config the URL from where to get the configuration.
+     * @param source the URL from where to get the configuration.
      * @param callback
      * @return new {@link Harvester} instance.
      * @throws IOException problems with reading the configuration.

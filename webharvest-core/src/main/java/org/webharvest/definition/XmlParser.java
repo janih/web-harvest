@@ -61,8 +61,6 @@ public class XmlParser extends DefaultHandler {
 
     protected static Logger log = LoggerFactory.getLogger(XmlParser.class);
 
-    ElementDefProxy rootDef;
-
     XmlNode rootNode;
 
     // working stack of elements
@@ -70,14 +68,14 @@ public class XmlParser extends DefaultHandler {
 
     private Locator locator;
 
-    public static ElementDefProxy parse(InputSource in) {
+    public static ElementDefProxy parse(final ConfigSource config) {
         long startTime = System.currentTimeMillis();
 
         XmlParser handler = new XmlParser();
         try {
             final SAXParserFactory factory = XmlUtil.getSAXParserFactory(false, true);
             factory.setSchema(SchemaComponentFactory.getSchemaFactory().getSchema());
-            factory.newSAXParser().parse(in, handler);
+            factory.newSAXParser().parse(new InputSource(config.getReader()), handler);
 
             log.info("XML parsed in "
                     + (System.currentTimeMillis() - startTime) + "ms.");
@@ -90,7 +88,6 @@ public class XmlParser extends DefaultHandler {
             throw new ParserException(e.getMessage(), e);
         }
 
-        //return handler.rootDef;
         return new ElementDefProxy(handler.rootNode);
     }
 

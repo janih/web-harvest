@@ -36,13 +36,18 @@
 */
 package org.webharvest.definition;
 
+import java.util.List;
+
 /**
  * Marker for element definition.
  */
 public interface IElementDef extends PluginDef {
 
     // TODO Add javadoc
+    @Deprecated
     IElementDef[] getOperationDefs();
+
+    List<IElementDef> getElementDefs();
 
     // TODO Add javadoc
     String getShortElementName();

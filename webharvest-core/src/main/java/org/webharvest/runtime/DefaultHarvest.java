@@ -38,6 +38,8 @@ import java.io.IOException;
 import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.definition.Config;
+import org.webharvest.definition.ConfigFactory;
 import org.webharvest.definition.ConfigSource;
 import org.webharvest.events.EventHandler;
 import org.webharvest.events.EventSink;
@@ -57,6 +59,8 @@ import com.google.inject.Inject;
  */
 public final class DefaultHarvest implements Harvest {
 
+    private final ConfigFactory configFactory;
+
     private final HarvesterFactory harvestFactory;
 
     private final HandlerHolder handlerHolder;
@@ -68,6 +72,8 @@ public final class DefaultHarvest implements Harvest {
      * {@link HandlerHolder} and {@link EventSink} that are expected to be Guice
      * injected.
      *
+     * @param configFactory
+     *            reference to {@link Config} factory
      * @param harvestFactory
      *            reference to factory capable to produce {@link Harvester}
      *            objects.
@@ -77,20 +83,27 @@ public final class DefaultHarvest implements Harvest {
      *            reference to event bus facade.
      */
     @Inject
-    public DefaultHarvest(final HarvesterFactory harvestFactory,
+    public DefaultHarvest(final ConfigFactory configFactory,
+            final HarvesterFactory harvestFactory,
             final HandlerHolder handlerHolder, final EventSink eventSink) {
         this.harvestFactory = harvestFactory;
         this.handlerHolder = handlerHolder;
         this.eventSink = eventSink;
+        this.configFactory = configFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Harvester getHarvester(final ConfigSource config,
+    public Harvester getHarvester(final ConfigSource source,
             final HarvestLoadCallback callback) throws IOException {
-        return harvestFactory.create(config, callback);
+        final Config config = configFactory.create(source);
+        final Harvester harvester = harvestFactory.create(config);
+        config.reload();
+        callback.onSuccess(config.getElementDef().getElementDefs());
+
+        return harvester;
     }
 
     /**

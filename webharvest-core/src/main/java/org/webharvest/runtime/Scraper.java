@@ -85,7 +85,7 @@ public class Scraper implements WebScraper {
 
         try {
             final Processor processor = ProcessorResolver.createProcessor(
-                    context.getRootDef());
+                    context.getConfig().getElementDef());
             if (processor != null) {
                 processor.run(context);
             }
