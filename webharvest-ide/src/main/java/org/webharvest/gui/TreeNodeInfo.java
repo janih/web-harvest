@@ -41,9 +41,7 @@ import org.webharvest.definition.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,9 +104,6 @@ public class TreeNodeInfo {
     private int executionCount = 0;
     private Exception exception = null;
     private Map properties;
-
-    // list of synchronizes views
-    private List<ViewerFrame> synchronizedViews = new ArrayList<ViewerFrame>();
 
     public TreeNodeInfo(IElementDef elementDef) {
         this.elementDef = elementDef;
@@ -181,18 +176,6 @@ public class TreeNodeInfo {
 
     public Map getProperties() {
         return properties;
-    }
-
-    public List<ViewerFrame> getSynchronizedViews() {
-        return synchronizedViews;
-    }
-
-    public void removeSynchronizedView(ViewerFrame viewerFrame) {
-        this.synchronizedViews.remove(viewerFrame);
-    }
-
-    public void addSynchronizedView(ViewerFrame viewerFrame) {
-        this.synchronizedViews.add(viewerFrame);
     }
 
 }

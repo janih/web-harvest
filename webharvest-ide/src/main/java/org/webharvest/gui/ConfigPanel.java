@@ -784,13 +784,6 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                         model.setProperties(nodeInfo.getProperties(), nodeInfo);
                     }
                 }
-
-                List<ViewerFrame> syncViews = nodeInfo.getSynchronizedViews();
-                if (syncViews != null) {
-                    for (ViewerFrame viewerFrame : syncViews) {
-                        viewerFrame.setValue(properties);
-                    }
-                }
             }
         }
     }

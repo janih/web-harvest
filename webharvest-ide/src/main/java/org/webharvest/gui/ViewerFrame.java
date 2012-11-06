@@ -164,7 +164,6 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     private int zoomFactor = 100;
     private JLabel zoomFactorLabel;
     private JTable listTable;
-    private JCheckBox keepSyncCheckBox;
     private JCheckBox wrapTextCheckBox;
     private JButton findButton;
     private JButton zoomInButton;
@@ -200,10 +199,6 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                // remove this viewer from the list of synchronized views
-                if (nodeInfo != null) {
-                    nodeInfo.removeSynchronizedView(ViewerFrame.this);
-                }
                 super.windowClosing(e);
                 ViewerFrame.this.nodeInfo = null;
                 ViewerFrame.this.value = null;
@@ -253,13 +248,6 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
                 toolBar.addSeparator(new Dimension(10, 0));
             }
 
-            int scraperStatus = scraper.getStatus();
-            if (propertyName != null && scraperStatus == Scraper.STATUS_RUNNING || scraperStatus == Scraper.STATUS_PAUSED) {
-                this.keepSyncCheckBox = new WHCheckBox("Synchronized");
-                this.keepSyncCheckBox.addActionListener(this);
-                toolBar.add(this.keepSyncCheckBox);
-                toolBar.addSeparator(new Dimension(10, 0));
-            }
         }
 
         DropDownButton viewTypeButton = new DropDownButton();
@@ -664,14 +652,7 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
 
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == this.keepSyncCheckBox) {
-            boolean isSynchronized = this.keepSyncCheckBox.isSelected();
-            if (isSynchronized) {
-                this.nodeInfo.addSynchronizedView(this);
-            } else {
-                this.nodeInfo.removeSynchronizedView(this);
-            }
-        } else if (source == this.wrapTextCheckBox) {
+        if (source == this.wrapTextCheckBox) {
             this.textArea.setLineWrap(this.wrapTextCheckBox.isSelected());
         }
     }
