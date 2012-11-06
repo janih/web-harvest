@@ -50,7 +50,7 @@ public final class XMLConfig implements Config {
 
     private final ConfigSource configSource;
 
-    private IElementDef elementDef;
+    private ElementDefProxy elementDef;
 
     /**
      * Default class constructor specifying {@link ConfigSource} object
@@ -84,6 +84,19 @@ public final class XMLConfig implements Config {
         }
 
         return elementDef;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public String getNamespaceURI() {
+        if (elementDef == null) {
+            throw new IllegalStateException("No configuration source provided");
+        }
+
+        return elementDef.getNamespaceURI();
     }
 
     /**

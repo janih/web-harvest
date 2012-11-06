@@ -144,7 +144,7 @@ public final class ScraperModule extends AbstractModule {
 
             @Override
             public DynamicScopeContext create(final Config config) {
-                final DynamicScopeContext context = WHConstants.XMLNS_CORE_10.equals(null)
+                final DynamicScopeContext context = WHConstants.XMLNS_CORE_10.equals(config.getNamespaceURI())
                     ? oldProvider.get() : newProvider.get();
                 // TODO rbala So far this should be enough. Find better option to pass configuration when instantiating context
                 context.setConfig(config);

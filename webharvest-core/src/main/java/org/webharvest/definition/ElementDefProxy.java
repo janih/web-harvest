@@ -68,4 +68,8 @@ public class ElementDefProxy implements IElementDef {
         return getDelegate().getElementDefs();
     }
 
+    public String getNamespaceURI() {
+        return getNode().getUri();
+    }
+
 }

@@ -1,11 +1,10 @@
 package org.webharvest.definition;
 
 /**
- * Represents lazily loaded configuration object that is loaded from
- * associated {@link ConfigSource} on demand with call to {@link #reload()}
- * method.
- * For already loaded configuration it is possible to get reference
- * to a graph of configuration elements with {@link #getElementDef}.
+ * Represents lazily loaded configuration object that is loaded from associated
+ * {@link ConfigSource} on demand with call to {@link #reload()} method. For
+ * already loaded configuration it is possible to get reference to a graph of
+ * configuration elements with {@link #getElementDef}.
  *
  * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
@@ -30,6 +29,16 @@ public interface Config {
      *         been loaded.
      */
     IElementDef getElementDef();
+
+    /**
+     * Gets reference to configuration root element namespace
+     *
+     * @deprecated Provided as a backward compatibility with older version
+     * @return namespace URL or {@link IllegalStateException} in case the
+     *         configuration has not been loaded.
+     */
+    @Deprecated
+    String getNamespaceURI();
 
     /**
      * Loads configuration from resource defined by {@link #getConfigSource()}.

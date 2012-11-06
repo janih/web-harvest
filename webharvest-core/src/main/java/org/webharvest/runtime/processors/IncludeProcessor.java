@@ -40,18 +40,16 @@ import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.webharvest.annotation.Definition;
+import org.webharvest.definition.Config;
+import org.webharvest.definition.ConfigFactory;
 import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.FileConfigSource;
-import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.URLConfigSource;
-import org.webharvest.definition.XmlParser;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
@@ -61,6 +59,8 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
+
+import com.google.inject.Inject;
 
 /**
  * Include processor.
@@ -72,6 +72,9 @@ import org.webharvest.utils.CommonUtil;
 @Definition(value = "include", validAttributes = { "id", "path" },
         requiredAttributes = "path", definitionClass = IncludeDef.class)
 public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
+
+    @Inject
+    private ConfigFactory configFactory;
 
     public Variable execute(DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
@@ -101,8 +104,10 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
             // TODO rbala Use factory with polymorfic methods!
             final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
 
-            ProcessorResolver.createProcessor(
-                    XmlParser.parse(source)).run(
+            final Config config = configFactory.create(source);
+            config.reload();
+
+            ProcessorResolver.createProcessor(config.getElementDef()).run(
                             NestedContextFactory.create(context));
 
             if (Thread.currentThread().isInterrupted()) {
