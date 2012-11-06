@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ScriptDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
@@ -68,8 +67,8 @@ public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
     @Inject
     private ScriptEngineFactory scriptEngineFactory;
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        String sourceCode = getBodyTextContent(elementDef, scraper, context).toString();
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
+        String sourceCode = getBodyTextContent(elementDef, context).toString();
 
         // For backward compatibility with ver.2b1 only!
         final String returnExpression = elementDef.getReturnExpression();

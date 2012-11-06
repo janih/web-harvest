@@ -44,7 +44,6 @@ import org.webharvest.definition.CaseDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.IfDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -64,7 +63,7 @@ import org.webharvest.utils.CommonUtil;
         definitionClass = CaseDef.class)
 public class CaseProcessor extends AbstractProcessor<CaseDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         IfDef[] ifDefs = elementDef.getIfDefs();
 
         if (ifDefs != null) {
@@ -72,7 +71,7 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
                 String condition = BaseTemplater.evaluateToString(ifDef.getCondition(), null, context);
                 if (CommonUtil.isBooleanTrue(condition)) {
                     Variable ifResult = new BodyProcessor.Builder(ifDef).
-                        setParentProcessor(this).build().run(scraper, context);
+                        setParentProcessor(this).build().run(context);
                     debug(ifDef, context, ifResult);
                     return ifResult;
                 }
@@ -82,7 +81,7 @@ public class CaseProcessor extends AbstractProcessor<CaseDef> {
         IElementDef elseDef = elementDef.getElseDef();
         if (elseDef != null) {
             Variable elseResult = new BodyProcessor.Builder(elseDef).
-                setParentProcessor(this).build().run(scraper, context);
+                setParentProcessor(this).build().run(context);
             debug(elseDef, context, elseResult);
             return elseResult;
         }

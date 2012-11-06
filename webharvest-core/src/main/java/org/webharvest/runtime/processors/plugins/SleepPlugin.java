@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -55,7 +54,7 @@ public class SleepPlugin extends WebHarvestPlugin {
 
     private static final String MILLISECONDS_ATT_NAME = "milliseconds";
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         final int millis = evaluateAttributeAsInteger(MILLISECONDS_ATT_NAME, 0, context);
         setProperty("Milliseconds", millis);
         if (millis > 0) {

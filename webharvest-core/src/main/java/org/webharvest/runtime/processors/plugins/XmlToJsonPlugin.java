@@ -9,7 +9,6 @@ import org.json.XML;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -26,8 +25,8 @@ public class XmlToJsonPlugin extends WebHarvestPlugin {
         return "xml-to-json";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        Variable body = executeBody(scraper, context);
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
+        Variable body = executeBody(context);
         try {
             JSONObject jsonObject = XML.toJSONObject(body.toString());
             return new NodeVariable(jsonObject.toString());

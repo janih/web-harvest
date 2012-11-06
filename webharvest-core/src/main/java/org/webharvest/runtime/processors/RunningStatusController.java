@@ -51,14 +51,13 @@ public final class RunningStatusController<TDef extends IElementDef> extends
      * {@inheritDoc}
      */
     @Override
-    public Variable run(final Scraper scraper,
-            final DynamicScopeContext context) throws InterruptedException {
+    public Variable run(final DynamicScopeContext context) throws InterruptedException {
         try {
             monitor.enterWhen(runningGuard);
         } finally {
             monitor.leave();
         }
-        return this.decoratedProcessor.run(scraper, context);
+        return this.decoratedProcessor.run(context);
     }
 
 }

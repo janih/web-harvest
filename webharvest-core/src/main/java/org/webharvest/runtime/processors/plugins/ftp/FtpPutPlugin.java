@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -23,7 +22,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
         return "ftp-put";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         FtpPlugin ftpPlugin = (FtpPlugin) getParentProcessor();
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();
@@ -37,7 +36,7 @@ public class FtpPutPlugin extends WebHarvestPlugin {
             setProperty("Path", path);
             setProperty("Charset", charset);
 
-            Variable body = executeBody(scraper, context);
+            Variable body = executeBody(context);
 
             try {
                 ByteArrayInputStream stream = new ByteArrayInputStream(body.toBinary(charset));

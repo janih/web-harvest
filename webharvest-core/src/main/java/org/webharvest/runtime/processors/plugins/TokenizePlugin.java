@@ -5,7 +5,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -24,14 +23,14 @@ public class TokenizePlugin extends WebHarvestPlugin {
         return "tokenize";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         String delimiters = evaluateAttribute("delimiters", context);
         if ( delimiters == null || "".equals(delimiters) ) {
             delimiters = "\n\r";
         }
         boolean trimTokens = evaluateAttributeAsBoolean("trimtokens", true, context);
         boolean allowWmptyTokens = evaluateAttributeAsBoolean("allowemptytokens", false, context);
-        String text =  executeBody(scraper, context).toString();
+        String text =  executeBody(context).toString();
 
         this.setProperty("Delimiters", delimiters);
         this.setProperty("Trim tokens", trimTokens);

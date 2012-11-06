@@ -43,7 +43,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpHeaderDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -61,7 +60,7 @@ import org.webharvest.runtime.variables.Variable;
         requiredAttributes = "name", definitionClass = HttpHeaderDef.class)
 public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(),
                 null, context);
@@ -69,10 +68,8 @@ public class HttpHeaderProcessor extends AbstractProcessor<HttpHeaderDef> {
         final HttpProcessor httpProcessor =
             (HttpProcessor) getParentProcessor();
         if (httpProcessor != null) {
-            httpProcessor
-                    .addHttpHeader(name,
-                            getBodyTextContent(elementDef, scraper, context)
-                                    .toString());
+            httpProcessor.addHttpHeader(name,
+                            getBodyTextContent(elementDef, context).toString());
             this.setProperty("Name", name);
         } else {
             throw new HttpException(

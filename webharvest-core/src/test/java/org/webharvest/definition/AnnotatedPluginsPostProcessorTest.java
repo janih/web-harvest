@@ -1,18 +1,14 @@
 package org.webharvest.definition;
 
-import static org.testng.Assert.*;
-import static org.unitils.mock.ArgumentMatchers.*;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
 import org.unitils.mock.Mock;
-import org.unitils.mock.core.proxy.ProxyInvocation;
-import org.unitils.mock.mockbehavior.MockBehavior;
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -69,8 +65,8 @@ public class AnnotatedPluginsPostProcessorTest extends UnitilsTestNG {
     abstract static class MockAbstractPlugin extends WebHarvestPlugin {
 
         @Override
-        public Variable executePlugin(final Scraper scraper,
-                final DynamicScopeContext context) throws InterruptedException {
+        public Variable executePlugin(final DynamicScopeContext context)
+                throws InterruptedException {
             throw new UnsupportedOperationException("not supported by mock");
         }
     }

@@ -47,7 +47,6 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.TryDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
@@ -65,11 +64,11 @@ import org.webharvest.utils.CommonUtil;
         requiredAttributes = { "body", "catch" }, definitionClass = TryDef.class )
 public class TryProcessor extends AbstractProcessor<TryDef> {
 
-    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context) throws InterruptedException {
         try {
             IElementDef tryBodyDef = elementDef.getTryBodyDef();
             Variable result = new BodyProcessor.Builder(tryBodyDef).
-                setParentProcessor(this).build().run(scraper, context);
+                setParentProcessor(this).build().run(context);
             debug(tryBodyDef, context, result);
 
             return result;
@@ -90,7 +89,7 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                     final IElementDef catchValueDef = elementDef.getCatchValueDef();
                     final Variable res =
                         new BodyProcessor.Builder(catchValueDef).build().
-                            run(scraper, context);
+                            run(context);
                     debug(catchValueDef, context, res);
                     return res;
                 }

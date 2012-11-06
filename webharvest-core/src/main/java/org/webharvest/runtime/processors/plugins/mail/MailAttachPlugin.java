@@ -9,7 +9,6 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.webharvest.WHConstants;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -26,7 +25,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
         return "mail-attach";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         Processor processor = getParentProcessor();
         if (processor != null) {
             MailPlugin mailPlugin = (MailPlugin) processor;
@@ -39,7 +38,7 @@ public class MailAttachPlugin extends WebHarvestPlugin {
                 String mimeType = evaluateAttribute("mimetype", context);
                 boolean isInline = evaluateAttributeAsBoolean("inline", false, context);
                 HtmlEmail htmlEmail = (HtmlEmail) email;
-                Variable bodyVar = executeBody(scraper, context);
+                Variable bodyVar = executeBody(context);
                 try {
                     if (CommonUtil.isEmptyString(mimeType)) {
                         mimeType = isInline ? "image/jpeg" : "application/octet-stream";

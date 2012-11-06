@@ -39,12 +39,14 @@ package org.webharvest.runtime.processors;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.webharvest.WHConstants;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.WhileDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -53,9 +55,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Conditional processor.
@@ -67,7 +66,7 @@ import java.util.List;
 @Definition(value = "while", validAttributes = { "id", "condition", "index", "maxloops", "empty" }, requiredAttributes = "condition", definitionClass = WhileDef.class)
 public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
-    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context) throws InterruptedException {
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, context);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxLoops(), null, context);
         final boolean isEmpty = CommonUtil.getBooleanValue(BaseTemplater.evaluateToString(elementDef.getEmpty(), null, context), false);
@@ -92,7 +91,7 @@ public class WhileProcessor extends AbstractProcessor<WhileDef> {
         final double maxLoops = NumberUtils.toDouble(maxLoopsString, WHConstants.DEFAULT_MAX_LOOPS);
         while (CommonUtil.isBooleanTrue(condition) && (i <= maxLoops)) {
             Variable loopResult = new BodyProcessor.Builder(elementDef).
-            	setParentProcessor(this).build().execute(scraper, context);
+                setParentProcessor(this).build().execute(context);
             if (!isEmpty) {
                 resultList.addAll(loopResult.toList());
             }

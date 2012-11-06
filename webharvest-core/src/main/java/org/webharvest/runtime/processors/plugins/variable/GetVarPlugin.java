@@ -45,7 +45,6 @@ import java.text.MessageFormat;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -59,7 +58,7 @@ public class GetVarPlugin extends WebHarvestPlugin {
 
     private static final String ATTR_VAR = "var";
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
+    public Variable executePlugin(DynamicScopeContext context) {
         final String varName = evaluateAttribute(ATTR_VAR, context);
 
         final Variable value = context.getVar(varName);

@@ -55,7 +55,6 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.XsltDef;
 import org.webharvest.exception.XsltException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.NodeVariable;
@@ -74,13 +73,13 @@ import org.webharvest.runtime.variables.Variable;
         definitionClass = XsltDef.class)
 public class XsltProcessor extends AbstractProcessor<XsltDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         final IElementDef xsltElementDef = elementDef.getXmlDef();
-        Variable xmlStr = getBodyTextContent(xsltElementDef, scraper, context, true);
+        Variable xmlStr = getBodyTextContent(xsltElementDef, context, true);
         debug(xsltElementDef, context, xmlStr);
 
         IElementDef stylesheetElementDef = elementDef.getStylesheetDef();
-        Variable stylesheetStr = getBodyTextContent(stylesheetElementDef, scraper, context, true);
+        Variable stylesheetStr = getBodyTextContent(stylesheetElementDef, context, true);
         debug(stylesheetElementDef, context, stylesheetStr);
 
         try {

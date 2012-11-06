@@ -41,11 +41,8 @@ package org.webharvest.runtime.processors;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.unitils.UnitilsTestNG;
-import org.unitils.mock.Mock;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 
 /**
@@ -58,7 +55,6 @@ import org.webharvest.runtime.ScraperContext;
 public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
 
     ScraperContext context;
-    Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
@@ -74,7 +70,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>a111b222c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "[a111b222c333] => [111][222][333]");
     }
 
@@ -87,7 +83,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>xxx</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "xxx");
     }
 
@@ -100,7 +96,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source></regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).isEmpty());
+                run(context).isEmpty());
     }
 
     @Test
@@ -112,7 +108,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>b222c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "[b222c333] => [][222][333]");
     }
 
@@ -125,7 +121,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>a111c333</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "[a111c333] => [111][][333]");
     }
 
@@ -138,7 +134,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>a111b222</regexp-source>" +
                 "  <regexp-result><![CDATA[[$0] => [$1][$2][$3]]]></regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "[a111b222] => [111][222][]");
     }
 
@@ -151,7 +147,7 @@ public class RegexpProcessor_Replace_Test extends UnitilsTestNGExtension {
                 "  <regexp-source>a111b222</regexp-source>" +
                 "  <regexp-result>|</regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString(),
+                run(context).toString(),
                 "a|b|");
     }
 }

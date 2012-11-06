@@ -50,7 +50,6 @@ import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -63,11 +62,9 @@ import org.webharvest.utils.KeyValuePair;
 public class ValueOfPluginTest extends UnitilsTestNGExtension {
 
     Mock<ScraperContext> contextMock;
-    Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
-        scraperMock.returns(contextMock.getMock()).getContext();
         contextMock.returns(ScriptingLanguage.BEANSHELL).getScriptingLanguage();
     }
 
@@ -82,7 +79,7 @@ public class ValueOfPluginTest extends UnitilsTestNGExtension {
                 createPlugin(XmlNodeTestUtils.createXmlNode(
                         "<value-of expr='Hello, ${name}!'/>",
                         XmlNodeTestUtils.NAMESPACE_21),
-                        ValueOfPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
+                        ValueOfPlugin.class).executePlugin(contextMock.getMock()));
     }
 
     @Test
@@ -96,7 +93,7 @@ public class ValueOfPluginTest extends UnitilsTestNGExtension {
         ReflectionAssert.assertReflectionEquals(listVar, createPlugin(
                 XmlNodeTestUtils.createXmlNode("<value-of expr='${list}'/>",
                 XmlNodeTestUtils.NAMESPACE_21),
-                ValueOfPlugin.class).executePlugin(scraperMock.getMock(), contextMock.getMock()));
+                ValueOfPlugin.class).executePlugin(contextMock.getMock()));
     }
 
     @Override

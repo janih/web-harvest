@@ -1,8 +1,8 @@
 package org.webharvest.runtime.processors;
 
-import static org.testng.AssertJUnit.assertEquals;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
 import java.lang.reflect.Field;
@@ -27,9 +27,6 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
     @RegularMock
     private StatusHolder mockStatusHolder;
-
-    @RegularMock
-    private Scraper mockScraper;
 
     @RegularMock
     private DynamicScopeContext mockContext;
@@ -66,7 +63,7 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
         EasyMockUnitils.replay();
 
-        final Variable result = processor.run(mockScraper, mockContext);
+        final Variable result = processor.run(mockContext);
         assertNotNull("Result variable is null.", result);
         assertEquals("Unexpected variable.", result, EmptyVariable.INSTANCE);
     }
@@ -77,7 +74,7 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
         EasyMockUnitils.replay();
 
-        final Variable result = processor.run(mockScraper, mockContext);
+        final Variable result = processor.run(mockContext);
         assertNotNull("Result variable is null.", result);
         assertEquals("Unexpected variable.", result, EmptyVariable.INSTANCE);
     }
@@ -88,12 +85,12 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
         expect(mockStatusHolder.getStatus()).andReturn(Scraper.STATUS_RUNNING);
 
-        expect(mockProcessor.run(eq(mockScraper), eq(mockContext)))
+        expect(mockProcessor.run(eq(mockContext)))
             .andReturn(var);
 
         EasyMockUnitils.replay();
 
-        final Variable result = processor.run(mockScraper, mockContext);
+        final Variable result = processor.run(mockContext);
         assertNotNull("Result variable is null.", result);
         assertEquals("Unexpected variable.", result, var);
     }

@@ -3,19 +3,18 @@ package org.webharvest.runtime.processors.plugins.ftp;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.io.IOException;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.io.IOException;
 
 /**
  * FTP processor
@@ -31,7 +30,7 @@ public class FtpPlugin extends WebHarvestPlugin {
         return "ftp";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         String server = CommonUtil.nvl(evaluateAttribute("server", context), "");
         int port = evaluateAttributeAsInteger("port", 21, context);
         String username = CommonUtil.nvl(evaluateAttribute("username", context), "");
@@ -70,7 +69,7 @@ public class FtpPlugin extends WebHarvestPlugin {
 
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            return executeBody(scraper, context);
+            return executeBody(context);
         } catch (IOException e) {
             throw new FtpPluginException(e);
         } finally {

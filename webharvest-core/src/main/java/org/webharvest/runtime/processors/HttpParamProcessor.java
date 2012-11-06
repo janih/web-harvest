@@ -43,7 +43,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpParamDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -63,7 +62,7 @@ import org.webharvest.utils.CommonUtil;
         definitionClass = HttpParamDef.class)
 public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(),
                 null, context);
@@ -84,8 +83,7 @@ public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
                     fileName,
                     contentType,
                     new BodyProcessor.Builder(elementDef).
-                    	setParentProcessor(this).build().
-                    		execute(scraper, context));
+                        setParentProcessor(this).build().execute(context));
             this.setProperty("Name", name);
             this.setProperty("Is File", String.valueOf(isFile));
             this.setProperty("File Name", fileName);

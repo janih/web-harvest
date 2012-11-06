@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.EmptyDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -64,10 +63,10 @@ public class EmptyProcessor extends AbstractProcessor<EmptyDef> {
      * {@inheritDoc}
      */
     @Override
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
         new BodyProcessor.Builder(elementDef).
-        	setParentProcessor(this).build().execute(scraper, context);       
+            setParentProcessor(this).build().execute(context);
 
         return EmptyVariable.INSTANCE;
     }

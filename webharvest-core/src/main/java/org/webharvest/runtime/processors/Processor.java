@@ -2,7 +2,6 @@ package org.webharvest.runtime.processors;
 
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.Variable;
 
 // TODO Add javadoc
@@ -21,23 +20,22 @@ public interface Processor<TDef extends IElementDef> {
     TDef getElementDef();
 
     // TODO Add javadoc
-    Variable run(Scraper scraper, DynamicScopeContext context)
-            throws InterruptedException;
+    Variable run(DynamicScopeContext context) throws InterruptedException;
 
-	/**
-	 * Returns reference to parent {@link Processor} of this processor.
-	 */
-	Processor getParentProcessor();
+    /**
+     * Returns reference to parent {@link Processor} of this processor.
+     */
+    Processor getParentProcessor();
 
-	/**
-	 * Sets reference to parent {@link Processor}.
-	 */
-	void setParentProcessor(Processor parentProcessor);
+    /**
+     * Sets reference to parent {@link Processor}.
+     */
+    void setParentProcessor(Processor parentProcessor);
 
-	/**
-	 * Returns information how deep in processors hierarchy is this
-	 * {@link Processor}. Value of the lowest level is {@code 1}.
-	 */
-	int getRunningLevel();
+    /**
+     * Returns information how deep in processors hierarchy is this
+     * {@link Processor}. Value of the lowest level is {@code 1}.
+     */
+    int getRunningLevel();
 
 }

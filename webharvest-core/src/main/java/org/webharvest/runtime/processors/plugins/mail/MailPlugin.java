@@ -17,7 +17,6 @@ import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -48,7 +47,7 @@ public class MailPlugin extends WebHarvestPlugin {
         return "mail";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         email = null;
 
         boolean isHtml = "html".equalsIgnoreCase(evaluateAttribute("type", context));
@@ -119,7 +118,7 @@ public class MailPlugin extends WebHarvestPlugin {
 
         if (isHtml) {
             HtmlEmail htmlEmail = (HtmlEmail) email;
-            String htmlContent = executeBody(scraper, context).toString();
+            String htmlContent = executeBody(context).toString();
             try {
                 htmlEmail.setHtmlMsg(htmlContent);
             } catch (EmailException e) {
@@ -127,7 +126,7 @@ public class MailPlugin extends WebHarvestPlugin {
             }
         } else {
             try {
-                email.setMsg(executeBody(scraper, context).toString());
+                email.setMsg(executeBody(context).toString());
             } catch (EmailException e) {
                 throw new MailPluginException(e);
             }

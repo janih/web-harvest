@@ -8,7 +8,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -23,7 +22,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
         return "zip-entry";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         ZipPlugin zipPlugin = (ZipPlugin) getParentProcessor();
         if (zipPlugin != null) {
             String name = evaluateAttribute("name", context);
@@ -36,7 +35,7 @@ public class ZipEntryPlugin extends WebHarvestPlugin {
             }
 
             ZipOutputStream zipOutStream = zipPlugin.getZipOutStream();
-            Variable bodyResult = executeBody(scraper, context);
+            Variable bodyResult = executeBody(context);
             try {
                 zipOutStream.putNextEntry(new ZipEntry(name));
                 zipOutStream.write(bodyResult.toBinary(charset));

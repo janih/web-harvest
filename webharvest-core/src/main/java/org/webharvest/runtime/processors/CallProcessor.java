@@ -48,7 +48,6 @@ import org.webharvest.definition.FunctionDef;
 import org.webharvest.exception.BaseException;
 import org.webharvest.exception.FunctionException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -73,7 +72,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
         new HashMap<String, Variable>();
     private Variable functionResult = new NodeVariable("");
 
-    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context) throws InterruptedException {
         String functionName = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         final FunctionDef functionDef = context.getFunctionDef(functionName);
 
@@ -85,7 +84,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
 
         // executes body of call processor
         new BodyProcessor.Builder(elementDef).setParentProcessor(this).
-            build().execute(scraper, context);
+            build().execute(context);
 
         doCall(context, new Callable<Object>() {
 
@@ -98,7 +97,7 @@ public class CallProcessor extends AbstractProcessor<CallDef> {
                 // executes body of function using new context
                 new BodyProcessor.Builder(functionDef).
                     setParentProcessor(CallProcessor.this).build().
-                        execute(scraper, context);
+                        execute(context);
                 return null;
             }
         });

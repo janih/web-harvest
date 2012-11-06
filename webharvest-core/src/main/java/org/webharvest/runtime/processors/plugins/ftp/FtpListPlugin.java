@@ -1,20 +1,19 @@
 package org.webharvest.runtime.processors.plugins.ftp;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.processors.WebHarvestPlugin;
-import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.ListVariable;
-import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.CommonUtil;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.webharvest.runtime.DynamicScopeContext;
+import org.webharvest.runtime.processors.WebHarvestPlugin;
+import org.webharvest.runtime.variables.EmptyVariable;
+import org.webharvest.runtime.variables.ListVariable;
+import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * Ftp List plugin - can be used only inside ftp plugin for listing file in working remote directory.
@@ -25,7 +24,7 @@ public class FtpListPlugin extends WebHarvestPlugin {
         return "ftp-list";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
+    public Variable executePlugin(DynamicScopeContext context) {
         FtpPlugin ftpPlugin = (FtpPlugin) getParentProcessor();
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();

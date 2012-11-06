@@ -42,11 +42,9 @@ import static org.webharvest.runtime.processors.plugins.PluginTestUtils.createPl
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.unitils.mock.Mock;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -57,12 +55,10 @@ import org.webharvest.runtime.variables.NodeVariable;
 public class SetVarPluginTest extends UnitilsTestNGExtension {
 
     ScraperContext context;
-    Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
         context = new ScraperContext();
-        scraperMock.returns(context).getContext();
         context.setScriptingLanguage(ScriptingLanguage.GROOVY);
     }
 
@@ -73,7 +69,7 @@ public class SetVarPluginTest extends UnitilsTestNGExtension {
         createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='greetings' value='Hello, ${name}!'/>",
                 XmlNodeTestUtils.NAMESPACE_21),
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+                SetVarPlugin.class).executePlugin(context);
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("Hello, World!"),
@@ -86,7 +82,7 @@ public class SetVarPluginTest extends UnitilsTestNGExtension {
         createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='greetings'><template>Hello, ${name}!</template></set>",
                 XmlNodeTestUtils.NAMESPACE_21),
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+                SetVarPlugin.class).executePlugin(context);
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("Hello, World!"),
                 context.getVar("greetings"));
@@ -97,7 +93,7 @@ public class SetVarPluginTest extends UnitilsTestNGExtension {
         createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='x' value='actual'>ignored</set>",
                 XmlNodeTestUtils.NAMESPACE_21),
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+                SetVarPlugin.class).executePlugin(context);
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("actual"),
@@ -111,7 +107,7 @@ public class SetVarPluginTest extends UnitilsTestNGExtension {
         createPlugin(XmlNodeTestUtils.createXmlNode(
                 "<set var='x' value='new'/>",
                 XmlNodeTestUtils.NAMESPACE_21),
-                SetVarPlugin.class).executePlugin(scraperMock.getMock(), context);
+                SetVarPlugin.class).executePlugin(context);
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("new"),

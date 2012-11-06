@@ -9,7 +9,6 @@ import org.json.XML;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -25,10 +24,10 @@ public class JsonToXmlPlugin extends WebHarvestPlugin {
     private final static String ATTR_ROOT_TAG_NAME = "tag";
 
     @Override
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         try {
             return new NodeVariable(XML.toString(
-                    new JSONObject(executeBody(scraper, context).toString()),
+                    new JSONObject(executeBody(context).toString()),
                     evaluateAttribute(ATTR_ROOT_TAG_NAME, context)));
         } catch (JSONException e) {
             throw new PluginException("Error converting JSON to XML: " + e.getMessage());

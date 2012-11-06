@@ -38,6 +38,13 @@ package org.webharvest.runtime.processors;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
+
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.transform.stream.StreamSource;
+
 import net.sf.saxon.Configuration;
 import net.sf.saxon.query.DynamicQueryContext;
 import net.sf.saxon.query.StaticQueryContext;
@@ -49,7 +56,6 @@ import org.webharvest.definition.XPathDef;
 import org.webharvest.exception.ScraperXPathException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -59,11 +65,6 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.XmlUtil;
 
 import com.google.inject.Inject;
-
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * XQuery processor.
@@ -79,8 +80,8 @@ public class XPathProcessor extends AbstractProcessor<XPathDef> {
     @Inject
     private RuntimeConfig runtimeConfig;
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        Variable xml = getBodyTextContent(elementDef, scraper, context);
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
+        Variable xml = getBodyTextContent(elementDef, context);
         String expression = BaseTemplater.evaluateToString(elementDef.getExpression(), null, context);
         if (expression != null) {
             this.setProperty("Expression", expression);

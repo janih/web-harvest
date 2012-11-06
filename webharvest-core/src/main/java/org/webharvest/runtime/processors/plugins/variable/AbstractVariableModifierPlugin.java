@@ -38,19 +38,18 @@
 
 package org.webharvest.runtime.processors.plugins.variable;
 
+import java.text.MessageFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
-
-import java.text.MessageFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
@@ -60,7 +59,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
 
     private static final Pattern identifierExprPattern = Pattern.compile("\\$\\{\\s*(\\w*)\\s*\\}");
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         final String varName = getAttributes().get(ATTR_VAR);
         final String valueExpr = getAttributes().get(ATTR_VALUE);
         final String defaultExpr = getAttributes().get(ATTR_DEFAULT);
@@ -93,7 +92,7 @@ abstract class AbstractVariableModifierPlugin extends WebHarvestPlugin {
         if (value.isEmpty()) {
             // value is either unspecified or evaluates to empty.
             // Try to evaluate the body to get the value
-            value = executeBody(scraper, context);
+            value = executeBody(context);
         }
 
         if (value.isEmpty()

@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.CallParamDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -59,13 +58,13 @@ import org.webharvest.runtime.variables.Variable;
         requiredAttributes = "name", definitionClass = CallParamDef.class)
 public class CallParamProcessor extends AbstractProcessor<CallParamDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         Variable variable = new BodyProcessor.Builder(elementDef).setParentProcessor(this).build().
-            execute(scraper, context);
+            execute(context);
 
-        final CallProcessor parentProcessor = 
-        	(CallProcessor) getParentProcessor();
+        final CallProcessor parentProcessor =
+            (CallProcessor) getParentProcessor();
         parentProcessor.addFunctionParam(name, variable);
 
         this.setProperty("Name", name);

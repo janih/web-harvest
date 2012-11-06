@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.TextDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -66,7 +65,7 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
      * {@inheritDoc}
      */
     @Override
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
         String charset = BaseTemplater.evaluateToString(
                 elementDef.getCharset(), null, context);
@@ -80,7 +79,7 @@ public class TextProcessor extends AbstractProcessor<TextDef> {
         }
 
         Variable body = new BodyProcessor.Builder(elementDef).
-            setParentProcessor(this).build().execute(scraper, context);
+            setParentProcessor(this).build().execute(context);
         return new NodeVariable(
                 body instanceof ListVariable ? ((ListVariable) body).toString(
                         charset, delimiter) : body.toString(charset));

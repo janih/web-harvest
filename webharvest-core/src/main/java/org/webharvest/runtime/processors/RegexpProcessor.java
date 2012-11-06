@@ -50,7 +50,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.RegexpDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -74,15 +73,15 @@ import org.webharvest.utils.CommonUtil;
         definitionClass = RegexpDef.class )
 public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
 
-    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context) throws InterruptedException {
 
         IElementDef patternDef = elementDef.getRegexpPatternDef();
-        Variable patternVar = getBodyTextContent(patternDef, scraper, context, true);
+        Variable patternVar = getBodyTextContent(patternDef, context, true);
         debug(patternDef, context, patternVar);
 
         IElementDef sourceDef = elementDef.getRegexpSourceDef();
         Variable source = new BodyProcessor.Builder(sourceDef).
-            setParentProcessor(this).build().run(scraper, context);
+            setParentProcessor(this).build().run(context);
         debug(sourceDef, context, source);
 
         String replace = BaseTemplater.evaluateToString(elementDef.getReplace(), null, context);
@@ -150,7 +149,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
                 }
 
                 IElementDef resultDef = elementDef.getRegexpResultDef();
-                Variable result = getBodyTextContent(resultDef, scraper, context, true);
+                Variable result = getBodyTextContent(resultDef, context, true);
                 debug(resultDef, context, result);
 
                 String currResult = (result == null) ? matcher.group(0) : result.toString();

@@ -3,7 +3,6 @@ package org.webharvest.runtime.processors;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -16,8 +15,8 @@ import java.util.concurrent.Callable;
  */
 public class BodyProcessor extends AbstractProcessor<IElementDef> {
 
-    public Variable execute(final Scraper scraper,
-            final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context)
+            throws InterruptedException {
         return context.executeWithinNewContext(new Callable<Variable>() {
             @Override
             public Variable call() throws Exception {
@@ -26,7 +25,7 @@ public class BodyProcessor extends AbstractProcessor<IElementDef> {
                     final Processor processor = ProcessorResolver
                             .createProcessor(def);
                     processor.setParentProcessor(getParentProcessor());
-                    final Variable variable = processor.run(scraper, context);
+                    final Variable variable = processor.run(context);
                     if (!variable.isEmpty()) {
                         result.addVariable(variable);
                     }

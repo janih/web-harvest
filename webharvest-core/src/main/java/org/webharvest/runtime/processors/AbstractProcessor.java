@@ -47,7 +47,6 @@ import org.webharvest.events.ProcessorStartEvent;
 import org.webharvest.events.ProcessorStopEvent;
 import org.webharvest.ioc.DebugFileLogger;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -68,7 +67,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
     @DebugFileLogger @Inject private Logger debugFileLogger;
 
-    abstract protected Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
+    abstract protected Variable execute(DynamicScopeContext context) throws InterruptedException;
 
     protected TDef elementDef;
 
@@ -86,7 +85,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
      * Wrapper for the execute method. Adds controlling and logging logic.
      */
     @Override
-    public Variable run(final Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable run(DynamicScopeContext context) throws InterruptedException {
 
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -110,7 +109,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
 
         eventBus.post(new ProcessorStartEvent(this));
 
-        final Variable result = execute(scraper, context);
+        final Variable result = execute(context);
         final long executionTime = System.currentTimeMillis() - startTime;
 
         setProperty(WHConstants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
@@ -148,7 +147,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         }
     }
 
-    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context,
+    protected Variable getBodyTextContent(IElementDef elementDef, DynamicScopeContext context,
                                           boolean registerExecution, KeyValuePair properties[]) throws InterruptedException {
         if (elementDef.hasOperations()) {
             BodyProcessor bodyProcessor = new BodyProcessor.Builder(elementDef).
@@ -158,18 +157,18 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
                     bodyProcessor.setProperty(property.getKey(), property.getValue());
                 }
             }
-            return registerExecution ? bodyProcessor.run(scraper, context) : bodyProcessor.execute(scraper, context);
+            return registerExecution ? bodyProcessor.run(context) : bodyProcessor.execute(context);
         }
 
         return EmptyVariable.INSTANCE;
     }
 
-    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
-        return getBodyTextContent(elementDef, scraper, context, registerExecution, null);
+    protected Variable getBodyTextContent(IElementDef elementDef, DynamicScopeContext context, boolean registerExecution) throws InterruptedException {
+        return getBodyTextContent(elementDef, context, registerExecution, null);
     }
 
-    protected Variable getBodyTextContent(IElementDef elementDef, Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        return getBodyTextContent(elementDef, scraper, context, false);
+    protected Variable getBodyTextContent(IElementDef elementDef, DynamicScopeContext context) throws InterruptedException {
+        return getBodyTextContent(elementDef, context, false);
     }
 
     /**

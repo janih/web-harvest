@@ -56,7 +56,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.definition.LoopDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -80,7 +79,7 @@ import org.webharvest.utils.CommonUtil;
         definitionClass = LoopDef.class )
 public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
-    public Variable execute(final Scraper scraper, final DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(final DynamicScopeContext context) throws InterruptedException {
         final String item = BaseTemplater.evaluateToString(elementDef.getItem(), null, context);
         final String index = BaseTemplater.evaluateToString(elementDef.getIndex(), null, context);
         final String maxLoopsString = BaseTemplater.evaluateToString(elementDef.getMaxloops(), null, context);
@@ -95,7 +94,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
         IElementDef loopValueDef = elementDef.getLoopValueDef();
         Variable loopValue = new BodyProcessor.Builder(loopValueDef).
-            setParentProcessor(this).build().run(scraper, context);
+            setParentProcessor(this).build().run(context);
         debug(loopValueDef, context, loopValue);
 
 
@@ -124,7 +123,7 @@ public class LoopProcessor extends AbstractProcessor<LoopDef> {
 
                 // execute the loop body
                 IElementDef bodyDef = elementDef.getLoopBodyDef();
-                Variable loopResult = (bodyDef != null) ? new BodyProcessor.Builder(bodyDef).build().run(scraper, context) : EmptyVariable.INSTANCE;
+                Variable loopResult = (bodyDef != null) ? new BodyProcessor.Builder(bodyDef).build().run(context) : EmptyVariable.INSTANCE;
                 debug(bodyDef, context, loopResult);
                 if (!isEmpty) {
                     resultList.addAll(loopResult.toList());

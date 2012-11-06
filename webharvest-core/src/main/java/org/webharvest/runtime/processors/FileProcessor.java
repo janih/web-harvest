@@ -56,7 +56,6 @@ import org.webharvest.definition.FileDef;
 import org.webharvest.exception.FileException;
 import org.webharvest.ioc.WorkingDir;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -84,7 +83,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
     @WorkingDir
     private String workingDir;
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
         String action = BaseTemplater.evaluateToString(elementDef.getAction(),
                 null, context);
@@ -122,16 +121,16 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
         // depending on file acton calls appropriate method
         if ("write".equalsIgnoreCase(action)) {
-            return executeFileWrite(false, scraper, context, fullPath, type,
+            return executeFileWrite(false, context, fullPath, type,
                     charset);
         } else if ("append".equalsIgnoreCase(action)) {
-            return executeFileWrite(true, scraper, context, fullPath, type,
+            return executeFileWrite(true, context, fullPath, type,
                     charset);
         } else if ("list".equalsIgnoreCase(action)) {
             return executeFileList(filePath, listFilter, isListFiles,
                     isListDirs, isListRecursive);
         } else {
-            return executeFileRead(fullPath, type, charset, scraper);
+            return executeFileRead(fullPath, type, charset);
         }
     }
 
@@ -181,7 +180,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
      * Writing content to the specified file. If parameter "append" is true,
      * then append content, otherwise write
      */
-    private Variable executeFileWrite(boolean append, Scraper scraper,
+    private Variable executeFileWrite(boolean append,
             DynamicScopeContext context, String fullPath, String type,
             String charset) throws InterruptedException {
         Variable result;
@@ -195,11 +194,11 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
 
             if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
                 Variable bodyListVar = new BodyProcessor.Builder(elementDef).
-                    setParentProcessor(this).build().execute(scraper, context);
+                    setParentProcessor(this).build().execute(context);
                 result = appendBinary(bodyListVar);
                 data = result.toBinary();
             } else {
-                Variable body = getBodyTextContent(elementDef, scraper, context);
+                Variable body = getBodyTextContent(elementDef, context);
                 String content = body.toString();
                 data = content.getBytes(charset);
                 result = new NodeVariable(content);
@@ -220,7 +219,7 @@ public class FileProcessor extends AbstractProcessor<FileDef> {
      * Reading the specified file.
      */
     private Variable executeFileRead(String fullPath, String type,
-            String charset, Scraper scraper) {
+            String charset) {
         if (Types.TYPE_BINARY.equalsIgnoreCase(type)) {
             try {
                 byte[] data = CommonUtil.readBytesFromFile(new File(fullPath));

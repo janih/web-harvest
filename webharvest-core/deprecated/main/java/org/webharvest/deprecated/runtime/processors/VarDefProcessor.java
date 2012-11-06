@@ -43,7 +43,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.VarDefDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.BodyProcessor;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -67,9 +66,9 @@ import org.webharvest.utils.CommonUtil;
         requiredAttributes = "name", definitionClass = VarDefDef.class)
 public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         final Variable var = new BodyProcessor.Builder(elementDef).
-        	setParentProcessor(this).build().execute(scraper, context);
+            setParentProcessor(this).build().execute(context);
 
         final String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         final String overwrite = BaseTemplater.evaluateToString(elementDef.getOverwrite(), null, context);

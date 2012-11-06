@@ -42,7 +42,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.VarDef;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
@@ -63,7 +62,7 @@ import org.webharvest.runtime.variables.Variable;
       requiredAttributes = "name", definitionClass = VarDef.class)
 public class VarProcessor extends AbstractProcessor<VarDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) {
+    public Variable execute(DynamicScopeContext context) {
         String name = BaseTemplater.evaluateToString(elementDef.getName(), null, context);
         this.setProperty("Name", name);
 

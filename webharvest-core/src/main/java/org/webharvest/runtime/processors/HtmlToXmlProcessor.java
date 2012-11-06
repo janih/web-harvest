@@ -39,21 +39,26 @@ package org.webharvest.runtime.processors;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.io.IOException;
+
 import org.apache.commons.lang.BooleanUtils;
-import org.htmlcleaner.*;
+import org.htmlcleaner.BrowserCompactXmlSerializer;
+import org.htmlcleaner.CleanerProperties;
+import org.htmlcleaner.CompactXmlSerializer;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.PrettyXmlSerializer;
+import org.htmlcleaner.SimpleXmlSerializer;
+import org.htmlcleaner.XmlSerializer;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HtmlToXmlDef;
 import org.webharvest.exception.ParserException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.io.IOException;
 
 /**
  * HTML to XML processor.
@@ -71,8 +76,8 @@ import java.io.IOException;
         "prunetags", "booleanatts" }, definitionClass=HtmlToXmlDef.class)
 public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
-        Variable body = getBodyTextContent(elementDef, scraper, context);
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
+        Variable body = getBodyTextContent(elementDef, context);
 
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = cleaner.getProperties();

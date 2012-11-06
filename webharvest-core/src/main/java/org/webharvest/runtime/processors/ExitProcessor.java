@@ -7,7 +7,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ExitDef;
 import org.webharvest.events.ScraperExecutionExitEvent;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -32,7 +31,7 @@ public class ExitProcessor extends AbstractProcessor<ExitDef> {
     @Inject
     private EventBus eventBus;
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) {
+    public Variable execute(DynamicScopeContext context) {
         String condition = BaseTemplater.evaluateToString(elementDef.getCondition(), null, context);
         if (condition == null || "".equals(condition)) {
             condition = "true";

@@ -54,7 +54,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.HttpDef;
 import org.webharvest.exception.HttpException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -91,7 +90,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
     private Map<String, HttpParamInfo> httpParams = new LinkedHashMap<String, HttpParamInfo>();
     private Map<String, String> httpHeaderMap = new HashMap<String, String>();
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context)
+    public Variable execute(DynamicScopeContext context)
             throws InterruptedException {
 
         final String url = BaseTemplater.evaluateToString(elementDef.getUrl(),
@@ -133,7 +132,7 @@ public class HttpProcessor extends AbstractProcessor<HttpDef> {
 
         // executes body of HTTP processor
         final Variable bodyContent = new BodyProcessor.Builder(elementDef).
-            setParentProcessor(this).build().execute(scraper, context);
+            setParentProcessor(this).build().execute(context);
 
         httpClientManager.setCookiePolicy(cookiePolicy);
 

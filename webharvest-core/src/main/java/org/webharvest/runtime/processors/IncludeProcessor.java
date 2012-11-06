@@ -39,25 +39,24 @@ package org.webharvest.runtime.processors;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Include processor.
@@ -70,7 +69,7 @@ import java.net.URL;
         requiredAttributes = "path", definitionClass = IncludeDef.class)
 public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 
         String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, context);
@@ -99,7 +98,7 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
             includedConfig = isUrl ? new ScraperConfiguration(new URL(fullPath)) : new ScraperConfiguration(fullPath);
 
             ProcessorResolver.createProcessor(
-                    includedConfig.getRootElementDef()).run(scraper,
+                    includedConfig.getRootElementDef()).run(
                             NestedContextFactory.create(context));
 
             if (Thread.currentThread().isInterrupted()) {

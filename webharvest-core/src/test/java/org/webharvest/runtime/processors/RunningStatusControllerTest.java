@@ -1,8 +1,9 @@
 package org.webharvest.runtime.processors;
 
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertSame;
-import static org.easymock.EasyMock.*;
 
 import java.lang.reflect.Field;
 
@@ -15,7 +16,6 @@ import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.mock.Mock;
 import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
 
@@ -27,9 +27,6 @@ public class RunningStatusControllerTest extends UnitilsTestNG {
 
     private Monitor monitor;
     private GuardMock guard;
-
-    @RegularMock
-    private Scraper mockScraper;
 
     @RegularMock
     private DynamicScopeContext mockContext;
@@ -72,12 +69,12 @@ public class RunningStatusControllerTest extends UnitilsTestNG {
 
         guard.setSatisfied(true);
 
-        expect(mockProcessor.run(eq(mockScraper), eq(mockContext)))
+        expect(mockProcessor.run(eq(mockContext)))
             .andReturn(var);
 
         EasyMockUnitils.replay();
 
-        final Variable result = controller.run(mockScraper, mockContext);
+        final Variable result = controller.run(mockContext);
         assertNotNull("Result variable is null.", result);
         assertSame("Unexpected variable.", result, var);
     }

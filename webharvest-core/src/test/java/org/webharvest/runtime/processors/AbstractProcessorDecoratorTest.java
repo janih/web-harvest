@@ -1,9 +1,11 @@
 package org.webharvest.runtime.processors;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.same;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertSame;
-import static org.easymock.EasyMock.*;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -13,7 +15,6 @@ import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.variables.Variable;
 
 public class AbstractProcessorDecoratorTest extends UnitilsTestNG {
@@ -101,7 +102,7 @@ public class AbstractProcessorDecoratorTest extends UnitilsTestNG {
         }
 
         @Override
-        public Variable run(Scraper scraper, DynamicScopeContext context)
+        public Variable run(DynamicScopeContext context)
                 throws InterruptedException {
             return null;
         }

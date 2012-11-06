@@ -41,10 +41,8 @@ package org.webharvest.runtime.processors;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.unitils.mock.Mock;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 
 /**
@@ -57,7 +55,6 @@ import org.webharvest.runtime.ScraperContext;
 public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
 
     ScraperContext context;
-    Mock<Scraper> scraperMock;
 
     @BeforeMethod
     public void before() {
@@ -78,7 +75,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222c333][111][222][333]");
+                run(context).toString().replaceAll("\\s", ""), "[a111b222c333][111][222][333]");
     }
 
     @Test
@@ -93,7 +90,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_1'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).isEmpty());
+                run(context).isEmpty());
     }
 
     @Test
@@ -110,7 +107,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).isEmpty());
+                run(context).isEmpty());
     }
 
     @Test
@@ -127,7 +124,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[b222c333][][222][333]");
+                run(context).toString().replaceAll("\\s", ""), "[b222c333][][222][333]");
     }
 
     @Test
@@ -144,7 +141,7 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111c333][111][][333]");
+                run(context).toString().replaceAll("\\s", ""), "[a111c333][111][][333]");
     }
 
     @Test
@@ -161,6 +158,6 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "    [<var name='_3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
-                run(scraperMock.getMock(), context).toString().replaceAll("\\s", ""), "[a111b222][111][222][]");
+                run(context).toString().replaceAll("\\s", ""), "[a111b222][111][222][]");
     }
 }

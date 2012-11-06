@@ -60,7 +60,6 @@ import org.webharvest.definition.XQueryExternalParamDef;
 import org.webharvest.exception.ScraperXQueryException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
@@ -109,9 +108,9 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
     @Inject
     private RuntimeConfig runtimeConfig;
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         IElementDef xqueryElementDef = elementDef.getXqDef();
-        Variable xq = getBodyTextContent(xqueryElementDef, scraper, context, true);
+        Variable xq = getBodyTextContent(xqueryElementDef, context, true);
         debug(xqueryElementDef, context, xq);
 
         String xqExpression = xq.toString().trim();
@@ -143,7 +142,7 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
                             setParentProcessor(this).build();
                     bodyProcessor.setProperty("Name", externalParamName);
                     bodyProcessor.setProperty("Type", externalParamType);
-                    Variable variable = bodyProcessor.run(scraper, context);
+                    Variable variable = bodyProcessor.run(context);
                     debug(externalParamDef, context, variable);
 
                     List<Object> paramList = new ArrayList<Object>();
@@ -155,7 +154,7 @@ public class XQueryProcessor extends AbstractProcessor<XQueryDef> {
                     dynamicContext.setParameter(externalParamName, paramList);
                 } else {
                     KeyValuePair props[] = {new KeyValuePair<String>("Name", externalParamName), new KeyValuePair<String>("Type", externalParamType)};
-                    Variable var = getBodyTextContent(externalParamDef, scraper, context, true, props);
+                    Variable var = getBodyTextContent(externalParamDef, context, true, props);
 
                     debug(externalParamDef, context, var);
 

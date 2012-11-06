@@ -5,7 +5,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -27,8 +26,7 @@ public final class RegexpSourceProcessor extends WebHarvestPlugin {
      * {@inheritDoc}
      */
     @Override
-    public Variable executePlugin(final Scraper scraper,
-            final DynamicScopeContext context)
+    public Variable executePlugin(final DynamicScopeContext context)
             throws InterruptedException {
         // Do nothing
         return EmptyVariable.INSTANCE;

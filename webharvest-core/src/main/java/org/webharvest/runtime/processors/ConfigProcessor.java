@@ -7,7 +7,6 @@ import org.webharvest.annotation.Definition;
 import org.webharvest.definition.ConfigDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.EmptyVariable;
@@ -30,8 +29,8 @@ public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
      * {@inheritDoc}
      */
     @Override
-    protected Variable execute(final Scraper scraper,
-            final DynamicScopeContext context) throws InterruptedException {
+    protected Variable execute(final DynamicScopeContext context)
+            throws InterruptedException {
 
         context.setCharset(getElementDef().getCharset());
         context.setScriptingLanguage(getElementDef().getScriptingLanguage());
@@ -43,7 +42,7 @@ public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
         // within 'config' element body would not be available in the scraper
         // context at the end of its execution.
         for (IElementDef elementDef : getElementDef().getOperationDefs()) {
-            ProcessorResolver.createProcessor(elementDef).run(scraper, context);
+            ProcessorResolver.createProcessor(elementDef).run(context);
         }
 
         return EmptyVariable.INSTANCE;

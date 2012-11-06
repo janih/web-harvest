@@ -38,7 +38,8 @@
 
 package org.webharvest.runtime.processors;
 
-import static org.webharvest.runtime.scripting.ScriptingLanguage.*;
+import static org.webharvest.runtime.scripting.ScriptingLanguage.GROOVY;
+import static org.webharvest.runtime.scripting.ScriptingLanguage.JAVASCRIPT;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,11 +48,9 @@ import org.unitils.mock.core.MockObject;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.webharvest.UnitilsTestNGExtension;
 import org.webharvest.definition.XmlNodeTestUtils;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptSource;
-import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.NodeVariable;
 
 /**
@@ -63,14 +62,12 @@ import org.webharvest.runtime.variables.NodeVariable;
 public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
     ScraperContext context;
-    Mock<Scraper> scraperMock;
     Mock<ScriptEngine> engineMock;
 
     @BeforeMethod
     public void before() {
         context = new ScraperContext();
         context.setScriptingLanguage(JAVASCRIPT); // default scripting language
-        scraperMock.returns(context).getContext();
         scriptEngineFactoryMock.returns(engineMock.getMock()).getEngine(null);
     }
 
@@ -86,7 +83,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.run(scraperMock.getMock(), context));
+                processor.run(context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", JAVASCRIPT));
@@ -104,7 +101,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.run(scraperMock.getMock(), context));
+                processor.run(context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", GROOVY));
@@ -123,7 +120,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         ReflectionAssert.assertReflectionEquals(
                 new NodeVariable("my val"),
-                processor.run(scraperMock.getMock(), context));
+                processor.run(context));
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here", GROOVY));
@@ -142,7 +139,7 @@ public class ScriptProcessorTest extends UnitilsTestNGExtension {
 
         ProcessorTestUtils.processor(XmlNodeTestUtils.createXmlNode("" +
                 "<script return='${myReturnExpr}'><![CDATA[ some script here ]]></script>",
-                XmlNodeTestUtils.NAMESPACE_10)).run(scraperMock.getMock(), context);
+                XmlNodeTestUtils.NAMESPACE_10)).run(context);
 
         scriptEngineFactoryMock.assertInvoked().
                 getEngine(new ScriptSource("some script here; my return code",

@@ -46,7 +46,6 @@ import org.apache.commons.dbutils.DbUtils;
 import org.webharvest.exception.DatabaseException;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ListVariable;
@@ -82,12 +81,12 @@ public abstract class AbstractDatabasePlugin extends WebHarvestPlugin {
         return "database";
     }
 
-    public Variable executePlugin(final Scraper scraper,
-            final DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(final DynamicScopeContext context)
+            throws InterruptedException {
 
         final Connection conn = obtainConnection(context);
 
-        Variable body = executeBody(scraper, context);
+        Variable body = executeBody(context);
         String sql = body.toString();
 
         PreparedStatement statement = null;

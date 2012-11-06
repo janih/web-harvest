@@ -42,7 +42,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.TemplateDef;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -62,9 +61,9 @@ import org.webharvest.runtime.variables.Variable;
         definitionClass = TemplateDef.class)
 public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
 
-    public Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable execute(DynamicScopeContext context) throws InterruptedException {
         return new NodeVariable(BaseTemplater.evaluateToString(
-                getBodyTextContent(elementDef, scraper, context).toString(),
+                getBodyTextContent(elementDef, context).toString(),
                 ScriptingLanguage.recognize(BaseTemplater.evaluateToString(elementDef.getLanguage(), null, context)),
                 context));
     }

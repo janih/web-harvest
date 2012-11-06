@@ -6,7 +6,6 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 import org.webharvest.annotation.Definition;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -28,12 +27,12 @@ public final class DbParamPlugin extends WebHarvestPlugin {
         return "db-param";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         Processor processor = getParentProcessor();
         if (processor != null) {
             AbstractDatabasePlugin databasePlugin = (AbstractDatabasePlugin) processor;
             String type = evaluateAttribute("type", context);
-            Variable body = executeBody(scraper, context);
+            Variable body = executeBody(context);
             if (CommonUtil.isEmptyString(type)) {
                 type = "text";
                 if ( body.getWrappedObject() instanceof byte[] ) {

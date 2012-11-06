@@ -1,15 +1,14 @@
 package org.webharvest.runtime.processors.plugins.ftp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.apache.commons.net.ftp.FTPClient;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.processors.WebHarvestPlugin;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * Ftp Get plugin - can be used only inside ftp plugin for retrieving file from remote directory.
@@ -20,7 +19,7 @@ public class FtpGetPlugin extends WebHarvestPlugin {
         return "ftp-get";
     }
 
-    public Variable executePlugin(Scraper scraper, DynamicScopeContext context) {
+    public Variable executePlugin(DynamicScopeContext context) {
         FtpPlugin ftpPlugin = (FtpPlugin) getParentProcessor();
         if (ftpPlugin != null) {
             FTPClient ftpClient = ftpPlugin.getFtpClient();

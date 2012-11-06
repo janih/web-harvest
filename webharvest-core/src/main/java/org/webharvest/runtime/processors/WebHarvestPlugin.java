@@ -36,6 +36,8 @@
 */
 package org.webharvest.runtime.processors;
 
+import java.util.Map;
+
 import org.webharvest.definition.WebHarvestPluginDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
@@ -43,8 +45,6 @@ import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.CommonUtil;
-
-import java.util.Map;
 
 /**
  * Base for all user-defined plugins.
@@ -55,9 +55,9 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * {@inheritDoc}
      */
     @Override
-    public final Variable execute(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    public final Variable execute(DynamicScopeContext context) throws InterruptedException {
         // pre processing
-        final Variable variable = executePlugin(scraper, context);
+        final Variable variable = executePlugin(context);
         Assert.notNull(variable, "Plugin {0} returned 'null' instead of 'empty'", getClass().getName());
         // post processing
         return variable;
@@ -69,12 +69,11 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * local variables at the beginning of this method.
      *
      * @deprecated Use execute(...) instead
-     * @param scraper
      * @param context
      * @return Instance of variable as result of execution.
      */
     @Deprecated
-    public abstract Variable executePlugin(Scraper scraper, DynamicScopeContext context) throws InterruptedException;
+    public abstract Variable executePlugin(DynamicScopeContext context) throws InterruptedException;
 
     /**
      * @return Map of attributes of this plugin
@@ -125,9 +124,9 @@ public abstract class WebHarvestPlugin extends AbstractProcessor<WebHarvestPlugi
      * @param context
      * @return Instance of Variable
      */
-    protected Variable executeBody(Scraper scraper, DynamicScopeContext context) throws InterruptedException {
+    protected Variable executeBody(DynamicScopeContext context) throws InterruptedException {
         return new BodyProcessor.Builder(elementDef).setParentProcessor(this).
-        	build().execute(scraper, context);
+            build().execute(context);
     }
 
 }

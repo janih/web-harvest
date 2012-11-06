@@ -47,15 +47,15 @@ public final class StoppedOrExitedProcessor<TDef extends IElementDef> extends
      * {@inheritDoc}
      */
     @Override
-    public Variable run(final Scraper scraper,
-            final DynamicScopeContext context) throws InterruptedException {
+    public Variable run(final DynamicScopeContext context)
+            throws InterruptedException {
         final int status = statusHolder.getStatus();
 
         if (status == Scraper.STATUS_STOPPED || status == Scraper.STATUS_EXIT) {
             return EmptyVariable.INSTANCE;
         }
 
-        return decoratedProcessor.run(scraper, context);
+        return decoratedProcessor.run(context);
     }
 
 }
