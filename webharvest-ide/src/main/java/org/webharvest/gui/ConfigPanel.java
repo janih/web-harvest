@@ -406,7 +406,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionStartEvent event) {
-                ConfigPanel.this.onExecutionStart(event.getScraper());
+                ConfigPanel.this.onExecutionStart();
             }
 
         });
@@ -417,7 +417,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionPausedEvent event) {
-                ConfigPanel.this.onExecutionPaused(event.getScraper());
+                ConfigPanel.this.onExecutionPaused();
             }
 
         });
@@ -428,7 +428,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionContinuedEvent event) {
-                ConfigPanel.this.onExecutionContinued(event.getScraper());
+                ConfigPanel.this.onExecutionContinued();
             }
 
         });
@@ -450,8 +450,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionErrorEvent event) {
-                ConfigPanel.this.onExecutionError(event.getScraper(),
-                        event.getException());
+                ConfigPanel.this.onExecutionError(event.getException());
             }
 
         });
@@ -703,7 +702,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         }
     }
 
-    private void onExecutionStart(WebScraper scraper) {
+    private void onExecutionStart() {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
@@ -711,14 +710,14 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         this.ide.updateGUI();
     }
 
-    private void onExecutionContinued(WebScraper scraper) {
+    private void onExecutionContinued() {
         xmlPane.clearStopDebugLine();
         xmlPane.clearErrorLine();
         xmlPane.clearMarkerLine();
         this.ide.updateGUI();
     }
 
-    private void onExecutionPaused(WebScraper scraper) {
+    private void onExecutionPaused() {
         this.ide.updateGUI();
     }
 
@@ -796,7 +795,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         }
     }
 
-    private void onExecutionError(WebScraper scraper, Exception e) {
+    private void onExecutionError(Exception e) {
         final Settings settings = ide.getSettings();
         if (settings.isDynamicConfigLocate()) {
             this.xmlPane.setEditable(true);
