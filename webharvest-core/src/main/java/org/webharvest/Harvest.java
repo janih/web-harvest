@@ -33,13 +33,12 @@
 
 package org.webharvest;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
+import org.webharvest.definition.ConfigSource;
 import org.webharvest.events.EventHandler;
 import org.webharvest.events.HarvesterEvent;
-import org.xml.sax.InputSource;
 
 /**
  * Web-Harvest application facade that provides control over creation of
@@ -57,7 +56,8 @@ import org.xml.sax.InputSource;
 public interface Harvest {
 
     /**
-     * Creates new {@link Harvester} object with configuration at specified URL.
+     * Creates new {@link Harvester} object with configuration with
+     * configuration represented by {@link ConfigSource} object.
      * Throws {@link IOException} in case of any problems with reading
      * configuration from remote location.
      *
@@ -66,32 +66,8 @@ public interface Harvest {
      * @return new {@link Harvester} instance.
      * @throws IOException problems with reading the configuration.
      */
-    Harvester getHarvester(URL config, HarvestLoadCallback callback)
+    Harvester getHarvester(ConfigSource source, HarvestLoadCallback callback)
             throws IOException;
-
-    /**
-     * Creates new {@link Harvester} object with configuration specified as
-     * file path.
-     * Throws {@link FileNotFoundException} in case of the specified file does
-     * not exist.
-     *
-     * @param config the path to configuration file.
-     * @param callback
-     * @return new {@link Harvester} instance.
-     * @throws FileNotFoundException for not existing configuration file
-     */
-    Harvester getHarvester(String config, HarvestLoadCallback callback)
-            throws FileNotFoundException;
-
-    /**
-     * Creates new {@link Harvester} object with configuration specified as XML
-     * input source.
-     *
-     * @param config XML source configuration.
-     * @param callback
-     * @return new {@link Harvester} instance.
-     */
-    Harvester getHarvester(InputSource config, HarvestLoadCallback callback);
 
     /**
      * Register event handler. Registered handler will receive events from

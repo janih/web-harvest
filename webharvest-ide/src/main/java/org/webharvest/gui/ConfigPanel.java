@@ -82,6 +82,8 @@ import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.WHConstants;
+import org.webharvest.definition.BufferConfigSource;
+import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
 import org.webharvest.events.EventHandler;
@@ -608,10 +610,6 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             }
 
             refreshTree();
-            InputSource in = new InputSource(new StringReader(xmlPane.getText()));
-
-            // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            loadHarvester(in);
         } catch (IOException e) {
             GuiUtils.showErrorMessage(e.getMessage());
         }
@@ -628,13 +626,15 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         xmlPane.clearStopDebugLine();
         updateControls();
 
-        String xmlContent = this.xmlPane.getText();
-        InputSource in = new InputSource(new StringReader(xmlContent));
         try {
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            loadHarvester(in);
-
+            loadHarvester(new BufferConfigSource(xmlPane.getText()));
             ide.setTabIcon(this, null);
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+            ide.setTabIcon(this, ResourceManager.SMALL_ERROR_ICON);
+            GuiUtils.showErrorMessage(e.getMessage());
+            return false;
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
             ide.setTabIcon(this, ResourceManager.SMALL_ERROR_ICON);
@@ -645,10 +645,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         return true;
     }
 
-    private void loadHarvester(final InputSource in) {
+    private void loadHarvester(final ConfigSource config) throws IOException {
 
 
-        this.harvester = createHarvest().getHarvester(in,
+        this.harvester = createHarvest().getHarvester(config,
                 new HarvestLoadCallback() {
 
             @Override

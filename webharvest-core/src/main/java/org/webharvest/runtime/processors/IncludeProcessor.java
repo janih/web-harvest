@@ -46,8 +46,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.webharvest.annotation.Definition;
+import org.webharvest.definition.ConfigSource;
+import org.webharvest.definition.FileConfigSource;
 import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.ScraperConfiguration;
+import org.webharvest.definition.URLConfigSource;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
@@ -95,7 +98,9 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
 
         ScraperConfiguration includedConfig;
         try {
-            includedConfig = isUrl ? new ScraperConfiguration(new URL(fullPath)) : new ScraperConfiguration(fullPath);
+            final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
+
+            includedConfig = new ScraperConfiguration(source);
 
             ProcessorResolver.createProcessor(
                     includedConfig.getRootElementDef()).run(
@@ -105,6 +110,7 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
                 throw new InterruptedException();
             }
             return EmptyVariable.INSTANCE;
+
         } catch (FileNotFoundException e) {
             throw new FileException("Cannot include configuration file " + fullPath, e);
         } catch (MalformedURLException e) {

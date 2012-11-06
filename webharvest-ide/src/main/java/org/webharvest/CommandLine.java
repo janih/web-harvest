@@ -53,7 +53,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.webharvest.definition.DefinitionResolver;
+import org.webharvest.definition.FileConfigSource;
 import org.webharvest.definition.IElementDef;
+import org.webharvest.definition.URLConfigSource;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.ioc.DebugFileLogger;
@@ -164,8 +166,8 @@ public class CommandLine {
 
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
             final Harvester harvester = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
-                    ? harvest.getHarvester(new URL(configFilePath), callback)
-                    : harvest.getHarvester(configFilePath, callback);
+                    ? harvest.getHarvester(new URLConfigSource(new URL(configFilePath)), callback)
+                    : harvest.getHarvester(new FileConfigSource(new File(configFilePath)), callback);
 
             harvester.execute(new Harvester.ContextInitCallback() {
                 @Override

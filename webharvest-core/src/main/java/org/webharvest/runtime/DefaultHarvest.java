@@ -33,19 +33,17 @@
 
 package org.webharvest.runtime;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 
 import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.definition.ConfigSource;
 import org.webharvest.events.EventHandler;
 import org.webharvest.events.EventSink;
 import org.webharvest.events.HandlerHolder;
 import org.webharvest.events.HarvesterEvent;
 import org.webharvest.ioc.HarvesterFactory;
-import org.xml.sax.InputSource;
 
 import com.google.inject.Inject;
 
@@ -90,26 +88,8 @@ public final class DefaultHarvest implements Harvest {
      * {@inheritDoc}
      */
     @Override
-    public Harvester getHarvester(final URL config,
+    public Harvester getHarvester(final ConfigSource config,
             final HarvestLoadCallback callback) throws IOException {
-        return harvestFactory.create(config, callback);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Harvester getHarvester(final String config,
-            final HarvestLoadCallback callback) throws FileNotFoundException {
-        return harvestFactory.create(config, callback);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Harvester getHarvester(final InputSource config,
-            final HarvestLoadCallback callback) {
         return harvestFactory.create(config, callback);
     }
 

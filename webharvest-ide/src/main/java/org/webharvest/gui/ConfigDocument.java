@@ -1,6 +1,10 @@
 package org.webharvest.gui;
 
 import org.bounce.text.xml.XMLDocument;
+import org.webharvest.definition.BufferConfigSource;
+import org.webharvest.definition.ConfigSource;
+import org.webharvest.definition.FileConfigSource;
+import org.webharvest.definition.URLConfigSource;
 import org.webharvest.utils.CommonUtil;
 
 import javax.swing.*;
@@ -38,6 +42,9 @@ public class ConfigDocument implements DocumentListener {
 
     private int lineCount = 0;
 
+    // TODO rbala Should be set by Guice
+    private ConfigSource configSource;
+
     /**
      * Constructor - initializes xml pane for this document.
      * @param configPanel
@@ -59,8 +66,8 @@ public class ConfigDocument implements DocumentListener {
 
     // methods for loading document from various sources
 
-    private void load(Reader reader) throws IOException {
-        xmlPane.read(reader, null);
+    private void load(ConfigSource configSource) throws IOException {
+        xmlPane.read(configSource.getReader(), null);
 
         final Document document = xmlPane.getDocument();
         document.addDocumentListener(this);
@@ -77,11 +84,13 @@ public class ConfigDocument implements DocumentListener {
             e.printStackTrace();
         }
 
+        this.configSource = configSource;
+
         updateGUI();
     }
 
     void load(String text) throws IOException {
-        load( new StringReader(text) );
+        load(new BufferConfigSource(text));
         updateDocumentChanged(false);
     }
 
@@ -89,14 +98,16 @@ public class ConfigDocument implements DocumentListener {
         this.file = file;
         this.name = file.getName();
         String fileCharset = ide.getSettings().getFileCharset();
-        load( new InputStreamReader(new FileInputStream(file), fileCharset) );
+        //load( new InputStreamReader(new FileInputStream(file), fileCharset) );
+        // TODO rbala We need charset as well!!!
+        load(new FileConfigSource(file));
         ide.getSettings().addRecentFile( file.getAbsolutePath() );
     }
 
     void load(URL url) throws IOException {
         this.url = url.toString();
         this.name = CommonUtil.getFileFromPath(this.url);
-        load( new InputStreamReader((InputStream)url.getContent()) );
+        load(new URLConfigSource(url));
     }
 
     // implementation of methods from DocumentListener interface
@@ -258,6 +269,10 @@ public class ConfigDocument implements DocumentListener {
         this.configPanel = null;
         this.xmlPane = null;
         this.file = null;
+    }
+
+    public ConfigSource getConfigSource() {
+        return configSource;
     }
 
 }

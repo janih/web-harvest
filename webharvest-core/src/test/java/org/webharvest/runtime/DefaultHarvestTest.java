@@ -4,7 +4,6 @@ import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
@@ -12,12 +11,12 @@ import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.definition.ConfigSource;
 import org.webharvest.events.EventHandler;
 import org.webharvest.events.EventSink;
 import org.webharvest.events.HandlerHolder;
 import org.webharvest.events.HarvesterEvent;
 import org.webharvest.ioc.HarvesterFactory;
-import org.xml.sax.InputSource;
 
 public class DefaultHarvestTest extends UnitilsTestNG {
 
@@ -40,7 +39,7 @@ public class DefaultHarvestTest extends UnitilsTestNG {
     private Harvester mockHarvester;
 
     @RegularMock
-    private InputSource mockInputSource;
+    private ConfigSource mockConfigSource;
 
     private DefaultHarvest harvest;
 
@@ -56,35 +55,11 @@ public class DefaultHarvestTest extends UnitilsTestNG {
     }
 
     @Test
-    public void testGetHarvesterFromURL() throws IOException {
-        final URL config = new URL("http://www.hurra.com");
-        expect(mockFactory.create(config, mockLoadCallback)).
+    public void testGetHarvester() throws IOException {
+        expect(mockFactory.create(mockConfigSource, mockLoadCallback)).
             andReturn(mockHarvester);
         EasyMockUnitils.replay();
-        final Harvester harvester = harvest.getHarvester(config,
-                mockLoadCallback);
-        assertNotNull(harvester);
-        assertSame(mockHarvester, harvester);
-    }
-
-    @Test
-    public void testGetHarvesterByFilePath() throws IOException {
-        final String config = "/foo/sdsd/";
-        expect(mockFactory.create(config, mockLoadCallback)).
-            andReturn(mockHarvester);
-        EasyMockUnitils.replay();
-        final Harvester harvester = harvest.getHarvester(config,
-                mockLoadCallback);
-        assertNotNull(harvester);
-        assertSame(mockHarvester, harvester);
-    }
-
-    @Test
-    public void testGetHarvesterByInputSource() throws IOException {
-        expect(mockFactory.create(mockInputSource, mockLoadCallback)).
-            andReturn(mockHarvester);
-        EasyMockUnitils.replay();
-        final Harvester harvester = harvest.getHarvester(mockInputSource,
+        final Harvester harvester = harvest.getHarvester(mockConfigSource,
                 mockLoadCallback);
         assertNotNull(harvester);
         assertSame(mockHarvester, harvester);
@@ -113,7 +88,5 @@ public class DefaultHarvestTest extends UnitilsTestNG {
         EasyMockUnitils.replay();
         harvest.postEvent(mockEvent);
     }
-
-
 
 }

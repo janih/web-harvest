@@ -33,13 +33,11 @@
 
 package org.webharvest.ioc;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
-import org.xml.sax.InputSource;
+import org.webharvest.definition.ConfigSource;
 
 /**
  * Guice dynamic factory helper interface that help to instantiate
@@ -58,12 +56,12 @@ public interface HarvesterFactory {
 
     /**
      * Creates new instance of {@link Harvester} according to policy defined in
-     * Guice module bindings with {@link URL} to configuration resource and
-     * {@link HarvestLoadCallback} callback executed upon successful load of
+     * Guice module bindings with {@link ConfigSource} to configuration resource
+     * and {@link HarvestLoadCallback} callback executed upon successful load of
      * configuration.
      *
      * @param config
-     *            URL to remote configuration resource.
+     *            reference to {@link ConfigSource}.
      * @param callback
      *            loaded configuration callback.
      * @return new instance of {@link Harvester} with already loaded
@@ -71,40 +69,7 @@ public interface HarvesterFactory {
      * @throws IOException
      *             in case of configuration load problems.
      */
-    Harvester create(URL config, HarvestLoadCallback callback)
+    Harvester create(ConfigSource config, HarvestLoadCallback callback)
             throws IOException;
-
-    /**
-     * Creates new instance of {@link Harvester} according to policy defined in
-     * Guice module bindings with file path to configuration file and
-     * {@link HarvestLoadCallback} callback executed upon successful load of
-     * configuration.
-     *
-     * @param config
-     *            file path to configuration file
-     * @param callback
-     *            loaded configuration callback.
-     * @return new instance of {@link Harvester} with already loaded
-     *         configuration.
-     * @throws FileNotFoundException
-     *             in case of configuration load problems.
-     */
-    Harvester create(String config, HarvestLoadCallback callback)
-            throws FileNotFoundException;
-
-    /**
-     * Creates new instance of {@link Harvester} according to policy defined in
-     * Guice module bindings with XML configuration stream and
-     * {@link HarvestLoadCallback} callback executed upon successful load of
-     * configuration.
-     *
-     * @param config
-     *            configuration XML stream
-     * @param callback
-     *            loaded configuration callback.
-     * @return new instance of {@link Harvester} with already loaded
-     *         configuration.
-     */
-    Harvester create(InputSource config, HarvestLoadCallback callback);
 
 }

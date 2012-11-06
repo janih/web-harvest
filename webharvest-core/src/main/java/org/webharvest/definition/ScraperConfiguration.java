@@ -37,11 +37,7 @@
 package org.webharvest.definition;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,49 +63,9 @@ public class ScraperConfiguration {
      * @param in
      */
     @AssistedInject
-    public ScraperConfiguration(@Assisted InputSource in) {
-        createFromInputStream(in);
-
-    }
-
-    /**
-     * Creates configuration instance loaded from the specified File.
-     *
-     * @param sourceFile
-     * @throws FileNotFoundException
-     */
-    @Deprecated
-    private ScraperConfiguration(File sourceFile)
-            throws FileNotFoundException {
-        this.sourceFile = sourceFile;
-        createFromInputStream(new InputSource(new FileReader(sourceFile)));
-    }
-
-    /**
-     * Creates configuration instance loaded from the file specified by filename.
-     *
-     * @param sourceFilePath
-     */
-    @Deprecated
-    @AssistedInject
-    public ScraperConfiguration(@Assisted String sourceFilePath)
-            throws FileNotFoundException {
-        this(new File(sourceFilePath));
-    }
-
-    /**
-     * Creates configuration instance loaded from specified URL.
-     *
-     * @param sourceUrl
-     * @throws IOException
-     */
-    @Deprecated
-    @AssistedInject
-    public ScraperConfiguration(@Assisted URL sourceUrl)
+    public ScraperConfiguration(@Assisted ConfigSource config)
             throws IOException {
-        this.url = sourceUrl.toString();
-        createFromInputStream(new InputSource(
-                new InputStreamReader(sourceUrl.openStream())));
+        createFromInputStream(new InputSource(config.getReader()));
     }
 
     private void createFromInputStream(InputSource in) {

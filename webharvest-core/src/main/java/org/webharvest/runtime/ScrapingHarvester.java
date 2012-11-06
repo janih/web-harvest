@@ -33,17 +33,15 @@
 
 package org.webharvest.runtime;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
+import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.ScraperConfiguration;
 import org.webharvest.ioc.ConfigFactory;
 import org.webharvest.ioc.ContextFactory;
 import org.webharvest.ioc.Scraping;
-import org.xml.sax.InputSource;
 
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
@@ -90,75 +88,25 @@ public class ScrapingHarvester implements Harvester {
 
     /**
      * Class constructor expecting Guice
-     * {@link WebScraper} provider, {@link URL} and {@link HarvestLoadCallback}
-     * to be specified.
+     * {@link WebScraper} provider, {@link ConfigSource} and
+     * {@link HarvestLoadCallback} to be specified.
      *
      * @param scraperProvider
      *            the {@link WebScraper} provider.
      * @param config
-     *            an url to remote configuration.
+     *            reference to configuration source as {@link ConfigSource}.
      * @param callback
      *            reference to a callback that is automatically invoked on
      *            successful load of configuration.
      * @throws IOException
      */
-    // FIXME rbala more then 4 parameters
     // TODO contextFactory not in documentation
     @AssistedInject
-    public ScrapingHarvester(final ConfigFactory configFactory,
-            final Provider<WebScraper> scraperProvider,
-            final ContextFactory contextFactory, @Assisted final URL config,
-            @Assisted final HarvestLoadCallback callback) throws IOException {
-        this(scraperProvider, contextFactory,
-                configFactory.create(config), callback);
-    }
-
-    /**
-     * Class constructor expecting Guice {@link WebScraper} provider,
-     * configuration file path and {@link HarvestLoadCallback} to be specified.
-     *
-     * @param scraperProvider
-     *            the {@link WebScraper} provider.
-     * @param config
-     *            configuration file path.
-     * @param callback
-     *            reference to a callback that is automatically invoked on
-     *            successful load of configuration.
-     * @throws IOException
-     */
-    // FIXME rbala more then 4 parameters
-    @AssistedInject
-    // TODO contextFactory not in documentation
-    public ScrapingHarvester(final ConfigFactory configFactory,
-            final Provider<WebScraper> scraperProvider,
-            final ContextFactory contextFactory, @Assisted final String config,
-            @Assisted final HarvestLoadCallback callback)
-            throws FileNotFoundException {
-        this(scraperProvider, contextFactory,
-                configFactory.create(config), callback);
-    }
-
-    /**
-     * Class constructor expecting Guice {@link WebScraper} provider,
-     * {@link URL} and {@link HarvestLoadCallback}
-     * to be specified.
-     *
-     * @param scraperProvider
-     *            the {@link WebScraper} provider.
-     * @param config
-     *            configuration XML stream.
-     * @param callback
-     *            reference to a callback that is automatically invoked on
-     *            successful load of configuration.
-     * @throws IOException
-     */
-    @AssistedInject
-    // TODO contextFactory not in documentation
     public ScrapingHarvester(final ConfigFactory configFactory,
             final Provider<WebScraper> scraperProvider,
             final ContextFactory contextFactory,
-            @Assisted final InputSource config,
-            @Assisted final HarvestLoadCallback callback) {
+            @Assisted final ConfigSource config,
+            @Assisted final HarvestLoadCallback callback) throws IOException {
         this(scraperProvider, contextFactory,
                 configFactory.create(config), callback);
     }
@@ -185,6 +133,9 @@ public class ScrapingHarvester implements Harvester {
                 contextFactory.create(config.getNamespaceURI());
         context.setRootDef(config.getRootElementDef());
 
+        // TODO rbala Added in order to fix problem with IncludeProcessor. However currently it may work with only one level of nested configurations.
+       // context.setSourceFile(config.getSourceFile());
+        //context.setUrl(config.getUrl());
 
         callback.onSuccess(context);
 
