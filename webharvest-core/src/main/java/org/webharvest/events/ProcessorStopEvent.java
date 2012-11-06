@@ -2,40 +2,60 @@ package org.webharvest.events;
 
 import java.util.Map;
 
-import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.Processor;
 
-//TODO Add javadoc
-//TODO Add unit test
-//FIXME Do we need overwritten hashcode and equals?
+/**
+ * Event informing that the specified {@link Processor} has successfully
+ * finished its work.
+ *
+ * @see ProcessorStopEvent
+ *
+ * @author mczapiewski
+ * @since 2.1-SNAPSHOT
+ * @version %I%, %G%
+ */
 public final class ProcessorStopEvent {
-
-    @Deprecated
-    private final WebScraper scraper;
 
     private final Processor processor;
 
     private final Map properties;
 
-    // TODO Add javadoc
-    // TODO Add unit test
-    // TODO Protect against null
-    public ProcessorStopEvent(final WebScraper scraper,
-            final Processor processor, final Map properties) {
-        this.scraper = scraper;
+    /**
+     * Default class constructor which accepts not {@code null} reference to
+     * {@link Processor} and its properties.
+     *
+     * @param processor
+     *            reference to {@link Processor} which has been stopped; must
+     *            not be null
+     * @param properties
+     *            all properties which has been completed by the
+     *            {@link Processor}; must not be null
+     */
+    public ProcessorStopEvent(final Processor processor, final Map properties) {
+        if (processor == null) {
+            throw new IllegalArgumentException("Processor is mandatory.");
+        }
+        if (properties == null) {
+            throw new IllegalArgumentException("Properties are required.");
+        }
         this.processor = processor;
         this.properties = properties;
     }
 
-    @Deprecated
-    public WebScraper getScraper() {
-        return scraper;
-    }
-
+    /**
+     * Returns reference to {@link Processor} which has been stopped.
+     *
+     * @return reference to {@link Processor} which has been stopped.
+     */
     public Processor getProcessor() {
         return processor;
     }
 
+    /**
+     * Returns properties of the {@link Processor} which has been stopped.
+     *
+     * @return properties of the {@link Processor} which has been stopped.
+     */
     public Map getProperties() {
         return properties;
     }

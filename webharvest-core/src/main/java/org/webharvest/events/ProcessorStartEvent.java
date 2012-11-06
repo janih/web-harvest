@@ -1,32 +1,40 @@
 package org.webharvest.events;
 
-import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.Processor;
 
-// TODO Add javadoc
-// TODO Add unit test
-// FIXME Do we need overwritten hashcode and equals?
+/**
+ * Event informing that the specified {@link Processor} has been started.
+ *
+ * @see ProcessorStopEvent
+ *
+ * @author mczapiewski
+ * @since 2.1-SNAPSHOT
+ * @version %I%, %G%
+ */
 public final class ProcessorStartEvent {
-
-    @Deprecated
-    private final WebScraper scraper;
 
     private final Processor processor;
 
-    // TODO Add javadoc
-    // TODO Add unit test
-    // TODO Protect against null
-    public ProcessorStartEvent(final WebScraper scraper,
-            final Processor processor) {
-        this.scraper = scraper;
+    /**
+     * Default class constructor which accepts not {@code null} reference to
+     * {@link Processor}.
+     *
+     * @param processor
+     *            reference to {@link Processor} which has been started; must
+     *            not be null.
+     */
+    public ProcessorStartEvent(final Processor processor) {
+        if (processor == null) {
+            throw new IllegalArgumentException("Processor is mandatory.");
+        }
         this.processor = processor;
     }
 
-    @Deprecated
-    public WebScraper getScraper() {
-        return scraper;
-    }
-
+    /**
+     * Returns reference to {@link Processor} which has been started.
+     *
+     * @return reference to {@link Processor} which has been started.
+     */
     public Processor getProcessor() {
         return processor;
     }

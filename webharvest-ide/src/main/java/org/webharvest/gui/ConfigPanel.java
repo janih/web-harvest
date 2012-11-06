@@ -460,8 +460,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ProcessorStartEvent event) {
-                ConfigPanel.this.onNewProcessorExecution(event.getScraper(),
-                        event.getProcessor());
+                ConfigPanel.this.onNewProcessorExecution(event.getProcessor());
             }
 
         });
@@ -473,8 +472,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ProcessorStopEvent event) {
                 ConfigPanel.this.onProcessorExecutionFinished(
-                        event.getScraper(), event.getProcessor(),
-                        event.getProperties());
+                        event.getProcessor(), event.getProperties());
             }
         });
 
@@ -682,7 +680,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         }
     }
 
-    private void onNewProcessorExecution(WebScraper scraper, Processor processor) {
+    private void onNewProcessorExecution(Processor processor) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
@@ -775,7 +773,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 //        releaseScraper();
     }
 
-    private void onProcessorExecutionFinished(WebScraper scraper, Processor processor, Map properties) {
+    private void onProcessorExecutionFinished(Processor processor, Map properties) {
         final IElementDef elementDef = processor.getElementDef();
         if (elementDef != null) {
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());

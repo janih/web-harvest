@@ -108,7 +108,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
                     id != null ? "[ID=" + id + "] " : ""});
         }
 
-        eventBus.post(new ProcessorStartEvent(scraper, this));
+        eventBus.post(new ProcessorStartEvent(this));
 
         final Variable result = execute(scraper, context);
         final long executionTime = System.currentTimeMillis() - startTime;
@@ -116,7 +116,7 @@ public abstract class AbstractProcessor<TDef extends IElementDef> implements Pro
         setProperty(WHConstants.EXECUTION_TIME_PROPERTY_NAME, executionTime);
         setProperty(WHConstants.VALUE_PROPERTY_NAME, result);
 
-        eventBus.post(new ProcessorStopEvent(scraper, this, properties));
+        eventBus.post(new ProcessorStopEvent(this, properties));
 
         writeDebugFile(id, result);
 
