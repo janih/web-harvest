@@ -837,8 +837,7 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="cookie-policy" use="optional"
-          default="[Default cookie policy of the HTTP client]" type="xs:string">
+        <xs:attribute name="cookie-policy" use="optional" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Specifies the way how HTTP client manages cookies. Allowed values
@@ -870,8 +869,7 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="follow-redirects" use="optional"
-          default="[Varies depending on the method]" type="xs:string">
+        <xs:attribute name="follow-redirects" use="optional" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Sets whether or not the HTTP method should automatically follow
