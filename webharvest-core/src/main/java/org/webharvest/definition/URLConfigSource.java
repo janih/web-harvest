@@ -38,6 +38,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 
+import org.webharvest.definition.ConfigLocationVisitor.VisitableLocation;
 import org.webharvest.utils.HasReader;
 
 /**
@@ -55,12 +56,24 @@ public final class URLConfigSource implements ConfigSource {
     private final URLLocation location;
 
     /**
-     * Default class constructor expecting {@link URL} as configuration source.
+     * Class constructor expecting {@link URL} as configuration source.
      *
      * @param url configuration source
      */
     public URLConfigSource(final URL url) {
-        this.location = new URLLocation(url);
+        this(new URLLocation(url));
+    }
+
+    /**
+     * Class constructor accepting {@link URLLocation} as configuration source.
+     *
+     * @param location configuration source
+     */
+    URLConfigSource(final URLLocation location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Location is requried");
+        }
+        this.location = location;
     }
 
     /**
@@ -86,8 +99,10 @@ public final class URLConfigSource implements ConfigSource {
      * @author Robert Bala
      * @since 2.1.0-SNAPSHOT
      * @version %I%, %G%
+     * @see VisitableLocation
      */
-    private final class URLLocation implements Location, HasReader {
+    // TODO Move to its own file
+    static final class URLLocation implements VisitableLocation, HasReader {
 
         private final URL url;
 
@@ -118,6 +133,15 @@ public final class URLConfigSource implements ConfigSource {
         @Override
         public String toString() {
             return url.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(final ConfigLocationVisitor visitor)
+                throws IOException {
+            visitor.visit(this);
         }
 
     }

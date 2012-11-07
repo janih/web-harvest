@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import org.webharvest.definition.URLConfigSource.URLLocation;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
@@ -30,8 +31,13 @@ public class URLConfigSourceTest extends UnitilsTestNG {
      }
 
      @Test(expectedExceptions=IllegalArgumentException.class)
-     public void testCreateWithoutFile() {
-         new URLConfigSource(null);
+     public void testCreateWithoutURL() {
+         new URLConfigSource((URL) null);
+     }
+
+     @Test(expectedExceptions=IllegalArgumentException.class)
+     public void testCreateWithoutURLLocation() {
+         new URLConfigSource((URLLocation) null);
      }
 
      @Test

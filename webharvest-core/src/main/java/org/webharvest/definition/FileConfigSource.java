@@ -38,6 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.webharvest.definition.ConfigLocationVisitor.VisitableLocation;
 import org.webharvest.utils.HasReader;
 
 /**
@@ -53,15 +54,27 @@ import org.webharvest.utils.HasReader;
  */
 public final class FileConfigSource implements ConfigSource {
 
-    private final FileLocationAdapter location;
+    private final FileLocation location;
 
     /**
-     * Default class constructor expecting {@link File} as configuration source.
+     * Class constructor expecting {@link File} as configuration source.
      *
      * @param file configuration source
      */
     public FileConfigSource(final File file) {
-        this.location = new FileLocationAdapter(file);
+        this(new FileLocation(file));
+    }
+
+    /**
+     * Class constructor accepting {@link FileLocation} as configuration source.
+     *
+     * @param location configuration source
+     */
+    FileConfigSource(final FileLocation location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Location is requried");
+        }
+        this.location = location;
     }
 
     /**
@@ -87,8 +100,10 @@ public final class FileConfigSource implements ConfigSource {
      * @author Robert Bala
      * @since 2.1.0-SNAPSHOT
      * @version %I%, %G%
+     * @see VisitableLocation
      */
-    private final class FileLocationAdapter implements Location, HasReader {
+    // TODO Move to its own file
+    static final class FileLocation implements VisitableLocation, HasReader {
 
         private final File file;
 
@@ -97,7 +112,7 @@ public final class FileConfigSource implements ConfigSource {
          *
          * @param file reference to {@link File}.
          */
-        public FileLocationAdapter(final File file) {
+        public FileLocation(final File file) {
             if (file == null) {
                 throw new IllegalArgumentException("Configuration file is "
                         + "required");
@@ -119,6 +134,15 @@ public final class FileConfigSource implements ConfigSource {
         @Override
         public String toString() {
             return file.getAbsolutePath();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(final ConfigLocationVisitor visitor)
+                throws IOException {
+            visitor.visit(this);
         }
 
     }

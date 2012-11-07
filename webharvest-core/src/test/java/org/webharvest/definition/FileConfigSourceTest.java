@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import org.webharvest.definition.FileConfigSource.FileLocation;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
@@ -32,7 +33,12 @@ public class FileConfigSourceTest extends UnitilsTestNG {
 
     @Test(expectedExceptions=IllegalArgumentException.class)
     public void testCreateWithoutFile() {
-        new FileConfigSource(null);
+        new FileConfigSource((File) null);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void testCreateWithoutLocation() {
+        new FileConfigSource((FileLocation) null);
     }
 
     @Test
