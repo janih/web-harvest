@@ -114,7 +114,7 @@ public class Scraper implements WebScraper {
      */
     public void informListenersAboutError(Exception e) {
         // inform al listeners that execution is continued
-        eventBus.post(new ScraperExecutionErrorEvent(this, e));
+        eventBus.post(new ScraperExecutionErrorEvent(e));
     }
 
 }

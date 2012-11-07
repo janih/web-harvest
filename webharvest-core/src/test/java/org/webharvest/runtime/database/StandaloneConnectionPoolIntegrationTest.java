@@ -85,7 +85,7 @@ public class StandaloneConnectionPoolIntegrationTest extends UnitilsTestNG {
         EasyMock.expectLastCall();
 
         EasyMockUnitils.replay();
-        pool.onExecutionError(new ScraperExecutionErrorEvent(null, null));
+        pool.onExecutionError(new ScraperExecutionErrorEvent(null));
         EasyMockUnitils.verify();
     }
 

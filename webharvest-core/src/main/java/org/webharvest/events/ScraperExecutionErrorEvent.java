@@ -33,13 +33,9 @@
 
 package org.webharvest.events;
 
-import org.webharvest.runtime.Scraper;
-import org.webharvest.runtime.WebScraper;
-
 /**
- * Event informing that during the execution of {@link Scraper} some exception
- * has occurred. Event holds a reference to the instance of {@link Scraper}
- * which execution caused exception and reference to the exception raised.
+ * Event informing that during the execution of Scraper some exception
+ * has occurred. Event holds reference to the exception raised.
  *
  * @author Piotr Dyraga
  * @since 2.1.0-SNAPSHOT
@@ -47,32 +43,17 @@ import org.webharvest.runtime.WebScraper;
  */
 public final class ScraperExecutionErrorEvent {
 
-    private final WebScraper scraper;
-
     private final Exception exception;
 
     /**
-     * Event constructor accepting reference to {@link WebScraper} being executed
-     * and {@link Exception} which occurred during the execution.
+     * Event constructor accepting {@link Exception} which occurred during the
+     * execution.
      *
-     * @param scraper
-     *            reference to {@link WebScraper} being executed
      * @param exception
      *            reference to the {@link Exception} occurred
      */
-    public ScraperExecutionErrorEvent(final WebScraper scraper,
-            final Exception exception) {
-        this.scraper = scraper;
+    public ScraperExecutionErrorEvent(final Exception exception) {
         this.exception = exception;
-    }
-
-    /**
-     * Returns instance of {@link WebScraper} which execution caused exception.
-     *
-     * @return reference to {@link WebScraper}
-     */
-    public WebScraper getScraper() {
-        return this.scraper;
     }
 
     /**
