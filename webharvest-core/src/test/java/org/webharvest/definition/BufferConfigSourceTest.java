@@ -1,17 +1,29 @@
 package org.webharvest.definition;
 
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.RegularMock;
+import org.webharvest.definition.ConfigLocationVisitor.VisitableLocation;
 
 public class BufferConfigSourceTest extends UnitilsTestNG {
 
     private static final String CONTENT = "blah, blah";
+
+    @RegularMock
+    private ConfigLocationVisitor mockVisitor;
+
+    @RegularMock
+    private VisitableLocation mockVisitableLocation;
 
     private BufferConfigSource source;
 
@@ -51,6 +63,21 @@ public class BufferConfigSourceTest extends UnitilsTestNG {
         final Reader reader = source.getReader();
         assertNotNull(reader);
         assertTrue((reader instanceof StringReader));
+    }
+
+    @Test
+    public void testVisitWithUnvisitableLocation() throws IOException {
+        EasyMockUnitils.replay();
+        source.visit(mockVisitor);
+    }
+
+    @Test
+    public void testVisitWithVisitableLocation() throws IOException {
+        mockVisitableLocation.accept(mockVisitor);
+        expectLastCall();
+        EasyMockUnitils.replay();
+        new BufferConfigSource(CONTENT,
+                mockVisitableLocation).visit(mockVisitor);
     }
 
 }

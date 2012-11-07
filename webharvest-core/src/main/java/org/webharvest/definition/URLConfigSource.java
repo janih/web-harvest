@@ -51,7 +51,7 @@ import org.webharvest.utils.HasReader;
  * @see ConfigSource
  * @see URL
  */
-public final class URLConfigSource implements ConfigSource {
+public final class URLConfigSource extends AbstractConfigSource {
 
     private final URLLocation location;
 
@@ -88,8 +88,17 @@ public final class URLConfigSource implements ConfigSource {
      * {@inheritDoc}
      */
     @Override
-    public Location getLocation() {
+    public VisitableLocation getLocation() {
         return location;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void visit(final ConfigLocationVisitor visitor)
+            throws IOException {
+        location.accept(visitor);
     }
 
     /**

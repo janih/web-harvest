@@ -50,6 +50,7 @@ import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.FileConfigSource;
 import org.webharvest.definition.IncludeDef;
 import org.webharvest.definition.URLConfigSource;
+import org.webharvest.definition.ConfigSource.Location;
 import org.webharvest.exception.FileException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
@@ -79,9 +80,11 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
     public Variable execute(DynamicScopeContext context) throws InterruptedException {
         boolean isUrl = false;
 
-        String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, context);
+        final String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, context);
 
         this.setProperty("Path", path);
+/*
+
 
         path = CommonUtil.adaptFilename(path);
         String fullPath = path;
@@ -99,12 +102,25 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
             fullPath = CommonUtil.fullUrl(originalUrl, path);
             isUrl = true;
         }
+        */
+
+        String fullPath = "/sdsdsdsd";
 
         try {
-            // TODO rbala Use factory with polymorfic methods!
-            final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
+            final ConfigSource configSource =
+                context.getConfig().getConfigSource().include(new Location() {
 
-            final Config config = configFactory.create(source);
+                    public String toString() {
+                        return path;
+                    }
+
+                });
+
+
+            // TODO rbala Use factory with polymorfic methods!
+           // final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
+
+            final Config config = configFactory.create(configSource);
             config.reload();
 
             ProcessorResolver.createProcessor(config.getElementDef()).run(

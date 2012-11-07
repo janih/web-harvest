@@ -10,6 +10,8 @@ import org.webharvest.definition.FileConfigSource.FileLocation;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.definition.ConfigSource.Location;
 
 public class FileConfigSourceTest extends UnitilsTestNG {
@@ -17,6 +19,9 @@ public class FileConfigSourceTest extends UnitilsTestNG {
     private File configFile;
 
     private FileConfigSource source;
+
+    @RegularMock
+    private ConfigLocationVisitor mockVisitor;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -53,6 +58,14 @@ public class FileConfigSourceTest extends UnitilsTestNG {
         final Reader reader = source.getReader();
         assertNotNull(reader);
         assertTrue((reader instanceof FileReader));
+    }
+
+    @Test
+    public void testVisitWithVisitableLocation() throws IOException {
+        final FileLocation mockLocation = new FileLocation(configFile);
+        mockVisitor.visit(mockLocation);
+        EasyMockUnitils.replay();
+        new FileConfigSource(mockLocation).visit(mockVisitor);
     }
 
 }

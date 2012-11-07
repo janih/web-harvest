@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.webharvest.definition.ConfigLocationVisitor.VisitableLocation;
+
 /**
  * Implementation of {@link ConfigSource} that uses plain old string as source
  * of configuration/
@@ -13,7 +15,7 @@ import java.io.StringReader;
  * @version %I%, %G%
  * @see ConfigSource
  */
-public final class BufferConfigSource implements ConfigSource {
+public final class BufferConfigSource extends AbstractConfigSource {
 
     private final String content;
 
@@ -73,6 +75,18 @@ public final class BufferConfigSource implements ConfigSource {
     @Override
     public Location getLocation() {
         return location;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void visit(final ConfigLocationVisitor visitor)
+            throws IOException {
+        // FIXME rbala Ugly but effective solution to overcome the problem with lost type
+        if (location instanceof VisitableLocation) {
+            ((VisitableLocation) location).accept(visitor);
+        }
     }
 
 }

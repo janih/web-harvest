@@ -52,7 +52,7 @@ import org.webharvest.utils.HasReader;
  * @see File
  * @see Location
  */
-public final class FileConfigSource implements ConfigSource {
+public final class FileConfigSource extends AbstractConfigSource {
 
     private final FileLocation location;
 
@@ -89,8 +89,17 @@ public final class FileConfigSource implements ConfigSource {
      * {@inheritDoc}
      */
     @Override
-    public Location getLocation() {
+    public VisitableLocation getLocation() {
         return location;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void visit(final ConfigLocationVisitor visitor)
+            throws IOException {
+        location.accept(visitor);
     }
 
     /**

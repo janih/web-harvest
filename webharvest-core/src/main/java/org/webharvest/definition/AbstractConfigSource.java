@@ -35,65 +35,47 @@ package org.webharvest.definition;
 
 import java.io.IOException;
 
-import org.webharvest.utils.HasReader;
-
 /**
- * Represents source of XML configuration object. The configuration can be
- * loaded from different sources like database, remote web server or just plain
- * old file system.
+ * Base class for other more specialized implementations of {@link ConfigSource}
+ * interface. Provides implementation of
+ * {@link #include(org.webharvest.definition.ConfigSource.Location)} method.
  *
  * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
- * @see HasReader
+ * @see ConfigSource
  */
-public interface ConfigSource extends HasReader {
+public abstract class AbstractConfigSource implements ConfigSource {
 
     /**
-     * Configuration source undefined location.
+     * {@inheritDoc}
      */
-    Location UNDEFINED_LOCATION = new Location() {
-    };
-
-    /**
-     * Gets the reference to physical location of configuration. (eg. URL or
-     * file path).
-     *
-     * @return location of configuration.
-     */
-    Location getLocation();
-
-    /**
-     * Includes specified {@link Location} from current configuration if
-     * possible.
-     * Included configuration is not merged but instead returned as a
-     * reference to new {@link ConfigSource}.
-     * Inclusion is smart enough to decide if the current configuration
-     * source points to a file system or remote web server location
-     * to determine the base for always contextual location that has
-     * been specified to include.
-     *
-     * @param location
-     *            reference to {@link Location} to include.
-     * @return Included instance of {@link ConfigSource} or throws
-     *         {@link IllegalStateException} in case of unrecognized
-     *         {@link Location} type.
-     * @throws IOException
-     *             In case of any problems with instantiation of included
-     *             {@link ConfigSource}
-     */
-    ConfigSource include(Location location) throws IOException;
-
-    /**
-     * Just a marker interface to indicate the actual type of location eg. file,
-     * url or any other
-     *
-     * @author Robert Bala
-     * @since 2.1.0-SNAPSHOT
-     * @version %I%, %G%
-     */
-    interface Location {
-
+    @Override
+    public final ConfigSource include(final Location location)
+            throws IOException {
+        if ((location == null) || location == ConfigSource.UNDEFINED_LOCATION) {
+            throw new IllegalArgumentException("Unknown location");
+        }
+        final IncludeVisitor visitor = new IncludeVisitor(location.toString());
+        visit(visitor);
+        final ConfigSource configSource = visitor.getConfigSource();
+        if (configSource == null) {
+            throw new IllegalStateException("Unsupported location type");
+        }
+        return configSource;
     }
+
+    /**
+     * Depending on owned {@link Location} allows the ancestor class to accept
+     * intercepted {@link ConfigLocationVisitor}.
+     *
+     * @param visitor
+     *            reference to {@link ConfigLocationVisitor}
+     * @throws IOException
+     *             in case of any problem with inclusion of {@link ConfigSource}
+     *             .
+     */
+    protected abstract void visit(ConfigLocationVisitor visitor)
+            throws IOException;
 
 }
