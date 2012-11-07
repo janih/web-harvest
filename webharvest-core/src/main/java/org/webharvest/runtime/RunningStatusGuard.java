@@ -35,7 +35,7 @@ public final class RunningStatusGuard extends Guard {
      */
     @Override
     public boolean isSatisfied() {
-        return statusHolder.getStatus() == Scraper.STATUS_RUNNING;
+        return statusHolder.getStatus() == ScraperState.RUNNING;
     }
 
 }

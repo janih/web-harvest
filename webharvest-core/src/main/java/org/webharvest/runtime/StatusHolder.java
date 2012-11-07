@@ -15,7 +15,6 @@ public interface StatusHolder {
      *
      * @return current status of being processed configuration.
      */
-    // TODO This method should return enum instead of int.
-    int getStatus();
+    ScraperState getStatus();
 
 }

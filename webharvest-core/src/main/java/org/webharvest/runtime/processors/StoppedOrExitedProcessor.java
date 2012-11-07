@@ -4,6 +4,7 @@ import org.webharvest.definition.IElementDef;
 import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperState;
 import org.webharvest.runtime.StatusHolder;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -49,9 +50,10 @@ public final class StoppedOrExitedProcessor<TDef extends IElementDef> extends
     @Override
     public Variable run(final DynamicScopeContext context)
             throws InterruptedException {
-        final int status = statusHolder.getStatus();
+        final ScraperState status = statusHolder.getStatus();
 
-        if (status == Scraper.STATUS_STOPPED || status == Scraper.STATUS_EXIT) {
+        if (status == ScraperState.STOPPED
+                || status == ScraperState.EXIT) {
             return EmptyVariable.INSTANCE;
         }
 

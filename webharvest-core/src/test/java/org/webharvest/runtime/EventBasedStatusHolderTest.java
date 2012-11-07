@@ -30,53 +30,53 @@ public class EventBasedStatusHolderTest {
     @Test
     public void pause() throws Exception {
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_RUNNING);
+                ScraperState.RUNNING);
 
         //event is unneeded in unit test
         holder.pause(null);
 
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_PAUSED);
+                ScraperState.PAUSED);
     }
 
     @Test
     public void resume() throws Exception {
         ReflectionUtils.setFieldValue(holder,
                 EventBasedStatusHolder.class.getDeclaredField("status"),
-                Scraper.STATUS_PAUSED);
+                ScraperState.PAUSED);
 
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_PAUSED);
+                ScraperState.PAUSED);
 
         //event is unneeded in unit test
         holder.resume(null);
 
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_RUNNING);
+                ScraperState.RUNNING);
     }
 
     @Test
     public void stop() throws Exception {
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_RUNNING);
+                ScraperState.RUNNING);
 
         //event is unneeded in unit test
         holder.stop(null);
 
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_STOPPED);
+                ScraperState.STOPPED);
     }
 
     @Test
     public void exit() throws Exception {
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_RUNNING);
+                ScraperState.RUNNING);
 
         //event is unneeded in unit test
         holder.exit(null);
 
         assertEquals("Unexpected status.", holder.getStatus(),
-                Scraper.STATUS_EXIT);
+                ScraperState.EXIT);
     }
 
 

@@ -16,7 +16,7 @@ import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.mock.Mock;
 import org.webharvest.ioc.InjectorHelper;
 import org.webharvest.runtime.DynamicScopeContext;
-import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperState;
 import org.webharvest.runtime.StatusHolder;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
@@ -59,7 +59,8 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
     @Test
     public void runIfStoppedStatus() throws Exception {
-        expect(mockStatusHolder.getStatus()).andReturn(Scraper.STATUS_STOPPED);
+        expect(mockStatusHolder.getStatus())
+            .andReturn(ScraperState.STOPPED);
 
         EasyMockUnitils.replay();
 
@@ -70,7 +71,8 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
 
     @Test
     public void runIfExitStatus() throws Exception {
-        expect(mockStatusHolder.getStatus()).andReturn(Scraper.STATUS_EXIT);
+        expect(mockStatusHolder.getStatus())
+            .andReturn(ScraperState.EXIT);
 
         EasyMockUnitils.replay();
 
@@ -83,7 +85,8 @@ public class StoppedOrExitedProcessorTest extends UnitilsTestNG {
     public void run() throws Exception {
         final Variable var = EmptyVariable.INSTANCE;
 
-        expect(mockStatusHolder.getStatus()).andReturn(Scraper.STATUS_RUNNING);
+        expect(mockStatusHolder.getStatus())
+            .andReturn(ScraperState.RUNNING);
 
         expect(mockProcessor.run(eq(mockContext)))
             .andReturn(var);

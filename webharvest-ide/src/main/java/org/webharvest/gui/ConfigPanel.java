@@ -102,6 +102,7 @@ import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperState;
 import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
@@ -543,7 +544,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         boolean viewAllowed = false;
 
         if (this.harvester != null) {
-            viewAllowed = (harvester.getScraper() != null) && (harvester.getScraper().getStatus() != Scraper.STATUS_READY);
+            viewAllowed = (harvester.getScraper() != null) && (harvester.getScraper().getStatus() != ScraperState.READY);
         }
 
         this.textViewMenuItem.setEnabled(viewAllowed);
@@ -727,10 +728,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             this.xmlPane.setEditable(true);
         }
 
-        int status = scraper.getStatus();
+        ScraperState status = scraper.getStatus();
         final String message = scraper.getMessage();
 
-        if (status == Scraper.STATUS_FINISHED) {
+        if (status == ScraperState.FINISHED) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
@@ -739,14 +740,14 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                     }
                 }
             });
-        } else if (status == Scraper.STATUS_STOPPED) {
+        } else if (status == ScraperState.STOPPED) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     GuiUtils.showWarningMessage("Configuration \"" + configDocument.getName() + "\" aborted by user!");
                     ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
                 }
             });
-        } else if (status == Scraper.STATUS_EXIT && message != null && !"".equals(message.trim())) {
+        } else if (status == ScraperState.EXIT && message != null && !"".equals(message.trim())) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     GuiUtils.showWarningMessage("Configuration exited: " + message);
@@ -838,11 +839,11 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     }
 
     public void runConfiguration() {
-        if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == Scraper.STATUS_PAUSED) {
+        if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == ScraperState.PAUSED) {
             harvest.postEvent(new ScraperExecutionContinuedEvent(this.harvester));
 
             ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
-        } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != Scraper.STATUS_RUNNING) {
+        } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != ScraperState.RUNNING) {
             boolean ok = refreshTree();
             if (ok) {
 
@@ -904,12 +905,12 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         return (harvester != null) ? harvester.getScraper() : null;
     }
 
-    public synchronized int getScraperStatus() {
+    public synchronized ScraperState getScraperStatus() {
         if ((this.harvester != null) && (harvester.getScraper() != null)) {
             return this.harvester.getScraper().getStatus();
         }
 
-        return -1;
+        return ScraperState.UNKNOWN;
     }
 
     public Ide getIde() {

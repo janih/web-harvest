@@ -59,26 +59,18 @@ public class Scraper implements WebScraper {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
-    public static final int STATUS_READY = 0;
-    public static final int STATUS_RUNNING = 1;
-    public static final int STATUS_PAUSED = 2;
-    public static final int STATUS_FINISHED = 3;
-    public static final int STATUS_STOPPED = 4;
-    public static final int STATUS_ERROR = 5;
-    public static final int STATUS_EXIT = 6;
-
     @Inject
     private EventBus eventBus;
 
     private DynamicScopeContext context;
 
-    private volatile int status = STATUS_READY;
+    private volatile ScraperState status = ScraperState.READY;
     private String message = null;
 
     public void execute(final DynamicScopeContext context) {
         long startTime = System.currentTimeMillis();
 
-        this.setStatus(STATUS_RUNNING);
+        this.setStatus(ScraperState.RUNNING);
 
         // inform all listeners that execution is just about to start
         eventBus.post(new ScraperExecutionStartEvent(this));
@@ -90,12 +82,12 @@ public class Scraper implements WebScraper {
                 processor.run(context);
             }
         } catch (InterruptedException e) {
-            setStatus(STATUS_STOPPED);
+            setStatus(ScraperState.STOPPED);
             Thread.currentThread().interrupt();
         }
 
-        if (this.status == STATUS_RUNNING) {
-            this.setStatus(STATUS_FINISHED);
+        if (this.status == ScraperState.RUNNING) {
+            this.setStatus(ScraperState.FINISHED);
         }
 
         // TODO rbala Remove along with deprecated method getContext()
@@ -105,10 +97,10 @@ public class Scraper implements WebScraper {
         eventBus.post(new ScraperExecutionEndEvent(this));
 
         if (LOG.isInfoEnabled()) {
-            if (this.status == STATUS_FINISHED) {
+            if (this.status == ScraperState.FINISHED) {
                 LOG.info("Configuration executed in {} ms.",
                         (System.currentTimeMillis() - startTime));
-            } else if (this.status == STATUS_STOPPED) {
+            } else if (this.status == ScraperState.STOPPED) {
                 LOG.info("Configuration stopped!");
             }
         }
@@ -118,22 +110,22 @@ public class Scraper implements WebScraper {
         return context;
     }
 
-    public synchronized int getStatus() {
+    public synchronized ScraperState getStatus() {
         return status;
     }
 
-    private synchronized void setStatus(int status) {
+    private synchronized void setStatus(ScraperState status) {
         this.status = status;
     }
 
     @Subscribe
     public void stopExecution(final ScraperExecutionStoppedEvent event) {
-        setStatus(STATUS_STOPPED);
+        setStatus(ScraperState.STOPPED);
     }
 
     @Subscribe
     public void exitExecution(final ScraperExecutionExitEvent event) {
-        setStatus(STATUS_EXIT);
+        setStatus(ScraperState.EXIT);
         this.message = event.getMessage();
     }
 
@@ -143,8 +135,8 @@ public class Scraper implements WebScraper {
 
     @Subscribe
     public void pauseExecution(final ScraperExecutionPausedEvent event) {
-        if (this.status == STATUS_RUNNING) {
-            setStatus(STATUS_PAUSED);
+        if (this.status == ScraperState.RUNNING) {
+            setStatus(ScraperState.PAUSED);
 
             // inform al listeners that execution is paused
            // eventBus.post(new ScraperExecutionPausedEvent(this));
@@ -153,8 +145,8 @@ public class Scraper implements WebScraper {
 
     @Subscribe
     public void continueExecution(final ScraperExecutionContinuedEvent event) {
-        if (this.status == STATUS_PAUSED) {
-            setStatus(STATUS_RUNNING);
+        if (this.status == ScraperState.PAUSED) {
+            setStatus(ScraperState.RUNNING);
 
             // inform al listeners that execution is continued
             // eventBus.post(new ScraperExecutionContinuedEvent(this));
@@ -165,7 +157,7 @@ public class Scraper implements WebScraper {
      * Inform all scraper listeners that an error has occured during scraper execution.
      */
     public void informListenersAboutError(Exception e) {
-        setStatus(STATUS_ERROR);
+        setStatus(ScraperState.ERROR);
 
         // inform al listeners that execution is continued
         eventBus.post(new ScraperExecutionErrorEvent(this, e));

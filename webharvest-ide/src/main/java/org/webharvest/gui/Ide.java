@@ -95,6 +95,7 @@ import org.webharvest.gui.component.GCPanel;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.runtime.Scraper;
+import org.webharvest.runtime.ScraperState;
 
 import com.google.inject.Injector;
 
@@ -211,8 +212,8 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
                 if (configDocument != null) {
                     boolean canceled = false;
 
-                    int status = currenConfigPanel.getScraperStatus();
-                    if (status == Scraper.STATUS_RUNNING || status == Scraper.STATUS_PAUSED) {
+                    ScraperState status = currenConfigPanel.getScraperStatus();
+                    if (status == ScraperState.RUNNING || status == ScraperState.PAUSED) {
                         canceled = GuiUtils.showWarningQuestionBox("Configuration \"" + configDocument.getName() + "\" is still running!\nAre you sure you want to exit Web-Harvest?", false) != JOptionPane.YES_OPTION;
                     }
 
@@ -246,8 +247,8 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
             if (configDocument != null) {
                 boolean canceled = false;
 
-                int status = currenConfigPanel.getScraperStatus();
-                if (status == Scraper.STATUS_RUNNING || status == Scraper.STATUS_PAUSED) {
+                ScraperState status = currenConfigPanel.getScraperStatus();
+                if (status == ScraperState.RUNNING || status == ScraperState.PAUSED) {
                     canceled = GuiUtils.showWarningQuestionBox("Configuration \"" + configDocument.getName() + "\" is still running!\nAre you sure you want to exit Web-Harvest?", false) != JOptionPane.YES_OPTION;
                     if (!canceled) {
                         currenConfigPanel.stopScraperExecution();
@@ -698,11 +699,11 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         setCommandEnabled(COMMAND_SAVE, configPanel != null);
         setCommandEnabled(COMMAND_SAVEAS, configPanel != null);
         setCommandEnabled(COMMAND_REFRESH, configPanel != null &&
-                                           configPanel.getScraperStatus() != Scraper.STATUS_RUNNING &&
-                                           configPanel.getScraperStatus() != Scraper.STATUS_PAUSED);
-        setCommandEnabled(COMMAND_RUN, configPanel != null && configPanel.getScraperStatus() != Scraper.STATUS_RUNNING);
-        setCommandEnabled(COMMAND_PAUSE, configPanel != null && configPanel.getScraperStatus() == Scraper.STATUS_RUNNING);
-        setCommandEnabled(COMMAND_STOP, configPanel != null && configPanel.getScraperStatus() == Scraper.STATUS_RUNNING);
+                                           configPanel.getScraperStatus() != ScraperState.RUNNING &&
+                                           configPanel.getScraperStatus() != ScraperState.PAUSED);
+        setCommandEnabled(COMMAND_RUN, configPanel != null && configPanel.getScraperStatus() != ScraperState.RUNNING);
+        setCommandEnabled(COMMAND_PAUSE, configPanel != null && configPanel.getScraperStatus() == ScraperState.RUNNING);
+        setCommandEnabled(COMMAND_STOP, configPanel != null && configPanel.getScraperStatus() == ScraperState.RUNNING);
         setCommandEnabled(COMMAND_VIEWVALUES, configPanel != null && configPanel.getScraper() != null);
         setCommandEnabled(COMMAND_RUNPARAMS, configPanel != null);
 
@@ -810,7 +811,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
             }
         } else if ( COMMAND_PAUSE.equals(cmd) ) {
             ConfigPanel activeConfigPanel = getActiveConfigPanel();
-            if (activeConfigPanel != null && activeConfigPanel.getScraperStatus() == Scraper.STATUS_RUNNING) {
+            if (activeConfigPanel != null && activeConfigPanel.getScraperStatus() == ScraperState.RUNNING) {
                 activeConfigPanel.pauseScraperExecution();
             }
         } else if ( COMMAND_STOP.equals(cmd) ) {

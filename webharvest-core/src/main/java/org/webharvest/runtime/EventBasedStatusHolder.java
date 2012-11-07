@@ -31,9 +31,9 @@ public class EventBasedStatusHolder implements StatusHolder {
     private final Monitor.Guard pauseGuard;
     private final Monitor.Guard continueGuard;
 
-    // TODO: Scraper#STATUS_READY should be default status, but currently
+    // TODO: ScraperState#STATUS_READY should be default status, but currently
     // ScraperExecutionStartEvent is not handled here.
-    private int status = Scraper.STATUS_RUNNING;
+    private ScraperState status = ScraperState.RUNNING;
 
     /**
      * Default class constructor which creates {@link Monitor.Guard} instances
@@ -54,21 +54,21 @@ public class EventBasedStatusHolder implements StatusHolder {
         this.pauseGuard = new Monitor.Guard(monitor) {
             @Override
             public boolean isSatisfied() {
-                return status == Scraper.STATUS_RUNNING;
+                return status == ScraperState.RUNNING;
             }
         };
         this.continueGuard = new Monitor.Guard(monitor) {
 
             @Override
             public boolean isSatisfied() {
-                return status == Scraper.STATUS_PAUSED;
+                return status == ScraperState.PAUSED;
             }
         };
     }
 
     /**
-     * Changes status from {@link Scraper#STATUS_RUNNING} to
-     * {@link Scraper#STATUS_PAUSED}. This method is called when
+     * Changes status from {@link ScraperState#RUNNING} to
+     * {@link ScraperState#PAUSED}. This method is called when
      * {@link ScraperExecutionPausedEvent} has been fired.
      *
      * @param event
@@ -79,15 +79,15 @@ public class EventBasedStatusHolder implements StatusHolder {
             throws InterruptedException {
         try {
             monitor.enterWhen(pauseGuard);
-            status = Scraper.STATUS_PAUSED;
+            status = ScraperState.PAUSED;
         } finally {
             monitor.leave();
         }
     }
 
     /**
-     * Changes status from {@link Scraper#STATUS_PAUSED} to
-     * {@link Scraper#STATUS_RUNNING}. This method is called when
+     * Changes status from {@link ScraperState#PAUSED} to
+     * {@link ScraperState#RUNNING}. This method is called when
      * {@link ScraperExecutionContinuedEvent} has been fired.
      *
      * @param event
@@ -98,40 +98,40 @@ public class EventBasedStatusHolder implements StatusHolder {
             throws InterruptedException {
         try {
             monitor.enterWhen(continueGuard);
-            status = Scraper.STATUS_RUNNING;
+            status = ScraperState.RUNNING;
         } finally {
             monitor.leave();
         }
     }
 
     /**
-     * Changes status to {@link Scraper#STATUS_STOPPED}. This method is called
-     * when {@link ScraperExecutionStoppedEvent} has been fired.
+     * Changes status to {@link ScraperState#STOPPED}. This method is
+     * called when {@link ScraperExecutionStoppedEvent} has been fired.
      *
      * @param event
      *            an instance of {@link ScraperExecutionStoppedEvent}
      */
     @Subscribe
     public void stop(final ScraperExecutionStoppedEvent event) {
-        status = Scraper.STATUS_STOPPED;
+        status = ScraperState.STOPPED;
     }
 
     /**
-     * Changes status to {@link Scraper#STATUS_EXIT}. This method is called when
-     * {@link ScraperExecutionExitEvent} has been fired.
+     * Changes status to {@link ScraperState#EXIT}. This method is called
+     * when {@link ScraperExecutionExitEvent} has been fired.
      *
      * @param event
      *            an instance of {@link ScraperExecutionExitEvent}
      */
     @Subscribe
     public void exit(final ScraperExecutionExitEvent event) {
-        status = Scraper.STATUS_EXIT;
+        status = ScraperState.EXIT;
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getStatus() {
+    public ScraperState getStatus() {
         return status;
     }
 

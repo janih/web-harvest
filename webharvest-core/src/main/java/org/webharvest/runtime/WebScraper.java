@@ -42,7 +42,7 @@ public interface WebScraper {
     DynamicScopeContext getContext();
 
     // TODO Missing documentation
-    int getStatus();
+    ScraperState getStatus();
 
     // TODO Missing documentation
     void execute(DynamicScopeContext context);

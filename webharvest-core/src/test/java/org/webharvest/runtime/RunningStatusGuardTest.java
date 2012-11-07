@@ -37,7 +37,7 @@ public class RunningStatusGuardTest extends UnitilsTestNG {
 
     @Test
     public void isSatisfiedIfRunningStatus() throws Exception {
-        expect(mockHolder.getStatus()).andReturn(Scraper.STATUS_RUNNING);
+        expect(mockHolder.getStatus()).andReturn(ScraperState.RUNNING);
 
         EasyMockUnitils.replay();
 
@@ -47,7 +47,7 @@ public class RunningStatusGuardTest extends UnitilsTestNG {
 
     @Test
     public void isSatisfiedIfOtherStatus() throws Exception {
-        expect(mockHolder.getStatus()).andReturn(Scraper.STATUS_PAUSED);
+        expect(mockHolder.getStatus()).andReturn(ScraperState.PAUSED);
 
         EasyMockUnitils.replay();
 
