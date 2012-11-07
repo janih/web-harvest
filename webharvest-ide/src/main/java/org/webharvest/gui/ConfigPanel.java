@@ -627,7 +627,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
         try {
             // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            loadHarvester(new BufferConfigSource(xmlPane.getText()));
+            loadHarvester(configDocument.getConfigSource());
             ide.setTabIcon(this, null);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);

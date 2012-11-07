@@ -38,6 +38,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 
+import org.webharvest.utils.HasReader;
+
 /**
  * Implementation of {@link ConfigSource} that uses a HTTP protocol as
  * source of XML configurations.
@@ -50,35 +52,74 @@ import java.net.URL;
  */
 public final class URLConfigSource implements ConfigSource {
 
-    private final URL source;
+    private final URLLocation location;
 
     /**
      * Default class constructor expecting {@link URL} as configuration source.
      *
-     * @param source configuration source
+     * @param url configuration source
      */
-    public URLConfigSource(final URL source) {
-        if (source == null) {
-            throw new IllegalArgumentException("Configuration URL is required");
-        }
-        this.source = source;
+    public URLConfigSource(final URL url) {
+        this.location = new URLLocation(url);
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Reader getReader() throws IOException {
-        return new InputStreamReader(source.openStream());
+        return location.getReader();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getLocation() {
-        return source.toString();
+    public Location getLocation() {
+        return location;
+    }
+
+    /**
+     * Helper class representing wrapper for {@link URL} object that is adapted
+     * to {@link Location} and {@link HasReader} interfaces.
+     *
+     * @author Robert Bala
+     * @since 2.1.0-SNAPSHOT
+     * @version %I%, %G%
+     */
+    private final class URLLocation implements Location, HasReader {
+
+        private final URL url;
+
+        /**
+         * Default class constructor expecting reference to {@link URL}.
+         *
+         * @param file reference to {@link URL}.
+         */
+        public URLLocation(final URL url) {
+            if (url == null) {
+                throw new IllegalArgumentException("Configuration URL is "
+                        + "required");
+            }
+            this.url = url;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Reader getReader() throws IOException {
+            return new InputStreamReader(url.openStream());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return url.toString();
+        }
+
     }
 
 }

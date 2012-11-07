@@ -9,6 +9,7 @@ import java.io.Reader;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
+import org.webharvest.definition.ConfigSource.Location;
 
 public class FileConfigSourceTest extends UnitilsTestNG {
 
@@ -36,9 +37,9 @@ public class FileConfigSourceTest extends UnitilsTestNG {
 
     @Test
     public void testGetLocation() {
-        final String location = source.getLocation();
+        final Location location = source.getLocation();
         assertNotNull(location);
-        assertEquals(location, configFile.getAbsolutePath());
+        assertEquals(location.toString(), configFile.getAbsolutePath());
     }
 
     @Test

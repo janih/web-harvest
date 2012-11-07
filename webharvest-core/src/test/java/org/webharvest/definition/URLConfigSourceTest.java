@@ -9,6 +9,7 @@ import java.net.URL;
 
 import org.testng.annotations.*;
 import org.unitils.UnitilsTestNG;
+import org.webharvest.definition.ConfigSource.Location;
 
 public class URLConfigSourceTest extends UnitilsTestNG {
 
@@ -35,9 +36,9 @@ public class URLConfigSourceTest extends UnitilsTestNG {
 
      @Test
      public void testGetLocation() {
-         final String location = source.getLocation();
+         final Location location = source.getLocation();
          assertNotNull(location);
-         assertEquals(location, url.toString());
+         assertEquals(location.toString(), url.toString());
      }
 
      @Test

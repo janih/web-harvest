@@ -31,45 +31,26 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.webharvest.definition;
+package org.webharvest.utils;
 
-import org.webharvest.utils.HasReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
- * Represents source of XML configuration object. The configuration can be
- * loaded from different sources like database, remote web server or just plain
- * old file system.
+ * Represent an object holding character stream {@link Reader}.
  *
  * @author Robert Bala
  * @since 2.1.0-SNAPSHOT
  * @version %I%, %G%
- * @see HasReader
+ * @see Reader
  */
-public interface ConfigSource extends HasReader {
+public interface HasReader {
 
     /**
-     * Configuration source undefined location.
-     */
-    Location UNDEFINED_LOCATION = new Location() { };
-
-    /**
-     * Gets the reference to physical location of configuration. (eg. URL or
-     * file path).
+     * Gets the {@link Reader} for character stream.
      *
-     * @return location of configuration.
+     * @return stream {@link Reader}.
      */
-    Location getLocation();
-
-    /**
-     * Just a marker interface to indicate the actual type of location eg. file,
-     * url or any other
-     *
-     * @author Robert Bala
-     * @since 2.1.0-SNAPSHOT
-     * @version %I%, %G%
-     */
-    interface Location {
-
-    }
+    Reader getReader() throws IOException;
 
 }

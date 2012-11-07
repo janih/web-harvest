@@ -272,7 +272,8 @@ public class ConfigDocument implements DocumentListener {
     }
 
     public ConfigSource getConfigSource() {
-        return configSource;
+        return new BufferConfigSource(xmlPane.getText(),
+                configSource.getLocation());
     }
 
 }

@@ -38,6 +38,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.webharvest.utils.HasReader;
+
 /**
  * Implementation of {@link ConfigSource} that uses a file system as
  * source of XML configurations.
@@ -47,22 +49,19 @@ import java.io.Reader;
  * @version %I%, %G%
  * @see ConfigSource
  * @see File
+ * @see Location
  */
 public final class FileConfigSource implements ConfigSource {
 
-    private final File source;
+    private final FileLocationAdapter location;
 
     /**
      * Default class constructor expecting {@link File} as configuration source.
      *
-     * @param source configuration source
+     * @param file configuration source
      */
-    public FileConfigSource(final File source) {
-        if (source == null) {
-            throw new IllegalArgumentException("Configuration file is required");
-        }
-
-        this.source = source;
+    public FileConfigSource(final File file) {
+        this.location = new FileLocationAdapter(file);
     }
 
     /**
@@ -70,15 +69,58 @@ public final class FileConfigSource implements ConfigSource {
      */
     @Override
     public Reader getReader() throws IOException {
-        return new FileReader(source);
+        return location.getReader();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getLocation() {
-        return source.getAbsolutePath();
+    public Location getLocation() {
+        return location;
+    }
+
+    /**
+     * Helper class representing wrapper for {@link File} object that is adapted
+     * to {@link Location} and {@link HasReader} interfaces.
+     *
+     * @author Robert Bala
+     * @since 2.1.0-SNAPSHOT
+     * @version %I%, %G%
+     */
+    private final class FileLocationAdapter implements Location, HasReader {
+
+        private final File file;
+
+        /**
+         * Default class constructor expecting reference to {@link File}.
+         *
+         * @param file reference to {@link File}.
+         */
+        public FileLocationAdapter(final File file) {
+            if (file == null) {
+                throw new IllegalArgumentException("Configuration file is "
+                        + "required");
+            }
+            this.file = file;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Reader getReader() throws IOException {
+            return new FileReader(file);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return file.getAbsolutePath();
+        }
+
     }
 
 }

@@ -17,7 +17,7 @@ public final class BufferConfigSource implements ConfigSource {
 
     private final String content;
 
-    private final String location;
+    private final Location location;
 
     /**
      * Class constructor expecting plain old string configuration. For
@@ -29,7 +29,7 @@ public final class BufferConfigSource implements ConfigSource {
      *            just an XML configuration.
      */
     public BufferConfigSource(final String content) {
-        this(content, "");
+        this(content, UNDEFINED_LOCATION);
     }
 
     /**
@@ -47,7 +47,7 @@ public final class BufferConfigSource implements ConfigSource {
     // FIXME rbala I believe there could be a better solution in terms of
     // creating dynamic copy of other ConfigSource types but with modified
     // content.
-    public BufferConfigSource(final String content, final String location) {
+    public BufferConfigSource(final String content, final Location location) {
         if (content == null) {
             throw new IllegalArgumentException("Configuration content is"
                     + " required");
@@ -71,7 +71,7 @@ public final class BufferConfigSource implements ConfigSource {
      * {@inheritDoc}
      */
     @Override
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
