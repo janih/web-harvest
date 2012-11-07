@@ -99,6 +99,7 @@ import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
 import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperModule;
+import org.webharvest.runtime.ContextHolder;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperState;
@@ -115,7 +116,7 @@ import com.google.inject.Guice;
  * It is part of multiple-document interface where several such instances may exist at
  * the same time.
  */
-public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretListener {
+public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretListener, ContextHolder {
 
     private static final String VIEW_RESULT_AS_TEXT = "View result as text";
     private static final String VIEW_RESULT_AS_XML = "View result as XML";
@@ -173,7 +174,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                         TreeNodeInfo treeNodeInfo = (TreeNodeInfo) userObject;
                         Map properties = treeNodeInfo.getProperties();
                         Object value = properties == null ? null : properties.get(WHConstants.VALUE_PROPERTY_NAME);
-                        final ViewerFrame viewerFrame = new ViewerFrame(harvester.getScraper(), WHConstants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
+                        final ViewerFrame viewerFrame = new ViewerFrame(ConfigPanel.this, WHConstants.VALUE_PROPERTY_NAME, value, treeNodeInfo, viewType);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 viewerFrame.setVisible(true);
@@ -226,6 +227,11 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     private Harvest harvest;
 
     private Harvester harvester;
+
+    //TODO: ConfigPanel should not hold reference to DynamicScopeContext, but
+    //firstly ViewerFrame must be well designed in order to do not required
+    //Scraper's context.
+    private DynamicScopeContext scraperContext;
 
     //TODO: ConfigPanel should not hold Scraper's state, but firstly components
     //of IDE must be well designed and react correctly on events.
@@ -911,7 +917,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
                     @Override
                     public void onSuccess(final DynamicScopeContext context) {
                         context.setLocalVar(initParams);
-
+                        //FIXME mczapiewski This is a dirty way to get reference
+                        //to the context. It is required to instantiate
+                        //ViewerFrame until it is not well-designed.
+                        ConfigPanel.this.scraperContext = context;
                     }
                 };
 
@@ -958,8 +967,11 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         return proxySettingsBuilder.build();
     }
 
-    public WebScraper getScraper() {
-        return (harvester != null) ? harvester.getScraper() : null;
+    /**
+     * {@inheritDoc}
+     */
+    public DynamicScopeContext getContext() {
+        return scraperContext;
     }
 
     public synchronized ScraperState getScraperStatus() {

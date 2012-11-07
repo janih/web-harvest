@@ -76,11 +76,6 @@ public class ScrapingHarvester implements Harvester {
 
     private final Config config;
 
-    // TODO rbala not needed when we finally get rid of getScraper() method
-    // FIXME rbala Not thread safe (no synchronization)
-    @Deprecated
-    private WebScraper scraper;
-
     private final ContextFactory contextFactory;
 
     /**
@@ -112,7 +107,7 @@ public class ScrapingHarvester implements Harvester {
     @Override
     @Scraping
     public DynamicScopeContext execute(final ContextInitCallback callback) {
-        this.scraper = scraperProvider.get();
+        final WebScraper scraper = scraperProvider.get();
 
         final DynamicScopeContext context =
                 contextFactory.create(config);
@@ -126,16 +121,6 @@ public class ScrapingHarvester implements Harvester {
         }
 
         return context;
-    }
-
-    /**
-     * @deprecated Remove as soon as possible
-     */
-    @Override
-    @Deprecated
-    public WebScraper getScraper() {
-        // Return reference to scraper from last call
-        return scraper;
     }
 
 }

@@ -92,9 +92,9 @@ public class PropertiesGrid extends JTable {
         public Object getCellEditorValue() {
             if (isPushed) {
                 PropertiesGridModel model = getPropertiesGridModel();
-                String propertyName = (String) model.getValueAt(this.row, 0); 
+                String propertyName = (String) model.getValueAt(this.row, 0);
                 Object value = model.getValueAt(this.row, 1);
-                final ViewerFrame viewerFrame = new ViewerFrame(configPanel.getScraper(), propertyName, value, model.getNodeInfo(), 0 );
+                final ViewerFrame viewerFrame = new ViewerFrame(configPanel, propertyName, value, model.getNodeInfo(), 0 );
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         viewerFrame.setVisible(true);

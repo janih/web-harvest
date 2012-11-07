@@ -704,7 +704,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         setCommandEnabled(COMMAND_RUN, configPanel != null && configPanel.getScraperStatus() != ScraperState.RUNNING);
         setCommandEnabled(COMMAND_PAUSE, configPanel != null && configPanel.getScraperStatus() == ScraperState.RUNNING);
         setCommandEnabled(COMMAND_STOP, configPanel != null && configPanel.getScraperStatus() == ScraperState.RUNNING);
-        setCommandEnabled(COMMAND_VIEWVALUES, configPanel != null && configPanel.getScraper() != null);
+        setCommandEnabled(COMMAND_VIEWVALUES, configPanel != null);
         setCommandEnabled(COMMAND_RUNPARAMS, configPanel != null);
 
         setCommandEnabled(COMMAND_UNDO, configPanel != null);
@@ -822,7 +822,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
         } else if ( COMMAND_VIEWVALUES.equals(cmd) ) {
             ConfigPanel activeConfigPanel = getActiveConfigPanel();
             if (activeConfigPanel != null) {
-                final ViewerFrame viewerFrame = new ViewerFrame(activeConfigPanel.getScraper(), null, "", null, 0);
+                final ViewerFrame viewerFrame = new ViewerFrame(activeConfigPanel, null, "", null, 0);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         viewerFrame.setVisible(true);

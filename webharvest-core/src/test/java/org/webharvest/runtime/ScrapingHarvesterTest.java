@@ -55,9 +55,6 @@ public class ScrapingHarvesterTest extends UnitilsTestNG {
         final DynamicScopeContext context = harvester.execute(mockInitCallback);
         assertNotNull(context);
         assertSame(mockContext, context);
-        final WebScraper scraper = harvester.getScraper();
-        assertNotNull(scraper);
-        assertSame(mockScraper, scraper);
     }
 
 }

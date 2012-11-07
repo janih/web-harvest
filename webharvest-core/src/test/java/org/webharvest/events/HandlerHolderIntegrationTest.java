@@ -86,12 +86,6 @@ public class HandlerHolderIntegrationTest extends UnitilsTestNG {
             return null;
         }
 
-        @Deprecated
-        @Override
-        public WebScraper getScraper() {
-            return null;
-        }
-
     }
 
     public static final class DummyEvent {

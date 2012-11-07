@@ -94,6 +94,7 @@ import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.SmallButton;
 import org.webharvest.gui.component.WHCheckBox;
 import org.webharvest.gui.component.WHScrollPane;
+import org.webharvest.runtime.ContextHolder;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.RuntimeConfig;
 import org.webharvest.runtime.Scraper;
@@ -178,12 +179,12 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
     /**
      * Constructor.
      *
-     * @param scraper
+     * @param contextHolder
      * @param propertyName
      * @param value
      * @param nodeInfo
      */
-    public ViewerFrame(final WebScraper scraper, final String propertyName, final Object value, final TreeNodeInfo nodeInfo, final int viewIndex) {
+    public ViewerFrame(final ContextHolder contextHolder, final String propertyName, final Object value, final TreeNodeInfo nodeInfo, final int viewIndex) {
         if (propertyName == null) {
             setTitle("Runtime Value Viewer");
         } else {
@@ -213,8 +214,8 @@ public class ViewerFrame extends JFrame implements DropDownButtonListener, Actio
         toolBar.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
         toolBar.setFloatable(false);
 
-        if (scraper != null) {
-            final DynamicScopeContext context = scraper.getContext();
+        if (contextHolder != null && contextHolder.getContext() != null) {
+            final DynamicScopeContext context = contextHolder.getContext();
 
             if (propertyName == null) {
                 final EditableComboBox variablesComboBox = new EditableComboBox(20) {

@@ -64,18 +64,6 @@ public interface Harvester {
     DynamicScopeContext execute(ContextInitCallback callback);
 
     /**
-     * Gets reference to {@link WebScraper} object that is available during
-     * invocation of {@link #execute(ContextInitCallback)} method (and after
-     * it).
-     *
-     * @deprecated Temporarily exposed until the end of 2.1 version refactoring.
-     * @return reference to internal scraping session
-     */
-    // TODO Remove ass soon as possible
-    @Deprecated
-    WebScraper getScraper();
-
-    /**
      * Context initialization callback that is invoked for all newly created
      * context objects shortly before of scraping session. This creates
      * opportunity to set attributes that are taken into account in scraping
