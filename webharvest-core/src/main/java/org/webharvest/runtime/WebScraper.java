@@ -38,10 +38,6 @@ package org.webharvest.runtime;
 public interface WebScraper {
 
     // TODO Missing documentation
-    @Deprecated
-    DynamicScopeContext getContext();
-
-    // TODO Missing documentation
     void execute(DynamicScopeContext context);
 
     @Deprecated

@@ -59,8 +59,6 @@ public class Scraper implements WebScraper {
     @Inject
     private EventBus eventBus;
 
-    private DynamicScopeContext context;
-
     public void execute(final DynamicScopeContext context) {
         long startTime = System.currentTimeMillis();
 
@@ -78,18 +76,17 @@ public class Scraper implements WebScraper {
             Thread.currentThread().interrupt();
         }
 
-        // TODO rbala Remove along with deprecated method getContext()
-        this.context = context;
-
         // inform all listeners that execution is finished
         eventBus.post(new ScraperExecutionEndEvent(this,
                 System.currentTimeMillis() - startTime));
     }
 
-    public DynamicScopeContext getContext() {
-        return context;
-    }
-
+    /**
+     * Logs information that Scraper's execution has been stopped.
+     *
+     * @param event
+     *            an instance of {@link ScraperExecutionStoppedEvent}
+     */
     @Subscribe
     public void onExecutionStopped(final ScraperExecutionStoppedEvent event) {
         if (LOG.isInfoEnabled()) {
@@ -97,13 +94,19 @@ public class Scraper implements WebScraper {
         }
     }
 
+    /**
+     * Logs information about time of Scraper's execution on
+     * {@link ScraperExecutionEndEvent}.
+     *
+     * @param event
+     *            an instance of {@link ScraperExecutionEndEvent}
+     */
     @Subscribe
     public void onExecutionFinished(final ScraperExecutionEndEvent event) {
         if (LOG.isInfoEnabled()) {
             LOG.info("Configuration executed in {} ms.",
                     event.getExecutionTime());
         }
-
     }
 
     /**
