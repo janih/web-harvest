@@ -42,14 +42,9 @@ public interface WebScraper {
     DynamicScopeContext getContext();
 
     // TODO Missing documentation
-    ScraperState getStatus();
-
-    // TODO Missing documentation
     void execute(DynamicScopeContext context);
 
     @Deprecated
     void informListenersAboutError(Exception e);
 
-    @Deprecated
-    String getMessage();
 }

@@ -48,7 +48,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Hashtable;
@@ -82,7 +81,6 @@ import org.webharvest.Harvest;
 import org.webharvest.HarvestLoadCallback;
 import org.webharvest.Harvester;
 import org.webharvest.WHConstants;
-import org.webharvest.definition.BufferConfigSource;
 import org.webharvest.definition.ConfigSource;
 import org.webharvest.definition.ConstantDef;
 import org.webharvest.definition.IElementDef;
@@ -92,6 +90,7 @@ import org.webharvest.events.ProcessorStopEvent;
 import org.webharvest.events.ScraperExecutionContinuedEvent;
 import org.webharvest.events.ScraperExecutionEndEvent;
 import org.webharvest.events.ScraperExecutionErrorEvent;
+import org.webharvest.events.ScraperExecutionExitEvent;
 import org.webharvest.events.ScraperExecutionPausedEvent;
 import org.webharvest.events.ScraperExecutionStartEvent;
 import org.webharvest.events.ScraperExecutionStoppedEvent;
@@ -107,7 +106,6 @@ import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
-import org.xml.sax.InputSource;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
@@ -228,6 +226,10 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     private Harvest harvest;
 
     private Harvester harvester;
+
+    //TODO: ConfigPanel should not hold Scraper's state, but firstly components
+    //of IDE must be well designed and react correctly on events.
+    private ScraperState scraperState = ScraperState.READY;
 
     /**
      * Constructor of the panel - initializes parent Ide instance and name of the document.
@@ -407,6 +409,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionStartEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.RUNNING;
                 ConfigPanel.this.onExecutionStart();
             }
 
@@ -418,6 +421,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionPausedEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.PAUSED;
                 ConfigPanel.this.onExecutionPaused();
             }
 
@@ -429,6 +433,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionContinuedEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.RUNNING;
                 ConfigPanel.this.onExecutionContinued();
             }
 
@@ -440,7 +445,36 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionEndEvent event) {
-                ConfigPanel.this.onExecutionEnd(event.getScraper());
+                //TODO This condition has been moved from Scraper class, but
+                //finally it should not be here.
+                if (ConfigPanel.this.scraperState == ScraperState.RUNNING) {
+                    ConfigPanel.this.scraperState = ScraperState.FINISHED;
+                    ConfigPanel.this.onExecutionFinished();
+                }
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionStoppedEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionStoppedEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.STOPPED;
+                ConfigPanel.this.onExecutionStopped();
+            }
+
+        });
+        // TODO rbala Possibly bind with Guice when finally created Swing module
+        harvest.addEventHandler(new EventHandler<ScraperExecutionExitEvent>() {
+
+            @Override
+            @Subscribe
+            // TODO rbala Get rid of @Subscribe annotation
+            public void handle(final ScraperExecutionExitEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.EXIT;
+                ConfigPanel.this.onExecutionExit(event.getMessage());
             }
 
         });
@@ -451,6 +485,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             @Subscribe
             // TODO rbala Get rid of @Subscribe annotation
             public void handle(final ScraperExecutionErrorEvent event) {
+                ConfigPanel.this.scraperState = ScraperState.ERROR;
                 ConfigPanel.this.onExecutionError(event.getException());
             }
 
@@ -544,7 +579,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         boolean viewAllowed = false;
 
         if (this.harvester != null) {
-            viewAllowed = (harvester.getScraper() != null) && (harvester.getScraper().getStatus() != ScraperState.READY);
+            viewAllowed = (this.scraperState != null) && (this.scraperState != ScraperState.READY);
         }
 
         this.textViewMenuItem.setEnabled(viewAllowed);
@@ -722,38 +757,59 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         this.ide.updateGUI();
     }
 
-    private void onExecutionEnd(WebScraper scraper) {
-        final Settings settings = ide.getSettings();
-        if (settings.isDynamicConfigLocate()) {
-            this.xmlPane.setEditable(true);
-        }
-
-        ScraperState status = scraper.getStatus();
-        final String message = scraper.getMessage();
-
-        if (status == ScraperState.FINISHED) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
-                    if (settings.isShowFinishDialog()) {
-                        GuiUtils.showInfoMessage("Configuration \"" + configDocument.getName() + "\" finished execution.");
-                    }
+    /**
+     * Helper method invoking when execution has finished.
+     */
+    private void onExecutionFinished() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
+                if (ide.getSettings().isShowFinishDialog()) {
+                    GuiUtils.showInfoMessage("Configuration \"" + configDocument.getName() + "\" finished execution.");
                 }
-            });
-        } else if (status == ScraperState.STOPPED) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    GuiUtils.showWarningMessage("Configuration \"" + configDocument.getName() + "\" aborted by user!");
-                    ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
-                }
-            });
-        } else if (status == ScraperState.EXIT && message != null && !"".equals(message.trim())) {
+            }
+        });
+
+        onExecutionEnd();
+    }
+
+    /**
+     * Helper method invoking when execution has been stopped.
+     */
+    private void onExecutionStopped() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtils.showWarningMessage("Configuration \"" + configDocument.getName() + "\" aborted by user!");
+                ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
+            }
+        });
+
+        onExecutionEnd();
+    }
+
+    /**
+     * Helper method invoking when execution has finished with error.
+     *
+     * @param message
+     *            cause of execution's exit
+     */
+    private void onExecutionExit(final String message) {
+        if (message != null && !"".equals(message.trim())) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     GuiUtils.showWarningMessage("Configuration exited: " + message);
                     ide.setTabIcon(ConfigPanel.this, ResourceManager.SMALL_FINISHED_ICON);
                 }
             });
+        }
+
+        onExecutionEnd();
+    }
+
+    private void onExecutionEnd() {
+        final Settings settings = ide.getSettings();
+        if (settings.isDynamicConfigLocate()) {
+            this.xmlPane.setEditable(true);
         }
 
         // refresh last executing node
@@ -772,6 +828,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
         // releases scraper in order help garbage collector
 //        releaseScraper();
     }
+
 
     private void onProcessorExecutionFinished(Processor processor, Map properties) {
         final IElementDef elementDef = processor.getElementDef();
@@ -839,11 +896,11 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     }
 
     public void runConfiguration() {
-        if ((harvester != null) && (harvester.getScraper() != null) && this.harvester.getScraper().getStatus() == ScraperState.PAUSED) {
+        if ((harvester != null) && this.scraperState == ScraperState.PAUSED) {
             harvest.postEvent(new ScraperExecutionContinuedEvent(this.harvester));
 
             ide.setTabIcon(this, ResourceManager.SMALL_RUN_ICON);
-        } else if ((this.harvester == null) || (harvester.getScraper() == null) || this.harvester.getScraper().getStatus() != ScraperState.RUNNING) {
+        } else if ((this.harvester == null) || this.scraperState != ScraperState.RUNNING) {
             boolean ok = refreshTree();
             if (ok) {
 
@@ -906,11 +963,7 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
     }
 
     public synchronized ScraperState getScraperStatus() {
-        if ((this.harvester != null) && (harvester.getScraper() != null)) {
-            return this.harvester.getScraper().getStatus();
-        }
-
-        return ScraperState.UNKNOWN;
+        return scraperState;
     }
 
     public Ide getIde() {

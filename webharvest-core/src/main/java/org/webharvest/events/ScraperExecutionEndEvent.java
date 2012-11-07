@@ -29,7 +29,7 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package org.webharvest.events;
 
@@ -47,15 +47,21 @@ public final class ScraperExecutionEndEvent {
 
     private final WebScraper scraper;
 
+    private final long executionTime;
+
     /**
      * Constructs {@link ScraperExecutionEndEvent} accepting reference to
      * {@link WebScraper} which execution has been completed
      *
      * @param scraper
      *            {@link WebScraper} which execution has been completed
+     * @param executionTime
+     *            how long the execution took in milliseconds
      */
-    public ScraperExecutionEndEvent(final WebScraper scraper) {
+    public ScraperExecutionEndEvent(final WebScraper scraper,
+            final long executionTime) {
         this.scraper = scraper;
+        this.executionTime = executionTime;
     }
 
     /**
@@ -66,5 +72,14 @@ public final class ScraperExecutionEndEvent {
      */
     public WebScraper getScraper() {
         return this.scraper;
+    }
+
+    /**
+     * Returns how long the execution took in milliseconds.
+     *
+     * @return how long the execution took in milliseconds.
+     */
+    public long getExecutionTime() {
+        return this.executionTime;
     }
 }
