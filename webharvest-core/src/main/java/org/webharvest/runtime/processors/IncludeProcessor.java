@@ -39,19 +39,14 @@ package org.webharvest.runtime.processors;
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.webharvest.annotation.Definition;
 import org.webharvest.definition.Config;
 import org.webharvest.definition.ConfigFactory;
 import org.webharvest.definition.ConfigSource;
-import org.webharvest.definition.FileConfigSource;
-import org.webharvest.definition.IncludeDef;
-import org.webharvest.definition.URLConfigSource;
 import org.webharvest.definition.ConfigSource.Location;
-import org.webharvest.exception.FileException;
+import org.webharvest.definition.IncludeDef;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.NestedContextFactory;
 import org.webharvest.runtime.processors.plugins.Autoscanned;
@@ -59,7 +54,6 @@ import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.templaters.BaseTemplater;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.Variable;
-import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Inject;
 
@@ -77,62 +71,53 @@ public class IncludeProcessor extends AbstractProcessor<IncludeDef> {
     @Inject
     private ConfigFactory configFactory;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    // TODO Missing unit test
     public Variable execute(DynamicScopeContext context) throws InterruptedException {
-        boolean isUrl = false;
 
-        final String path = BaseTemplater.evaluateToString(elementDef.getPath(), null, context);
+        final String path = BaseTemplater.evaluateToString(elementDef.getPath(),
+                null, context);
 
         this.setProperty("Path", path);
-/*
 
+        final Config config = includeConfig(context, path);
 
-        path = CommonUtil.adaptFilename(path);
-        String fullPath = path;
+        // TODO rbala Unify processors execution with Scraper (remove duplicate code)!
+        ProcessorResolver.createProcessor(config.getElementDef()).run(
+                NestedContextFactory.create(context));
 
-        File originalFile = context.getSourceFile();
-        String originalUrl = context.getUrl();
-        if (originalFile != null) {
-            String originalPath = CommonUtil.adaptFilename(originalFile.getAbsolutePath());
-            int index = originalPath.lastIndexOf('/');
-            if (index > 0) {
-                String workingPath = originalPath.substring(0, index);
-                fullPath = CommonUtil.getAbsoluteFilename(workingPath, path);
-            }
-        } else if (originalUrl != null) {
-            fullPath = CommonUtil.fullUrl(originalUrl, path);
-            isUrl = true;
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
         }
-        */
 
-        String fullPath = "/sdsdsdsd";
+        return EmptyVariable.INSTANCE;
+    }
 
+    private Config includeConfig(final DynamicScopeContext context,
+            final String path) {
         try {
-            final ConfigSource configSource =
-                context.getConfig().getConfigSource().include(new Location() {
+            final ConfigSource configSource = context.getConfig().
+                    getConfigSource().include(new Location() {
 
-                    public String toString() {
-                        return path;
-                    }
+                public String toString() {
+                    return path;
+                }
 
-                });
-
-
-            // TODO rbala Use factory with polymorfic methods!
-           // final ConfigSource source = isUrl ? new URLConfigSource(new URL(fullPath)) : new FileConfigSource(new File(fullPath));
+            });
 
             final Config config = configFactory.create(configSource);
             config.reload();
 
-            ProcessorResolver.createProcessor(config.getElementDef()).run(
-                            NestedContextFactory.create(context));
-
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-            return EmptyVariable.INSTANCE;
+            return config;
         } catch (IOException e) {
-            throw new FileException("Cannot include configuration file " + fullPath, e);
+            // FIXME rbala What type of exception should we throw in case of problems with ConfigResource initialization
+            // FIXME rbala What type of exception should we throw in case of problems with Config initialization
+            throw new RuntimeException(e);
         }
     }
+
 
 }

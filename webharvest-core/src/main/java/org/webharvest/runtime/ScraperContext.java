@@ -90,12 +90,6 @@ public class ScraperContext implements DynamicScopeContext {
     @Deprecated
     private String charset;
 
-    @Deprecated
-    private File sourceFile;
-
-    @Deprecated
-    private String url;
-
     private Config config;
 
     public ScraperContext() {
@@ -263,30 +257,6 @@ public class ScraperContext implements DynamicScopeContext {
     @Override
     public void setCharset(final String charset) {
         this.charset = charset;
-    }
-
-    @Override
-    @Deprecated
-    public File getSourceFile() {
-        return this.sourceFile;
-    }
-
-    @Override
-    @Deprecated
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
-
-    @Override
-    @Deprecated
-    public String getUrl() {
-        return this.url;
-    }
-
-    @Override
-    @Deprecated
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     /**

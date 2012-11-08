@@ -98,18 +98,6 @@ public interface DynamicScopeContext extends Iterable<KeyValuePair<Variable>> {
      */
     void setCharset(String charset);
 
-    @Deprecated
-    File getSourceFile();
-
-    @Deprecated
-    void setSourceFile(File sourceFile);
-
-    @Deprecated
-    String getUrl();
-
-    @Deprecated
-    void setUrl(String url);
-
     Config getConfig();
 
     @Deprecated
