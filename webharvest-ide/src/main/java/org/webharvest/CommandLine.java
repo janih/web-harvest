@@ -52,10 +52,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.webharvest.definition.ConfigSource;
+import org.webharvest.definition.ConfigSourceFactory;
 import org.webharvest.definition.DefinitionResolver;
-import org.webharvest.definition.FileConfigSource;
 import org.webharvest.definition.IElementDef;
-import org.webharvest.definition.URLConfigSource;
 import org.webharvest.exception.PluginException;
 import org.webharvest.gui.Ide;
 import org.webharvest.ioc.DebugFileLogger;
@@ -161,13 +161,14 @@ public class CommandLine {
                 }
             };
 
-            // FIXME rbala although temporary solution it is duplicated (CommandLine)
-            final Harvest harvest = injector .getInstance(Harvest.class);
-
+            final ConfigSourceFactory configSourceFactory =
+                    injector.getInstance(ConfigSourceFactory.class);
+            final Harvest harvest = injector.getInstance(Harvest.class);
+            final ConfigSource configSource = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
+                    ? configSourceFactory.create(new URL(configFilePath))
+                    : configSourceFactory.create(new File(configFilePath));
             // FIXME rbala although temporary solution it is duplicated (ConfigPanel)
-            final Harvester harvester = (configLowercase.startsWith("http://") || configLowercase.startsWith("https://"))
-                    ? harvest.getHarvester(new URLConfigSource(new URL(configFilePath)), callback)
-                    : harvest.getHarvester(new FileConfigSource(new File(configFilePath)), callback);
+            final Harvester harvester = harvest.getHarvester(configSource, callback);
 
             harvester.execute(new Harvester.ContextInitCallback() {
                 @Override
