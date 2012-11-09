@@ -656,6 +656,17 @@
   <xs:complexType name="bodyType" mixed="true">
     <!-- TODO Change minOccurs="0" to minOccurs="1" and get rid of mixed="true" -->
     <xs:group ref="bodyElements"/>
+
+    <xs:attribute name="id" use="optional" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>
+                Special attribute which is used in debugging particular
+                processor. It tells Web-Harvest to save its content to the file
+                named _debug/&lt;id&gt;_&lt;num&gt;.debug under the working
+                path.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="textElementType">
