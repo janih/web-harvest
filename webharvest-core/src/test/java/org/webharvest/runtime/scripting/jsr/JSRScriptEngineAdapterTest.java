@@ -1,20 +1,25 @@
 package org.webharvest.runtime.scripting.jsr;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.getCurrentArguments;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.eq;
 import static org.testng.AssertJUnit.assertSame;
 import static org.testng.AssertJUnit.fail;
-import static org.unitils.mock.ArgumentMatchers.same;
-import static org.unitils.mock.ArgumentMatchers.eq;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.script.ScriptException;
 
+import org.easymock.IAnswer;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.unitils.UnitilsTestNG;
-import org.unitils.mock.Mock;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.RegularMock;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.scripting.ScriptSource;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
@@ -28,16 +33,18 @@ public class JSRScriptEngineAdapterTest extends UnitilsTestNG {
 
     private ScriptSource scriptSource;
 
-    private Mock<DynamicScopeContext> mockContext;
+    @RegularMock
+    private DynamicScopeContext mockContext;
 
-    private Mock<javax.script.ScriptEngine> adaptee;
+    @RegularMock
+    private javax.script.ScriptEngine mockJsrEngine;
 
     private JSRScriptEngineAdapter adapter;
 
     @BeforeMethod
     public void setUp() {
         this.scriptSource = new ScriptSource(SCRIPT, ScriptingLanguage.GROOVY);
-        this.adapter = new JSRScriptEngineAdapter(adaptee.getMock());
+        this.adapter = new JSRScriptEngineAdapter(mockJsrEngine);
     }
 
     @AfterMethod
@@ -52,22 +59,26 @@ public class JSRScriptEngineAdapterTest extends UnitilsTestNG {
     }
 
     @Test
-    public void isDelegateInvoked() throws Exception {
+    public void isDelegateInvoked() throws ScriptException {
         final Object adapteeResult = new Object();
-        mockContext.returns(new HashSet<KeyValuePair<Variable>>().iterator())
-            .iterator();
-        adaptee.returns(adapteeResult).eval(same(SCRIPT));
 
-        final Object result = adapter.evaluate(mockContext.getMock(),
-                scriptSource);
+        expect(mockContext.iterator()).andReturn(
+                new HashSet<KeyValuePair<Variable>>().iterator());
+        expect(mockJsrEngine.eval(eq(SCRIPT),
+                isA(javax.script.ScriptContext.class)))
+        .andReturn(adapteeResult);
 
-        mockContext.assertInvoked().iterator();
-        adaptee.assertInvoked().eval(same(SCRIPT));
+        EasyMockUnitils.replay();
+
+        final Object result = adapter.evaluate(mockContext, scriptSource);
         assertSame("Unexpected script result", adapteeResult, result);
     }
 
     @Test
-    public void areContextVariablesCopied() {
+    public void areContextVariablesCopied() throws ScriptException {
+        final Object adapteeResult = new Object();
+        final Capture capturedContext = new Capture();
+
         final Variable value1 = new NodeVariable("var1value");
         final Variable value2 = new NodeVariable("var2value");
 
@@ -76,27 +87,59 @@ public class JSRScriptEngineAdapterTest extends UnitilsTestNG {
         variables.add(new KeyValuePair<Variable>("var1name", value1));
         variables.add(new KeyValuePair<Variable>("var2name", value2));
 
-        mockContext.returns(variables.iterator()).iterator();
+        expect(mockContext.iterator()).andReturn(variables.iterator());
+        mockJsrEngine.eval(eq(SCRIPT), isA(javax.script.ScriptContext.class));
+        expectLastCall().andAnswer(new IAnswer<Object>() {
+            @Override
+            public Object answer() throws Throwable {
+                capturedContext.setCaptured(getCurrentArguments()[1]);
+                return adapteeResult;
+            }
+        });
 
-        adapter.evaluate(mockContext.getMock(), scriptSource);
+        EasyMockUnitils.replay();
 
-        mockContext.assertInvoked().iterator();
-        adaptee.assertInvoked().put(eq("var1name"), same(value1));
-        adaptee.assertInvoked().put(eq("var2name"), same(value2));
+        final Object result = adapter.evaluate(mockContext, scriptSource);
+        assertSame("Unexpected script result", adapteeResult, result);
+
+        final javax.script.ScriptContext ctx = capturedContext.getCaptured();
+        assertSame("Unexpected attribute value", value1,
+                ctx.getAttribute("var1name",
+                        javax.script.ScriptContext.ENGINE_SCOPE));
+        assertSame("Unexpected attribute value", value2,
+                ctx.getAttribute("var2name",
+                        javax.script.ScriptContext.ENGINE_SCOPE));
     }
 
     @Test
     public void evaluateInCaseOfException() throws Exception {
-        mockContext.returns(new HashSet<KeyValuePair<Variable>>().iterator())
-            .iterator();
-        adaptee.raises(new ScriptException("test")).eval((String) null);
+        expect(mockContext.iterator()).andReturn(
+                new HashSet<KeyValuePair<Variable>>().iterator());
+        expect(mockJsrEngine.eval(eq(SCRIPT), isA(javax.script.ScriptContext.class)))
+            .andThrow(new ScriptException("test"));
+
+        EasyMockUnitils.replay();
 
         try {
-            adapter.evaluate(mockContext.getMock(), scriptSource);
+            adapter.evaluate(mockContext, scriptSource);
             fail("ScriptException expected");
         } catch (org.webharvest.exception.ScriptException e) {
             // ok, it's expected
         }
-        adaptee.assertInvoked().eval(same(SCRIPT));
+    }
+
+    // FIXME [pdyraga] Duplicate code with SpringAwareTypeListener
+    private final class Capture {
+
+        private Object captured;
+
+        @SuppressWarnings("unchecked")
+        public <T> T getCaptured() {
+            return (T) captured;
+        }
+
+        private void setCaptured(final Object captured) {
+            this.captured = captured;
+        }
     }
 }

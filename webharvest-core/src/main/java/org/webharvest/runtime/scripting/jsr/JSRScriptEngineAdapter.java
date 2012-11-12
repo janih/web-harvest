@@ -33,8 +33,11 @@
 
 package org.webharvest.runtime.scripting.jsr;
 
-import org.webharvest.exception.ScriptException;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.SimpleScriptContext;
 
+import org.webharvest.exception.ScriptException;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptSource;
@@ -81,26 +84,34 @@ public final class JSRScriptEngineAdapter implements ScriptEngine {
     public Object evaluate(final DynamicScopeContext context,
             final ScriptSource script) {
         try {
-            copyVariables(context);
-            return adaptee.eval(script.getSourceCode());
+            return adaptee.eval(script.getSourceCode(),
+                    createScriptContext(context));
         } catch (javax.script.ScriptException e) {
             throw new ScriptException(e);
         }
     }
 
-    private void copyVariables(final DynamicScopeContext context) {
+    private ScriptContext createScriptContext(
+            final DynamicScopeContext context) {
+        final ScriptContext scriptContext = new SimpleScriptContext();
+        final Bindings bindings = scriptContext.getBindings(
+                ScriptContext.ENGINE_SCOPE);
+
         for (KeyValuePair<Variable> pair : context) {
             final Variable value = pair.getValue();
 
-            // FIXME: The inline condition below has been moved from the
-            // first web harvest implementation of script engines
-            // (org.webharvest.runtime.scripting.ScriptEngine abstract class);
+            // FIXME: The inline condition below regarding attribute value
+            // has been moved from the first web harvest implementation of
+            //script engines (org.webharvest.runtime.scripting.ScriptEngine
+            // abstract class);
             // It was required to place it here for backward compatibility,
             // however it would be neat if we just had value.getWrappedObject()
             // invocation; this way we could use in scripts wrapped objects
             // directly instead of manually unwrapping them...
-            adaptee.put(pair.getKey(), (value instanceof ScriptingVariable)
-                            ? value.getWrappedObject() : value);
+            bindings.put(pair.getKey(), (value instanceof ScriptingVariable)
+                             ? value.getWrappedObject() : value);
         }
+
+        return scriptContext;
     }
 }
