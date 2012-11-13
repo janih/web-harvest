@@ -33,11 +33,10 @@
 
 package org.webharvest.runtime.scripting.jsr;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.script.ScriptEngineManager;
 
+import org.webharvest.Cache;
+import org.webharvest.ThreadLocalCache;
 import org.webharvest.exception.ConfigurationException;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptEngineFactory;
@@ -60,8 +59,15 @@ import org.webharvest.runtime.scripting.ScriptingLanguage;
  */
 public final class JSRScriptEngineFactory implements ScriptEngineFactory {
 
-    private final Map<ScriptingLanguage, javax.script.ScriptEngine> cache =
-        new HashMap<ScriptingLanguage, javax.script.ScriptEngine>();
+    /**
+     * Despite of declarations, some script engines are not really thread safe
+     * (for example bsh script engine storing stateful interpreter instance
+     * as a class field). To overcome this problem we have to cache script
+     * engines per thread. Storing script engines 'globally' may cause
+     * serious issues in the multithreaded environment.
+     */
+    private final Cache<ScriptingLanguage, javax.script.ScriptEngine> cache =
+        new ThreadLocalCache<ScriptingLanguage, javax.script.ScriptEngine>();
 
     private final ScriptEngineManager manager = new ScriptEngineManager();
 
@@ -77,7 +83,8 @@ public final class JSRScriptEngineFactory implements ScriptEngineFactory {
             final ScriptSource scriptSource) {
         final ScriptingLanguage scriptingLanguage = scriptSource.getLanguage();
 
-        javax.script.ScriptEngine scriptEngine = cache.get(scriptingLanguage);
+        javax.script.ScriptEngine scriptEngine =
+            cache.lookup(scriptingLanguage);
         if (scriptEngine != null) {
             return scriptEngine;
         }
