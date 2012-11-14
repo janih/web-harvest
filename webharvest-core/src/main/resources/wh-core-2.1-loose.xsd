@@ -1318,8 +1318,7 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="return" use="optional" default="Empty value "
-          type="xs:string">
+        <xs:attribute name="return" use="optional" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Specifies what this processor should evaluate at the end and
