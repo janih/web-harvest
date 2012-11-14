@@ -97,19 +97,20 @@ import org.webharvest.events.ScraperExecutionStoppedEvent;
 import org.webharvest.gui.component.MenuElements;
 import org.webharvest.gui.component.ProportionalSplitPane;
 import org.webharvest.gui.component.WHPopupMenu;
+import org.webharvest.gui.ioc.GuiModule;
 import org.webharvest.ioc.HttpModule;
 import org.webharvest.ioc.ScraperModule;
 import org.webharvest.runtime.ContextHolder;
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperState;
-import org.webharvest.runtime.WebScraper;
 import org.webharvest.runtime.processors.AbstractProcessor;
 import org.webharvest.runtime.processors.Processor;
 import org.webharvest.runtime.web.HttpClientManager.ProxySettings;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
+import com.google.inject.util.Modules;
 
 /**
  * Single panel containing XML configuration.
@@ -404,8 +405,9 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
     private Harvest createHarvest() {
         // FIXME rbala although temporary solution it is duplicated (CommandLine)
-        this.harvest = Guice.createInjector(
-                    new ScraperModule(ide.getSettings().getWorkingPath()),
+        this.harvest = Guice.createInjector(Modules.override(
+                        new ScraperModule(ide.getSettings().getWorkingPath())).
+                            with(new GuiModule()),
                     new HttpModule(loadProxySettings()))
                 .getInstance(Harvest.class);
         // TODO rbala Possibly bind with Guice when finally created Swing module

@@ -113,12 +113,7 @@ public class ScrapingHarvester implements Harvester {
                 contextFactory.create(config);
         callback.onSuccess(context);
 
-        // FIXME rbala Moved directly from ScraperExecutionThread. Not covered by any test!
-        try {
-            scraper.execute(context);
-        } catch (RuntimeException e) {
-            scraper.informListenersAboutError(e);
-        }
+        scraper.execute(context);
 
         return context;
     }
