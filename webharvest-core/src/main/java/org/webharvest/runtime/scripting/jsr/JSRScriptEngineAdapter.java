@@ -33,11 +33,8 @@
 
 package org.webharvest.runtime.scripting.jsr;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.SimpleScriptContext;
-
 import org.webharvest.exception.ScriptException;
+
 import org.webharvest.runtime.DynamicScopeContext;
 import org.webharvest.runtime.scripting.ScriptEngine;
 import org.webharvest.runtime.scripting.ScriptSource;
@@ -48,9 +45,17 @@ import org.webharvest.utils.KeyValuePair;
 /**
  * Adapter design pattern implementation. Adapts provided
  * {@link javax.script.ScriptEngine} representing JSR-223 script engine to the
- * {@link org.webharvest.runtime.scripting.ScriptEngine} interface.
- * This adapter is universal for all scripting language implementations
- * supporting JSR-223 specification.
+ * {@link org.webharvest.runtime.scripting.ScriptEngine} interface. This adapter
+ * is universal for all scripting language implementations supporting JSR-223
+ * specification.
+ * <p/>
+ * It is important to bear in mind that this implementation is not thread-safe,
+ * that is, {@link javax.script.ScriptEngine} being adapted can not be shared
+ * between multiple threads. Bindings from scraper's {@link DynamicScopeContext}
+ * are copied directly to the {@link ScriptEngine}. This is performance
+ * trade-off, since currently creation of brand new
+ * {@link javax.script.ScriptContext} instances each time script is evaluated is
+ * quite expensive.
  *
  * @see ScriptEngine
  *
@@ -84,34 +89,26 @@ public final class JSRScriptEngineAdapter implements ScriptEngine {
     public Object evaluate(final DynamicScopeContext context,
             final ScriptSource script) {
         try {
-            return adaptee.eval(script.getSourceCode(),
-                    createScriptContext(context));
+            copyVariables(context);
+            return adaptee.eval(script.getSourceCode());
         } catch (javax.script.ScriptException e) {
             throw new ScriptException(e);
         }
     }
 
-    private ScriptContext createScriptContext(
-            final DynamicScopeContext context) {
-        final ScriptContext scriptContext = new SimpleScriptContext();
-        final Bindings bindings = scriptContext.getBindings(
-                ScriptContext.ENGINE_SCOPE);
-
+    private void copyVariables(final DynamicScopeContext context) {
         for (KeyValuePair<Variable> pair : context) {
             final Variable value = pair.getValue();
 
-            // FIXME: The inline condition below regarding attribute value
-            // has been moved from the first web harvest implementation of
-            //script engines (org.webharvest.runtime.scripting.ScriptEngine
-            // abstract class);
+            // FIXME: The inline condition below has been moved from the
+            // first web harvest implementation of script engines
+            // (org.webharvest.runtime.scripting.ScriptEngine abstract class);
             // It was required to place it here for backward compatibility,
             // however it would be neat if we just had value.getWrappedObject()
             // invocation; this way we could use in scripts wrapped objects
             // directly instead of manually unwrapping them...
-            bindings.put(pair.getKey(), (value instanceof ScriptingVariable)
-                             ? value.getWrappedObject() : value);
+            adaptee.put(pair.getKey(), (value instanceof ScriptingVariable)
+                            ? value.getWrappedObject() : value);
         }
-
-        return scriptContext;
     }
 }
