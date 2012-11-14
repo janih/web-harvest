@@ -170,7 +170,7 @@ public final class StandaloneConnectionPool implements ConnectionFactory {
 
     private ConnectionProxy createConnectionProxy(final Connection delegate) {
         return (ConnectionProxy) Proxy.newProxyInstance(
-                ClassLoader.getSystemClassLoader(),
+                this.getClass().getClassLoader(),
                 new Class< ? >[] {ConnectionProxy.class},
                 new ConnectionProxyInvocationHandler(delegate));
     }
