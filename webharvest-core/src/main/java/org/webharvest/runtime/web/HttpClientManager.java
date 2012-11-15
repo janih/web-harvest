@@ -36,14 +36,41 @@
 */
 package org.webharvest.runtime.web;
 
-import org.apache.commons.httpclient.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.ProxyHost;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.*;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -56,17 +83,6 @@ import org.webharvest.runtime.variables.Variable;
 import org.webharvest.utils.CommonUtil;
 
 import com.google.inject.Inject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * HTTP client functionality.
@@ -335,20 +351,36 @@ public class HttpClientManager {
         return method;
     }
 
-    private GetMethod createGetMethod(String url, Map<String, HttpParamInfo> params, String charset, Boolean followRedirects) {
+    // FIXME: package protected for testing. This is not perfect solution
+    // - we need to refactor entire HttpClientManager class (splitting it into
+    // multiple classes/interfaces)
+    GetMethod createGetMethod(String url, Map<String, HttpParamInfo> params,
+            String charset, Boolean followRedirects) {
         if (params != null) {
-            String urlParams = "";
-            for (Map.Entry<String, HttpParamInfo> entry : params.entrySet()) {
-                String value = entry.getValue().toString();
-                NameValuePair pair = new NameValuePair(entry.getKey(), value);
+            final StringBuilder urlParamsBuilder = new StringBuilder();
+            final Iterator<Entry<String, HttpParamInfo>> iterator =
+                params.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                final Entry<String, HttpParamInfo> entry = iterator.next();
+                final HttpParamInfo httpParamInfo = entry.getValue();
+
                 try {
-                    urlParams += pair.getName() + "=" + URLEncoder.encode(value == null ? "" : value, charset) + "&";
+                    urlParamsBuilder.append(entry.getKey())
+                        .append("=")
+                        .append(URLEncoder.encode(CommonUtil.nvl(
+                                httpParamInfo.getValue(), ""), charset));
                 } catch (UnsupportedEncodingException e) {
-                    throw new org.webharvest.exception.HttpException("Charset " + charset + " is not supported!", e);
+                    throw new org.webharvest.exception.HttpException("Charset "
+                            + charset + " is not supported!", e);
+                }
+                if (iterator.hasNext()) {
+                    urlParamsBuilder.append("&");
                 }
             }
 
-            if (!"".equals(urlParams)) {
+            if (urlParamsBuilder.length() != 0) {
+                final String urlParams = urlParamsBuilder.toString();
                 if (url.indexOf("?") < 0) {
                     url += "?" + urlParams;
                 } else if (url.endsWith("&")) {
