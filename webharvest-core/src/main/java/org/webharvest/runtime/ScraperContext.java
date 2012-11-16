@@ -36,9 +36,6 @@
 */
 package org.webharvest.runtime;
 
-import static java.text.MessageFormat.format;
-
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,14 +48,13 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.webharvest.definition.Config;
 import org.webharvest.definition.FunctionDef;
-import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.EmptyVariable;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.variables.VariableName;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.Assert;
 import org.webharvest.utils.CommonUtil;
@@ -109,7 +105,8 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Override
     public void setLocalVar(String name, Variable variable) {
-        checkIdentifier(name);
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(name);
         Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         final Set<String> localVariableNames = variablesNamesStack.peek();
 
@@ -128,7 +125,8 @@ public class ScraperContext implements DynamicScopeContext {
     @Override
     @SuppressWarnings({"ConstantConditions"})
     public Variable replaceExistingVar(String name, Variable variable) {
-        checkIdentifier(name);
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(name);
         final Stack<Variable> variableValueStack = centralReferenceTable.get(name);
         Assert.isFalse(variableValueStack == null || variableValueStack.isEmpty(), "Variable {0} does not exist", name);
         return variableValueStack.replaceTop((Variable) ObjectUtils.defaultIfNull(variable, EmptyVariable.INSTANCE));
@@ -136,7 +134,8 @@ public class ScraperContext implements DynamicScopeContext {
 
     @Override
     public Variable getVar(String name) {
-        checkIdentifier(name);
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(name);
         final Stack<Variable> stack = centralReferenceTable.get(name);
         return (stack == null) ? null : stack.peek();
     }
@@ -179,7 +178,8 @@ public class ScraperContext implements DynamicScopeContext {
     }
 
     private Variable removeVarFromCRT(String varName) {
-        checkIdentifier(varName);
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(varName);
         final Stack<Variable> stack = centralReferenceTable.get(varName);
         try {
             return stack.pop();
@@ -187,12 +187,6 @@ public class ScraperContext implements DynamicScopeContext {
             if (stack.isEmpty()) {
                 centralReferenceTable.remove(varName);
             }
-        }
-    }
-
-    protected void checkIdentifier(String identifier) {
-        if (StringUtils.isBlank(identifier)) {
-            throw new VariableException(format("Invalid identifier ''{0}''", identifier));
         }
     }
 

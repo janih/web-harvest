@@ -69,10 +69,10 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222c333</regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
+                "    [<var name='group2'/>]" +
+                "    [<var name='group3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).toString().replaceAll("\\s", ""), "[a111b222c333][111][222][333]");
@@ -86,8 +86,8 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(\\d+)$</regexp-pattern>" +
                 "  <regexp-source>xxx</regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).isEmpty());
@@ -101,10 +101,10 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source></regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
+                "    [<var name='group2'/>]" +
+                "    [<var name='group3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).isEmpty());
@@ -118,10 +118,10 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>b222c333</regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
+                "    [<var name='group2'/>]" +
+                "    [<var name='group3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).toString().replaceAll("\\s", ""), "[b222c333][][222][333]");
@@ -135,10 +135,10 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111c333</regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
+                "    [<var name='group2'/>]" +
+                "    [<var name='group3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).toString().replaceAll("\\s", ""), "[a111c333][111][][333]");
@@ -152,10 +152,10 @@ public class RegexpProcessor_Match_Test extends UnitilsTestNGExtension {
                 "  <regexp-pattern>^(?:a(\\d+))?(?:b(\\d+))?(?:c(\\d+))?$</regexp-pattern>" +
                 "  <regexp-source>a111b222</regexp-source>" +
                 "  <regexp-result>" +
-                "    [<var name='_0'/>]" +
-                "    [<var name='_1'/>]" +
-                "    [<var name='_2'/>]" +
-                "    [<var name='_3'/>]" +
+                "    [<var name='group0'/>]" +
+                "    [<var name='group1'/>]" +
+                "    [<var name='group2'/>]" +
+                "    [<var name='group3'/>]" +
                 "  </regexp-result>" +
                 "</regexp>", XmlNodeTestUtils.NAMESPACE_10)).
                 run(context).toString().replaceAll("\\s", ""), "[a111b222][111][222][]");

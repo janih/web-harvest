@@ -127,7 +127,7 @@ public class ScraperContextTest extends UnitilsTestNG {
         context.setLocalVar("x", dummyVar);
         context.setLocalVar("null", null);
         assertTrue(context.containsVar("x"));
-        assertFalse(context.containsVar("not existing"));
+        assertFalse(context.containsVar("notExisting"));
         assertSame(context.getVar("null"), EmptyVariable.INSTANCE);
     }
 
@@ -147,7 +147,7 @@ public class ScraperContextTest extends UnitilsTestNG {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testReplaceExistingVar_noSuchVariable() throws Exception {
-        context.replaceExistingVar("not existing", dummyVar);
+        context.replaceExistingVar("notExisting", dummyVar);
     }
 
     @Test

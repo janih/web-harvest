@@ -107,7 +107,7 @@ public class ScraperContext10Test extends UnitilsTestNG {
             @Override
             public Object call() throws Exception {
                 Assert.assertNull(context.getVar("x"));
-                Assert.assertEquals(context.getVar("caller.x").toInt(), 123);
+                Assert.assertEquals(context.getVar("callerx").toInt(), 123);
 
                 // inner variables should be accessible at any level
                 Assert.assertNotNull(context.getVar("sys"));
@@ -118,8 +118,8 @@ public class ScraperContext10Test extends UnitilsTestNG {
                     @Override
                     public Object call() throws Exception {
                         Assert.assertNull(context.getVar("x"));
-                        Assert.assertNull(context.getVar("caller.x"));
-                        Assert.assertEquals(context.getVar("caller.caller.x").toInt(), 123);
+                        Assert.assertNull(context.getVar("callerx"));
+                        Assert.assertEquals(context.getVar("callercallerx").toInt(), 123);
 
                         // inner variables should be accessible at any level
                         Assert.assertNotNull(context.getVar("sys"));

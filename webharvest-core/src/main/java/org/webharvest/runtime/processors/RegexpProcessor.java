@@ -145,7 +145,7 @@ public class RegexpProcessor extends AbstractProcessor<RegexpDef> {
                 }
 
                 for (int i = 0; i <= groupCount; i++) {
-                    context.setLocalVar("_" + i, new NodeVariable(matcher.group(i)));
+                    context.setLocalVar("group" + i, new NodeVariable(matcher.group(i)));
                 }
 
                 IElementDef resultDef = elementDef.getRegexpResultDef();

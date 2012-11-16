@@ -38,9 +38,6 @@
 
 package org.webharvest.deprecated.runtime;
 
-import static java.text.MessageFormat.format;
-
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +49,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webharvest.definition.Config;
@@ -63,6 +59,7 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.scripting.ScriptingLanguage;
 import org.webharvest.runtime.variables.ScriptingVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.runtime.variables.VariableName;
 import org.webharvest.runtime.web.HttpClientManager;
 import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
@@ -76,7 +73,7 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(Scraper.class);
 
-    private static final String CALLER_PREFIX = "caller.";
+    private static final String CALLER_PREFIX = "caller";
 
     @Inject private HttpClientManager httpClientManager;
 
@@ -108,8 +105,8 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     @Override
     public Variable getVar(String name) {
-        checkIdentifier(name);
-
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(name);
         int level = 0;
         while (name.startsWith(CALLER_PREFIX, level * CALLER_PREFIX.length())) {
             level++;
@@ -125,7 +122,8 @@ public class ScraperContext10 implements DynamicScopeContext {
 
     @Override
     public void setLocalVar(String key, Variable value) {
-        checkIdentifier(key);
+        // TODO rbala Currently used only for the sake of validation.
+        new VariableName(key);
         stack.peek().put(key, value);
     }
 
@@ -188,12 +186,6 @@ public class ScraperContext10 implements DynamicScopeContext {
                 return new KeyValuePair<Variable>(entry.getKey(), entry.getValue());
             }
         });
-    }
-
-    protected void checkIdentifier(String identifier) {
-        if (StringUtils.isBlank(identifier)) {
-            throw new VariableException(format("Invalid identifier ''{0}''", identifier));
-        }
     }
 
     /**
