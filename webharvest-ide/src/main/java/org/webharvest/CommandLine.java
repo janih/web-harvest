@@ -101,7 +101,7 @@ public class CommandLine {
     }
 
     public static void main(final String[] args) throws IOException {
-        Map<String, String> params = getArgValue(args);
+        final Map<String, String> params = getArgValue(args);
 
         if (params.size() == 0) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -174,15 +174,12 @@ public class CommandLine {
                 @Override
                 public void onSuccess(DynamicScopeContext context) {
                     // adds initial variables to the scraper's content, if any
-                    Map<String, String> caseSensitiveParams = getArgValue(args, true);
-                    for (Map.Entry<String, String> entry : caseSensitiveParams.entrySet()) {
-                        final String key = entry.getKey();
-                        if (key.startsWith("#")) {
-                            String varName = key.substring(1);
-                            if (varName.length() > 0) {
-                                context.setLocalVar(varName,
-                                        entry.getValue());
-                            }
+                    final Map<String, String> vars =
+                        getArgValue(getVariables(params), true);
+                    for (Map.Entry<String, String> var : vars.entrySet()) {
+                        final String varName = var.getKey();
+                        if (varName.length() > 0) {
+                            context.setLocalVar(varName, var.getValue());
                         }
                     }
                 }
@@ -257,6 +254,23 @@ public class CommandLine {
         }
     }
 
+    /**
+     * Returns {@link String} array with value of 'vars' parameter if it exists,
+     * otherwise it returns empty array. The value of 'vars' parameter is split
+     * using ';' delimiter.
+     *
+     * @param params
+     *            parameters specified in the command line
+     * @return array of configuration's variables
+     */
+    private static String[] getVariables(final Map<String, String> params) {
+        final String vars = params.get("vars");
+        if (vars != null) {
+            return vars.split(";");
+        }
+        return new String[]{};
+    }
+
     private static void printHelp() {
         System.out.println("");
         System.out.println("To open Web-Harvest GUI:");
@@ -273,7 +287,7 @@ public class CommandLine {
         System.out.println("             [logpropsfile=<path>]");
         System.out.println("             [plugins=<plugin-class1>[:<uri1>][,<plugin-class2>[:<uri2>]]...]");
         System.out.println("             [dbdrivers=<jar-uri1>[,<jar-uri2>]...]");
-        System.out.println("             [#var1=<value1> [#var2=<value2>...]]");
+        System.out.println("             [vars=<name1>=<value1>[;<name2>=<value2>...]]");
         System.out.println("");
         System.out.println("   -h            - shows this help.");
         System.out.println("   config        - path or URL of configuration (URL must begin with \"http://\" or \"https://\").");
@@ -290,8 +304,8 @@ public class CommandLine {
         System.out.println("   plugins       - comma-separated list of pairs <plugin-class>[:<uri>], where <plugin-class> is full plugin class name," +
                 "and URI is an XML namespace in which this plugin is declared. If URI is not specified the default WebHarvest schema is assumed.");
         System.out.println("   dbdrivers     - comma-separated list of JAR locations containing database drivers");
-        System.out.println("   #varN, valueN - specify initial variables of the Web-Harvest context. To be recognized, ");
-        System.out.println("                   each variable name must have prefix #. ");
+        System.out.println("   vars	         - semicolon-separated list of pairs <name>=<value>, where <name> is a name of initial variable " +
+                "of the Web-Harvest context and <value> is its value");
     }
 
 }
