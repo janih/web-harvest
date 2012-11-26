@@ -5,6 +5,7 @@ import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Abstract SQL {@link Driver} mock. Facilitates testing classes using
@@ -75,6 +76,12 @@ public abstract class AbstractMockedDriver implements Driver {
      */
     @Override
     public boolean jdbcCompliant() {
+        throw new UnsupportedOperationException("TEST MOCK");
+    }
+
+    // added in JDK7 Driver interface, we can't add @Override because
+    // it would break build in JDK6 ;/
+    public Logger getParentLogger() {
         throw new UnsupportedOperationException("TEST MOCK");
     }
 
