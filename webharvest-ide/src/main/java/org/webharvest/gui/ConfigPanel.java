@@ -729,7 +729,15 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
             TreeNodeInfo nodeInfo = this.nodeInfos.get(elementDef.getLineNumber());
             if (nodeInfo != null) {
                 nodeInfo.increaseExecutionCount();
-                setExecutingNode(nodeInfo);
+                //
+                //  Fri Feb 22 17:28:26 2013 -- Scott R. Turner
+                //
+                //  This prevents the node tree from updating if DynamicConfigLocate
+                //  is turned off
+                //
+                if (ide.getSettings().isDynamicConfigLocate()) {
+                    setExecutingNode(nodeInfo);
+                };
                 int lineNumber = locateInSource(nodeInfo.getNode(), true) - 1;
                 if (xmlPane.getBreakpoints().isThereBreakpoint(lineNumber)) {
 
@@ -1029,7 +1037,15 @@ public class ConfigPanel extends JPanel implements TreeSelectionListener, CaretL
 
                     int startIndex = content.lastIndexOf('<');
 
-                    this.xmlPane.setCaretPosition(startIndex >= 0 ? startIndex : 0);
+                    //
+                    //  Fri Feb 22 17:29:19 2013 -- Scott R. Turner
+                    //
+                    //  Setting the caret forces the xmlPane to update, so this needs to
+                    //  be prevented when DynamicConfigLocate is off.
+                    //
+                    if (ide.getSettings().isDynamicConfigLocate()) {
+                        this.xmlPane.setCaretPosition(startIndex >= 0 ? startIndex : 0);
+                    };
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                     //todo: swallow exception?

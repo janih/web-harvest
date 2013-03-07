@@ -49,6 +49,9 @@ import org.webharvest.exception.PluginException;
 import org.webharvest.gui.settings.validation.FilePathToURITransformer;
 import org.webharvest.gui.settings.validation.XmlSchemaDTO;
 import org.webharvest.utils.CommonUtil;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.URI;
@@ -85,6 +88,13 @@ public class Settings implements Serializable, SchemaResolverPostProcessor {
 
     // specify if processors are located in source while configuration is running
     private boolean isDynamicConfigLocate = true;
+
+    //
+    //  Wed Feb 20 19:23:56 2013 -- Scott R. Turner
+    //
+    //  Mute the INFO messages in the log?
+    //
+    private boolean isMuteLog = false;
 
     // specify if info is displayed on execution finish
     private boolean isShowFinishDialog = true;
@@ -208,6 +218,24 @@ public class Settings implements Serializable, SchemaResolverPostProcessor {
 
     public void setDynamicConfigLocate(boolean dynamicConfigLocate) {
         isDynamicConfigLocate = dynamicConfigLocate;
+    }
+
+    public boolean isMuteLog() {
+        return this.isMuteLog;
+    }
+
+    public void setMuteLog(boolean muteLog) {
+        isMuteLog = muteLog;
+        //
+        //  Wed Feb 20 19:26:54 2013 -- Scott R. Turner
+        //
+        //  When mute log is set (or unset) we need to adjust the log level accordingly.
+        //
+        if (muteLog) {
+            LogManager.getRootLogger().setLevel(Level.WARN);
+        } else {
+            LogManager.getRootLogger().setLevel(Level.INFO);
+        };
     }
 
     public boolean isShowFinishDialog() {
@@ -344,6 +372,7 @@ public class Settings implements Serializable, SchemaResolverPostProcessor {
         props.setProperty("showlog", String.valueOf(isShowLogByDefault));
         props.setProperty("showlinenums", String.valueOf(isShowLineNumbersByDefault));
         props.setProperty("dynlocate", String.valueOf(isDynamicConfigLocate));
+        props.setProperty("mutelog", String.valueOf(isMuteLog));
         props.setProperty("filecharset", String.valueOf(fileCharset));
         props.setProperty("showfinish", String.valueOf(isShowFinishDialog));
 
@@ -413,6 +442,9 @@ public class Settings implements Serializable, SchemaResolverPostProcessor {
         if (props.containsKey("dynlocate")) {
             isDynamicConfigLocate = CommonUtil.getBooleanValue(props.getProperty("dynlocate"), false);
         }
+        if (props.containsKey("mutelog")) {
+            isMuteLog = CommonUtil.getBooleanValue(props.getProperty("mutelog"), false);
+        }
         if (props.containsKey("filecharset")) {
             fileCharset = props.getProperty("filecharset");
         }
@@ -471,6 +503,7 @@ public class Settings implements Serializable, SchemaResolverPostProcessor {
         isShowLogByDefault = readBoolean(in, isShowLogByDefault);
         isShowLineNumbersByDefault = readBoolean(in, isShowLineNumbersByDefault);
         isDynamicConfigLocate = readBoolean(in, isDynamicConfigLocate);
+        isMuteLog = readBoolean(in, isMuteLog);
 
         fileCharset = readString(in, fileCharset);
 

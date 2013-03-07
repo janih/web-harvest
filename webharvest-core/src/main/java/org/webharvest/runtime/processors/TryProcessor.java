@@ -80,12 +80,25 @@ public class TryProcessor extends AbstractProcessor<TryDef> {
                         ? new InterruptedException(e.getMessage())
                         : (InterruptedException) ExceptionUtils.getThrowableList(e).get(interruptedExceptionIndexInChain);
             }
-            LOG.info("Exception caught with try processor: {}", e.getMessage());
+            //
+            //  Fri Feb 22 17:32:06 2013 -- Scott R. Turner
+            //
+            //  Make this a "warning" level log message so that it shows up even
+            //  when the INFO messages are muted.
+            //
+            LOG.warn("Exception caught with try processor: {}", e.getMessage());
 
             return context.executeWithinNewContext(new Callable<Variable>() {
                 @Override
                 public Variable call() throws Exception {
-                    context.setLocalVar("_error", CommonUtil.createVariable(e));
+                    //
+                    //  Fri Feb 22 17:32:37 2013 -- Scott R. Turner
+                    //
+                    //  Changed _error to error to match 2.1 variable name requirements.
+                    //  This is dubious code, since it might overwrite an "error" variable
+                    //  provided by the user.
+                    //
+                    context.setLocalVar("error", CommonUtil.createVariable(e));
                     final IElementDef catchValueDef = elementDef.getCatchValueDef();
                     final Variable res =
                         new BodyProcessor.Builder(catchValueDef).build().

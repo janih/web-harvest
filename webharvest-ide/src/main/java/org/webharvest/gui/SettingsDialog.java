@@ -188,6 +188,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
     private JCheckBox showLogByDefaultCheckBox;
     private JCheckBox showLineNumbersByDefaultCheckBox;
     private JCheckBox dynamicConfigLocateCheckBox;
+    private JCheckBox muteLogCheckBox;
     private JCheckBox showFinishDialogCheckBox;
 
     private JButton pluginUpdateButton;
@@ -367,12 +368,19 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         this.showLogByDefaultCheckBox = new WHCheckBox("Show log panel by default");
         this.showLineNumbersByDefaultCheckBox = new WHCheckBox("Show line numbers by default");
         this.dynamicConfigLocateCheckBox = new WHCheckBox("Dynamically locate processors in runtime");
+        //
+        //  Wed Feb 20 19:21:29 2013 -- Scott R. Turner
+        //
+        //  Add a new option for muting the log.
+        //
+        this.muteLogCheckBox = new WHCheckBox("Mute INFO messages in log window");
         this.showFinishDialogCheckBox = new WHCheckBox("Show info/error dialog when execution finishes");
 
         viewPanel.add(this.showHierarchyByDefaultCheckBox);
         viewPanel.add(this.showLogByDefaultCheckBox);
         viewPanel.add(this.showLineNumbersByDefaultCheckBox);
         viewPanel.add(this.dynamicConfigLocateCheckBox);
+        viewPanel.add(this.muteLogCheckBox);
         viewPanel.add(this.showFinishDialogCheckBox);
 
         JPanel pluginsPanel = new JPanel(new BorderLayout(5, 0));
@@ -515,6 +523,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         showLogByDefaultCheckBox.setSelected(settings.isShowLogByDefault());
         showLineNumbersByDefaultCheckBox.setSelected(settings.isShowLineNumbersByDefault());
         dynamicConfigLocateCheckBox.setSelected(settings.isDynamicConfigLocate());
+        muteLogCheckBox.setSelected(settings.isMuteLog());
         showFinishDialogCheckBox.setSelected(settings.isShowFinishDialog());
 
         pluginListModel.clear();
@@ -590,6 +599,7 @@ public class SettingsDialog extends CommonDialog implements ChangeListener {
         settings.setShowLogByDefault(this.showLogByDefaultCheckBox.isSelected());
         settings.setShowLineNumbersByDefault(this.showLineNumbersByDefaultCheckBox.isSelected());
         settings.setDynamicConfigLocate(this.dynamicConfigLocateCheckBox.isSelected());
+        settings.setMuteLog(this.muteLogCheckBox.isSelected());
         settings.setShowFinishDialog(this.showFinishDialogCheckBox.isSelected());
 
         int pluginCount = pluginListModel.getSize();
