@@ -212,6 +212,14 @@
     </xs:annotation>
   </xs:element>
 
+  <xs:element name="sleep" type="sleepElementType">
+    <xs:annotation>
+      <xs:documentation>
+        Sleeps for specified amount of time in milliseconds.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
   <xs:element name="file" type="fileElementType">
     <xs:annotation>
       <xs:documentation>
@@ -572,6 +580,54 @@
     </xs:annotation>
   </xs:element>
 
+  <xs:element name="web-browser" type="webBrowserElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="web-browser-load" type="webBrowserLoadElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="web-browser-eval" type="webBrowserEvalElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="web-browser-includejs" type="webBrowserIncludeJSElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="web-browser-render-to-image" type="webBrowserRenderToImageElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="web-browser-render-to-pdf" type="webBrowserRenderToPdfElementType">
+    <xs:annotation>
+      <xs:documentation>
+        TODO Add documentation
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
   <xs:element name="zip" type="zipElementType">
     <xs:annotation>
       <xs:documentation>
@@ -619,6 +675,7 @@
         <xs:element ref="set" />
         <xs:element ref="get" />
         <xs:element ref="value-of" />
+        <xs:element ref="sleep" />
         <xs:element ref="file"/>
         <xs:element ref="http"/>
         <xs:element ref="http-param" />
@@ -646,6 +703,12 @@
         <xs:element ref="database"/>
         <xs:element ref="mail" />
         <xs:element ref="mail-attach" />
+        <xs:element ref="web-browser" />
+        <xs:element ref="web-browser-load" />
+        <xs:element ref="web-browser-eval" />
+        <xs:element ref="web-browser-includejs" />
+        <xs:element ref="web-browser-render-to-image" />
+        <xs:element ref="web-browser-render-to-pdf" />
         <xs:element ref="json-to-xml"/>
         <xs:element ref="xml-to-json"/>
         <xs:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
@@ -740,6 +803,20 @@
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="expr" use="required" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Expression to evaluate.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sleepElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+        <xs:attribute name="milliseconds" use="required" type="xs:string">
           <xs:annotation>
             <xs:documentation>
               Expression to evaluate.
@@ -1669,7 +1746,7 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-          <xs:attribute name="inline" type="xs:boolean" default="false">
+        <xs:attribute name="inline" type="xs:boolean" default="false">
           <xs:annotation>
             <xs:documentation>
                Tells whether attachment is embeded in the mail body.
@@ -1680,7 +1757,119 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="zipElementType">
+  <xs:complexType name="webBrowserElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+        <xs:attribute name="path" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="port" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="width" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="height" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="paperformat" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="paperorientation" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="paperborder" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="webBrowserLoadElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+          <xs:attribute name="url" type="xs:string">
+              <xs:annotation>
+                  <xs:documentation>
+                      Mime type of the attachment.
+                  </xs:documentation>
+              </xs:annotation>
+          </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="webBrowserEvalElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+        <xs:attribute name="urlchange" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="webBrowserRenderToImageElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+        <xs:attribute name="type" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+               Mime type of the attachment.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="webBrowserRenderToPdfElementType">
+    <xs:complexContent>
+      <xs:extension base="bodyType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="webBrowserIncludeJSElementType">
+    <xs:complexContent>
+        <xs:extension base="bodyType">
+        </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+    <xs:complexType name="zipElementType">
     <xs:complexContent>
       <xs:extension base="bodyType"/>
     </xs:complexContent>

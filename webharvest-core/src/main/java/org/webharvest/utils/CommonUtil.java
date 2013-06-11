@@ -50,10 +50,7 @@ import org.webharvest.runtime.web.HttpInfo;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -601,6 +598,46 @@ public class CommonUtil {
             buffer.append((char) ch);
         }
         in.close();
+
+        return buffer.toString();
+    }
+
+    public static String readStringFromUrl(String urlString, boolean isPostRequest) throws IOException {
+        InputStream in;
+        if (isPostRequest) {
+            String params = null;
+            // get parameters after ?
+            final int index = urlString.indexOf("?");
+            if (index > 0) {
+                if (index < urlString.length() - 1) {
+                    params = urlString.substring(index + 1);
+                }
+                urlString = urlString.substring(0, index);
+            }
+            URL u = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Content-Length", String.valueOf(params != null ? params.length() : 0));
+            DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+            if (params != null) {
+                os.writeBytes(params);
+            }
+            os.flush();
+            os.close();
+            in = conn.getInputStream();
+        } else {
+            in = new URL(urlString).openStream();
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            buffer.append((char) ch);
+        }
+        reader.close();
 
         return buffer.toString();
     }
