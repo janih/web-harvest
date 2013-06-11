@@ -39,10 +39,7 @@ package org.webharvest.gui;
 import org.webharvest.gui.component.SmallButton;
 
 import javax.swing.*;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +49,19 @@ import java.awt.event.ActionListener;
  * Date: May 7, 2007
  */
 public class PropertiesGrid extends JTable {
+
+    private class PropertyValueCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value != null) {
+                String str = value.toString();
+                if (str.length() > 1000) {
+                    value = str.substring(0, 1000);
+                }
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
+    }
 
     private class ButtonRenderer extends SmallButton implements TableCellRenderer {
         public ButtonRenderer() {
@@ -126,6 +136,7 @@ public class PropertiesGrid extends JTable {
         tableHeader.setReorderingAllowed(false);
 
         TableColumnModel columnModel = this.getColumnModel();
+        columnModel.getColumn(1).setCellRenderer( new PropertyValueCellRenderer() );
         columnModel.getColumn(2).setCellRenderer( new ButtonRenderer() );
         columnModel.getColumn(2).setCellEditor( new ButtonEditor(new JCheckBox()) );
         columnModel.getColumn(2).setMaxWidth(15);
