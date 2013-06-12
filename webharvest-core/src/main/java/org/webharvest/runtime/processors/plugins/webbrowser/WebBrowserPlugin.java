@@ -31,7 +31,7 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
 
     private static final int DEFAULT_PORT = 8081;
     // todo: this default name should depend on OS
-    private static final String HEADLESS_BROWSER_FILENAME = "phantomjs.exe";
+    private static final String HEADLESS_BROWSER_FILENAME = "phantomjs";
 
     public static synchronized String getPhantomTemplateAsString() throws IOException {
         if (phantomTemplate == null) {

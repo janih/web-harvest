@@ -612,15 +612,7 @@
     </xs:annotation>
   </xs:element>
 
-  <xs:element name="web-browser-render-to-image" type="webBrowserRenderToImageElementType">
-    <xs:annotation>
-      <xs:documentation>
-        TODO Add documentation
-      </xs:documentation>
-    </xs:annotation>
-  </xs:element>
-
-  <xs:element name="web-browser-render-to-pdf" type="webBrowserRenderToPdfElementType">
+  <xs:element name="web-browser-render" type="webBrowserRenderElementType">
     <xs:annotation>
       <xs:documentation>
         TODO Add documentation
@@ -707,8 +699,7 @@
         <xs:element ref="web-browser-load" />
         <xs:element ref="web-browser-eval" />
         <xs:element ref="web-browser-includejs" />
-        <xs:element ref="web-browser-render-to-image" />
-        <xs:element ref="web-browser-render-to-pdf" />
+        <xs:element ref="web-browser-render" />
         <xs:element ref="json-to-xml"/>
         <xs:element ref="xml-to-json"/>
         <xs:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
@@ -1841,7 +1832,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="webBrowserRenderToImageElementType">
+  <xs:complexType name="webBrowserRenderElementType">
     <xs:complexContent>
       <xs:extension base="bodyType">
         <xs:attribute name="type" type="xs:string">
@@ -1851,13 +1842,6 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="webBrowserRenderToPdfElementType">
-    <xs:complexContent>
-      <xs:extension base="bodyType">
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
