@@ -23,7 +23,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-render", validAttributes = {"type"})
+@Definition(value = "web-browser-render", validAttributes = {"type", "page"})
 public class WebBrowserRenderPlugin extends WebHarvestPlugin {
 
     private static final String TEMP_PDF_FILE_NAME = "__temp__.pdf";
@@ -35,6 +35,7 @@ public class WebBrowserRenderPlugin extends WebHarvestPlugin {
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         WebBrowserPlugin webBrowserPlugin = WebBrowserPlugin.findParentPlugin(this);
         if (webBrowserPlugin != null) {
+            String pageName = CommonUtil.nvl(evaluateAttribute("page", context), "");
             String type = evaluateAttribute("type", context);
             if ( CommonUtil.isEmptyString(type) || (!"png".equalsIgnoreCase(type) && !"gif".equalsIgnoreCase(type) && !"jpeg".equalsIgnoreCase(type) && !"pdf".equalsIgnoreCase(type)) ) {
                 type = "JPEG";
@@ -42,7 +43,7 @@ public class WebBrowserRenderPlugin extends WebHarvestPlugin {
 
             if ("pdf".equalsIgnoreCase(type)) {
                 String path = CommonUtil.getAbsoluteFilename(workingDir, TEMP_PDF_FILE_NAME);
-                String urlContent = webBrowserPlugin.renderToPdf(path);
+                String urlContent = webBrowserPlugin.renderToPdf(path, pageName);
                 if (CommonUtil.isEmptyString(urlContent)) {
                     File file = new File(path);
                     try {
@@ -61,7 +62,7 @@ public class WebBrowserRenderPlugin extends WebHarvestPlugin {
                     return new NodeVariable(urlContent);
                 }
             } else {
-                String urlContent = webBrowserPlugin.renderToImage(type.toUpperCase());
+                String urlContent = webBrowserPlugin.renderToImage(type.toUpperCase(), pageName);
                 return new NodeVariable(urlContent != null ? Base64.decodeBase64(urlContent) : "");
             }
         } else {

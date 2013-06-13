@@ -160,31 +160,36 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
         }
     }
 
-    String loadUrl(String url, String pageContent) {
+    String loadUrl(String url, String pageName, String pageContent) {
         if (CommonUtil.isEmptyString(url)) {
             url = "";
         }
         if (CommonUtil.isEmptyString(pageContent)) {
             pageContent = "";
         }
-        return sendActionRequest("load", new KeyValuePair<String>("url", url), new KeyValuePair<String>("content", pageContent));
+        return sendActionRequest(
+                "load",
+                new KeyValuePair<String>("url", url),
+                new KeyValuePair<String>("page", pageName),
+                new KeyValuePair<String>("content", pageContent)
+        );
     }
 
-    String evaluateOnPage(String expression, boolean isUrlChange) {
-        return sendActionRequest( "eval", new KeyValuePair<String>("exp", expression), new KeyValuePair<String>("urlchange", String.valueOf(isUrlChange)) );
+    String evaluateOnPage(String expression, boolean isUrlChange, String pageName) {
+        return sendActionRequest(
+                "eval",
+                new KeyValuePair<String>("urlchange", String.valueOf(isUrlChange)),
+                new KeyValuePair<String>("page", pageName)
+        );
     }
 
-    String includeJSOnPage(String jsPath) {
-        return sendActionRequest("includejs", new KeyValuePair<String>("path", jsPath));
+    String renderToImage(String type, String pageName) {
+        return sendActionRequest("rendertoimage", new KeyValuePair<String>("type", type), new KeyValuePair<String>("page", pageName));
     }
 
-    String renderToImage(String type) {
-        return sendActionRequest("rendertoimage", new KeyValuePair<String>("type", type));
-    }
-
-    String renderToPdf(String path) {
+    String renderToPdf(String path, String pageName) {
         path = CommonUtil.getAbsoluteFilename(workingDir, path);
-        return sendActionRequest("rendertopdf", new KeyValuePair<String>("path", path));
+        return sendActionRequest("rendertopdf", new KeyValuePair<String>("page", pageName));
     }
 
 }

@@ -7,6 +7,7 @@ import org.webharvest.runtime.processors.plugins.Autoscanned;
 import org.webharvest.runtime.processors.plugins.TargetNamespace;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
+import org.webharvest.utils.CommonUtil;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
 import static org.webharvest.WHConstants.XMLNS_CORE_10;
@@ -16,16 +17,17 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-eval", validAttributes = {"urlchange"})
+@Definition(value = "web-browser-eval", validAttributes = {"urlchange", "page"})
 public class WebBrowserEvalPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         WebBrowserPlugin webBrowserPlugin = WebBrowserPlugin.findParentPlugin(this);
         if (webBrowserPlugin != null) {
             boolean isUrlChange = evaluateAttributeAsBoolean("urlchange", false, context);
+            String pageName = evaluateAttribute("page", context);
             Variable body = executeBody(context);
             String jsExpression = body.toString();
-            String urlContent = webBrowserPlugin.evaluateOnPage(jsExpression, isUrlChange);
+            String urlContent = webBrowserPlugin.evaluateOnPage(jsExpression, isUrlChange, CommonUtil.nvl(pageName, ""));
             return new NodeVariable(urlContent);
         } else {
             throw new WebBrowserlPluginException("Plugin 'web-browser-eval' must be inside 'web-browser' execution context");

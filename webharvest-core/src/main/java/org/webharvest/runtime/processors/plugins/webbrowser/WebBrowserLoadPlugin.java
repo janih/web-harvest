@@ -17,18 +17,19 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-load", validAttributes = {"url"})
+@Definition(value = "web-browser-load", validAttributes = {"url", "page"})
 public class WebBrowserLoadPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         WebBrowserPlugin webBrowserPlugin = WebBrowserPlugin.findParentPlugin(this);
         if (webBrowserPlugin != null) {
             String url = evaluateAttribute("url", context);
+            String pageName = evaluateAttribute("page", context);
             if (CommonUtil.isEmptyString(url)) {
                 throw new WebBrowserlPluginException("Url must be non-empty!");
             }
             Variable content = executeBody(context);
-            String urlContent = webBrowserPlugin.loadUrl(url, content == null ? null : content.toString());
+            String urlContent = webBrowserPlugin.loadUrl(url, CommonUtil.nvl(pageName, ""), content == null ? null : content.toString());
             return new NodeVariable(urlContent);
         } else {
             throw new WebBrowserlPluginException("Plugin 'web-browser-load' must be inside 'web-browser' execution context");
