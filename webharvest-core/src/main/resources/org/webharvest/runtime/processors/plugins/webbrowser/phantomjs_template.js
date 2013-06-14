@@ -2,7 +2,7 @@ var DFLT_VIEWPORT_SIZE = {"width":"${WIDTH}","height":"${HEIGHT}"};
 var DFLT_PAGE_SIZE = {"format":"${FORMAT}","orientation":"${ORIENTATION}","border":"${BORDER}"};
 
 var pageEvaluate = function(expression) {
-    return eval(expression);
+    return eval.apply(window, [expression]);
 }
 
 var currentResponse = null;
@@ -12,12 +12,8 @@ var initPage = function(page) {
     page.paperSize = DFLT_PAGE_SIZE;
     page.onError = function (msg, trace) {
         if (currentResponse != null) {
-            var errResponse = msg;
-            trace.forEach(function(item) {
-                errResponse += "\n" + item.file + ':' + item.line;
-            });
             currentResponse.statusCode = -101;
-            currentResponse.write(errResponse);
+            currentResponse.write(msg ? msg : "There is an error executing JavaScript!");
             currentResponse.close();
             currentResponse = null;
         }

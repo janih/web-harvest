@@ -14,6 +14,8 @@ import org.webharvest.utils.CommonUtil;
 import org.webharvest.utils.KeyValuePair;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import static org.webharvest.WHConstants.XMLNS_CORE;
@@ -63,6 +65,53 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
     private static String phantomTemplate = null;
 
     private int browserPort;
+
+    private class HttpActionWrapper {
+        private int responseCode = 200;
+        private String content = null;
+
+        private HttpActionWrapper(String urlString) throws IOException {
+            String params = null;
+            // get parameters after ?
+            final int index = urlString.indexOf("?");
+            if (index > 0) {
+                if (index < urlString.length() - 1) {
+                    params = urlString.substring(index + 1);
+                }
+                urlString = urlString.substring(0, index);
+            }
+            URL u = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Content-Length", String.valueOf(params != null ? params.length() : 0));
+            DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+            if (params != null) {
+                os.writeBytes(params);
+            }
+            os.flush();
+            os.close();
+
+            InputStream in = conn.getInputStream();
+
+            this.responseCode = conn.getResponseCode();
+
+            StringBuilder buffer = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            int ch;
+            while ((ch = reader.read()) != -1) {
+                buffer.append((char) ch);
+            }
+            reader.close();
+
+            this.content = buffer.toString();
+        }
+
+        private boolean isOkResponse() {
+            return this.responseCode == 200;
+        }
+    }
 
     @Inject
     @WorkingDir
@@ -154,7 +203,12 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
                     b.append("&").append(encode(pair.getKey())).append("=").append(encode(pair.getValue()));
                 }
             }
-            return CommonUtil.readStringFromUrl(b.toString(), true);
+            HttpActionWrapper httpActionWrapper = new HttpActionWrapper(b.toString());
+            if (httpActionWrapper.isOkResponse()) {
+                return httpActionWrapper.content;
+            } else {
+                throw new WebBrowserlPluginException(httpActionWrapper.content);
+            }
         } catch (Exception e) {
             throw new WebBrowserlPluginException(e);
         }
@@ -178,6 +232,7 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
     String evaluateOnPage(String expression, boolean isUrlChange, String pageName) {
         return sendActionRequest(
                 "eval",
+                new KeyValuePair<String>("exp", expression),
                 new KeyValuePair<String>("urlchange", String.valueOf(isUrlChange)),
                 new KeyValuePair<String>("page", pageName)
         );
