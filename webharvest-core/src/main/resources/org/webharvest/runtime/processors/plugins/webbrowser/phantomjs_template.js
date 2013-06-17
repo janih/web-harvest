@@ -1,15 +1,26 @@
-var DFLT_VIEWPORT_SIZE = {"width":"${WIDTH}","height":"${HEIGHT}"};
-var DFLT_PAGE_SIZE = {"format":"${FORMAT}","orientation":"${ORIENTATION}","border":"${BORDER}"};
-
 var pageEvaluate = function(expression) {
     return eval.apply(window, [expression]);
 }
 
 var currentResponse = null;
 
-var initPage = function(page) {
-    page.viewportSize = DFLT_VIEWPORT_SIZE;
-    page.paperSize = DFLT_PAGE_SIZE;
+var initPage = function(page, pageParams) {
+    page.viewportSize = {width: pageParams.width, height: pageParams.height};
+    page.paperSize = {format: pageParams.paperformat, orientation: pageParams.paperorientation, border: pageParams.paperborder};
+    page.settings.javascriptEnabled = pageParams.javascriptenabled == null || pageParams.javascriptenabled === "true" || pageParams.javascriptenabled === "yes";
+    page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages === "true" || pageParams.loadimages === "yes";
+    if (pageParams.useragent) {
+        page.settings.userAgent = pageParams.useragent;
+    }
+    if (pageParams.username) {
+        page.settings.username = pageParams.username;
+    }
+    if (pageParams.password) {
+        page.settings.password = pageParams.password;
+    }
+    if (pageParams.zoomfactor) {
+        page.zoomFactor = parseFloat(pageParams.zoomfactor);
+    }
     page.onError = function (msg, trace) {
         if (currentResponse != null) {
             currentResponse.statusCode = -101;
@@ -27,16 +38,16 @@ var server = require('webserver').create();
 var dfltPage = null;
 var namedPages = {};
 
-var getPage = function(pageName, createIfNotExist) {
+var getPage = function(pageName, createIfNotExist, pageParams) {
     if (!pageName) {
         if (dfltPage == null && createIfNotExist) {
-            dfltPage = initPage(new WebPage());
+            dfltPage = initPage(new WebPage(), pageParams);
         }
         return dfltPage;
     } else if (namedPages[pageName]) {
         return namedPages[pageName];
     } else if (createIfNotExist) {
-        var newPage = initPage(new WebPage());
+        var newPage = initPage(new WebPage(), pageParams);
         namedPages[pageName] = newPage;
         return newPage;
     }
@@ -49,7 +60,21 @@ var service = server.listen(${PORT}, function (request, response) {
     var params = request.post;
     var action = params["action"];
     var pageName = params["page"];
-    var page = getPage(pageName, action == "load");
+    var pageParams = {
+        width: params["width"] ? params["width"] : "1280",
+        height: params["width"] ? params["width"] : "720",
+        paperformat: params["paperformat"] ? params["paperformat"] : "A4",
+        paperorientation: params["paperorientation"] ? params["paperorientation"] : "portrait",
+        paperborder: params["paperborder"] ? params["paperborder"] : "0",
+        javascriptenabled: params["javascriptenabled"],
+        loadimages: params["loadimages"],
+        useragent: params["useragent"],
+        username: params["username"],
+        password: params["password"],
+        zoomfactor: params["zoomfactor"]
+    };
+
+    var page = getPage(pageName, action == "load", pageParams);
 
     if (page == null) {
         response.statusCode = -101;

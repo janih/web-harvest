@@ -17,7 +17,12 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-load", validAttributes = {"url", "page"})
+@Definition(value = "web-browser-load",
+            validAttributes = {
+                    "url", "page", "width", "height", "paperformat", "paperorientation", "paperborder",
+                    "javascriptenabled", "loadimages", "useragent", "username", "password", "zoomfactor"
+            }
+)
 public class WebBrowserLoadPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
@@ -29,7 +34,22 @@ public class WebBrowserLoadPlugin extends WebHarvestPlugin {
                 throw new WebBrowserlPluginException("Url must be non-empty!");
             }
             Variable content = executeBody(context);
-            String urlContent = webBrowserPlugin.loadUrl(url, CommonUtil.nvl(pageName, ""), content == null ? null : content.toString());
+            String urlContent = webBrowserPlugin.loadUrl(
+                    url,
+                    CommonUtil.nvl(pageName, ""),
+                    evaluateAttribute("width", context),
+                    evaluateAttribute("height", context),
+                    evaluateAttribute("paperformat", context),
+                    evaluateAttribute("paperorientation", context),
+                    evaluateAttribute("paperborder", context),
+                    evaluateAttribute("javascriptenabled", context),
+                    evaluateAttribute("loadimages", context),
+                    evaluateAttribute("useragent", context),
+                    evaluateAttribute("username", context),
+                    evaluateAttribute("password", context),
+                    evaluateAttribute("zoomfactor", context),
+                    content == null ? null : content.toString()
+            );
             return new NodeVariable(urlContent);
         } else {
             throw new WebBrowserlPluginException("Plugin 'web-browser-load' must be inside 'web-browser' execution context");

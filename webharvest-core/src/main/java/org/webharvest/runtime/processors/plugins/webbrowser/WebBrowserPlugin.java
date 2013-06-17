@@ -26,7 +26,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser", validAttributes = {"path", "port", "width", "height", "paperformat", "paperorientation", "paperborder"})
+@Definition(value = "web-browser", validAttributes = {"path", "port"})
 public class WebBrowserPlugin extends WebHarvestPlugin {
 
     public static final long TIME_TO_LAUNCH_WEB_SERVER = 1000L;
@@ -125,36 +125,10 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
         }
 
         browserPort = evaluateAttributeAsInteger("port", DEFAULT_PORT, context);
-        String pageW = evaluateAttribute("width", context);
-        if (CommonUtil.isEmptyString(pageW)) {
-            pageW = "1280";
-        }
-        String pageH = evaluateAttribute("height", context);
-        if (CommonUtil.isEmptyString(pageH)) {
-            pageH = "768";
-        }
-        String pageFormat = evaluateAttribute("paperformat", context);
-        if (CommonUtil.isEmptyString(pageFormat)) {
-            pageFormat = "A4";
-        }
-        String pageOrientation = evaluateAttribute("paperorientation", context);
-        if (CommonUtil.isEmptyString(pageOrientation)) {
-            pageOrientation = "portrait";
-        }
-        String pageBorder = evaluateAttribute("paperborder", context);
-        if (CommonUtil.isEmptyString(pageBorder)) {
-            pageBorder = "0";
-        }
-
         Process process = null;
         try {
             String template = getPhantomTemplateAsString();
             template = template.replaceAll("\\$\\{PORT\\}", String.valueOf(browserPort));
-            template = template.replaceAll("\\$\\{WIDTH\\}", String.valueOf(pageW));
-            template = template.replaceAll("\\$\\{HEIGHT\\}", String.valueOf(pageH));
-            template = template.replaceAll("\\$\\{FORMAT\\}", String.valueOf(pageFormat));
-            template = template.replaceAll("\\$\\{ORIENTATION\\}", String.valueOf(pageOrientation));
-            template = template.replaceAll("\\$\\{BORDER\\}", String.valueOf(pageBorder));
 
             String jsFileName = workingDir + "/phantom_input.js";
             CommonUtil.saveStringToFile(new File(jsFileName), template, "utf-8");
@@ -200,7 +174,11 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
             b.append("http://localhost:").append(browserPort).append("/?action=").append(action);
             if (params != null) {
                 for (KeyValuePair<String> pair: params) {
-                    b.append("&").append(encode(pair.getKey())).append("=").append(encode(pair.getValue()));
+                    String key = pair.getKey();
+                    String value = pair.getValue();
+                    if (!CommonUtil.isEmptyString(key) && value != null) {
+                        b.append("&").append(encode(key)).append("=").append(encode(value));
+                    }
                 }
             }
             HttpActionWrapper httpActionWrapper = new HttpActionWrapper(b.toString());
@@ -214,7 +192,8 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
         }
     }
 
-    String loadUrl(String url, String pageName, String pageContent) {
+    String loadUrl(String url, String pageName, String width, String height, String paperformat, String paperorientation, String paperborder,
+                   String javascriptenabled, String loadimages, String useragent, String username, String password, String zoomfactor, String pageContent) {
         if (CommonUtil.isEmptyString(url)) {
             url = "";
         }
@@ -225,6 +204,17 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
                 "load",
                 new KeyValuePair<String>("url", url),
                 new KeyValuePair<String>("page", pageName),
+                new KeyValuePair<String>("width", width),
+                new KeyValuePair<String>("height", height),
+                new KeyValuePair<String>("paperformat", paperformat),
+                new KeyValuePair<String>("paperorientation", paperorientation),
+                new KeyValuePair<String>("paperborder", paperborder),
+                new KeyValuePair<String>("javascriptenabled", javascriptenabled),
+                new KeyValuePair<String>("loadimages", loadimages),
+                new KeyValuePair<String>("useragent", useragent),
+                new KeyValuePair<String>("username", username),
+                new KeyValuePair<String>("password", password),
+                new KeyValuePair<String>("zoomfactor", zoomfactor),
                 new KeyValuePair<String>("content", pageContent)
         );
     }

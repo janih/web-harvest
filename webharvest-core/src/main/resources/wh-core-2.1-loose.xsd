@@ -1757,6 +1757,27 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="webBrowserLoadElementType">
+        <xs:complexContent>
+            <xs:extension base="bodyType">
+                <xs:attribute name="url" use="required" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="page" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="width" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
@@ -1792,21 +1813,42 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="webBrowserLoadElementType">
-        <xs:complexContent>
-            <xs:extension base="bodyType">
-                <xs:attribute name="url" type="xs:string">
+                <xs:attribute name="javascriptenabled" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                             Mime type of the attachment.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="page" type="xs:string">
+                <xs:attribute name="loadimages" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="useragent" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="username" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="password" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="zoomfactor" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                             Mime type of the attachment.
