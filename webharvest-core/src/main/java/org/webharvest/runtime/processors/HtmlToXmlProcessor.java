@@ -67,13 +67,13 @@ import org.webharvest.utils.CommonUtil;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "html-to-xml", validAttributes = { "id", "outputtype",
-        "advancedxmlescape", "usecdata", "specialentities", "unicodechars",
-        "nbsp-to-sp", "omitunknowntags", "treatunknowntagsascontent",
-        "omitdeprtags", "treatdeprtagsascontent", "omitxmldecl", "omitcomments",
-        "omithtmlenvelope", "useemptyelementtags", "allowmultiwordattributes",
-        "allowhtmlinsideattributes", "namespacesaware", "hyphenreplacement",
-        "prunetags", "booleanatts" }, definitionClass=HtmlToXmlDef.class)
+@Definition(value = "html-to-xml", validAttributes = { "id", "outputtype(simple;compact;browser-compact;pretty)",
+        "advancedxmlescape(true;false)", "usecdata(true;false)", "specialentities(true;false)", "unicodechars(true;false)",
+        "nbsp-to-sp(true;false)", "omitunknowntags(true;false)", "treatunknowntagsascontent(true;false)",
+        "omitdeprtags(true;false)", "treatdeprtagsascontent(true;false)", "omitxmldecl(true;false)", "omitcomments(true;false)",
+        "omithtmlenvelope(true;false)", "useemptyelementtags(true;false)", "allowmultiwordattributes(true;false)",
+        "allowhtmlinsideattributes(true;false)", "namespacesaware(true;false)", "hyphenreplacement",
+        "prunetags", "booleanatts(self;empty;true)" }, definitionClass=HtmlToXmlDef.class)
 public class HtmlToXmlProcessor extends AbstractProcessor<HtmlToXmlDef> {
 
     public Variable execute(DynamicScopeContext context) throws InterruptedException {

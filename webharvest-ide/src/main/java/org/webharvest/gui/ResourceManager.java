@@ -138,16 +138,6 @@ public class ResourceManager {
         return clazz.getResource("resources/help/" + helpId + ".html");
     }
 
-    public static Properties getAttrValuesProperties() {
-        Properties properties = new Properties();
-        try {
-            properties.load(ResourceManager.class.getResourceAsStream("resources/attrvalues.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return properties;
-    }
-
     public static Image getImage(String path) {
         return Toolkit.getDefaultToolkit().getImage(clazz.getResource(path));
     }

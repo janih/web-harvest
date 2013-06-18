@@ -60,7 +60,7 @@ import com.google.inject.Inject;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "script", validAttributes = { "id", "language", "return" },
+@Definition(value = "script", validAttributes = { "id", "language(beanshell;javascript;groovy)", "return" },
         definitionClass = ScriptDef.class)
 public class ScriptProcessor extends AbstractProcessor<ScriptDef> {
 

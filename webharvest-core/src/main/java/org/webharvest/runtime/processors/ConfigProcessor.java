@@ -21,7 +21,7 @@ import org.webharvest.runtime.variables.Variable;
 // TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "config", validAttributes = { "charset", "scriptlang" },
+@Definition(value = "config", validAttributes = { "charset(*charset)", "scriptlang(beanshell;javascript;groovy)" },
         definitionClass = ConfigDef.class)
 public final class ConfigProcessor extends AbstractProcessor<ConfigDef> {
 

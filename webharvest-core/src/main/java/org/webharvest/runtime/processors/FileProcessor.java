@@ -74,8 +74,8 @@ import com.google.inject.Inject;
 // TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "file", validAttributes = { "id", "path", "action", "type",
-        "charset", "listfilter", "listfiles", "listdirs", "listrecursive" },
+@Definition(value = "file", validAttributes = { "id", "path", "action(read;write;append;list)", "type(text;binary)",
+        "charset(*charset)", "listfilter", "listfiles(true;false)", "listdirs(true;false)", "listrecursive(true;false)" },
         requiredAttributes="path", definitionClass = FileDef.class)
 public class FileProcessor extends AbstractProcessor<FileDef> {
 

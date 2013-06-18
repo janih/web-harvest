@@ -63,7 +63,7 @@ import org.webharvest.utils.CommonUtil;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "while", validAttributes = { "id", "condition", "index", "maxloops", "empty" }, requiredAttributes = "condition", definitionClass = WhileDef.class)
+@Definition(value = "while", validAttributes = { "id", "condition", "index", "maxloops", "empty(true;false)" }, requiredAttributes = "condition", definitionClass = WhileDef.class)
 public class WhileProcessor extends AbstractProcessor<WhileDef> {
 
     public Variable execute(final DynamicScopeContext context) throws InterruptedException {

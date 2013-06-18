@@ -75,10 +75,10 @@ import com.google.inject.Inject;
 // TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "http", validAttributes = { "id", "url", "method",
-        "follow-redirects", "ignore-response-body", "retry-attempts",
-        "retry-delay", "retry-delay-factor", "content-type", "charset",
-        "username", "password", "cookie-policy" },
+@Definition(value = "http", validAttributes = { "id", "url", "method(get;post)",
+        "follow-redirects(true;false)", "ignore-response-body(true;false)", "retry-attempts",
+        "retry-delay", "retry-delay-factor", "content-type(*mime)", "charset(*charset)",
+        "username", "password", "cookie-policy(default;browser;ignore;netscape;rfc_2109)" },
         requiredAttributes="url", definitionClass = HttpDef.class)
 public class HttpProcessor extends AbstractProcessor<HttpDef> {
 

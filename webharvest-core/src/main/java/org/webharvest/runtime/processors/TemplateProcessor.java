@@ -57,7 +57,7 @@ import org.webharvest.runtime.variables.Variable;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "template", validAttributes = { "id", "language" },
+@Definition(value = "template", validAttributes = { "id", "language(beanshell;javascript;groovy)" },
         definitionClass = TemplateDef.class)
 public class TemplateProcessor extends AbstractProcessor<TemplateDef> {
 

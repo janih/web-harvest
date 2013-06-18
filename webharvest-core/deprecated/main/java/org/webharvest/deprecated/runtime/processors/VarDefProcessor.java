@@ -62,7 +62,7 @@ import org.webharvest.utils.CommonUtil;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE_10 })
-@Definition(value = "var-def", validAttributes = { "id", "name", "overwrite" },
+@Definition(value = "var-def", validAttributes = { "id", "name", "overwrite(true;false)" },
         requiredAttributes = "name", definitionClass = VarDefDef.class)
 public class VarDefProcessor extends AbstractProcessor<VarDefDef> {
 

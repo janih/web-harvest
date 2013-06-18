@@ -65,9 +65,9 @@ import org.webharvest.utils.CommonUtil;
 //TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "regexp", validAttributes = { "id", "replace", "max",
-        "flag-caseinsensitive", "flag-multiline", "flag-dotall",
-        "flag-unicodecase", "flag-canoneq" }, validSubprocessors = {
+@Definition(value = "regexp", validAttributes = { "id", "replace(true;false)", "max",
+        "flag-caseinsensitive(true;false)", "flag-multiline(true;false)", "flag-dotall(true;false)",
+        "flag-unicodecase(true;false)", "flag-canoneq(true;false)" }, validSubprocessors = {
         "regexp-pattern", "regexp-source", "regexp-result" },
         requiredSubprocessors = { "regexp-pattern", "regexp-source"},
         definitionClass = RegexpDef.class )

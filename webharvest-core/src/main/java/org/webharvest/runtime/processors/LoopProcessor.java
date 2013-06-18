@@ -74,7 +74,7 @@ import org.webharvest.utils.CommonUtil;
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 @Definition(value = "loop",
         validAttributes = { "id", "item", "index", "maxloops", "filter",
-        "empty" }, validSubprocessors = { "list", "body" },
+        "empty(true;false)" }, validSubprocessors = { "list", "body" },
         requiredSubprocessors = { "list", "body"},
         definitionClass = LoopDef.class )
 public class LoopProcessor extends AbstractProcessor<LoopDef> {

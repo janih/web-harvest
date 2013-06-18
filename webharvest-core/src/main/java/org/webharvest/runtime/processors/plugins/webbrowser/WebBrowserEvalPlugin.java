@@ -17,7 +17,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-eval", validAttributes = {"urlchange", "page"})
+@Definition(value = "web-browser-eval", validAttributes = {"urlchange(true;false)", "page"})
 public class WebBrowserEvalPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {

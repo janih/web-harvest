@@ -19,8 +19,8 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
 @Definition(value = "web-browser-load",
             validAttributes = {
-                    "url", "page", "width", "height", "paperformat", "paperorientation", "paperborder",
-                    "javascriptenabled", "loadimages", "useragent", "username", "password", "zoomfactor"
+                    "url", "page", "width", "height", "paperformat(A3;A4;A5;Legal;Letter;Tabloid)", "paperorientation(portrait;landscape)", "paperborder",
+                    "javascriptenabled(true;false)", "loadimages(true;false)", "useragent", "username", "password", "zoomfactor"
             }
 )
 public class WebBrowserLoadPlugin extends WebHarvestPlugin {

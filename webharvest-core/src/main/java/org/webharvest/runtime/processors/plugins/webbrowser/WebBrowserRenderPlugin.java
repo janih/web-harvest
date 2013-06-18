@@ -23,7 +23,7 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-render", validAttributes = {"type", "page"})
+@Definition(value = "web-browser-render", validAttributes = {"type(jpeg;gif;png;pdf)", "page"})
 public class WebBrowserRenderPlugin extends WebHarvestPlugin {
 
     private static final String TEMP_PDF_FILE_NAME = "__temp__.pdf";

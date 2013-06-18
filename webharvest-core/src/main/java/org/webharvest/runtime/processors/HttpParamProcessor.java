@@ -57,8 +57,8 @@ import org.webharvest.utils.CommonUtil;
 // TODO Add javadoc
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "http-param", validAttributes = { "id", "name", "isfile",
-        "filename", "contenttype" }, requiredAttributes = "name",
+@Definition(value = "http-param", validAttributes = { "id", "name", "isfile(true;false)",
+        "filename", "contenttype(*mime)" }, requiredAttributes = "name",
         definitionClass = HttpParamDef.class)
 public class HttpParamProcessor extends AbstractProcessor<HttpParamDef> {
 

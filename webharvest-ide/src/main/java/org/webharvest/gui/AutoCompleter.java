@@ -54,8 +54,6 @@ public class AutoCompleter {
     // popup font
     private static final Font POPUP_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
-    private static final Properties attrValuesProperties = org.webharvest.gui.ResourceManager.getAttrValuesProperties();
-
     private DefinitionResolver definitionResolver = DefinitionResolver.INSTANCE;
 
     /**
@@ -214,20 +212,17 @@ public class AutoCompleter {
      * @return Array of suggested values for specified attribute - used for auto-completion in IDE.
      */
     private static String[] getAttributeValueSuggestions(ElementInfo elementInfo, String attributeName) {
-       if (attrValuesProperties != null && attributeName != null) {
-           String key = elementInfo.getName().toLowerCase() + "." + attributeName.toLowerCase();
-           String values = attrValuesProperties.getProperty(key);
-           if ("*charset".equalsIgnoreCase(values)) {
-               Set<String> charsetKeys = Charset.availableCharsets().keySet();
-
-               return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
-           } else if ("*mime".equalsIgnoreCase(values)) {
-
-               return WHConstants.MIME_TYPES;
-           } else {
-
-               return CommonUtil.tokenize(values, ",");
-           }
+        if (attributeName != null) {
+            String[] attValues = elementInfo.getAttValues(attributeName);
+            if (attValues != null && attValues.length == 1) {    // special cases
+                if ("*charset".equalsIgnoreCase(attValues[0])) {
+                    Set<String> charsetKeys = Charset.availableCharsets().keySet();
+                    return new ArrayList<String>(charsetKeys).toArray(new String[charsetKeys.size()]);
+                } else if ("*mime".equalsIgnoreCase(attValues[0])) {
+                    return WHConstants.MIME_TYPES;
+                }
+            }
+            return attValues;
         }
 
         return null;

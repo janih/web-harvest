@@ -36,12 +36,11 @@
 */
 package org.webharvest.definition;
 
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.webharvest.WHConstants;
 import org.webharvest.runtime.processors.Processor;
+import org.webharvest.utils.CommonUtil;
 
 /**
  * @author Vladimir Nikic
@@ -60,6 +59,8 @@ public class ElementInfo {
     private Set<String> requiredTagsSet = new TreeSet<String>();
     private Set<String> attsSet = new TreeSet<String>();
     private Set<String> requiredAttsSet = new TreeSet<String>();
+
+    private Map<String, String[]> attValues = new HashMap<String, String[]>();
 
     // denotes any attribute belonging to specif namespace
     private Set<String> nsAttsSet = new TreeSet<String>();
@@ -106,6 +107,16 @@ public class ElementInfo {
                 } else if (token.startsWith("!")) {
                     token = token.substring(1);
                     this.requiredAttsSet.add(token);
+                }
+                // check if attribute name is followed by possible values in brackets: attname(value1;value2;...;valueN)
+                int openBracketIndex = token.indexOf('(');
+                if (openBracketIndex > 0) {
+                    int closedBracketIndex = token.indexOf(')', openBracketIndex + 1);
+                    if (closedBracketIndex > openBracketIndex) {
+                        String[] attValuesArray = CommonUtil.tokenize(token.substring(openBracketIndex + 1, closedBracketIndex), ";");
+                        token = token.substring(0, openBracketIndex);
+                        attValues.put(token, attValuesArray);
+                    }
                 }
                 this.attsSet.add(token);
             }
@@ -154,6 +165,10 @@ public class ElementInfo {
 
     public Set<String> getAttsSet() {
         return attsSet;
+    }
+
+    public String[] getAttValues(String attName) {
+        return attValues.get(attName);
     }
 
     public Set<String> getRequiredAttsSet() {
