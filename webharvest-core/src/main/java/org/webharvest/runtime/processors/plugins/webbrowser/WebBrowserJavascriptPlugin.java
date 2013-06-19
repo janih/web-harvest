@@ -17,28 +17,22 @@ import static org.webharvest.WHConstants.XMLNS_CORE_10;
  */
 @Autoscanned
 @TargetNamespace({ XMLNS_CORE, XMLNS_CORE_10 })
-@Definition(value = "web-browser-eval", validAttributes = {"urlchange(true;false)", "page"})
-public class WebBrowserEvalPlugin extends WebHarvestPlugin {
+@Definition(value = "web-browser-javascript", validAttributes = {"page","type(evaluate;load;open)","newpage"})
+public class WebBrowserJavascriptPlugin extends WebHarvestPlugin {
 
     public Variable executePlugin(DynamicScopeContext context) throws InterruptedException {
         WebBrowserPlugin webBrowserPlugin = WebBrowserPlugin.findParentPlugin(this);
         if (webBrowserPlugin != null) {
-            boolean isUrlChange = evaluateAttributeAsBoolean("urlchange", false, context);
+            String type = evaluateAttribute("type", context);
+            String newPageName = evaluateAttribute("newpage", context);
             String pageName = evaluateAttribute("page", context);
             Variable body = executeBody(context);
             String jsExpression = body.toString();
-            String urlContent = webBrowserPlugin.evaluateOnPage(jsExpression, isUrlChange, CommonUtil.nvl(pageName, ""));
+            String urlContent = webBrowserPlugin.evaluateOnPage(jsExpression, CommonUtil.nvl(type, "evaluate"), CommonUtil.nvl(pageName, ""), CommonUtil.nvl(newPageName, ""));
             return new NodeVariable(urlContent);
         } else {
             throw new WebBrowserlPluginException("Plugin 'web-browser-eval' must be inside 'web-browser' execution context");
         }
-    }
-
-    public String[] getAttributeValueSuggestions(String attributeName) {
-        if ("urlchange".equalsIgnoreCase(attributeName)) {
-            return new String[] {"true", "false"};
-        }
-        return null;
     }
 
 }

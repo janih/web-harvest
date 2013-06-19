@@ -5,21 +5,24 @@ var pageEvaluate = function(expression) {
 var currentResponse = null;
 
 var initPage = function(page, pageParams) {
-    page.viewportSize = {width: pageParams.width, height: pageParams.height};
-    page.paperSize = {format: pageParams.paperformat, orientation: pageParams.paperorientation, border: pageParams.paperborder};
-    page.settings.javascriptEnabled = pageParams.javascriptenabled == null || pageParams.javascriptenabled === "true" || pageParams.javascriptenabled === "yes";
-    page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages === "true" || pageParams.loadimages === "yes";
-    if (pageParams.useragent) {
-        page.settings.userAgent = pageParams.useragent;
-    }
-    if (pageParams.username) {
-        page.settings.username = pageParams.username;
-    }
-    if (pageParams.password) {
-        page.settings.password = pageParams.password;
-    }
-    if (pageParams.zoomfactor) {
-        page.zoomFactor = parseFloat(pageParams.zoomfactor);
+    if (pageParams) {
+        page.viewportSize = {width: pageParams.width, height: pageParams.height};
+        page.paperSize = {format: pageParams.paperformat, orientation: pageParams.paperorientation, border: pageParams.paperborder};
+        page.settings.javascriptEnabled = pageParams.javascriptenabled == null || pageParams.javascriptenabled === "true" || pageParams.javascriptenabled === "yes";
+        page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages === "true" || pageParams.loadimages === "yes";
+        if (pageParams.useragent) {
+            page.settings.userAgent = pageParams.useragent;
+        }
+        if (pageParams.username) {
+            page.settings.username = pageParams.username;
+        }
+        if (pageParams.password) {
+            page.settings.password = pageParams.password;
+        }
+        if (pageParams.zoomfactor) {
+            page.zoomFactor = parseFloat(pageParams.zoomfactor);
+        }
+        page.pageParams = pageParams;
     }
     page.onError = function (msg, trace) {
         if (currentResponse != null) {
@@ -109,20 +112,62 @@ var service = server.listen(${PORT}, function (request, response) {
             }
         } else if (action == "eval") {
             var jsToEvaluate = params["exp"];
-            var urlChange = params["urlchange"] == "true";
-            if (!urlChange) {
-                var evalResult = page.evaluate(pageEvaluate, jsToEvaluate);
-                response.statusCode = 200;
-                response.write(evalResult);
-                response.close();
-            } else {
-                page.onLoadFinished = function (status) {
+            var type = params["type"];
+            if (type === "load") {  // expecting that page will reload
+                page.onLoadFinished = function(status) {
                     response.statusCode = 200;
                     response.write(page.content);
                     response.close();
                     page.onLoadFinished = null;
                 }
+                var isNavigationRequested = false;
+                page.onNavigationRequested = function(url, type, willNavigate, main) {
+                    if (willNavigate && main) {
+                        isNavigationRequested = true;
+                        page.onNavigationRequested = null;
+                    }
+                }
+                window.setTimeout(function () {
+                    if (!isNavigationRequested) {
+                        page.onLoadFinished = null;
+                        page.onNavigationRequested = null;
+                        response.statusCode = -101;
+                        response.write("Error: The page wasn't loaded as specified by the type!");
+                        response.close();
+                    }
+                }, 1000);
                 page.evaluate(pageEvaluate, jsToEvaluate);
+            } else if (type === "open") {   // expecting that evaluated javascript will open new child browser window
+                var newPageName = params["newpage"];
+                var isPageCreated = false;
+                page.onPageCreated = function(newPage) {
+                    isPageCreated = true;
+                    page.onPageCreated = null;
+                    newPage = initPage(newPage, page.pageParams);
+                    if (newPageName) {
+                        namedPages[newPageName] = newPage;
+                    }
+                    newPage.onLoadFinished = function(status) {
+                        newPage.onLoadFinished = null;
+                        response.statusCode = 200;
+                        response.write(newPage.content);
+                        response.close();
+                    }
+                };
+                window.setTimeout(function () {
+                    if (!isPageCreated) {
+                        page.onPageCreated = null;
+                        response.statusCode = -101;
+                        response.write("Error: New page wasn't created as specified by the type!");
+                        response.close();
+                    }
+                }, 1000);
+                page.evaluate(pageEvaluate, jsToEvaluate);
+            } else {    // ordinary javascript evaluate
+                var evalResult = page.evaluate(pageEvaluate, jsToEvaluate);
+                response.statusCode = 200;
+                response.write(evalResult);
+                response.close();
             }
         } else if (action == "rendertoimage") {
             var type = params["type"];

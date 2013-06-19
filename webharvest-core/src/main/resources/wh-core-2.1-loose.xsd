@@ -597,7 +597,7 @@
         </xs:annotation>
     </xs:element>
 
-    <xs:element name="web-browser-eval" type="webBrowserEvalElementType">
+    <xs:element name="web-browser-javascript" type="webBrowserJavascriptElementType">
         <xs:annotation>
             <xs:documentation>
                 TODO Add documentation
@@ -690,7 +690,7 @@
                 <xs:element ref="mail-attach"/>
                 <xs:element ref="web-browser"/>
                 <xs:element ref="web-browser-load"/>
-                <xs:element ref="web-browser-eval"/>
+                <xs:element ref="web-browser-javascript"/>
                 <xs:element ref="web-browser-render"/>
                 <xs:element ref="json-to-xml"/>
                 <xs:element ref="xml-to-json"/>
@@ -1859,10 +1859,10 @@
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="webBrowserEvalElementType">
+    <xs:complexType name="webBrowserJavascriptElementType">
         <xs:complexContent>
             <xs:extension base="bodyType">
-                <xs:attribute name="urlchange" type="xs:string">
+                <xs:attribute name="type" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                             Mime type of the attachment.
@@ -1870,6 +1870,13 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute name="page" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Mime type of the attachment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="newpage" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                             Mime type of the attachment.

@@ -56,16 +56,4 @@ public class WebBrowserLoadPlugin extends WebHarvestPlugin {
         }
     }
 
-    public String[] getValidAttributes() {
-        return new String[]{};
-    }
-
-    public String[] getRequiredAttributes() {
-        return new String[] {};
-    }
-
-    public String[] getAttributeValueSuggestions(String attributeName) {
-        return null;
-    }
-
 }

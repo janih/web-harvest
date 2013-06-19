@@ -290,7 +290,7 @@ public class Ide extends JFrame implements ActionListener, ChangeListener {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(800, 600);
+        return new Dimension(1024, 768);
     }
 
     private void defineToolbarButton(String text, String command, Icon icon, Container container) {

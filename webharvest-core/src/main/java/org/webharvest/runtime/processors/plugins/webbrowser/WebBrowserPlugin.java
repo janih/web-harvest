@@ -219,12 +219,13 @@ public class WebBrowserPlugin extends WebHarvestPlugin {
         );
     }
 
-    String evaluateOnPage(String expression, boolean isUrlChange, String pageName) {
+    String evaluateOnPage(String expression, String type, String pageName, String newPageName) {
         return sendActionRequest(
                 "eval",
                 new KeyValuePair<String>("exp", expression),
-                new KeyValuePair<String>("urlchange", String.valueOf(isUrlChange)),
-                new KeyValuePair<String>("page", pageName)
+                new KeyValuePair<String>("type", type),
+                new KeyValuePair<String>("page", pageName),
+                new KeyValuePair<String>("newpage", newPageName)
         );
     }
 
